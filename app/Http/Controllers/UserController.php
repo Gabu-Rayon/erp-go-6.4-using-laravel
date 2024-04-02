@@ -68,11 +68,10 @@ class UserController extends Controller
         }
     }
 
-    public function store(Request $request)
-    {
-
-        if(\Auth::user()->can('create user'))
-        {
+    //METHOD FOR SUPER ADMIN TO CREATE A NEW ADMIN FOR THE COMPANY
+    public function store(Request $request){
+        
+        if(\Auth::user()->can('create user')) {
             $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->where('created_by', '=', \Auth::user()->creatorId())->first();
             $objUser    = \Auth::user()->creatorId();
 
@@ -80,10 +79,13 @@ class UserController extends Controller
             {
                 $validator = \Validator::make(
                     $request->all(), [
-                                       'name' => 'required|max:120',
-                                       'email' => 'required|email|unique:users',
-                                       'password' => 'required|min:6',
-                                   ]
+                                   'name' => 'required|max:120',
+                                   'email' => 'required|email|unique:users',
+                                   'password' => 'required|min:6',
+                                   'address' => 'required',
+                                   'remark' => 'required',
+                                   'contact' => 'required',
+                               ]
                 );
                 if($validator->fails())
                 {
@@ -91,22 +93,22 @@ class UserController extends Controller
 
                     return redirect()->back()->with('error', $messages->first());
                 }
-                $user               = new User();
-                $user['name']       = $request->name;
-                $user['email']      = $request->email;
-                $psw                = $request->password;
-                $user['password']   = Hash::make($request->password);
-                $user['type']       = 'company';
-                $user['default_pipeline'] = 1;
-                $user['plan'] = 1;
-                $user['lang']       = !empty($default_language) ? $default_language->value : 'en';
-                $user['created_by'] = \Auth::user()->creatorId();
-                $user['plan']       = Plan::first()->id;
-                $user['email_verified_at'] = date('Y-m-d H:i:s');
+                 $user               = new User();
+            $user['name']       = $request->name;
+            $user['email']      = $request->email;
+            $user['password']   = Hash::make($request->password);
+            $user['contact']    = $request->contact;
+            $user['type']       = 'company';
+            $user['default_pipeline'] = 1;
+            $user['plan'] = 1;
+            $user['lang']       = !empty($default_language) ? $default_language->value : 'en';
+            $user['created_by'] = \Auth::user()->creatorId();
+            $user['plan']       = Plan::first()->id;            
+            $user['email_verified_at'] = date('Y-m-d H:i:s');
 
-                $user->save();
-                $role_r = Role::findByName('company');
-                $user->assignRole($role_r);
+            $user->save();
+            $role_r = Role::findByName('company');
+            $user->assignRole($role_r);
                     //                $user->userDefaultData();
                 $user->userDefaultDataRegister($user->id);
                 $user->userWarehouseRegister($user->id);
@@ -143,6 +145,7 @@ class UserController extends Controller
                 if($validator->fails())
                 {
                     $messages = $validator->getMessageBag();
+                    
                     return redirect()->back()->with('error', $messages->first());
                 }
 

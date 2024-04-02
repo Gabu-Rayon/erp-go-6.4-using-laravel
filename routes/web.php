@@ -685,7 +685,7 @@ Route::group(['middleware' => ['verified']], function () {
     Route::any('client-reset-password/{id}', [ClientController::class, 'clientPassword'])->name('clients.reset');
     Route::post('client-reset-password/{id}', [ClientController::class, 'clientPasswordReset'])->name('client.password.update');
 
-    // Deal Module
+    // Deal Module for creating new USER FOR COMPANIES
 
     Route::post('/deals/user', [DealController::class, 'jsonUser'])->name('deal.user.json');
     Route::post('/deals/order', [DealController::class, 'order'])->name('deals.order')->middleware(['auth', 'XSS']);
@@ -1170,6 +1170,8 @@ Route::group(['middleware' => ['verified']], function () {
     Route::get('dashboard', [DashboardController::class, 'clientView'])->name('client.dashboard.view')->middleware(['auth', 'XSS']);
 
     // saas
+    
+    //Route for super Adminn to create a new admin/user of the company
     Route::resource('users', UserController::class)->middleware(['auth', 'XSS', 'revalidate']);
     Route::resource('plans', PlanController::class)->middleware(['auth', 'XSS', 'revalidate']);
     Route::get('plan-trial/{id}', [PlanController::class,'planTrial'])->name('plan.trial')->middleware(['auth', 'XSS', 'revalidate']);
