@@ -29,6 +29,7 @@ use Lab404\Impersonate\Impersonate;
 class UserController extends Controller
 {
 
+    
     public function index()
     {
         $user = \Auth::user();

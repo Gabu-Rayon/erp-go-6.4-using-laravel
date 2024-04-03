@@ -29,6 +29,8 @@ class ZoomMeetingController extends Controller
     const MEETING_URL                        = "https://api.zoom.us/v2/";
 
 
+    
+
     public function index()
     {
         if(\Auth::user()->isClient())

@@ -15,6 +15,7 @@ class WarehouseTransferController extends Controller
 {
 
     public function index()
+    
     {
         $warehouse_transfers = WarehouseTransfer::where('created_by', '=', \Auth::user()->creatorId())->with(['product','fromWarehouse'])->get();
         return view('warehouse-transfer.index',compact('warehouse_transfers'));

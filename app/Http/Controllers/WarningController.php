@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 class WarningController extends Controller
 {
     public function index()
+    
     {
         if(\Auth::user()->can('manage warning'))
         {

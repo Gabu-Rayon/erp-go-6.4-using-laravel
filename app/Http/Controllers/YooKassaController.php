@@ -20,6 +20,7 @@ use App\Models\Customer;
 
 class YooKassaController extends Controller
 {
+    
     public function planPayWithYooKassa(Request $request)
     {
         $payment_setting = Utility::getAdminPaymentSetting();
