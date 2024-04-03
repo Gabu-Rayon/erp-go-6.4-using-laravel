@@ -124,7 +124,7 @@ class CustomerController extends Controller
 
     //             // Prepare data for API call
     //             $requestData = [
-    //                 "customerNo" => $customer->customer_id, // Assuming customer_id is the customer number
+    //                 "customerNo" => $customer->customer_id,
     //                 "customerTin" => $customer->customertin,
     //                 "customerName" => $customer->name,
     //                 "address" => $customer->address,
@@ -135,9 +135,15 @@ class CustomerController extends Controller
     //                 "remark" => $customer->remark,
     //             ];
 
-    //             // Make API call to add customer
-    //             $response = Http::post('https://etims.your-apps.biz/api/AddCustomer', $requestData);
-    //             // Check if API call was successful
+    //            $headers = [
+    //         'Accept' => 'application/json',
+    //         'Content-Type' => 'application/json',
+    //         'Authorization' => '123456',
+    //     ];
+
+    //     // API call to add customer with headers
+    //     $response = Http::withHeaders($headers)->post('https://etims.your-apps.biz/api/AddCustomer', $requestData);
+    //       // Check if API call was successful
     //             if ($response->successful()) {
     //                 // Handle success
     //                 return redirect()->route('customer.index')->with('success', __('Customer successfully created.'));
@@ -169,55 +175,62 @@ class CustomerController extends Controller
     //         return redirect()->back()->with('error', __('Permission denied.'));
     //     }
     // }
-    public function store(Request $request)
-    {
-        if (\Auth::user()->can('create customer')) {
-            // Validate the incoming request data
-            $validator = \Validator::make($request->all(), [
-                'customertin' => 'required',
-                'name' => 'required',
-                'address' => 'required',
-                'telno' => 'required',
-                'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'email' => 'required|email',
-                'faxno' => 'required',
-                'remark' => 'required',
-            ]);
 
-            if ($validator->fails()) {
-                $messages = $validator->getMessageBag();
-                return redirect()->route('customer.index')->with('error', $messages->first());
-            }
+public function store(Request $request){
+    if (\Auth::user()->can('create customer')) {
+        // Validate the incoming request data
+        $validator = \Validator::make($request->all(), [
+            'customertin' => 'required',
+            'name' => 'required',
+            'address' => 'required',
+            'telno' => 'required',
+            'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
+            'email' => 'required|email',
+            'faxno' => 'required',
+            'remark' => 'required',
+        ]);
 
-            // Prepare data for API call
-            $requestData = [
-                "customerNo" => $this->customerNumber(), // Assuming you have a method to generate customer number
-                "customerTin" => $request->customertin,
-                "customerName" => $request->name,
-                "address" => $request->address,
-                "telNo" => $request->telno,
-                "email" => $request->email,
-                "faxNo" => $request->faxno,
-                "isUsed" => true,
-                "remark" => $request->remark,
-            ];
-
-            // Make API call to add customer
-            $response = Http::post('https://etims.your-apps.biz/api/AddCustomer', $requestData);
-
-            // Check if API call was successful
-            if ($response->successful()) {
-                // Handle success
-                return redirect()->route('customer.index')->with('success', __('Customer successfully created.'));
-            } else {
-                // Handle API error
-                $error = $response->json(); // Get JSON error response
-                return redirect()->route('customer.index')->with('error', __('Failed to create customer. API error: ') . $error['message']);
-            }
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
+        if ($validator->fails()) {
+            $messages = $validator->getMessageBag();
+            return redirect()->route('customer.index')->with('error', $messages->first());
         }
+
+        // Prepare data for API call
+        $requestData = [
+            "customerNo" => "123456",
+            "customerTin" => "123456789",
+            "customerName" => "John Doe",
+            "address" => "123 Main St",
+            "telNo" => "123-456-7890",
+            "email" => "johndoe@example.com",
+            "faxNo" => "123-456-7890",
+            "isUsed" => true,
+            "remark" => "Some remarks about the customer"
+        ];
+
+        // Add API key to request headers
+        $headers = [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+            'Authorization' => '123456',
+        ];
+
+        // API call to add customer with headers
+        $response = Http::withHeaders($headers)->post('https://etims.your-apps.biz/api/AddCustomer', $requestData);
+
+        // Check if API call was successful
+        if ($response->successful()) {
+            // Handle success response
+            return redirect()->route('customer.index')->with('success', __('Customer successfully created.'));
+        } else {
+            // Handle API error response
+            $error = $response->json(); //JSON error response
+            return redirect()->route('customer.index')->with('error', __('Failed to create customer. API error: ') . $error['message']);
+        }
+    } else {
+        return redirect()->back()->with('error', __('Permission denied.'));
     }
+}
 
     public function show($ids)
     {
