@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                {{Form::label('name',__('UserName'),['class'=>'form-label']) }}
+                {{Form::label('name',__('Name'),['class'=>'form-label']) }}
                 {{Form::text('name',null,array('class'=>'form-control','placeholder'=>__('Enter User Name'),'required'=>'required'))}}
                 @error('name')
                 <small class="invalid-name" role="alert">
@@ -14,32 +14,9 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                {{Form::label('email',__('Email Address'),['class'=>'form-label'])}}
+                {{Form::label('email',__('Email'),['class'=>'form-label'])}}
                 {{Form::text('email',null,array('class'=>'form-control','placeholder'=>__('Enter User Email'),'required'=>'required'))}}
                 @error('email')
-                <small class="invalid-email" role="alert">
-                    <strong class="text-danger">{{ $message }}</strong>
-                </small>
-                @enderror
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                {{Form::label('remark',__('Remark'),['class'=>'form-label']) }}
-                {{Form::text('remark',null,array('class'=>'form-control','placeholder'=>__('Enter your Remark'),'required'=>'required'))}}
-                @error('remark')
-                 
-                <small class="invalid-name" role="alert">
-                    <strong class="text-danger">{{ $message }}</strong>
-                </small>
-                @enderror
-            </div>
-        </div>
-         <div class="col-md-6">
-            <div class="form-group">
-                {{Form::label('contact',__('Contact'),['class'=>'form-label'])}}
-                {{Form::text('email',null,array('class'=>'form-control','placeholder'=>__('07 056 45890'),'required'=>'required'))}}
-                @error('contact')
                 <small class="invalid-email" role="alert">
                     <strong class="text-danger">{{ $message }}</strong>
                 </small>

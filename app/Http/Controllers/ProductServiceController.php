@@ -31,25 +31,19 @@ class ProductServiceController extends Controller
     public function index(Request $request)
     {
 
-        if(\Auth::user()->can('manage product & service'))
-        {
+        if (\Auth::user()->can('manage product & service')) {
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
 
-            if(!empty($request->category))
-            {
+            if (!empty($request->category)) {
 
-                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', $request->category)->with(['category','unit'])->get();
-            }
-            else
-            {
-                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->with(['category','unit'])->get();
+                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', $request->category)->with(['category', 'unit'])->get();
+            } else {
+                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->with(['category', 'unit'])->get();
             }
 
             return view('productservice.index', compact('productServices', 'category'));
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -57,15 +51,14 @@ class ProductServiceController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create product & service'))
-        {
+        if (\Auth::user()->can('create product & service')) {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
-            $category     = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
-            $unit         = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $tax          = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
+            $unit = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $tax = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $incomeChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type')
-                ->where('chart_of_account_types.name' ,'income')
+                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
+                ->where('chart_of_account_types.name', 'income')
                 ->where('parent', '=', 0)
                 ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
                 ->pluck('code_name', 'id');
@@ -73,110 +66,175 @@ class ProductServiceController extends Controller
 
             $incomeSubAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name,chart_of_accounts.id, chart_of_accounts.code, chart_of_account_parents.account'));
             $incomeSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
-            $incomeSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type');
-            $incomeSubAccounts->where('chart_of_account_types.name' ,'income');
+            $incomeSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
+            $incomeSubAccounts->where('chart_of_account_types.name', 'income');
             $incomeSubAccounts->where('chart_of_accounts.parent', '!=', 0);
             $incomeSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
             $incomeSubAccounts = $incomeSubAccounts->get()->toArray();
 
 
             $expenseChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-            ->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type')
-            ->whereIn('chart_of_account_types.name' ,['Expenses','Costs of Goods Sold'])
-            ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-            ->pluck('code_name', 'id');
+                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
+                ->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold'])
+                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+                ->pluck('code_name', 'id');
             $expenseChartAccounts->prepend('Select Account', '');
 
             $expenseSubAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name,chart_of_accounts.id, chart_of_accounts.code, chart_of_account_parents.account'));
             $expenseSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
-            $expenseSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type');
-            $expenseSubAccounts->whereIn('chart_of_account_types.name' ,['Expenses','Costs of Goods Sold']);
+            $expenseSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
+            $expenseSubAccounts->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold']);
             $expenseSubAccounts->where('chart_of_accounts.parent', '!=', 0);
             $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
             $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
 
-            return view('productservice.create', compact('category', 'unit', 'tax', 'customFields','incomeChartAccounts','incomeSubAccounts','expenseChartAccounts' , 'expenseSubAccounts'));
-        }
-        else
-        {
+            return view('productservice.create', compact('category', 'unit', 'tax', 'customFields', 'incomeChartAccounts', 'incomeSubAccounts', 'expenseChartAccounts', 'expenseSubAccounts'));
+        } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
     }
 
+    // public function store(Request $request){
+
+    //     if(\Auth::user()->can('create product & service'))
+    //     {
+
+    //         $rules = [
+    //             'name' => 'required',
+    //             'sku' => ['required', Rule::unique('product_services')->where(function ($query) {
+    //                return $query->where('created_by', \Auth::user()->id);
+    //              })
+    //             ],
+    //             'sale_price' => 'required|numeric',
+    //             'purchase_price' => 'required|numeric',
+    //             'category_id' => 'required',
+    //             'unit_id' => 'required',
+    //             'type' => 'required',
+    //         ];
+
+    //         $validator = \Validator::make($request->all(), $rules);
+
+    //         if($validator->fails())
+    //         {
+    //             $messages = $validator->getMessageBag();
+
+    //             return redirect()->route('productservice.index')->with('error', $messages->first());
+    //         }
+
+    //         $productService                      = new ProductService();
+    //         $productService->name                = $request->name;
+    //         $productService->description         = $request->description;
+    //         $productService->sku                 = $request->sku;
+    //         $productService->sale_price          = $request->sale_price;
+    //         $productService->purchase_price      = $request->purchase_price;
+    //         $productService->tax_id              = !empty($request->tax_id) ? implode(',', $request->tax_id) : '';
+    //         $productService->unit_id             = $request->unit_id;
+    //         if(!empty($request->quantity))
+    //         {
+    //             $productService->quantity        = $request->quantity;
+    //         }
+    //         else{
+    //             $productService->quantity   = 0;
+    //         }
+    //         $productService->type                       = $request->type;
+    //         $productService->sale_chartaccount_id       = $request->sale_chartaccount_id;
+    //         $productService->expense_chartaccount_id    = $request->expense_chartaccount_id;
+    //         $productService->category_id                = $request->category_id;
+
+    //         if(!empty($request->pro_image))
+    //         {
+    //             //storage limit
+    //             $image_size = $request->file('pro_image')->getSize();
+    //             $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
+    //             if($result==1)
+    //             {
+    //                 if($productService->pro_image)
+    //                 {
+    //                     $path = storage_path('uploads/pro_image' . $productService->pro_image);
+    //                 }
+    //                 $fileName = $request->pro_image->getClientOriginalName();
+    //                 $productService->pro_image = $fileName;
+    //                 $dir        = 'uploads/pro_image';
+    //                 $path = Utility::upload_file($request,'pro_image',$fileName,$dir,[]);
+    //             }
+    //         }
+
+    //         $productService->created_by       = \Auth::user()->creatorId();
+    //         $productService->save();
+    //         CustomField::saveData($productService, $request->customField);
+
+    //         return redirect()->route('productservice.index')->with('success', __('Product successfully created.'));
+    //     }
+    //     else
+    //     {
+    //         return redirect()->back()->with('error', __('Permission denied.'));
+    //     }
+    // }
+    /********************************************************
+     * POST DATA TO API ENDPOINT 
+     **********************************************************/
     public function store(Request $request)
     {
+        if (\Auth::user()->can('create product & service')) {
+            // Your existing validation and other logic...
 
-        if(\Auth::user()->can('create product & service'))
-        {
-
-            $rules = [
-                'name' => 'required',
-                'sku' => ['required', Rule::unique('product_services')->where(function ($query) {
-                   return $query->where('created_by', \Auth::user()->id);
-                 })
-                ],
-                'sale_price' => 'required|numeric',
-                'purchase_price' => 'required|numeric',
-                'category_id' => 'required',
-                'unit_id' => 'required',
-                'type' => 'required',
+            // Assuming $productData contains the data you want to post to the API endpoint
+            $productData = [
+                'name' => $request->name,
+                'description' => $request->description,
+                'sku' => $request->sku,
+                'sale_price' => $request->sale_price,
+                'purchase_price' => $request->purchase_price,
+                'tax_id' => !empty($request->tax_id) ? implode(',', $request->tax_id) : '',
+                'unit_id' => $request->unit_id,
+                'quantity' => !empty($request->quantity) ? $request->quantity : 0,
+                'type' => $request->type,
+                'sale_chartaccount_id' => $request->sale_chartaccount_id,
+                'expense_chartaccount_id' => $request->expense_chartaccount_id,
+                'category_id' => $request->category_id,
+                // Add other fields as needed
+                // "itemCode" => $request->item_code,
+                // "itemClassifiCode" => $request->item_classified_code,
+                // "itemTypeCode" => $request->item_type_code,
+                // "itemName" => $request->item_name,
+                // "itemStrdName" => $request->item_strd_name,
+                // "countryCode" => $request->country_code,
+                // "pkgUnitCode" => $request->pkg_unit_code,
+                // "qtyUnitCode" => $request->qty_unit_code,
+                // "taxTypeCode" => $request->tax_type_code,
+                // "batchNo" => $request->batch_no,
+                // "barcode" => $request->bar_code,
+                // "unitPrice" => $request->unit_price,
+                // "group1UnitPrice" => $request->group1_unit_price,
+                // "group2UnitPrice" => $request->group2_unit_price,
+                // "group3UnitPrice" => $request->group3_unit_price,
+                // "group4UnitPrice" => $request->group4_unit_price,
+                // "group5UnitPrice" => $request->group5_unit_price,
+                // "additionalInfo" => $request->addintional_info,
+                // "saftyQuantity" => $request->safety_quantity,
+                // "isInrcApplicable" => $request->is_increase_applicable,
+                // "isUsed" => true,
+                // "openingBalance" => $request->opening_balance,
+                // "packageQuantity" => $request->package_quantity,
             ];
 
-            $validator = \Validator::make($request->all(), $rules);
+            // Post data to the API endpoint
+            $response = Http::post('https://etims.your-apps.biz/api/SaveItems', $productData);
 
-            if($validator->fails())
-            {
-                $messages = $validator->getMessageBag();
-
-                return redirect()->route('productservice.index')->with('error', $messages->first());
+            // Check if the request was successful (status code 2xx)
+            if ($response->successful()) {
+                // API request was successful, handle response if needed
+                $apiResponse = $response->json(); // Convert response to JSON
+                // Handle API response here
+            } else {
+                // API request failed, handle error
+                $errorResponse = $response->json(); // Convert error response to JSON
+                // Handle error response here
+                return redirect()->back()->with('error', 'Failed to post data to API.');
             }
 
-            $productService                      = new ProductService();
-            $productService->name                = $request->name;
-            $productService->description         = $request->description;
-            $productService->sku                 = $request->sku;
-            $productService->sale_price          = $request->sale_price;
-            $productService->purchase_price      = $request->purchase_price;
-            $productService->tax_id              = !empty($request->tax_id) ? implode(',', $request->tax_id) : '';
-            $productService->unit_id             = $request->unit_id;
-            if(!empty($request->quantity))
-            {
-                $productService->quantity        = $request->quantity;
-            }
-            else{
-                $productService->quantity   = 0;
-            }
-            $productService->type                       = $request->type;
-            $productService->sale_chartaccount_id       = $request->sale_chartaccount_id;
-            $productService->expense_chartaccount_id    = $request->expense_chartaccount_id;
-            $productService->category_id                = $request->category_id;
-
-            if(!empty($request->pro_image))
-            {
-                //storage limit
-                $image_size = $request->file('pro_image')->getSize();
-                $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
-                if($result==1)
-                {
-                    if($productService->pro_image)
-                    {
-                        $path = storage_path('uploads/pro_image' . $productService->pro_image);
-                    }
-                    $fileName = $request->pro_image->getClientOriginalName();
-                    $productService->pro_image = $fileName;
-                    $dir        = 'uploads/pro_image';
-                    $path = Utility::upload_file($request,'pro_image',$fileName,$dir,[]);
-                }
-            }
-
-            $productService->created_by       = \Auth::user()->creatorId();
-            $productService->save();
-            CustomField::saveData($productService, $request->customField);
-
-            return redirect()->route('productservice.index')->with('success', __('Product successfully created.'));
-        }
-        else
-        {
+            // Rest of your logic...
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -190,58 +248,52 @@ class ProductServiceController extends Controller
     {
         $productService = ProductService::find($id);
 
-        if(\Auth::user()->can('edit product & service'))
-        {
-            if($productService->created_by == \Auth::user()->creatorId())
-            {
+        if (\Auth::user()->can('edit product & service')) {
+            if ($productService->created_by == \Auth::user()->creatorId()) {
                 $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
-                $unit     = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-                $tax      = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+                $unit = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+                $tax = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
                 $productService->customField = CustomField::getData($productService, 'product');
-                $customFields                = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
-                $productService->tax_id      = explode(',', $productService->tax_id);
+                $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
+                $productService->tax_id = explode(',', $productService->tax_id);
                 $incomeChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type')
-                ->where('chart_of_account_types.name' ,'income')
-                ->where('parent', '=', 0)
-                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-                ->pluck('code_name', 'id');
-            $incomeChartAccounts->prepend('Select Account', 0);
+                    ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
+                    ->where('chart_of_account_types.name', 'income')
+                    ->where('parent', '=', 0)
+                    ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+                    ->pluck('code_name', 'id');
+                $incomeChartAccounts->prepend('Select Account', 0);
 
-            $incomeSubAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name' , 'chart_of_account_parents.account');
-            $incomeSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
-            $incomeSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type');
-            $incomeSubAccounts->where('chart_of_account_types.name' ,'income');
-            $incomeSubAccounts->where('chart_of_accounts.parent', '!=', 0);
-            $incomeSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
-            $incomeSubAccounts = $incomeSubAccounts->get()->toArray();
+                $incomeSubAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name', 'chart_of_account_parents.account');
+                $incomeSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
+                $incomeSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
+                $incomeSubAccounts->where('chart_of_account_types.name', 'income');
+                $incomeSubAccounts->where('chart_of_accounts.parent', '!=', 0);
+                $incomeSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
+                $incomeSubAccounts = $incomeSubAccounts->get()->toArray();
 
 
-            $expenseChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-            ->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type')
-            ->whereIn('chart_of_account_types.name' ,['Expenses','Costs of Goods Sold'])
-            ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-            ->pluck('code_name', 'id');
-            $expenseChartAccounts->prepend('Select Account', '');
+                $expenseChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
+                    ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
+                    ->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold'])
+                    ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+                    ->pluck('code_name', 'id');
+                $expenseChartAccounts->prepend('Select Account', '');
 
-            $expenseSubAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name' , 'chart_of_account_parents.account');
-            $expenseSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
-            $expenseSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type');
-            $expenseSubAccounts->whereIn('chart_of_account_types.name' ,['Expenses','Costs of Goods Sold']);
-            $expenseSubAccounts->where('chart_of_accounts.parent', '!=', 0);
-            $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
-            $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
+                $expenseSubAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name', 'chart_of_account_parents.account');
+                $expenseSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
+                $expenseSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
+                $expenseSubAccounts->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold']);
+                $expenseSubAccounts->where('chart_of_accounts.parent', '!=', 0);
+                $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
+                $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
 
-                return view('productservice.edit', compact('category', 'unit', 'tax', 'productService', 'customFields','incomeChartAccounts','expenseChartAccounts' , 'incomeSubAccounts' , 'expenseSubAccounts'));
-            }
-            else
-            {
+                return view('productservice.edit', compact('category', 'unit', 'tax', 'productService', 'customFields', 'incomeChartAccounts', 'expenseChartAccounts', 'incomeSubAccounts', 'expenseSubAccounts'));
+            } else {
                 return response()->json(['error' => __('Permission denied.')], 401);
             }
-        }
-        else
-        {
+        } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
     }
@@ -249,14 +301,13 @@ class ProductServiceController extends Controller
     public function update(Request $request, $id)
     {
 
-        if(\Auth::user()->can('edit product & service'))
-        {
+        if (\Auth::user()->can('edit product & service')) {
             $productService = ProductService::find($id);
-            if($productService->created_by == \Auth::user()->creatorId())
-            {
+            if ($productService->created_by == \Auth::user()->creatorId()) {
                 $rules = [
                     'name' => 'required',
-                    'sku' => 'required', Rule::unique('product_services')->ignore($productService->id),
+                    'sku' => 'required',
+                    Rule::unique('product_services')->ignore($productService->id),
                     'sale_price' => 'required|numeric',
                     'purchase_price' => 'required|numeric',
                     'category_id' => 'required',
@@ -267,86 +318,73 @@ class ProductServiceController extends Controller
 
                 $validator = \Validator::make($request->all(), $rules);
 
-                if($validator->fails())
-                {
+                if ($validator->fails()) {
                     $messages = $validator->getMessageBag();
 
                     return redirect()->route('productservice.index')->with('error', $messages->first());
                 }
 
-                $productService->name           = $request->name;
-                $productService->description    = $request->description;
-                $productService->sku            = $request->sku;
-                $productService->sale_price     = $request->sale_price;
+                $productService->name = $request->name;
+                $productService->description = $request->description;
+                $productService->sku = $request->sku;
+                $productService->sale_price = $request->sale_price;
                 $productService->purchase_price = $request->purchase_price;
-                $productService->tax_id         = !empty($request->tax_id) ? implode(',', $request->tax_id) : '';
-                $productService->unit_id        = $request->unit_id;
+                $productService->tax_id = !empty($request->tax_id) ? implode(',', $request->tax_id) : '';
+                $productService->unit_id = $request->unit_id;
 
-                if(!empty($request->quantity))
-                {
-                    $productService->quantity   = $request->quantity;
+                if (!empty($request->quantity)) {
+                    $productService->quantity = $request->quantity;
+                } else {
+                    $productService->quantity = 0;
                 }
-                else{
-                    $productService->quantity   = 0;
-                }
-                $productService->type                       = $request->type;
-                $productService->sale_chartaccount_id       = $request->sale_chartaccount_id;
-                $productService->expense_chartaccount_id    = $request->expense_chartaccount_id;
-                $productService->category_id                = $request->category_id;
+                $productService->type = $request->type;
+                $productService->sale_chartaccount_id = $request->sale_chartaccount_id;
+                $productService->expense_chartaccount_id = $request->expense_chartaccount_id;
+                $productService->category_id = $request->category_id;
 
-                if(!empty($request->pro_image))
-                {
+                if (!empty($request->pro_image)) {
                     //storage limit
-                    $file_path = '/uploads/pro_image/'.$productService->pro_image;
+                    $file_path = '/uploads/pro_image/' . $productService->pro_image;
                     $image_size = $request->file('pro_image')->getSize();
                     $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
-                    if($result==1)
-                    {
-                        if($productService->pro_image)
-                        {
+                    if ($result == 1) {
+                        if ($productService->pro_image) {
                             Utility::changeStorageLimit(\Auth::user()->creatorId(), $file_path);
                             $path = storage_path('uploads/pro_image' . $productService->pro_image);
-//                            if(file_exists($path))
+                            //                            if(file_exists($path))
 //                            {
 //                                \File::delete($path);
 //                            }
                         }
                         $fileName = $request->pro_image->getClientOriginalName();
                         $productService->pro_image = $fileName;
-                        $dir        = 'uploads/pro_image';
-                        $path = Utility::upload_file($request,'pro_image',$fileName,$dir,[]);
+                        $dir = 'uploads/pro_image';
+                        $path = Utility::upload_file($request, 'pro_image', $fileName, $dir, []);
                     }
 
                 }
 
-                $productService->created_by     = \Auth::user()->creatorId();
+                $productService->created_by = \Auth::user()->creatorId();
                 $productService->save();
                 CustomField::saveData($productService, $request->customField);
 
                 return redirect()->route('productservice.index')->with('success', __('Product successfully updated.'));
-            }
-            else
-            {
+            } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
 
     public function destroy($id)
     {
-        if(\Auth::user()->can('delete product & service'))
-        {
+        if (\Auth::user()->can('delete product & service')) {
             $productService = ProductService::find($id);
-            if($productService->created_by == \Auth::user()->creatorId())
-            {
-                if(!empty($productService->pro_image))
-                {
+            if ($productService->created_by == \Auth::user()->creatorId()) {
+                if (!empty($productService->pro_image)) {
                     //storage limit
-                    $file_path = '/uploads/pro_image/'.$productService->pro_image;
+                    $file_path = '/uploads/pro_image/' . $productService->pro_image;
                     $result = Utility::changeStorageLimit(\Auth::user()->creatorId(), $file_path);
 
                 }
@@ -354,14 +392,10 @@ class ProductServiceController extends Controller
                 $productService->delete();
 
                 return redirect()->route('productservice.index')->with('success', __('Product successfully deleted.'));
-            }
-            else
-            {
+            } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -392,18 +426,17 @@ class ProductServiceController extends Controller
 
             return redirect()->back()->with('error', $messages->first());
         }
-        $products     = (new ProductServiceImport)->toArray(request()->file('file'))[0];
+        $products = (new ProductServiceImport)->toArray(request()->file('file'))[0];
         $totalProduct = count($products) - 1;
-        $errorArray   = [];
+        $errorArray = [];
         for ($i = 1; $i <= count($products) - 1; $i++) {
-            $items  = $products[$i];
+            $items = $products[$i];
 
-            $taxes     = explode(';', $items[5]);
+            $taxes = explode(';', $items[5]);
 
             $taxesData = [];
-            foreach ($taxes as $tax)
-            {
-                $taxes       = Tax::where('id', $tax)->first();
+            foreach ($taxes as $tax) {
+                $taxes = Tax::where('id', $tax)->first();
                 //                $taxesData[] = $taxes->id;
                 $taxesData[] = !empty($taxes->id) ? $taxes->id : 0;
 
@@ -419,17 +452,17 @@ class ProductServiceController extends Controller
                 $productService = new ProductService();
             }
 
-            $productService->name           = $items[0];
-            $productService->sku            = $items[1];
-            $productService->sale_price     = $items[2];
+            $productService->name = $items[0];
+            $productService->sku = $items[1];
+            $productService->sale_price = $items[2];
             $productService->purchase_price = $items[3];
-            $productService->quantity       = $items[4];
-            $productService->tax_id         = $items[5];
-            $productService->category_id    = $items[6];
-            $productService->unit_id        = $items[7];
-            $productService->type           = $items[8];
-            $productService->description    = $items[9];
-            $productService->created_by     = \Auth::user()->creatorId();
+            $productService->quantity = $items[4];
+            $productService->tax_id = $items[5];
+            $productService->category_id = $items[6];
+            $productService->unit_id = $items[7];
+            $productService->type = $items[8];
+            $productService->description = $items[9];
+            $productService->created_by = \Auth::user()->creatorId();
 
             if (empty($productService)) {
                 $errorArray[] = $productService;
@@ -442,10 +475,10 @@ class ProductServiceController extends Controller
         if (empty($errorArray)) {
 
             $data['status'] = 'success';
-            $data['msg']    = __('Record successfully imported');
+            $data['msg'] = __('Record successfully imported');
         } else {
             $data['status'] = 'error';
-            $data['msg']    = count($errorArray) . ' ' . __('Record imported fail out of' . ' ' . $totalProduct . ' ' . 'record');
+            $data['msg'] = count($errorArray) . ' ' . __('Record imported fail out of' . ' ' . $totalProduct . ' ' . 'record');
 
 
             foreach ($errorArray as $errorData) {
@@ -473,66 +506,59 @@ class ProductServiceController extends Controller
         if (Auth::user()->can('manage pos') && $request->ajax() && isset($lastsegment) && !empty($lastsegment)) {
 
             $output = "";
-            if($request->war_id == '0'){
-                $ids = WarehouseProduct::where('warehouse_id',1)->get()->pluck('product_id')->toArray();
+            if ($request->war_id == '0') {
+                $ids = WarehouseProduct::where('warehouse_id', 1)->get()->pluck('product_id')->toArray();
 
                 if ($request->cat_id !== '' && $request->search == '') {
-                    if($request->cat_id == '0'){
-                        $products = ProductService::getallproducts()->whereIn('product_services.id',$ids)->get();
+                    if ($request->cat_id == '0') {
+                        $products = ProductService::getallproducts()->whereIn('product_services.id', $ids)->get();
 
-                    }else{
-                        $products = ProductService::getallproducts()->where('category_id', $request->cat_id)->whereIn('product_services.id',$ids)->get();
+                    } else {
+                        $products = ProductService::getallproducts()->where('category_id', $request->cat_id)->whereIn('product_services.id', $ids)->get();
                     }
                 } else {
-                    if($request->cat_id == '0'){
+                    if ($request->cat_id == '0') {
                         $products = ProductService::getallproducts()->where('product_services.name', 'LIKE', "%{$request->search}%")->get();
-                    }else{
+                    } else {
                         $products = ProductService::getallproducts()->where('product_services.name', 'LIKE', "%{$request->search}%")->orWhere('category_id', $request->cat_id)->get();
                     }
                 }
-            }else{
-                $ids = WarehouseProduct::where('warehouse_id',$request->war_id)->get()->pluck('product_id')->toArray();
-                
-                if($request->cat_id == '0'){
-                    $products = ProductService::getallproducts()->whereIn('product_services.id',$ids)->with(['unit'])->get();
-                    
-                }else{
-                    $products = ProductService::getallproducts()->whereIn('product_services.id',$ids)->where('category_id', $request->cat_id)->with(['unit'])->get();
-                    
+            } else {
+                $ids = WarehouseProduct::where('warehouse_id', $request->war_id)->get()->pluck('product_id')->toArray();
+
+                if ($request->cat_id == '0') {
+                    $products = ProductService::getallproducts()->whereIn('product_services.id', $ids)->with(['unit'])->get();
+
+                } else {
+                    $products = ProductService::getallproducts()->whereIn('product_services.id', $ids)->where('category_id', $request->cat_id)->with(['unit'])->get();
+
                 }
             }
 
-            if (count($products)>0)
-            {
-                foreach ($products as $key => $product)
-                {
-                    $quantity= $product->warehouseProduct($product->id,$request->war_id!=0?$request->war_id:1);
+            if (count($products) > 0) {
+                foreach ($products as $key => $product) {
+                    $quantity = $product->warehouseProduct($product->id, $request->war_id != 0 ? $request->war_id : 1);
 
-                    $unit=(!empty($product) && !empty($product->unit))?$product->unit->name:'';
+                    $unit = (!empty($product) && !empty($product->unit)) ? $product->unit->name : '';
 
-                    if(!empty($product->pro_image)){
-                        $image_url =('uploads/pro_image').'/'.$product->pro_image;
-                    }else{
-                        $image_url =('uploads/pro_image').'/default.png';
+                    if (!empty($product->pro_image)) {
+                        $image_url = ('uploads/pro_image') . '/' . $product->pro_image;
+                    } else {
+                        $image_url = ('uploads/pro_image') . '/default.png';
                     }
-                    if ($request->session_key == 'purchases')
-                    {
+                    if ($request->session_key == 'purchases') {
                         $productprice = $product->purchase_price != 0 ? $product->purchase_price : 0;
-                    }
-                    else if ($request->session_key == 'pos')
-                    {
+                    } else if ($request->session_key == 'pos') {
                         $productprice = $product->sale_price != 0 ? $product->sale_price : 0;
 
-                    }
-                    else
-                    {
+                    } else {
                         $productprice = $product->sale_price != 0 ? $product->sale_price : $product->purchase_price;
                     }
 
                     $output .= '
 
                             <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 col-12">
-                                <div class="tab-pane fade show active toacart w-100" data-url="' . url('add-to-cart/' . $product->id . '/' . $lastsegment) .'">
+                                <div class="tab-pane fade show active toacart w-100" data-url="' . url('add-to-cart/' . $product->id . '/' . $lastsegment) . '">
                                     <div class="position-relative card">
                                         <img alt="Image placeholder" src="' . asset(Storage::url($image_url)) . '" class="card-image avatar shadow hover-shadow-lg" style=" height: 6rem; width: 100%;">
                                         <div class="p-0 custom-card-body card-body d-flex ">
@@ -540,7 +566,7 @@ class ProductServiceController extends Controller
                                                 <h6 class="mb-2 text-dark product-title-name">' . $product->name . '</h6>
                                                 <small class="badge badge-primary mb-0">' . Auth::user()->priceFormat($productprice) . '</small>
 
-                                                <small class="top-badge badge badge-danger mb-0">'. $quantity.' '.$unit .'</small>
+                                                <small class="top-badge badge badge-danger mb-0">' . $quantity . ' ' . $unit . '</small>
                                             </div>
                                         </div>
                                     </div>
@@ -551,18 +577,18 @@ class ProductServiceController extends Controller
 
                 }
 
-                    return Response($output);
+                return Response($output);
 
             } else {
-                $output='<div class="card card-body col-12 text-center">
-                    <h5>'.__("No Product Available").'</h5>
+                $output = '<div class="card card-body col-12 text-center">
+                    <h5>' . __("No Product Available") . '</h5>
                     </div>';
                 return Response($output);
             }
         }
     }
 
-    public function addToCart(Request $request, $id,$session_key)
+    public function addToCart(Request $request, $id, $session_key)
     {
 
         if (Auth::user()->can('manage product & service') && $request->ajax()) {
@@ -597,30 +623,30 @@ class ProductServiceController extends Controller
                 $productprice = $product->sale_price != 0 ? $product->sale_price : $product->purchase_price;
             }
 
-            $originalquantity = (int)$productquantity;
+            $originalquantity = (int) $productquantity;
 
-            $taxes=Utility::tax($product->tax_id);
+            $taxes = Utility::tax($product->tax_id);
 
-            $totalTaxRate=Utility::totalTaxRate($product->tax_id);
+            $totalTaxRate = Utility::totalTaxRate($product->tax_id);
 
-            $product_tax='';
-            $product_tax_id=[];
-            foreach($taxes as $tax){
-                $product_tax.= !empty($tax)?"<span class='badge badge-primary'>". $tax->name.' ('.$tax->rate.'%)'."</span><br>":'';
-                $product_tax_id[]=!empty($tax) ?$tax->id :0;
+            $product_tax = '';
+            $product_tax_id = [];
+            foreach ($taxes as $tax) {
+                $product_tax .= !empty($tax) ? "<span class='badge badge-primary'>" . $tax->name . ' (' . $tax->rate . '%)' . "</span><br>" : '';
+                $product_tax_id[] = !empty($tax) ? $tax->id : 0;
             }
 
-            if(empty($product_tax)){
-                $product_tax="-";
+            if (empty($product_tax)) {
+                $product_tax = "-";
             }
             $producttax = $totalTaxRate;
 
 
             $tax = ($productprice * $producttax) / 100;
 
-            $subtotal        = $productprice + $tax;
-            $cart            = session()->get($session_key);
-            $image_url = (!empty($product->pro_image) && Storage::exists($product->pro_image)) ? $product->pro_image : 'uploads/pro_image/'. $product->pro_image;
+            $subtotal = $productprice + $tax;
+            $cart = session()->get($session_key);
+            $image_url = (!empty($product->pro_image) && Storage::exists($product->pro_image)) ? $product->pro_image : 'uploads/pro_image/' . $product->pro_image;
 
             $model_delete_id = 'delete-form-' . $id;
 
@@ -673,8 +699,8 @@ class ProductServiceController extends Controller
                         "tax" => $producttax,
                         "subtotal" => $subtotal,
                         "originalquantity" => $originalquantity,
-                        "product_tax"=>$product_tax,
-                        "product_tax_id"=>!empty($product_tax_id)?implode(',',$product_tax_id):0,
+                        "product_tax" => $product_tax,
+                        "product_tax_id" => !empty($product_tax_id) ? implode(',', $product_tax_id) : 0,
                     ],
                 ];
 
@@ -710,9 +736,9 @@ class ProductServiceController extends Controller
                 $cart[$id]['id'] = $id;
 
                 $subtotal = $cart[$id]["price"] * $cart[$id]["quantity"];
-                $tax      = ($subtotal * $cart[$id]["tax"]) / 100;
+                $tax = ($subtotal * $cart[$id]["tax"]) / 100;
 
-                $cart[$id]["subtotal"]         = $subtotal + $tax;
+                $cart[$id]["subtotal"] = $subtotal + $tax;
                 $cart[$id]["originalquantity"] = $originalquantity;
 
                 if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
@@ -748,7 +774,7 @@ class ProductServiceController extends Controller
                 "subtotal" => $subtotal,
                 "id" => $id,
                 "originalquantity" => $originalquantity,
-                "product_tax"=>$product_tax,
+                "product_tax" => $product_tax,
             ];
 
             if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
@@ -789,9 +815,9 @@ class ProductServiceController extends Controller
     public function updateCart(Request $request)
     {
 
-        $id          = $request->id;
-        $quantity    = $request->quantity;
-        $discount    = $request->discount;
+        $id = $request->id;
+        $quantity = $request->quantity;
+        $discount = $request->discount;
         $session_key = $request->session_key;
 
         if (Auth::user()->can('manage product & service') && $request->ajax() && isset($id) && !empty($id) && isset($session_key) && !empty($session_key)) {
@@ -806,16 +832,16 @@ class ProductServiceController extends Controller
 
                 $cart[$id]["quantity"] = $quantity;
 
-                $producttax            = isset($cart[$id]) ? $cart[$id]["tax"]:0;
-                $productprice          = $cart[$id]["price"];
+                $producttax = isset($cart[$id]) ? $cart[$id]["tax"] : 0;
+                $productprice = $cart[$id]["price"];
 
                 $subtotal = $productprice * $quantity;
-                $tax      = ($subtotal * $producttax) / 100;
+                $tax = ($subtotal * $producttax) / 100;
 
                 $cart[$id]["subtotal"] = $subtotal + $tax;
 
             }
-            
+
             if (isset($cart[$id]) && ($cart[$id]["originalquantity"]) < $cart[$id]['quantity'] && $session_key == 'pos') {
                 return response()->json(
                     [
@@ -860,18 +886,14 @@ class ProductServiceController extends Controller
     {
         $session_key = $request->session_key;
 
-        if (Auth::user()->can('manage product & service') && isset($session_key) && !empty($session_key))
-        {
+        if (Auth::user()->can('manage product & service') && isset($session_key) && !empty($session_key)) {
             $cart = session()->get($session_key);
-            if (isset($cart) && count($cart) > 0)
-            {
+            if (isset($cart) && count($cart) > 0) {
                 session()->forget($session_key);
             }
 
             return redirect()->back()->with('error', __('Cart is empty!'));
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', __('Cart cannot be empty!.'));
 
         }
@@ -881,11 +903,10 @@ class ProductServiceController extends Controller
     {
         $session_key = $request->session_key;
 
-            $cart = session()->get($session_key);
-            if (isset($cart) && count($cart) > 0)
-            {
-                session()->forget($session_key);
-            }
+        $cart = session()->get($session_key);
+        if (isset($cart) && count($cart) > 0) {
+            session()->forget($session_key);
+        }
 
         return response()->json();
 
@@ -893,7 +914,7 @@ class ProductServiceController extends Controller
 
     public function removeFromCart(Request $request)
     {
-        $id          = $request->id;
+        $id = $request->id;
         $session_key = $request->session_key;
         if (Auth::user()->can('manage product & service') && isset($id) && !empty($id) && isset($session_key) && !empty($session_key)) {
             $cart = session()->get($session_key);

@@ -5,24 +5,52 @@
     <div class="row">
         <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
-                {{Form::label('name',__('Name'),array('class'=>'form-label')) }}
+                {{Form::label('customer_tin',__('Customer Tin'),array('class'=>'form-label')) }}
+                {{Form::text('customertin',null,array('class'=>'form-control','required'=>'required'))}}
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-6">
+            <div class="form-group">
+                {{Form::label('name',__('Name'),['class'=>'form-label'])}}
                 {{Form::text('name',null,array('class'=>'form-control','required'=>'required'))}}
             </div>
         </div>
+         <div class="col-lg-4 col-md-4 col-sm-6">
+            <div class="form-group">
+                {{Form::label('address',__('Address'),array('class'=>'form-label')) }}
+                {{Form::text('address',null,array('class'=>'form-control','required'=>'required'))}}
+            </div>
+        </div>
         <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
-                {{Form::label('contact',__('Contact'),['class'=>'form-label'])}}
+                {{Form::label('telno',__('Tel No'),['class'=>'form-label'])}}
+                {{Form::number('telno',null,array('class'=>'form-control','required'=>'required'))}}
+            </div>
+        </div>
+         <div class="col-lg-4 col-md-4 col-sm-6">
+            <div class="form-group">
+                {{Form::label('email',__('Email'),array('class'=>'form-label')) }}
+                {{Form::text('email',null,array('class'=>'form-control','required'=>'required'))}}
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-6">
+            <div class="form-group">
+                {{Form::label('fax_no',__('Fax No'),['class'=>'form-label'])}}
+                {{Form::number('faxno',null,array('class'=>'form-control','required'=>'required'))}}
+            </div>
+        </div>
+         <div class="col-lg-4 col-md-4 col-sm-6">
+            <div class="form-group">
+                {{Form::label('remark',__('Remark'),array('class'=>'form-label')) }}
+                {{Form::text('remark',null,array('class'=>'form-control','required'=>'required'))}}
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-6">
+            <div class="form-group">
+                {{Form::label('contact',__('Contact'),array('class'=>'form-label')) }}
                 {{Form::number('contact',null,array('class'=>'form-control','required'=>'required'))}}
             </div>
         </div>
-        <div class="col-lg-4 col-md-4 col-sm-6">
-            <div class="form-group">
-                {{Form::label('email',__('Email'),['class'=>'form-label'])}}
-                {{Form::text('email',null,array('class'=>'form-control'))}}
-
-            </div>
-        </div>
-
         <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
                 {{Form::label('tax_number',__('Tax Number'),['class'=>'form-label'])}}
