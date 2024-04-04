@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\Plan;
 use File;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -55,7 +56,8 @@ class CustomerController extends Controller
     }
 
 
-    // public function store(Request $request) {
+    // public function store(Request $request)
+    // {
     //     if (\Auth::user()->can('create customer')) {
 
     //         $rules = [
@@ -95,11 +97,11 @@ class CustomerController extends Controller
     //             $customer->name = $request->name;
     //             $customer->address = $request->address;
     //             $customer->telno = $request->telno;
-    //             $customer->contact = $request->contact;
     //             $customer->email = $request->email;
     //             $customer->faxno = $request->faxno;
     //             $customer->remark = $request->remark;
     //             $customer->tax_number = $request->tax_number;
+    //             $customer->contact = $request->contact;
     //             $customer->created_by = \Auth::user()->creatorId();
     //             $customer->billing_name = $request->billing_name;
     //             $customer->billing_country = $request->billing_country;
@@ -121,37 +123,6 @@ class CustomerController extends Controller
 
     //             $customer->save();
     //             CustomField::saveData($customer, $request->customField);
-
-    //             // Prepare data for API call
-    //             $requestData = [
-    //                 "customerNo" => $customer->customer_id,
-    //                 "customerTin" => $customer->customertin,
-    //                 "customerName" => $customer->name,
-    //                 "address" => $customer->address,
-    //                 "telNo" => $customer->telno,
-    //                 "email" => $customer->email,
-    //                 "faxNo" => $customer->faxno,
-    //                 "isUsed" => true,
-    //                 "remark" => $customer->remark,
-    //             ];
-
-    //            $headers = [
-    //         'Accept' => 'application/json',
-    //         'Content-Type' => 'application/json',
-    //         'Authorization' => '123456',
-    //     ];
-
-    //     // API call to add customer with headers
-    //     $response = Http::withHeaders($headers)->post('https://etims.your-apps.biz/api/AddCustomer', $requestData);
-    //       // Check if API call was successful
-    //             if ($response->successful()) {
-    //                 // Handle success
-    //                 return redirect()->route('customer.index')->with('success', __('Customer successfully created.'));
-    //             } else {
-    //                 // Handle API error
-    //                 $error = $response->json(); // Get JSON error response
-    //                 return redirect()->route('customer.index')->with('error', __('Failed to create customer. API error: ') . $error['message']);
-    //             }
     //         } else {
     //             return redirect()->back()->with('error', __('Your user limit is over, Please upgrade plan.'));
     //         }
@@ -176,61 +147,77 @@ class CustomerController extends Controller
     //     }
     // }
 
-public function store(Request $request){
-    if (\Auth::user()->can('create customer')) {
-        // Validate the incoming request data
-        $validator = \Validator::make($request->all(), [
-            'customertin' => 'required',
-            'name' => 'required',
-            'address' => 'required',
-            'telno' => 'required',
-            'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-            'email' => 'required|email',
-            'faxno' => 'required',
-            'remark' => 'required',
-        ]);
+    public function store(Request $request)
+    {
+        if (\Auth::user()->can('create customer')) {
 
-        if ($validator->fails()) {
-            $messages = $validator->getMessageBag();
-            return redirect()->route('customer.index')->with('error', $messages->first());
-        }
+            $rules = [
+                'customertin' => 'required|between:9,15',
+                'name' => 'required',
+                'address' => 'required',
+                'telno' => 'required',
+                'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
+                'email' => [
+                    'required',
+                    Rule::unique('customers')->where(function ($query) {
+                        return $query->where('created_by', \Auth::user()->id);
+                    }),
+                    'faxno' => 'required',
+                    'remark' => 'required',
+                ],
+            ];
+            
+            $validator = \Validator::make($request->all(), $rules);
 
-        // Prepare data for API call
-        $requestData = [
-            "customerNo" => "123456",
-            "customerTin" => "123456789",
-            "customerName" => "John Doe",
-            "address" => "123 Main St",
-            "telNo" => "123-456-7890",
-            "email" => "johndoe@example.com",
-            "faxNo" => "123-456-7890",
-            "isUsed" => true,
-            "remark" => "Some remarks about the customer"
-        ];
+            if ($validator->fails()) {
+                $messages = $validator->getMessageBag();
+                return redirect()->route('customer.index')->with('error', $messages->first());
+            }
 
-        // Add API key to request headers
-        $headers = [
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-            'Authorization' => '123456',
-        ];
+            //array containing the data to be sent to the API
+            $requestData = [
+                'customerNo' => $this->customerNumber(),
+                'customerTin' => $request->customertin,
+                'customerName' => $request->name,
+                'address' => $request->address,
+                'telNo' => $request->telno,
+                'email' => $request->email,
+                'faxNo' => $request->faxno,
+                'isUsed' => true,
+                'remark' => $request->remark,
+            ];
 
-        // API call to add customer with headers
-        $response = Http::withHeaders($headers)->post('https://etims.your-apps.biz/api/AddCustomer', $requestData);
+            // Make API call
+            // $response = Http::withHeaders([
+            //     'accept' => 'application/json',
+            //     'Content-Type' => 'application/json',
+            // ])->withToken('123456')->post('https://etims.your-apps.biz/api/AddCustomer', $requestData);
+            
+            $response = Http::withHeaders([
+                'key' => '123456', // Set the key in the header
+            ])->post('https://etims.your-apps.biz/api/AddCustomer', $requestData);
 
-        // Check if API call was successful
-        if ($response->successful()) {
-            // Handle success response
-            return redirect()->route('customer.index')->with('success', __('Customer successfully created.'));
+
+            // Log the response body
+            \Log::info('API Response: ' . $response->body());
+
+            // Log the response status code
+            \Log::info('API Response Status Code: ' . $response->status());
+
+
+            // Check if API call was successful
+            if ($response->successful()) {
+                return redirect()->route('customer.index')->with('success', __('Customer successfully created.'));
+            } else {
+                // If API call failed, return with error message
+                return redirect()->back()->with('error', __('Failed to create customer.'));
+            }
+
         } else {
-            // Handle API error response
-            $error = $response->json(); //JSON error response
-            return redirect()->route('customer.index')->with('error', __('Failed to create customer. API error: ') . $error['message']);
+            return redirect()->back()->with('error', __('Permission denied.'));
         }
-    } else {
-        return redirect()->back()->with('error', __('Permission denied.'));
     }
-}
+
 
     public function show($ids)
     {
