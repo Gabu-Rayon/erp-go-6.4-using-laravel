@@ -194,7 +194,7 @@ class CustomerController extends Controller
             // ])->withToken('123456')->post('https://etims.your-apps.biz/api/AddCustomer', $requestData);
             
             $response = Http::withHeaders([
-                'key' => '123456', // Set the key in the header
+                'key' => '123456', 
             ])->post('https://etims.your-apps.biz/api/AddCustomer', $requestData);
 
 

@@ -94,150 +94,150 @@ class ProductServiceController extends Controller
         }
     }
 
-    // public function store(Request $request){
+    public function store(Request $request){
 
-    //     if(\Auth::user()->can('create product & service'))
-    //     {
+        if(\Auth::user()->can('create product & service'))
+        {
 
-    //         $rules = [
-    //             'name' => 'required',
-    //             'sku' => ['required', Rule::unique('product_services')->where(function ($query) {
-    //                return $query->where('created_by', \Auth::user()->id);
-    //              })
-    //             ],
-    //             'sale_price' => 'required|numeric',
-    //             'purchase_price' => 'required|numeric',
-    //             'category_id' => 'required',
-    //             'unit_id' => 'required',
-    //             'type' => 'required',
-    //         ];
-
-    //         $validator = \Validator::make($request->all(), $rules);
-
-    //         if($validator->fails())
-    //         {
-    //             $messages = $validator->getMessageBag();
-
-    //             return redirect()->route('productservice.index')->with('error', $messages->first());
-    //         }
-
-    //         $productService                      = new ProductService();
-    //         $productService->name                = $request->name;
-    //         $productService->description         = $request->description;
-    //         $productService->sku                 = $request->sku;
-    //         $productService->sale_price          = $request->sale_price;
-    //         $productService->purchase_price      = $request->purchase_price;
-    //         $productService->tax_id              = !empty($request->tax_id) ? implode(',', $request->tax_id) : '';
-    //         $productService->unit_id             = $request->unit_id;
-    //         if(!empty($request->quantity))
-    //         {
-    //             $productService->quantity        = $request->quantity;
-    //         }
-    //         else{
-    //             $productService->quantity   = 0;
-    //         }
-    //         $productService->type                       = $request->type;
-    //         $productService->sale_chartaccount_id       = $request->sale_chartaccount_id;
-    //         $productService->expense_chartaccount_id    = $request->expense_chartaccount_id;
-    //         $productService->category_id                = $request->category_id;
-
-    //         if(!empty($request->pro_image))
-    //         {
-    //             //storage limit
-    //             $image_size = $request->file('pro_image')->getSize();
-    //             $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
-    //             if($result==1)
-    //             {
-    //                 if($productService->pro_image)
-    //                 {
-    //                     $path = storage_path('uploads/pro_image' . $productService->pro_image);
-    //                 }
-    //                 $fileName = $request->pro_image->getClientOriginalName();
-    //                 $productService->pro_image = $fileName;
-    //                 $dir        = 'uploads/pro_image';
-    //                 $path = Utility::upload_file($request,'pro_image',$fileName,$dir,[]);
-    //             }
-    //         }
-
-    //         $productService->created_by       = \Auth::user()->creatorId();
-    //         $productService->save();
-    //         CustomField::saveData($productService, $request->customField);
-
-    //         return redirect()->route('productservice.index')->with('success', __('Product successfully created.'));
-    //     }
-    //     else
-    //     {
-    //         return redirect()->back()->with('error', __('Permission denied.'));
-    //     }
-    // }
-    /********************************************************
-     * POST DATA TO API ENDPOINT 
-     **********************************************************/
-    public function store(Request $request)
-    {
-        if (\Auth::user()->can('create product & service')) {
-            // Your existing validation and other logic...
-
-            // Assuming $productData contains the data you want to post to the API endpoint
-            $productData = [
-                'name' => $request->name,
-                'description' => $request->description,
-                'sku' => $request->sku,
-                'sale_price' => $request->sale_price,
-                'purchase_price' => $request->purchase_price,
-                'tax_id' => !empty($request->tax_id) ? implode(',', $request->tax_id) : '',
-                'unit_id' => $request->unit_id,
-                'quantity' => !empty($request->quantity) ? $request->quantity : 0,
-                'type' => $request->type,
-                'sale_chartaccount_id' => $request->sale_chartaccount_id,
-                'expense_chartaccount_id' => $request->expense_chartaccount_id,
-                'category_id' => $request->category_id,
-                // Add other fields as needed
-                // "itemCode" => $request->item_code,
-                // "itemClassifiCode" => $request->item_classified_code,
-                // "itemTypeCode" => $request->item_type_code,
-                // "itemName" => $request->item_name,
-                // "itemStrdName" => $request->item_strd_name,
-                // "countryCode" => $request->country_code,
-                // "pkgUnitCode" => $request->pkg_unit_code,
-                // "qtyUnitCode" => $request->qty_unit_code,
-                // "taxTypeCode" => $request->tax_type_code,
-                // "batchNo" => $request->batch_no,
-                // "barcode" => $request->bar_code,
-                // "unitPrice" => $request->unit_price,
-                // "group1UnitPrice" => $request->group1_unit_price,
-                // "group2UnitPrice" => $request->group2_unit_price,
-                // "group3UnitPrice" => $request->group3_unit_price,
-                // "group4UnitPrice" => $request->group4_unit_price,
-                // "group5UnitPrice" => $request->group5_unit_price,
-                // "additionalInfo" => $request->addintional_info,
-                // "saftyQuantity" => $request->safety_quantity,
-                // "isInrcApplicable" => $request->is_increase_applicable,
-                // "isUsed" => true,
-                // "openingBalance" => $request->opening_balance,
-                // "packageQuantity" => $request->package_quantity,
+            $rules = [
+                'name' => 'required',
+                'sku' => ['required', Rule::unique('product_services')->where(function ($query) {
+                   return $query->where('created_by', \Auth::user()->id);
+                 })
+                ],
+                'sale_price' => 'required|numeric',
+                'purchase_price' => 'required|numeric',
+                'category_id' => 'required',
+                'unit_id' => 'required',
+                'type' => 'required',
             ];
 
-            // Post data to the API endpoint
-            $response = Http::post('https://etims.your-apps.biz/api/SaveItems', $productData);
+            $validator = \Validator::make($request->all(), $rules);
 
-            // Check if the request was successful (status code 2xx)
-            if ($response->successful()) {
-                // API request was successful, handle response if needed
-                $apiResponse = $response->json(); // Convert response to JSON
-                // Handle API response here
-            } else {
-                // API request failed, handle error
-                $errorResponse = $response->json(); // Convert error response to JSON
-                // Handle error response here
-                return redirect()->back()->with('error', 'Failed to post data to API.');
+            if($validator->fails())
+            {
+                $messages = $validator->getMessageBag();
+
+                return redirect()->route('productservice.index')->with('error', $messages->first());
             }
 
-            // Rest of your logic...
-        } else {
+            $productService                      = new ProductService();
+            $productService->name                = $request->name;
+            $productService->description         = $request->description;
+            $productService->sku                 = $request->sku;
+            $productService->sale_price          = $request->sale_price;
+            $productService->purchase_price      = $request->purchase_price;
+            $productService->tax_id              = !empty($request->tax_id) ? implode(',', $request->tax_id) : '';
+            $productService->unit_id             = $request->unit_id;
+            if(!empty($request->quantity))
+            {
+                $productService->quantity        = $request->quantity;
+            }
+            else{
+                $productService->quantity   = 0;
+            }
+            $productService->type                       = $request->type;
+            $productService->sale_chartaccount_id       = $request->sale_chartaccount_id;
+            $productService->expense_chartaccount_id    = $request->expense_chartaccount_id;
+            $productService->category_id                = $request->category_id;
+
+            if(!empty($request->pro_image))
+            {
+                //storage limit
+                $image_size = $request->file('pro_image')->getSize();
+                $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
+                if($result==1)
+                {
+                    if($productService->pro_image)
+                    {
+                        $path = storage_path('uploads/pro_image' . $productService->pro_image);
+                    }
+                    $fileName = $request->pro_image->getClientOriginalName();
+                    $productService->pro_image = $fileName;
+                    $dir        = 'uploads/pro_image';
+                    $path = Utility::upload_file($request,'pro_image',$fileName,$dir,[]);
+                }
+            }
+
+            $productService->created_by       = \Auth::user()->creatorId();
+            $productService->save();
+            CustomField::saveData($productService, $request->customField);
+
+            return redirect()->route('productservice.index')->with('success', __('Product successfully created.'));
+        }
+        else
+        {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
+    /********************************************************
+     * POST DATA TO API ENDPOINT 
+     **********************************************************/
+    // public function store(Request $request)
+    // {
+    //     if (\Auth::user()->can('create product & service')) {
+    //         // Your existing validation and other logic...
+
+    //         // Assuming $productData contains the data you want to post to the API endpoint
+    //         $productData = [
+    //             'name' => $request->name,
+    //             'description' => $request->description,
+    //             'sku' => $request->sku,
+    //             'sale_price' => $request->sale_price,
+    //             'purchase_price' => $request->purchase_price,
+    //             'tax_id' => !empty($request->tax_id) ? implode(',', $request->tax_id) : '',
+    //             'unit_id' => $request->unit_id,
+    //             'quantity' => !empty($request->quantity) ? $request->quantity : 0,
+    //             'type' => $request->type,
+    //             'sale_chartaccount_id' => $request->sale_chartaccount_id,
+    //             'expense_chartaccount_id' => $request->expense_chartaccount_id,
+    //             'category_id' => $request->category_id,
+    //             // Add other fields as needed
+    //             // "itemCode" => $request->item_code,
+    //             // "itemClassifiCode" => $request->item_classified_code,
+    //             // "itemTypeCode" => $request->item_type_code,
+    //             // "itemName" => $request->item_name,
+    //             // "itemStrdName" => $request->item_strd_name,
+    //             // "countryCode" => $request->country_code,
+    //             // "pkgUnitCode" => $request->pkg_unit_code,
+    //             // "qtyUnitCode" => $request->qty_unit_code,
+    //             // "taxTypeCode" => $request->tax_type_code,
+    //             // "batchNo" => $request->batch_no,
+    //             // "barcode" => $request->bar_code,
+    //             // "unitPrice" => $request->unit_price,
+    //             // "group1UnitPrice" => $request->group1_unit_price,
+    //             // "group2UnitPrice" => $request->group2_unit_price,
+    //             // "group3UnitPrice" => $request->group3_unit_price,
+    //             // "group4UnitPrice" => $request->group4_unit_price,
+    //             // "group5UnitPrice" => $request->group5_unit_price,
+    //             // "additionalInfo" => $request->addintional_info,
+    //             // "saftyQuantity" => $request->safety_quantity,
+    //             // "isInrcApplicable" => $request->is_increase_applicable,
+    //             // "isUsed" => true,
+    //             // "openingBalance" => $request->opening_balance,
+    //             // "packageQuantity" => $request->package_quantity,
+    //         ];
+
+    //         // Post data to the API endpoint
+    //         $response = Http::post('https://etims.your-apps.biz/api/SaveItems', $productData);
+
+    //         // Check if the request was successful (status code 2xx)
+    //         if ($response->successful()) {
+    //             // API request was successful, handle response if needed
+    //             $apiResponse = $response->json(); // Convert response to JSON
+    //             // Handle API response here
+    //         } else {
+    //             // API request failed, handle error
+    //             $errorResponse = $response->json(); // Convert error response to JSON
+    //             // Handle error response here
+    //             return redirect()->back()->with('error', 'Failed to post data to API.');
+    //         }
+
+    //         // Rest of your logic...
+    //     } else {
+    //         return redirect()->back()->with('error', __('Permission denied.'));
+    //     }
+    // }
 
     public function show()
     {
