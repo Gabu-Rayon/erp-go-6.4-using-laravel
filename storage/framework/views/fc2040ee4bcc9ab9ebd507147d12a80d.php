@@ -24,9 +24,10 @@
 
               </div>
           </div>
-           <div class="col-md-6">
+          <div class="col-md-6">
               <div class="form-group">
-                  <?php echo e(Form::label('standard_name', __('Standard Name'), ['class' => 'form-label'])); ?><span class="text-danger">*</span>
+                  <?php echo e(Form::label('standard_name', __('Standard Name'), ['class' => 'form-label'])); ?><span
+                      class="text-danger">*</span>
                   <?php echo e(Form::text('standard_name', '', ['class' => 'form-control', 'required' => 'required'])); ?>
 
               </div>
@@ -39,16 +40,18 @@
 
               </div>
           </div>
-            <div class="col-md-6">
+          <div class="col-md-6">
               <div class="form-group">
-                  <?php echo e(Form::label('product_type_code', __('Product Type Code'), ['class' => 'form-label'])); ?><span class="text-danger">*</span>
+                  <?php echo e(Form::label('product_type_code', __('Product Type Code'), ['class' => 'form-label'])); ?><span
+                      class="text-danger">*</span>
                   <?php echo e(Form::text('product_type_code', '', ['class' => 'form-control', 'required' => 'required'])); ?>
 
               </div>
           </div>
           <div class="col-md-6">
               <div class="form-group">
-                  <?php echo e(Form::label('product_classified_code', __('Product Classified Code'), ['class' => 'form-label'])); ?><span class="text-danger">*</span>
+                  <?php echo e(Form::label('product_classified_code', __('Product Classified Code'), ['class' => 'form-label'])); ?><span
+                      class="text-danger">*</span>
                   <?php echo e(Form::text('product_classified_code', '', ['class' => 'form-control', 'required' => 'required'])); ?>
 
               </div>
@@ -61,21 +64,24 @@
                   <option value="">Select Country Code</option>
                   <?php $__currentLoopData = $countries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $country): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                       <option value="<?php echo e($country['alpha3_code']); ?>"><?php echo e($country['name']); ?> -
-                          (<?php echo e($country['alpha3_code']); ?>)</option>
+                          (<?php echo e($country['alpha3_code']); ?>)
+                      </option>
                   <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </select>
           </div>
           <div class="col-md-6">
               <div class="form-group">
-                  <?php echo e(Form::label('batch_no', __('Batch No'), ['class' => 'form-label'])); ?><span class="text-danger">*</span>
-                  <?php echo e(Form::text('batch_no', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'BNO2001'])); ?>
+                  <?php echo e(Form::label('batch_no', __('Batch No'), ['class' => 'form-label'])); ?><span
+                      class="text-danger">*</span>
+                  <?php echo e(Form::text('batch_no', '', ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'BNO2001'])); ?>
 
               </div>
           </div>
           <div class="col-md-6">
               <div class="form-group">
-                  <?php echo e(Form::label('bar_code', __('Bar Code'), ['class' => 'form-label'])); ?><span class="text-danger">*</span>
-                  <?php echo e(Form::text('bar_code', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'BRC2001'])); ?>
+                  <?php echo e(Form::label('bar_code', __('Bar Code'), ['class' => 'form-label'])); ?><span
+                      class="text-danger">*</span>
+                  <?php echo e(Form::text('bar_code', '', ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'BRC2001'])); ?>
 
               </div>
           </div>
@@ -127,10 +133,11 @@
 
               </div>
           </div>
-                    <div class="col-md-6">
+          <div class="col-md-6">
               <div class="form-group">
-                  <?php echo e(Form::label('opening_balance', __('Opening Balance'), ['class' => 'form-label'])); ?><span class="text-danger">*</span>
-                  <?php echo e(Form::text('opening_balance', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'4500'])); ?>
+                  <?php echo e(Form::label('opening_balance', __('Opening Balance'), ['class' => 'form-label'])); ?><span
+                      class="text-danger">*</span>
+                  <?php echo e(Form::text('opening_balance', '', ['class' => 'form-control', 'required' => 'required', 'placeholder' => '4500'])); ?>
 
               </div>
           </div>
@@ -173,16 +180,17 @@
               </select>
           </div>
 
-        <!--   <div class="form-group col-md-6">
+          <!--   <div class="form-group col-md-6">
               <?php echo e(Form::label('tax_id', __('Tax'), ['class' => 'form-label'])); ?>
 
               <?php echo e(Form::select('tax_id[]', $tax, null, ['class' => 'form-control select2', 'id' => 'choices-multiple1', 'multiple'])); ?>
 
           </div> -->
-             <div class="col-md-6">
+          <div class="col-md-6">
               <div class="form-group">
-                  <?php echo e(Form::label('tax_type_code', __('Tax Type Code'), ['class' => 'form-label'])); ?><span class="text-danger">*</span>
-                  <?php echo e(Form::text('tax_type_code', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'VAT'])); ?>
+                  <?php echo e(Form::label('tax_type_code', __('Tax Type Code'), ['class' => 'form-label'])); ?><span
+                      class="text-danger">*</span>
+                  <?php echo e(Form::text('tax_type_code', '', ['class' => 'form-control', 'required' => 'required', 'placeholder' => '4500'])); ?>
 
               </div>
           </div>
@@ -202,7 +210,7 @@
               <?php echo e(Form::select('unit_id', $unit, null, ['class' => 'form-control select', 'required' => 'required'])); ?>
 
           </div>
-          <!-- <div class="col-md-6 form-group">
+          <div class="col-md-6 form-group">
               <?php echo e(Form::label('pro_image', __('Product Image'), ['class' => 'form-label'])); ?>
 
               <div class="choose-file ">
@@ -213,7 +221,7 @@
 
                   </label>
               </div>
-          </div> -->
+          </div>
 
 
 
@@ -224,16 +232,16 @@
                       <div class="row">
                           <div class="col-md-6">
                               <div class="form-check form-check-inline">
-                                  <input type="radio" class="form-check-input type" id="customRadio5" name="type"
-                                      value="product" checked="checked">
+                                  <input type="radio" class="form-check-input type" id="customRadio5"
+                                      name="type" value="product" checked="checked">
                                   <label class="custom-control-label form-label"
                                       for="customRadio5"><?php echo e(__('Product')); ?></label>
                               </div>
                           </div>
                           <div class="col-md-6">
                               <div class="form-check form-check-inline">
-                                  <input type="radio" class="form-check-input type" id="customRadio6" name="type"
-                                      value="service">
+                                  <input type="radio" class="form-check-input type" id="customRadio6"
+                                      name="type" value="service">
                                   <label class="custom-control-label form-label"
                                       for="customRadio6"><?php echo e(__('Service')); ?></label>
                               </div>
@@ -244,21 +252,17 @@
           </div>
 
           <div class="form-group col-md-6 quantity">
-              <?php echo e(Form::label('quantity', __('Quantity'), ['class' => 'form-label'])); ?><span class="text-danger">*</span>
+              <?php echo e(Form::label('quantity', __('Quantity'), ['class' => 'form-label'])); ?><span
+                  class="text-danger">*</span>
               <?php echo e(Form::text('quantity', null, ['class' => 'form-control'])); ?>
 
           </div>
           <div class="form-group col-md-6 quantity">
-              <?php echo e(Form::label('safety_quantity', __('Safety Quantity'), ['class' => 'form-label'])); ?><span class="text-danger">*</span>
-              <?php echo e(Form::text('safety_quantity', null, ['class' => 'form-control','placeholder'=>'2000'])); ?>
+              <?php echo e(Form::label('safety_quantity', __('Safety Quantity'), ['class' => 'form-label'])); ?><span
+                  class="text-danger">*</span>
+              <?php echo e(Form::text('safety_quantity', null, ['class' => 'form-control', 'placeholder' => '2000'])); ?>
 
           </div>
-          <div class="form-group col-md-6 quantity">
-              <?php echo e(Form::label('', __('Is_Increase_Applicable'), ['class' => 'form-label'])); ?><span class="text-danger">*</span>
-              <?php echo e(Form::text('is_increase_applicable', null, ['class' => 'form-control','placeholder'=>'2000'])); ?>
-
-          </div>
-
 
           <div class="form-group col-md-12">
               <?php echo e(Form::label('description', __('Description'), ['class' => 'form-label'])); ?>
@@ -285,10 +289,10 @@
 
 
   <script>
-      // document.getElementById('pro_image').onchange = function() {
-      //     var src = URL.createObjectURL(this.files[0])
-      //     document.getElementById('image').src = src
-      // }
+      document.getElementById('pro_image').onchange = function() {
+          var src = URL.createObjectURL(this.files[0])
+          document.getElementById('image').src = src
+      }
 
       //hide & show quantity
 

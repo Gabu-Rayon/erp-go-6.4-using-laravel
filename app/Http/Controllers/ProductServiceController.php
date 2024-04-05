@@ -199,29 +199,30 @@ class ProductServiceController extends Controller
 
      **********************************************************/   
 
-    public function store(Request $request){
+   /***
+    *  public function store(Request $request){
         if (\Auth::user()->can('create product & service')) {
             // Validation rules
             $rules = [
-                'products.*.name' => 'required|string',
-                'products.*.standard_name' => 'required|string',
-                'products.*.category_id' => 'required|exists:product_service_categories,id',
-                'products.*.unit_id' => 'required|exists:product_service_units,id',
-                'products.*.tax_id' => 'required|exists:taxes,id',
-                'products.*.tax_type_code' => 'required',
-                'products.*.batch_no' => 'required|string',
-                'products.*.bar_code' => 'required|string',
-                'products.*.sale_price' => 'required|numeric',
-                'products.*.group1_unit_price' => 'required|numeric',
-                'products.*.group2_unit_price' => 'required|numeric',
-                'products.*.group3_unit_price' => 'required|numeric',
-                'products.*.group4_unit_price' => 'required|numeric',
-                'products.*.group5_unit_price' => 'required|numeric',
-                'products.*.opening_balance' => 'required|numeric',
-                'products.*.quantity' => 'required|numeric',
-                'products.*.safety_quantity' => 'required|numeric',
-                'products.*.is_increase_applicable' => 'required|boolean',
-                'products.*.description' => 'required|string',
+                'name' => 'required|string',
+                'standard_name' => 'required|string',
+                'category_id' => 'required|exists:product_service_categories,id',
+                'unit_id' => 'required|exists:product_service_units,id',
+                // 'tax_id' => 'required|exists:taxes,id',
+                'tax_type_code' => 'required',
+                'batch_no' => 'required|string',
+                'bar_code' => 'required|string',
+                'sale_price' => 'required|numeric',
+                'group1_unit_price' => 'required|numeric',
+                'group2_unit_price' => 'required|numeric',
+                'group3_unit_price' => 'required|numeric',
+                'group4_unit_price' => 'required|numeric',
+                'group5_unit_price' => 'required|numeric',
+                'opening_balance' => 'required|numeric',
+                'quantity' => 'required|numeric',
+                'safety_quantity' => 'required|numeric',
+                'is_increase_applicable' => 'required',
+                'description' => 'required|string',
             ];
 
             // Validate the request data
@@ -231,47 +232,35 @@ class ProductServiceController extends Controller
             if ($validator->fails()) {
                 $messages = $validator->getMessageBag();
                 return redirect()->back()->with('error', $messages->first());
-            }
+            } 
 
-              // Initialize an array to store formatted product data
-            $productData = [];
+
+            $productData = [
+                "itemCode" => $request->sku,
+                "itemClassifiCode" => $request->category_id,
+                "itemTypeCode" => $request->product_type_code,
+                "itemName" => $request->name,
+                "itemStrdName" => $request->standard_name,
+                "countryCode" => $request->country_code,
+                "pkgUnitCode" => $request->unit_id,
+                "qtyUnitCode" => $request->unit_id,
+                "taxTypeCode" => $request->tax_type_code,
+                "batchNo" => $request->batch_no,
+                "barcode" => $request->bar_code,
+                "unitPrice" => $request->sale_price,
+                "group1UnitPrice" => $request->group1_unit_price,
+                "group2UnitPrice" => $request->group2_unit_price,
+                "group3UnitPrice" => $request->group3_unit_price,
+                "group4UnitPrice" => $request->group4_unit_price,
+                "group5UnitPrice" => $request->group5_unit_price,
+                "additionalInfo" => $request->description,
+                "saftyQuantity" => $request->safety_quantity,
+                "isInrcApplicable" => $request->is_increase_applicable,
+                "isUsed" => true,
+                "openingBalance" => $request->opening_balance,
+                "packageQuantity" => $request->quantity,
+            ];
             
-            // Process each product
-            foreach ($request->input('products', []) as $product) {
-                // Map form inputs to API fields
-                $formattedProduct = [
-                    "itemCode" => $product['sku'],
-                    "itemClassifiCode" => $product['category_id'],
-                    "itemTypeCode" => $product['product_type_code'],
-                    "itemName" => $product['name'],
-                    "itemStrdName" => $product['standard_name'],
-                    "countryCode" => $product['country_code'],
-                    "pkgUnitCode" => $product['unit_id'],
-                    "qtyUnitCode" => $product['unit_id'],
-                    "taxTypeCode" => $product['tax_type_code'],
-                    "batchNo" => $product['batch_no'],
-                    "barcode" => $product['bar_code'],
-                    "unitPrice" => (float) $product['sale_price'],
-                    "group1UnitPrice" => (float) $product['group1_unit_price'],
-                    "group2UnitPrice" => (float) $product['group2_unit_price'],
-                    "group3UnitPrice" => (float) $product['group3_unit_price'],
-                    "group4UnitPrice" => (float) $product['group4_unit_price'],
-                    "group5UnitPrice" => (float) $product['group5_unit_price'],
-                    "additionalInfo" => $product['description'],
-                    "saftyQuantity" => (int) $product['safety_quantity'],
-                    "isInrcApplicable" => (bool) $product['is_increase_applicable'],
-                    "isUsed" => true,
-                    "openingBalance" => (int) $product['opening_balance'],
-                    "packageQuantity" => (int) $product['quantity'],
-                ];
-
-                // Merge additional fields from the form
-                $formattedProduct = array_merge($formattedProduct, $product);
-
-                // Add the formatted product to the array
-                $productData[] = $formattedProduct;
-            }
-
             // Make API call to store the products
             $response = Http::withHeaders([
                 'accept' => 'application/json',
@@ -300,6 +289,96 @@ class ProductServiceController extends Controller
             // User doesn't have permission
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+    }
+**/
+
+
+    public function store(Request $request)
+    {
+        if (\Auth::user()->can('create product & service')) {
+            // Validation rules
+            $rules = [
+                // Your validation rules here
+            ];
+
+            // Validate the request data
+            $validator = \Validator::make($request->all(), $rules);
+
+            // Check for validation errors
+            if ($validator->fails()) {
+                $messages = $validator->getMessageBag();
+                return redirect()->back()->with('error', $messages->first());
+            }
+
+            // Check if it's a single product or multiple products
+        if ($request->has('name') && is_array($request->name)) {
+            // Handle multiple products
+            $products = [];
+            foreach ($request->name as $key => $value) {
+                $products[] = $this->constructProductData($request, $key);
+            }
+        } else {
+            // Handle single product
+            $products[] = $this->constructProductData($request, null);
+        }
+
+            // Make API call to store the products
+            $response = Http::withHeaders([
+                'accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'key' => '123456', // Assuming this is your API key
+            ])->post('https://etims.your-apps.biz/api/SaveItems', $products);
+
+            // Log the API response
+            \Log::info('API Request Data: ' . json_encode($products));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+
+            // Check if API call was successful
+            if ($response->successful()) {
+                // API request was successful, handle response if needed
+                $apiResponse = $response->json();
+                return redirect()->route('productservice.index')->with('success', __('Item/s / Product/s successfully created.'));
+            } else {
+                // API request failed, handle error
+                $errorResponse = $response->json();
+                // If API call failed, return with error message
+                return redirect()->back()->with('error', __('Failed to create Item/s / Product/s.'));
+            }
+        } else {
+            // User doesn't have permission
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
+
+    private function constructProductData($request, $key)
+    {
+        $productData = [
+            "itemCode" => $request->input("sku.$key", $request->sku),
+            "itemClassifiCode" => $request->input("category_id.$key", $request->category_id),
+            "itemTypeCode" => $request->input("product_type_code.$key", $request->product_type_code),
+            "itemName" => $request->input("name.$key", $request->name),
+            "itemStrdName" => $request->input("standard_name.$key", $request->standard_name),
+            "countryCode" => $request->input("country_code.$key", $request->country_code),
+            "pkgUnitCode" => $request->input("unit_id.$key", $request->unit_id),
+            "qtyUnitCode" => $request->input("unit_id.$key", $request->unit_id),
+            "taxTypeCode" => $request->input("tax_type_code.$key", $request->tax_type_code),
+            "batchNo" => $request->input("batch_no.$key", $request->batch_no),
+            "barcode" => $request->input("bar_code.$key", $request->bar_code),
+            "unitPrice" => $request->input("sale_price.$key", $request->sale_price),
+            "group1UnitPrice" => $request->input("group1_unit_price.$key", $request->group1_unit_price),
+            "group2UnitPrice" => $request->input("group2_unit_price.$key", $request->group2_unit_price),
+            "group3UnitPrice" => $request->input("group3_unit_price.$key", $request->group3_unit_price),
+            "group4UnitPrice" => $request->input("group4_unit_price.$key", $request->group4_unit_price),
+            "group5UnitPrice" => $request->input("group5_unit_price.$key", $request->group5_unit_price),
+            "additionalInfo" => $request->input("description.$key", $request->description),
+            "saftyQuantity" => $request->input("safety_quantity.$key", $request->safety_quantity),
+            "isInrcApplicable" => true,
+            "isUsed" => true,
+            "openingBalance" => $request->input("opening_balance.$key", $request->opening_balance),
+            "packageQuantity" => $request->input("quantity.$key", $request->quantity),
+        ];
+        return $productData;
     }
 
 
@@ -555,6 +634,7 @@ class ProductServiceController extends Controller
 
         return redirect()->back()->with($data['status'], $data['msg']);
     }
+    
 
     public function warehouseDetail($id)
     {
