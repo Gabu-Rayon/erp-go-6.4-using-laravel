@@ -67,7 +67,7 @@
           <div class="col-md-6">
               <div class="form-group">
                   {{ Form::label('bar_code', __('Bar Code'), ['class' => 'form-label']) }}<span class="text-danger">*</span>
-                  {{ Form::text('bar_no', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'BRC2001']) }}
+                  {{ Form::text('bar_code', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'BRC2001']) }}
               </div>
           </div>
           <div class="col-md-6">
@@ -152,11 +152,15 @@
                       @endforeach
                   @endforeach
               </select>
-          </div>
-
-          <div class="form-group col-md-6">
+          </div>  <div class="form-group col-md-6">
               {{ Form::label('tax_id', __('Tax'), ['class' => 'form-label']) }}
               {{ Form::select('tax_id[]', $tax, null, ['class' => 'form-control select2', 'id' => 'choices-multiple1', 'multiple']) }}
+          </div>
+             <div class="col-md-6">
+              <div class="form-group">
+                  {{ Form::label('tax_type_code', __('Tax Type Code'), ['class' => 'form-label']) }}<span class="text-danger">*</span>
+                  {{ Form::text('tax_type_code', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'VAT']) }}
+              </div>
           </div>
           <div class="form-group col-md-6">
               {{ Form::label('category_id', __('Category'), ['class' => 'form-label']) }}<span
@@ -172,7 +176,7 @@
               {{ Form::label('unit_id', __('Unit'), ['class' => 'form-label']) }}<span class="text-danger">*</span>
               {{ Form::select('unit_id', $unit, null, ['class' => 'form-control select', 'required' => 'required']) }}
           </div>
-          <div class="col-md-6 form-group">
+          <!-- <div class="col-md-6 form-group">
               {{ Form::label('pro_image', __('Product Image'), ['class' => 'form-label']) }}
               <div class="choose-file ">
                   <label for="pro_image" class="form-label">
@@ -182,7 +186,7 @@
 
                   </label>
               </div>
-          </div>
+          </div> -->
 
 
 
@@ -220,6 +224,11 @@
               {{ Form::label('safety_quantity', __('Safety Quantity'), ['class' => 'form-label']) }}<span class="text-danger">*</span>
               {{ Form::text('safety_quantity', null, ['class' => 'form-control','placeholder'=>'2000']) }}
           </div>
+          <div class="form-group col-md-6 quantity">
+              {{ Form::label('', __('Is_Increase_Applicable'), ['class' => 'form-label']) }}<span class="text-danger">*</span>
+              {{ Form::text('is_increase_applicable', null, ['class' => 'form-control','placeholder'=>'2000']) }}
+          </div>
+
 
           <div class="form-group col-md-12">
               {{ Form::label('description', __('Description'), ['class' => 'form-label']) }}
@@ -243,10 +252,10 @@
 
 
   <script>
-      document.getElementById('pro_image').onchange = function() {
-          var src = URL.createObjectURL(this.files[0])
-          document.getElementById('image').src = src
-      }
+      // document.getElementById('pro_image').onchange = function() {
+      //     var src = URL.createObjectURL(this.files[0])
+      //     document.getElementById('image').src = src
+      // }
 
       //hide & show quantity
 

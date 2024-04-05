@@ -18,6 +18,7 @@ use App\Models\ChartOfAccountType;
 use App\Models\ProductServiceUnit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProductServiceExport;
 use App\Imports\ProductServiceImport;
@@ -91,171 +92,216 @@ class ProductServiceController extends Controller
 
             // Fetch countries data from the Countries model
             $countries = Countries::all();
-            
 
-            return view('productservice.create', compact('category', 'unit', 'tax', 'customFields', 'incomeChartAccounts', 'incomeSubAccounts', 'expenseChartAccounts', 'expenseSubAccounts','countries'));
+
+            return view('productservice.create', compact('category', 'unit', 'tax', 'customFields', 'incomeChartAccounts', 'incomeSubAccounts', 'expenseChartAccounts', 'expenseSubAccounts', 'countries'));
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
     }
 
+    /****
+   public function store(Request $request){
+
+       if(\Auth::user()->can('create product & service'))
+       {
+
+           $rules = [
+               'name' => 'required',
+               'standard_name' => 'required',
+               'product_type_code' => 'required',
+               'product_classified_code' => 'required',
+               'country_code' => 'required',
+               'batch_no' => 'required',
+               'bar_code' => 'required',
+               'sku' => ['required', Rule::unique('product_services')->where(function ($query) {
+                  return $query->where('created_by', \Auth::user()->id);
+                })
+               ],
+               'sale_price' => 'required|numeric',
+               'group1_unit_price' => 'required|numeric',
+               'group2_unit_price' => 'required|numeric',
+               'group3_unit_price' => 'required|numeric',
+               'group4_unit_price' => 'required|numeric',
+               'group5_unit_price' => 'required|numeric',
+               'opening_balance' => 'required|numeric',
+               'purchase_price' => 'required|numeric',
+               'category_id' => 'required',
+               'unit_id' => 'required',
+               'type' => 'required',
+               'safety_quantity' => 'required|numeric',
+           ];
+
+           $validator = \Validator::make($request->all(), $rules);
+
+           if($validator->fails())
+           {
+               $messages = $validator->getMessageBag();
+
+               return redirect()->route('productservice.index')->with('error', $messages->first());
+           }
+
+           $productService                      = new ProductService();
+           $productService->name                = $request->name;
+           $productService->description         = $request->description;
+           $productService->sku                 = $request->sku;
+           $productService->sale_price          = $request->sale_price;
+           $productService->purchase_price      = $request->purchase_price;
+           $productService->tax_id              = !empty($request->tax_id) ? implode(',', $request->tax_id) : '';
+           $productService->unit_id             = $request->unit_id;
+           if(!empty($request->quantity))
+           {
+               $productService->quantity        = $request->quantity;
+           }
+           else{
+               $productService->quantity   = 0;
+           }
+           $productService->type                       = $request->type;
+           $productService->sale_chartaccount_id       = $request->sale_chartaccount_id;
+           $productService->expense_chartaccount_id    = $request->expense_chartaccount_id;
+           $productService->category_id                = $request->category_id;
+
+           if(!empty($request->pro_image))
+           {
+               //storage limit
+               $image_size = $request->file('pro_image')->getSize();
+               $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
+               if($result==1)
+               {
+                   if($productService->pro_image)
+                   {
+                       $path = storage_path('uploads/pro_image' . $productService->pro_image);
+                   }
+                   $fileName = $request->pro_image->getClientOriginalName();
+                   $productService->pro_image = $fileName;
+                   $dir        = 'uploads/pro_image';
+                   $path = Utility::upload_file($request,'pro_image',$fileName,$dir,[]);
+               }
+           }
+
+           $productService->created_by       = \Auth::user()->creatorId();
+           $productService->save();
+           CustomField::saveData($productService, $request->customField);
+
+           return redirect()->route('productservice.index')->with('success', __('Product successfully created.'));
+       }
+       else
+       {
+           return redirect()->back()->with('error', __('Permission denied.'));
+       }
+   }
+   ****/
+
+    /********************************************************
+     * POST DATA TO API ENDPOINT 
+     * Data should be in an array for it to go through ensure that 
+     * 
+
+     **********************************************************/   
+
     public function store(Request $request){
-
-        if(\Auth::user()->can('create product & service'))
-        {
-
+        if (\Auth::user()->can('create product & service')) {
+            // Validation rules
             $rules = [
-                'name' => 'required',
-                'standard_name' => 'required',
-                'product_type_code' => 'required',
-                'product_classified_code' => 'required',
-                'country_code' => 'required',
-                'batch_no' => 'required',
-                'bar_code' => 'required',
-                'sku' => ['required', Rule::unique('product_services')->where(function ($query) {
-                   return $query->where('created_by', \Auth::user()->id);
-                 })
-                ],
-                'sale_price' => 'required|numeric',
-                'group1_unit_price' => 'required|numeric',
-                'group2_unit_price' => 'required|numeric',
-                'group3_unit_price' => 'required|numeric',
-                'group4_unit_price' => 'required|numeric',
-                'group5_unit_price' => 'required|numeric',
-                'opening_balance' => 'required|numeric',
-                'purchase_price' => 'required|numeric',
-                'category_id' => 'required',
-                'unit_id' => 'required',
-                'type' => 'required',
-                'safety_quantity' => 'required|numeric',
+                'products.*.name' => 'required|string',
+                'products.*.standard_name' => 'required|string',
+                'products.*.category_id' => 'required|exists:product_service_categories,id',
+                'products.*.unit_id' => 'required|exists:product_service_units,id',
+                'products.*.tax_id' => 'required|exists:taxes,id',
+                'products.*.tax_type_code' => 'required',
+                'products.*.batch_no' => 'required|string',
+                'products.*.bar_code' => 'required|string',
+                'products.*.sale_price' => 'required|numeric',
+                'products.*.group1_unit_price' => 'required|numeric',
+                'products.*.group2_unit_price' => 'required|numeric',
+                'products.*.group3_unit_price' => 'required|numeric',
+                'products.*.group4_unit_price' => 'required|numeric',
+                'products.*.group5_unit_price' => 'required|numeric',
+                'products.*.opening_balance' => 'required|numeric',
+                'products.*.quantity' => 'required|numeric',
+                'products.*.safety_quantity' => 'required|numeric',
+                'products.*.is_increase_applicable' => 'required|boolean',
+                'products.*.description' => 'required|string',
             ];
 
+            // Validate the request data
             $validator = \Validator::make($request->all(), $rules);
 
-            if($validator->fails())
-            {
+            // Check for validation errors
+            if ($validator->fails()) {
                 $messages = $validator->getMessageBag();
-
-                return redirect()->route('productservice.index')->with('error', $messages->first());
+                return redirect()->back()->with('error', $messages->first());
             }
 
-            $productService                      = new ProductService();
-            $productService->name                = $request->name;
-            $productService->description         = $request->description;
-            $productService->sku                 = $request->sku;
-            $productService->sale_price          = $request->sale_price;
-            $productService->purchase_price      = $request->purchase_price;
-            $productService->tax_id              = !empty($request->tax_id) ? implode(',', $request->tax_id) : '';
-            $productService->unit_id             = $request->unit_id;
-            if(!empty($request->quantity))
-            {
-                $productService->quantity        = $request->quantity;
-            }
-            else{
-                $productService->quantity   = 0;
-            }
-            $productService->type                       = $request->type;
-            $productService->sale_chartaccount_id       = $request->sale_chartaccount_id;
-            $productService->expense_chartaccount_id    = $request->expense_chartaccount_id;
-            $productService->category_id                = $request->category_id;
+              // Initialize an array to store formatted product data
+            $productData = [];
+            
+            // Process each product
+            foreach ($request->input('products', []) as $product) {
+                // Map form inputs to API fields
+                $formattedProduct = [
+                    "itemCode" => $product['sku'],
+                    "itemClassifiCode" => $product['category_id'],
+                    "itemTypeCode" => $product['product_type_code'],
+                    "itemName" => $product['name'],
+                    "itemStrdName" => $product['standard_name'],
+                    "countryCode" => $product['country_code'],
+                    "pkgUnitCode" => $product['unit_id'],
+                    "qtyUnitCode" => $product['unit_id'],
+                    "taxTypeCode" => $product['tax_type_code'],
+                    "batchNo" => $product['batch_no'],
+                    "barcode" => $product['bar_code'],
+                    "unitPrice" => (float) $product['sale_price'],
+                    "group1UnitPrice" => (float) $product['group1_unit_price'],
+                    "group2UnitPrice" => (float) $product['group2_unit_price'],
+                    "group3UnitPrice" => (float) $product['group3_unit_price'],
+                    "group4UnitPrice" => (float) $product['group4_unit_price'],
+                    "group5UnitPrice" => (float) $product['group5_unit_price'],
+                    "additionalInfo" => $product['description'],
+                    "saftyQuantity" => (int) $product['safety_quantity'],
+                    "isInrcApplicable" => (bool) $product['is_increase_applicable'],
+                    "isUsed" => true,
+                    "openingBalance" => (int) $product['opening_balance'],
+                    "packageQuantity" => (int) $product['quantity'],
+                ];
 
-            if(!empty($request->pro_image))
-            {
-                //storage limit
-                $image_size = $request->file('pro_image')->getSize();
-                $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
-                if($result==1)
-                {
-                    if($productService->pro_image)
-                    {
-                        $path = storage_path('uploads/pro_image' . $productService->pro_image);
-                    }
-                    $fileName = $request->pro_image->getClientOriginalName();
-                    $productService->pro_image = $fileName;
-                    $dir        = 'uploads/pro_image';
-                    $path = Utility::upload_file($request,'pro_image',$fileName,$dir,[]);
-                }
+                // Merge additional fields from the form
+                $formattedProduct = array_merge($formattedProduct, $product);
+
+                // Add the formatted product to the array
+                $productData[] = $formattedProduct;
             }
 
-            $productService->created_by       = \Auth::user()->creatorId();
-            $productService->save();
-            CustomField::saveData($productService, $request->customField);
+            // Make API call to store the products
+            $response = Http::withHeaders([
+                'accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'key' => '123456', // Assuming this is your API key
+            ])->post('https://etims.your-apps.biz/api/SaveItems', $productData);
 
-            return redirect()->route('productservice.index')->with('success', __('Product successfully created.'));
-        }
-        else
-        {
+            // Log the API response
+            \Log::info('API Request Data: ' . json_encode($productData));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+            
+             // Check if API call was successful
+            if ($response->successful()) {
+                // API request was successful, handle response if needed
+                $apiResponse = $response->json();
+                return redirect()->route('productservice.index')->with('success', __('Item/s / Product/s successfully created.'));
+            } else {
+
+                // API request failed, handle error
+                $errorResponse = $response->json(); 
+                // If API call failed, return with error message
+                return redirect()->back()->with('error', __('Failed to create Item/s / Product/s.'));
+            }            
+        } else {
+            // User doesn't have permission
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
-    /********************************************************
-     * POST DATA TO API ENDPOINT 
-     **********************************************************/
-    // public function store(Request $request)
-    // {
-    //     if (\Auth::user()->can('create product & service')) {
-    //         // Your existing validation and other logic...
 
-    //         // Assuming $productData contains the data you want to post to the API endpoint
-    //         $productData = [
-    //             'name' => $request->name,
-    //             'description' => $request->description,
-    //             'sku' => $request->sku,
-    //             'sale_price' => $request->sale_price,
-    //             'purchase_price' => $request->purchase_price,
-    //             'tax_id' => !empty($request->tax_id) ? implode(',', $request->tax_id) : '',
-    //             'unit_id' => $request->unit_id,
-    //             'quantity' => !empty($request->quantity) ? $request->quantity : 0,
-    //             'type' => $request->type,
-    //             'sale_chartaccount_id' => $request->sale_chartaccount_id,
-    //             'expense_chartaccount_id' => $request->expense_chartaccount_id,
-    //             'category_id' => $request->category_id,
-    //             // Add other fields as needed
-    //             // "itemCode" => $request->item_code,
-    //             // "itemClassifiCode" => $request->item_classified_code,
-    //             // "itemTypeCode" => $request->item_type_code,
-    //             // "itemName" => $request->item_name,
-    //             // "itemStrdName" => $request->item_strd_name,
-    //             // "countryCode" => $request->country_code,
-    //             // "pkgUnitCode" => $request->pkg_unit_code,
-    //             // "qtyUnitCode" => $request->qty_unit_code,
-    //             // "taxTypeCode" => $request->tax_type_code,
-    //             // "batchNo" => $request->batch_no,
-    //             // "barcode" => $request->bar_code,
-    //             // "unitPrice" => $request->unit_price,
-    //             // "group1UnitPrice" => $request->group1_unit_price,
-    //             // "group2UnitPrice" => $request->group2_unit_price,
-    //             // "group3UnitPrice" => $request->group3_unit_price,
-    //             // "group4UnitPrice" => $request->group4_unit_price,
-    //             // "group5UnitPrice" => $request->group5_unit_price,
-    //             // "additionalInfo" => $request->addintional_info,
-    //             // "saftyQuantity" => $request->safety_quantity,
-    //             // "isInrcApplicable" => $request->is_increase_applicable,
-    //             // "isUsed" => true,
-    //             // "openingBalance" => $request->opening_balance,
-    //             // "packageQuantity" => $request->package_quantity,
-    //         ];
-
-    //         // Post data to the API endpoint
-    //         $response = Http::post('https://etims.your-apps.biz/api/SaveItems', $productData);
-
-    //         // Check if the request was successful (status code 2xx)
-    //         if ($response->successful()) {
-    //             // API request was successful, handle response if needed
-    //             $apiResponse = $response->json(); // Convert response to JSON
-    //             // Handle API response here
-    //         } else {
-    //             // API request failed, handle error
-    //             $errorResponse = $response->json(); // Convert error response to JSON
-    //             // Handle error response here
-    //             return redirect()->back()->with('error', 'Failed to post data to API.');
-    //         }
-
-    //         // Rest of your logic...
-    //     } else {
-    //         return redirect()->back()->with('error', __('Permission denied.'));
-    //     }
-    // }
 
     public function show()
     {
