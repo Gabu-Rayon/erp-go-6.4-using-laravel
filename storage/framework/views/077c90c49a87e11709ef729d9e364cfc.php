@@ -413,11 +413,38 @@
                                     <div class="form-group">
                                         <?php echo e(Form::label('purchase_number', __('Purchase Number'),['class'=>'form-label'])); ?>
 
+                                         <input type="hidden"  name="purchase_number" class="form-control" value="<?php echo e($purchase_number); ?>" >
                                         <input type="text" class="form-control" value="<?php echo e($purchase_number); ?>" readonly>
 
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <?php echo e(Form::label('vendor_invoice_no', __('Invoice No'),['class'=>'form-label'])); ?>
+
+                                        <?php echo e(Form::text('vendor_invoice_no', null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'INV200'])); ?>
+
+
+
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <?php echo e(Form::label('purchase_type_code', __('Purchase Type'),['class'=>'form-label'])); ?>
+
+                                        <?php echo e(Form::text('purchase_type_code', null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'COMPUTERS200'])); ?>
+
+
+
+
+                                    </div>
+                                </div>
+                            </div>                            
 
 
                             </div>

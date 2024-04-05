@@ -7,11 +7,13 @@ use App\Models\User;
 use App\Models\Vender;
 use App\Models\Utility;
 use App\Models\Purchase;
+use App\Models\Countries;
 use App\Models\warehouse;
 use App\Models\BankAccount;
 use App\Models\CustomField;
 use App\Models\StockReport;
 use App\Models\Transaction;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\ProductService;
 use App\Models\PurchasePayment;
@@ -23,7 +25,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\ProductServiceCategory;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class PurchaseController extends Controller
 {
@@ -67,8 +68,10 @@ class PurchaseController extends Controller
 
             $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->where('type', '!=', 'service')->get()->pluck('name', 'id');
             $product_services->prepend('--', '');
+            // Fetch countries data from the Countries model
+            $countries = Countries::pluck('alpha3_code', 'id');
 
-            return view('purchase.create', compact('venders', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse'));
+            return view('purchase.create', compact('venders', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
@@ -82,73 +85,77 @@ class PurchaseController extends Controller
      */
 
 
-    /*****
-       public function store(Request $request){
+    /******
+        public function store(Request $request)
+        {
 
-           if (\Auth::user()->can('create purchase')) {
-               $validator = \Validator::make(
-                   $request->all(),
-                   [
-                       'vender_id' => 'required',
-                       'warehouse_id' => 'required',
-                       'purchase_date' => 'required',
-                       'category_id' => 'required',
-                       'items' => 'required',
-                   ]
-               );
-               if ($validator->fails()) {
-                   $messages = $validator->getMessageBag();
+            if (\Auth::user()->can('create purchase')) {
+                $validator = \Validator::make(
+                    $request->all(),
+                    [
+                        'vender_id' => 'required',
+                        'warehouse_id' => 'required',
+                        'purchase_date' => 'required',
+                        'category_id' => 'required',
+                        'items' => 'required',
+                        'vendor_invoice_no' => 'required',
+                        'purchase_type_code' => 'required',
+                       'purchase_number' => 'required',
+                    ]
+                );
+                if ($validator->fails()) {
+                    $messages = $validator->getMessageBag();
 
-                   return redirect()->back()->with('error', $messages->first());
-               }
-               $purchase = new Purchase();
-               $purchase->purchase_id = $this->purchaseNumber();
-               $purchase->vender_id = $request->vender_id;
-               $purchase->warehouse_id = $request->warehouse_id;
-               $purchase->purchase_date = $request->purchase_date;
-               $purchase->purchase_number = !empty($request->purchase_number) ? $request->purchase_number : 0;
-               $purchase->status = 0;
-               //            $purchase->discount_apply = isset($request->discount_apply) ? 1 : 0;
-               $purchase->category_id = $request->category_id;
-               $purchase->created_by = \Auth::user()->creatorId();
-               $purchase->save();
+                    return redirect()->back()->with('error', $messages->first());
+                }
+                $purchase = new Purchase();
+                $purchase->purchase_id = $this->purchaseNumber();
+                $purchase->vender_id = $request->vender_id;
+                $purchase->warehouse_id = $request->warehouse_id;
+                $purchase->purchase_date = $request->purchase_date;
+                $purchase->purchase_number = !empty($request->purchase_number) ? $request->purchase_number : 0;
+                $purchase->status = 0;
+                //            $purchase->discount_apply = isset($request->discount_apply) ? 1 : 0;
+                $purchase->category_id = $request->category_id;
+                $purchase->created_by = \Auth::user()->creatorId();
+                $purchase->save();
 
-               $products = $request->items;
+                $products = $request->items;
 
-               for ($i = 0; $i < count($products); $i++) {
-                   $purchaseProduct = new PurchaseProduct();
-                   $purchaseProduct->purchase_id = $purchase->id;
-                   $purchaseProduct->product_id = $products[$i]['item'];
-                   $purchaseProduct->quantity = $products[$i]['quantity'];
-                   $purchaseProduct->tax = $products[$i]['tax'];
-                   //                $purchaseProduct->discount    = isset($products[$i]['discount']) ? $products[$i]['discount'] : 0;
-                   $purchaseProduct->discount = $products[$i]['discount'];
-                   $purchaseProduct->price = $products[$i]['price'];
-                   $purchaseProduct->description = $products[$i]['description'];
-                   $purchaseProduct->save();
+                for ($i = 0; $i < count($products); $i++) {
+                    $purchaseProduct = new PurchaseProduct();
+                    $purchaseProduct->purchase_id = $purchase->id;
+                    $purchaseProduct->product_id = $products[$i]['item'];
+                    $purchaseProduct->quantity = $products[$i]['quantity'];
+                    $purchaseProduct->tax = $products[$i]['tax'];
+                    //                $purchaseProduct->discount    = isset($products[$i]['discount']) ? $products[$i]['discount'] : 0;
+                    $purchaseProduct->discount = $products[$i]['discount'];
+                    $purchaseProduct->price = $products[$i]['price'];
+                    $purchaseProduct->description = $products[$i]['description'];
+                    $purchaseProduct->save();
 
-                   //inventory management (Quantity)
-                   Utility::total_quantity('plus', $purchaseProduct->quantity, $purchaseProduct->product_id);
+                    //inventory management (Quantity)
+                    Utility::total_quantity('plus', $purchaseProduct->quantity, $purchaseProduct->product_id);
 
-                   //Product Stock Report
-                   $type = 'purchase';
-                   $type_id = $purchase->id;
-                   $description = $products[$i]['quantity'] . '  ' . __(' quantity add in purchase') . ' ' . \Auth::user()->purchaseNumberFormat($purchase->purchase_id);
-                   Utility::addProductStock($products[$i]['item'], $products[$i]['quantity'], $type, $description, $type_id);
+                    //Product Stock Report
+                    $type = 'purchase';
+                    $type_id = $purchase->id;
+                    $description = $products[$i]['quantity'] . '  ' . __(' quantity add in purchase') . ' ' . \Auth::user()->purchaseNumberFormat($purchase->purchase_id);
+                    Utility::addProductStock($products[$i]['item'], $products[$i]['quantity'], $type, $description, $type_id);
 
-                   //Warehouse Stock Report
-                   if (isset($products[$i]['item'])) {
-                       Utility::addWarehouseStock($products[$i]['item'], $products[$i]['quantity'], $request->warehouse_id);
-                   }
+                    //Warehouse Stock Report
+                    if (isset($products[$i]['item'])) {
+                        Utility::addWarehouseStock($products[$i]['item'], $products[$i]['quantity'], $request->warehouse_id);
+                    }
 
-               }
+                }
 
-               return redirect()->route('purchase.index', $purchase->id)->with('success', __('Purchase successfully created.'));
-           } else {
-               return redirect()->back()->with('error', __('Permission denied.'));
-           }
-       }
-
+                return redirect()->route('purchase.index', $purchase->id)->with('success', __('Purchase successfully created.'));
+            } else {
+                return redirect()->back()->with('error', __('Permission denied.'));
+            }
+        }
+    **/
 
 
 
@@ -160,74 +167,65 @@ class PurchaseController extends Controller
 
     public function store(Request $request)
     {
+        // Check if the authenticated user has permission to create a purchase
         if (\Auth::user()->can('create purchase')) {
-            $rules = [
-                'supplier_inc_no' => 'required',
-                'purchase_type_code' => 'required',
-                'purchase_status_code' => 'required',
-                'supplier_item_code' => 'required',
-                'item_code' => 'required',
-            ];
-
-            $validator = \Validator::make($request->all(), $rules);
-
-            if ($validator->fails()) {
-                $messages = $validator->getMessageBag();
-                return redirect()->route('purchase.index')->with('error', $messages->first());
-            }
-          
-
-            // array containing the data to be sent to the API
-            $requestData = [
-                'supplierInvcNo' =>'',
-                'purchaseTypeCode' =>'',
-                'purchaseStatuCode' =>'',
-                'itemPurchases' => [
-                    [
-                        'supplierItemCode' =>'',
-                        'itemCode' =>'',
-                    ]
+            // Validation rules for incoming request data
+            $validator = \Validator::make(
+                $request->all(),
+                [
+                    'vender_id' => 'required',
+                    'warehouse_id' => 'required',
+                    'purchase_date' => 'required',
+                    'category_id' => 'required',
+                    'items' => 'required|array',
+                    'vendor_invoice_no' => 'required',
+                    'purchase_type_code' => 'required',
+                    'purchase_number' => 'required',
                 ]
+            );
+
+            // If validation fails, return with error messages
+            if ($validator->fails()) {
+                return redirect()->back()->with('error', $validator->errors()->first());
+            }
+
+            // Prepare data to be sent to the API
+            $requestData = [
+                'supplierInvcNo' => $request->vendor_invoice_no,
+                'purchaseTypeCode' => $request->purchase_type_code,
+                'purchaseStatuCode' => $request->purchase_number,
+                'itemPurchases' => [],
             ];
-            
-            //Test with hardcoded data 
-            // $requestData = [
-            //     'supplierInvcNo' => 'VDR230',
-            //     'purchaseTypeCode' => 'PTC230',
-            //     'purchaseStatuCode' => 'PSC230',
-            //     'itemPurchases' => [
-            //         [
-            //             'supplierItemCode' => 'VIC230',
-            //             'itemCode' => 'PIT230',
-            //         ]
-            //     ]
-            // ];
 
+            // Process each item and add to the itemPurchases array
+            foreach ($request->items as $item) {
+                $requestData['itemPurchases'][] = [
+                    'supplierItemCode' => $request->vender_id,
+                    'itemCode' => $request->purchase_number,
+                ];
+            }
 
-            // Make API call
+            // Make API call to store the purchase
             $response = Http::withHeaders([
                 'accept' => 'application/json',
                 'Content-Type' => 'application/json',
                 'key' => '123456',
             ])->post('https://etims.your-apps.biz/api/AddPurchase', $requestData);
 
-
-            // Log the response body
+            // Log the API response
+            \Log::info('API Request Data: ' . json_encode($requestData));
             \Log::info('API Response: ' . $response->body());
-
-            // Log the response status code
             \Log::info('API Response Status Code: ' . $response->status());
-
 
             // Check if API call was successful
             if ($response->successful()) {
-                return redirect()->route('purchase.index')->with('success', __('Purchase successfully created..'));
+                return redirect()->route('purchase.index')->with('success', __('Purchase successfully created.'));
             } else {
                 // If API call failed, return with error message
-                return redirect()->back()->with('error', __('Failed to Created Purchase.'));
+                return redirect()->back()->with('error', __('Failed to create purchase.'));
             }
-
         } else {
+            // If user doesn't have permission, return with error message
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }

@@ -2,26 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ChartOfAccount;
-use App\Models\ChartOfAccountType;
-use App\Models\CustomField;
-use App\Exports\ProductServiceExport;
-use App\Imports\ProductServiceImport;
-use App\Models\Product;
-use App\Models\ProductService;
-use App\Models\ProductServiceCategory;
-use App\Models\ProductServiceUnit;
 use App\Models\Tax;
 use App\Models\User;
-use App\Models\Utility;
 use App\Models\Vender;
-use App\Models\WarehouseProduct;
+use App\Models\Product;
+use App\Models\Utility;
+use App\Models\Countries;
+use App\Models\CustomField;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use App\Models\ChartOfAccount;
+use App\Models\ProductService;
 use Illuminate\Validation\Rule;
+use App\Models\WarehouseProduct;
+use App\Models\ChartOfAccountType;
+use App\Models\ProductServiceUnit;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ProductServiceExport;
+use App\Imports\ProductServiceImport;
+use App\Models\ProductServiceCategory;
+use Illuminate\Support\Facades\Storage;
 
 
 
@@ -88,7 +89,11 @@ class ProductServiceController extends Controller
             $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
             $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
 
-            return view('productservice.create', compact('category', 'unit', 'tax', 'customFields', 'incomeChartAccounts', 'incomeSubAccounts', 'expenseChartAccounts', 'expenseSubAccounts'));
+            // Fetch countries data from the Countries model
+            $countries = Countries::all();
+            
+
+            return view('productservice.create', compact('category', 'unit', 'tax', 'customFields', 'incomeChartAccounts', 'incomeSubAccounts', 'expenseChartAccounts', 'expenseSubAccounts','countries'));
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
@@ -101,15 +106,28 @@ class ProductServiceController extends Controller
 
             $rules = [
                 'name' => 'required',
+                'standard_name' => 'required',
+                'product_type_code' => 'required',
+                'product_classified_code' => 'required',
+                'country_code' => 'required',
+                'batch_no' => 'required',
+                'bar_code' => 'required',
                 'sku' => ['required', Rule::unique('product_services')->where(function ($query) {
                    return $query->where('created_by', \Auth::user()->id);
                  })
                 ],
                 'sale_price' => 'required|numeric',
+                'group1_unit_price' => 'required|numeric',
+                'group2_unit_price' => 'required|numeric',
+                'group3_unit_price' => 'required|numeric',
+                'group4_unit_price' => 'required|numeric',
+                'group5_unit_price' => 'required|numeric',
+                'opening_balance' => 'required|numeric',
                 'purchase_price' => 'required|numeric',
                 'category_id' => 'required',
                 'unit_id' => 'required',
                 'type' => 'required',
+                'safety_quantity' => 'required|numeric',
             ];
 
             $validator = \Validator::make($request->all(), $rules);
