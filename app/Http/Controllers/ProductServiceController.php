@@ -197,100 +197,100 @@ class ProductServiceController extends Controller
      * Data should be in an array for it to go through ensure that 
      * 
 
-     **********************************************************/   
+     **********************************************************/
 
-   /***
-    *  public function store(Request $request){
-        if (\Auth::user()->can('create product & service')) {
-            // Validation rules
-            $rules = [
-                'name' => 'required|string',
-                'standard_name' => 'required|string',
-                'category_id' => 'required|exists:product_service_categories,id',
-                'unit_id' => 'required|exists:product_service_units,id',
-                // 'tax_id' => 'required|exists:taxes,id',
-                'tax_type_code' => 'required',
-                'batch_no' => 'required|string',
-                'bar_code' => 'required|string',
-                'sale_price' => 'required|numeric',
-                'group1_unit_price' => 'required|numeric',
-                'group2_unit_price' => 'required|numeric',
-                'group3_unit_price' => 'required|numeric',
-                'group4_unit_price' => 'required|numeric',
-                'group5_unit_price' => 'required|numeric',
-                'opening_balance' => 'required|numeric',
-                'quantity' => 'required|numeric',
-                'safety_quantity' => 'required|numeric',
-                'is_increase_applicable' => 'required',
-                'description' => 'required|string',
-            ];
+    /***
+     *  public function store(Request $request){
+         if (\Auth::user()->can('create product & service')) {
+             // Validation rules
+             $rules = [
+                 'name' => 'required|string',
+                 'standard_name' => 'required|string',
+                 'category_id' => 'required|exists:product_service_categories,id',
+                 'unit_id' => 'required|exists:product_service_units,id',
+                 // 'tax_id' => 'required|exists:taxes,id',
+                 'tax_type_code' => 'required',
+                 'batch_no' => 'required|string',
+                 'bar_code' => 'required|string',
+                 'sale_price' => 'required|numeric',
+                 'group1_unit_price' => 'required|numeric',
+                 'group2_unit_price' => 'required|numeric',
+                 'group3_unit_price' => 'required|numeric',
+                 'group4_unit_price' => 'required|numeric',
+                 'group5_unit_price' => 'required|numeric',
+                 'opening_balance' => 'required|numeric',
+                 'quantity' => 'required|numeric',
+                 'safety_quantity' => 'required|numeric',
+                 'is_increase_applicable' => 'required',
+                 'description' => 'required|string',
+             ];
 
-            // Validate the request data
-            $validator = \Validator::make($request->all(), $rules);
+             // Validate the request data
+             $validator = \Validator::make($request->all(), $rules);
 
-            // Check for validation errors
-            if ($validator->fails()) {
-                $messages = $validator->getMessageBag();
-                return redirect()->back()->with('error', $messages->first());
-            } 
+             // Check for validation errors
+             if ($validator->fails()) {
+                 $messages = $validator->getMessageBag();
+                 return redirect()->back()->with('error', $messages->first());
+             } 
 
 
-            $productData = [
-                "itemCode" => $request->sku,
-                "itemClassifiCode" => $request->category_id,
-                "itemTypeCode" => $request->product_type_code,
-                "itemName" => $request->name,
-                "itemStrdName" => $request->standard_name,
-                "countryCode" => $request->country_code,
-                "pkgUnitCode" => $request->unit_id,
-                "qtyUnitCode" => $request->unit_id,
-                "taxTypeCode" => $request->tax_type_code,
-                "batchNo" => $request->batch_no,
-                "barcode" => $request->bar_code,
-                "unitPrice" => $request->sale_price,
-                "group1UnitPrice" => $request->group1_unit_price,
-                "group2UnitPrice" => $request->group2_unit_price,
-                "group3UnitPrice" => $request->group3_unit_price,
-                "group4UnitPrice" => $request->group4_unit_price,
-                "group5UnitPrice" => $request->group5_unit_price,
-                "additionalInfo" => $request->description,
-                "saftyQuantity" => $request->safety_quantity,
-                "isInrcApplicable" => $request->is_increase_applicable,
-                "isUsed" => true,
-                "openingBalance" => $request->opening_balance,
-                "packageQuantity" => $request->quantity,
-            ];
-            
-            // Make API call to store the products
-            $response = Http::withHeaders([
-                'accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'key' => '123456', // Assuming this is your API key
-            ])->post('https://etims.your-apps.biz/api/SaveItems', $productData);
+             $productData = [
+                 "itemCode" => $request->sku,
+                 "itemClassifiCode" => $request->category_id,
+                 "itemTypeCode" => $request->product_type_code,
+                 "itemName" => $request->name,
+                 "itemStrdName" => $request->standard_name,
+                 "countryCode" => $request->country_code,
+                 "pkgUnitCode" => $request->unit_id,
+                 "qtyUnitCode" => $request->unit_id,
+                 "taxTypeCode" => $request->tax_type_code,
+                 "batchNo" => $request->batch_no,
+                 "barcode" => $request->bar_code,
+                 "unitPrice" => $request->sale_price,
+                 "group1UnitPrice" => $request->group1_unit_price,
+                 "group2UnitPrice" => $request->group2_unit_price,
+                 "group3UnitPrice" => $request->group3_unit_price,
+                 "group4UnitPrice" => $request->group4_unit_price,
+                 "group5UnitPrice" => $request->group5_unit_price,
+                 "additionalInfo" => $request->description,
+                 "saftyQuantity" => $request->safety_quantity,
+                 "isInrcApplicable" => $request->is_increase_applicable,
+                 "isUsed" => true,
+                 "openingBalance" => $request->opening_balance,
+                 "packageQuantity" => $request->quantity,
+             ];
+             
+             // Make API call to store the products
+             $response = Http::withHeaders([
+                 'accept' => 'application/json',
+                 'Content-Type' => 'application/json',
+                 'key' => '123456', // Assuming this is your API key
+             ])->post('https://etims.your-apps.biz/api/SaveItems', $productData);
 
-            // Log the API response
-            \Log::info('API Request Data: ' . json_encode($productData));
-            \Log::info('API Response: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
-            
-             // Check if API call was successful
-            if ($response->successful()) {
-                // API request was successful, handle response if needed
-                $apiResponse = $response->json();
-                return redirect()->route('productservice.index')->with('success', __('Item/s / Product/s successfully created.'));
-            } else {
+             // Log the API response
+             \Log::info('API Request Data: ' . json_encode($productData));
+             \Log::info('API Response: ' . $response->body());
+             \Log::info('API Response Status Code: ' . $response->status());
+             
+              // Check if API call was successful
+             if ($response->successful()) {
+                 // API request was successful, handle response if needed
+                 $apiResponse = $response->json();
+                 return redirect()->route('productservice.index')->with('success', __('Item/s / Product/s successfully created.'));
+             } else {
 
-                // API request failed, handle error
-                $errorResponse = $response->json(); 
-                // If API call failed, return with error message
-                return redirect()->back()->with('error', __('Failed to create Item/s / Product/s.'));
-            }            
-        } else {
-            // User doesn't have permission
-            return redirect()->back()->with('error', __('Permission denied.'));
-        }
-    }
-**/
+                 // API request failed, handle error
+                 $errorResponse = $response->json(); 
+                 // If API call failed, return with error message
+                 return redirect()->back()->with('error', __('Failed to create Item/s / Product/s.'));
+             }            
+         } else {
+             // User doesn't have permission
+             return redirect()->back()->with('error', __('Permission denied.'));
+         }
+     }
+ **/
 
 
     public function store(Request $request)
@@ -311,16 +311,16 @@ class ProductServiceController extends Controller
             }
 
             // Check if it's a single product or multiple products
-        if ($request->has('name') && is_array($request->name)) {
-            // Handle multiple products
-            $products = [];
-            foreach ($request->name as $key => $value) {
-                $products[] = $this->constructProductData($request, $key);
+            if ($request->has('name') && is_array($request->name)) {
+                // Handle multiple products
+                $products = [];
+                foreach ($request->name as $key => $value) {
+                    $products[] = $this->constructProductData($request, $key);
+                }
+            } else {
+                // Handle single product
+                $products[] = $this->constructProductData($request, null);
             }
-        } else {
-            // Handle single product
-            $products[] = $this->constructProductData($request, null);
-        }
 
             // Make API call to store the products
             $response = Http::withHeaders([
@@ -555,6 +555,86 @@ class ProductServiceController extends Controller
     {
         return view('productservice.import');
     }
+    /****
+  public function import(Request $request)
+  {
+      $rules = [
+          'file' => 'required',
+      ];
+
+      $validator = \Validator::make($request->all(), $rules);
+
+      if ($validator->fails()) {
+          $messages = $validator->getMessageBag();
+
+          return redirect()->back()->with('error', $messages->first());
+      }
+      $products = (new ProductServiceImport)->toArray(request()->file('file'))[0];
+      $totalProduct = count($products) - 1;
+      $errorArray = [];
+      for ($i = 1; $i <= count($products) - 1; $i++) {
+          $items = $products[$i];
+
+          $taxes = explode(';', $items[5]);
+
+          $taxesData = [];
+          foreach ($taxes as $tax) {
+              $taxes = Tax::where('id', $tax)->first();
+              //                $taxesData[] = $taxes->id;
+              $taxesData[] = !empty($taxes->id) ? $taxes->id : 0;
+
+
+          }
+
+          $taxData = implode(',', $taxesData);
+          //            dd($taxData);
+
+          if (!empty($productBySku)) {
+              $productService = $productBySku;
+          } else {
+              $productService = new ProductService();
+          }
+
+          $productService->name = $items[0];
+          $productService->sku = $items[1];
+          $productService->sale_price = $items[2];
+          $productService->purchase_price = $items[3];
+          $productService->quantity = $items[4];
+          $productService->tax_id = $items[5];
+          $productService->category_id = $items[6];
+          $productService->unit_id = $items[7];
+          $productService->type = $items[8];
+          $productService->description = $items[9];
+          $productService->created_by = \Auth::user()->creatorId();
+
+          if (empty($productService)) {
+              $errorArray[] = $productService;
+          } else {
+              $productService->save();
+          }
+      }
+
+      $errorRecord = [];
+      if (empty($errorArray)) {
+
+          $data['status'] = 'success';
+          $data['msg'] = __('Record successfully imported');
+      } else {
+          $data['status'] = 'error';
+          $data['msg'] = count($errorArray) . ' ' . __('Record imported fail out of' . ' ' . $totalProduct . ' ' . 'record');
+
+
+          foreach ($errorArray as $errorData) {
+
+              $errorRecord[] = implode(',', $errorData);
+          }
+
+          \Session::put('errorArray', $errorRecord);
+      }
+
+      return redirect()->back()->with($data['status'], $data['msg']);
+  }
+   ***/
 
     public function import(Request $request)
     {
@@ -569,72 +649,84 @@ class ProductServiceController extends Controller
 
             return redirect()->back()->with('error', $messages->first());
         }
+
+        // Read and process the CSV file
         $products = (new ProductServiceImport)->toArray(request()->file('file'))[0];
-        $totalProduct = count($products) - 1;
-        $errorArray = [];
-        for ($i = 1; $i <= count($products) - 1; $i++) {
-            $items = $products[$i];
 
-            $taxes = explode(';', $items[5]);
-
-            $taxesData = [];
-            foreach ($taxes as $tax) {
-                $taxes = Tax::where('id', $tax)->first();
-                //                $taxesData[] = $taxes->id;
-                $taxesData[] = !empty($taxes->id) ? $taxes->id : 0;
-
-
-            }
-
-            $taxData = implode(',', $taxesData);
-            //            dd($taxData);
-
-            if (!empty($productBySku)) {
-                $productService = $productBySku;
-            } else {
-                $productService = new ProductService();
-            }
-
-            $productService->name = $items[0];
-            $productService->sku = $items[1];
-            $productService->sale_price = $items[2];
-            $productService->purchase_price = $items[3];
-            $productService->quantity = $items[4];
-            $productService->tax_id = $items[5];
-            $productService->category_id = $items[6];
-            $productService->unit_id = $items[7];
-            $productService->type = $items[8];
-            $productService->description = $items[9];
-            $productService->created_by = \Auth::user()->creatorId();
-
-            if (empty($productService)) {
-                $errorArray[] = $productService;
-            } else {
-                $productService->save();
-            }
+        // Construct the data array in the required JSON format
+        $jsonData = [];
+        foreach ($products as $product) {
+            $jsonData[] = [
+                "itemCode" => $product[0],
+                "itemClassifiCode" => $product[1],
+                "itemTypeCode" => $product[2],
+                "itemName" => $product[3],
+                "itemStrdName" => $product[4],
+                "countryCode" => $product[5],
+                "pkgUnitCode" => $product[6],
+                "qtyUnitCode" => $product[7],
+                "taxTypeCode" => $product[8],
+                "batchNo" => $product[9],
+                "barcode" => $product[10],
+                "unitPrice" => (float) $product[11],
+                "group1UnitPrice" => (float) $product[12],
+                "group2UnitPrice" => (float) $product[13],
+                "group3UnitPrice" => (float) $product[14],
+                "group4UnitPrice" => (float) $product[15],
+                "group5UnitPrice" => (float) $product[16],
+                "additionalInfo" => $product[17],
+                "saftyQuantity" => (int) $product[18],
+                "isInrcApplicable" => (bool) $product[19],
+                "isUsed" => (bool) $product[20],
+                "openingBalance" => (float) $product[21],
+                "packageQuantity" => (int) $product[22]
+            ];
         }
 
-        $errorRecord = [];
-        if (empty($errorArray)) {
+        // Make a POST request to the API endpoint
+        $response = Http::withHeaders([
+            'accept' => '*/*',
+            'key' => '123456',
+            'Content-Type' => 'application/json-patch+json',
+        ])->post('https://etims.your-apps.biz/api/SaveItems', $jsonData);
 
-            $data['status'] = 'success';
-            $data['msg'] = __('Record successfully imported');
+        // Log the API response
+        \Log::info('API Request Data: ' . json_encode($products));
+        \Log::info('API Response: ' . $response->body());
+        \Log::info('API Response Status Code: ' . $response->status());
+
+        // Check if API call was successful
+        // if ($response->successful()) {
+        //     // API request was successful
+        //     return redirect()->route('productservice.index')->with('success', __('Data imported and posted to API successfully.'));
+        // } else {
+        //     // If API call failed, log error and handle error message
+        //     \Log::error('API Error: ' . $response->body());
+
+        //     // Get the error message from the API response
+        //     $errorMessage = $response->json()['message'] ?? __('Failed to import data or post to API.');
+
+        //     // Check if there are any failed products
+        //     if (!empty($jsonData)) {
+        //         // There are failed products, so return with error message
+        //         return redirect()->back()->with('error', $errorMessage)->with('failedProducts', $jsonData);
+        //     } else {
+        //         // No products were imported, so just return with error message
+        //         return redirect()->back()->with('error', $errorMessage);
+        //     }
+        // }
+        if ($response->successful()) {
+            // API request was successful
+            return redirect()->route('productservice.index')->with('success', __('Data imported and posted to API successfully.'));
         } else {
-            $data['status'] = 'error';
-            $data['msg'] = count($errorArray) . ' ' . __('Record imported fail out of' . ' ' . $totalProduct . ' ' . 'record');
-
-
-            foreach ($errorArray as $errorData) {
-
-                $errorRecord[] = implode(',', $errorData);
-            }
-
-            \Session::put('errorArray', $errorRecord);
+            // If API call failed, return with error message
+            return redirect()->back()->with('error', __('Failed to import data or post to API.'));
         }
 
-        return redirect()->back()->with($data['status'], $data['msg']);
     }
-    
+
+
+
 
     public function warehouseDetail($id)
     {
