@@ -1,4 +1,8 @@
- @extends('layouts.admin')
+<!-- @php
+    dd($productServices);
+@endphp -->
+
+@extends('layouts.admin')
 @section('page-title')
     {{__('Manage Product & Services')}}
 @endsection
@@ -153,4 +157,3 @@
         </div>
     </div>
 @endsection
-

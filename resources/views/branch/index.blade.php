@@ -1,3 +1,8 @@
+@php 
+
+ dd($branches);
+@endphp
+
 @extends('layouts.admin')
 @section('page-title')
     {{__('Manage Branch')}}
@@ -37,7 +42,7 @@
                             <tbody class="font-style">
                             @foreach ($branches as $branch)
                                 <tr>
-                                    <td>{{ $branch->name }}</td>
+                                    <td>{{ $branch->branchUserName }}</td>
                                     <td class="Action text-end">
                                         <span>
                                             @can('edit branch')
@@ -48,7 +53,7 @@
                                             @endcan
                                             @can('delete branch')
                                                 <div class="action-btn bg-danger ms-2">
-                                            {!! Form::open(['method' => 'DELETE', 'route' => ['branch.destroy', $branch->id],'id'=>'delete-form-'.$branch->id]) !!}
+                                            {!! Form::open(['method' => 'DELETE', 'route' => ['branch.destroy', $branch->branchUserId],'id'=>'delete-form-'.$branch->branchUserId]) !!}
 
                                                 <a href="#" class="mx-3 btn btn-sm align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?').'|'.__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$branch->id}}').submit();"><i class="ti ti-trash text-white text-white"></i></a>
                                                 {!! Form::close() !!}

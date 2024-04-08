@@ -50,6 +50,38 @@ class ProductServiceController extends Controller
         }
     }
 
+    /**
+     * Using Api Endpoint
+     *  
+     */
+
+    // public function index()
+    // {
+    //     if (\Auth::user()->can('manage product & service')) {
+    //         $response = Http::withHeaders([
+    //             'accept' => 'application/json',
+    //             'Content-Type' => 'application/json',
+    //             'key' => '123456',
+    //         ])->get('https://etims.your-apps.biz/api/GetItemInformation', [
+    //                     'date' => date('2024-04-08'),
+    //                 ]);
+    //         if ($response->successful()) {
+    //             $productServices = $response->json();
+    //         } else {
+    //             // Log the error
+    //             \Log::error('Failed to fetch users from API: ' . $response->status() . ' ' . $response->body());
+
+    //             // Handle error response
+    //             return redirect()->back()->with('error', 'Failed to fetch users from API.');
+    //         }
+    //         return view('productservice.index')->with('productServices', $productServices);
+    //     } else {
+    //         return redirect()->back();
+    //     }
+    // }
+
+    
+
 
     public function create()
     {

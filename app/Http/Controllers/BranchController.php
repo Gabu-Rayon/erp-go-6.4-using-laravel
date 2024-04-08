@@ -5,22 +5,55 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class BranchController extends Controller
 {
+    // public function index()
+    // {
+    //     if(\Auth::user()->can('manage branch'))
+    //     {
+    //         $branches = Branch::where('created_by', '=', \Auth::user()->creatorId())->get();
+
+    //         return view('branch.index', compact('branches'));
+    //     }
+    //     else
+    //     {
+    //         return redirect()->back()->with('error', __('Permission denied.'));
+    //     }
+    // }
+
+
     public function index()
     {
-        if(\Auth::user()->can('manage branch'))
-        {
-            $branches = Branch::where('created_by', '=', \Auth::user()->creatorId())->get();
+        if (\Auth::user()->can('manage branch')) {
+            try {
+                $response = Http::withHeaders([
+                    'accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                    'key' => '123456',
+                ])->get('https://etims.your-apps.biz/api/GetBranchList', [
+                        'date' => date('2024-04-08'),
+                    ]);
 
-            return view('branch.index', compact('branches'));
-        }
-        else
-        {
+                if ($response->successful()) {
+                    $branches = $response->json();
+                    return view('branch.index', compact('branches'));
+                } else {
+                    // Log error and handle error response
+                    \Log::error('Failed to fetch branches from API: ' . $response->status() . ' ' . $response->body());
+                    return redirect()->back()->with('error', 'Failed to fetch branches from API.');
+                }
+            } catch (\Exception $e) {
+                // Log exception and handle exception
+                \Log::error('Exception occurred while fetching branches: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Failed to fetch branches from API.');
+            }
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
+
 
     public function create()
     {
@@ -163,11 +196,11 @@ class BranchController extends Controller
     {
         if(in_array('0', $request->department_id))
         {
-            $employees = Employee::get()->pluck('name', 'id')->toArray();
+            $employees = \App\Models\Employee::get()->pluck('name', 'id')->toArray();
         }
         else
         {
-            $employees = Employee::whereIn('department_id', $request->department_id)->get()->pluck('name', 'id')->toArray();
+            $employees = \App\Models\Employee::whereIn('department_id', $request->department_id)->get()->pluck('name', 'id')->toArray();
         }
 
         return response()->json($employees);
