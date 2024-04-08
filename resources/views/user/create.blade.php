@@ -1,4 +1,5 @@
 {{Form::open(array('url'=>'users','method'=>'post'))}}
+
 <div class="modal-body">
     <div class="row">
         <div class="col-md-6">
@@ -12,7 +13,7 @@
                 @enderror
             </div>
         </div>
-        <div class="col-md-6">
+        <!-- <div class="col-md-6">
             <div class="form-group">
                 {{Form::label('email',__('Email'),['class'=>'form-label'])}}
                 {{Form::text('email',null,array('class'=>'form-control','placeholder'=>__('Enter User Email'),'required'=>'required'))}}
@@ -22,7 +23,40 @@
                 </small>
                 @enderror
             </div>
+        </div> -->
+        <div class="col-md-6">
+            <div class="form-group">
+                {{Form::label('address',__('Address'),['class'=>'form-label'])}}
+                {{Form::text('address',null,array('class'=>'form-control','placeholder'=>__('Enter Your Address'),'required'=>'required'))}}
+                @error('address')
+                <small class="invalid-address" role="alert">
+                    <strong class="text-danger">{{ $message }}</strong>
+                </small>
+                @enderror
+            </div>
         </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                {{Form::label('contact',__('Contact'),['class'=>'form-label'])}}
+                {{Form::text('contact',null,array('class'=>'form-control','placeholder'=>__('+2547123456'),'required'=>'required'))}}
+                @error('contact')
+                <small class="invalid-contact" role="alert">
+                    <strong class="text-danger">{{ $message }}</strong>
+                </small>
+                @enderror
+            </div>
+        </div>
+       <div class="col-md-6">
+            <div class="form-group">
+                {{Form::label('remark',__('Remark'),['class'=>'form-label'])}}
+                {{Form::text('remark',null,array('class'=>'form-control','placeholder'=>__('Enter Your Remarks'),'required'=>'required'))}}
+                @error('remark')
+                <small class="invalid-remark" role="alert">
+                    <strong class="text-danger">{{ $message }}</strong>
+                </small>
+                @enderror
+            </div>
+        </div> 
         @if(\Auth::user()->type != 'super admin')
             <div class="form-group col-md-6">
                 {{ Form::label('role', __('User Role'),['class'=>'form-label']) }}
@@ -47,6 +81,7 @@
                 @enderror
             </div>
         </div>
+        
         @if(!$customFields->isEmpty())
             <div class="col-md-6">
                 <div class="tab-pane fade show" id="tab-2" role="tabpanel">
