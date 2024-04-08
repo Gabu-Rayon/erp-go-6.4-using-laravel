@@ -25,11 +25,14 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use App\Models\ExperienceCertificate;
-
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
 
+    /********
+     * Method to get  All  companies/Branches for both local and  using API Endpoint 
+     */
 
     public function index()
     {
@@ -47,6 +50,35 @@ class UserController extends Controller
         }
 
     }
+    /**
+     * Using Api Endpoint
+     *  
+     */
+
+    // public function index()
+    // {
+    //     if (\Auth::user()->can('manage user') && (\Auth::user()->type == 'super admin')) {
+    //         $response = Http::withHeaders([
+    //             'accept' => 'application/json',
+    //             'Content-Type' => 'application/json',
+    //             'key' => '123456',
+    //         ])->get('https://etims.your-apps.biz/api/GetBranchList', [
+    //                     'date' => date('2024-04-08'),
+    //                 ]);
+    //         if ($response->successful()) {
+    //             $users = $response->json();
+    //         } else {
+    //             // Log the error
+    //             \Log::error('Failed to fetch users from API: ' . $response->status() . ' ' . $response->body());
+
+    //             // Handle error response
+    //             return redirect()->back()->with('error', 'Failed to fetch users from API.');
+    //         }
+    //         return view('user.index')->with('users', $users);
+    //     } else {
+    //         return redirect()->back();
+    //     }
+    // }
 
     public function create()
     {
@@ -61,10 +93,11 @@ class UserController extends Controller
         }
     }
 
-
+    /********
+     * Method to create  new company/Branch for both local and  using API Endpoint 
+     */
     /****
-  public function store(Request $request)
-  {
+  public function store(Request $request){
 
       if(\Auth::user()->can('create user'))
       {
@@ -207,9 +240,9 @@ class UserController extends Controller
         if (\Auth::user()->can('create user')) {
             $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->where('created_by', '=', \Auth::user()->creatorId())->first();
             $objUser = \Auth::user()->creatorId();
-            
+
             if (\Auth::user()->type == 'super admin') {
-                
+
                 $validator = \Validator::make(
                     $request->all(),
                     [
@@ -226,18 +259,18 @@ class UserController extends Controller
 
                     return redirect()->back()->with('error', $messages->first());
                 }
+                $uuid = Str::uuid()->toString();
+                $branchUserId = substr($uuid, 0, 20);
+                $authenticationCode = mt_rand(1000, 9999);
+
                 //array containing the data to be sent to the API
                 $requestData = [
-
-                    //create uuid for each branch 
-                    'branchUserId' => $this->customerNumber(),
+                    'branchUserId' => $branchUserId,
                     'branchUserName' => $request->name,
                     'password' => Hash::make($request->password),
                     'address' => $request->address,
                     'contactNo' => $request->contact,
-
-                    //autogenerate the auth code 
-                    'authenticationCode' => $request->auth,
+                    'authenticationCode' => $authenticationCode,
                     'remark' => $request->remark,
 
                     //we set is true
