@@ -77,7 +77,7 @@ class PurchaseController extends Controller
         }
     }
 
-    /**
+    /********
      * Store a newly created Purchase in storage.
      *
      * @param  \Illuminate\Http\Request  $request
