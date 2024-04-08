@@ -1,3 +1,4 @@
+
 <?php
    // $profile=asset(Storage::url('uploads/avatar/'));
     $profile=\App\Models\Utility::get_file('uploads/avatar');
