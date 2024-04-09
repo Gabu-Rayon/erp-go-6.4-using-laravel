@@ -12,6 +12,15 @@
 @section('action-btn')
     <div class="float-end">
         @can('create plan')
+            <a href="#" data-size="lg" data-url="{{ route('plans.create') }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Create')}}" data-title="{{__('Create New Plan')}}" class="btn btn-sm btn-primary">
+                <i class="ti ti-plus"></i>
+            </a>
+        @endcan
+    </div>
+@endsection
+@section('action-btn')
+    <div class="float-end">
+        @can('create plan')
             @if (isset($admin_payment_setting) && !empty($admin_payment_setting))
                 @if (
                     $admin_payment_setting['is_manually_payment_enabled'] == 'on' ||

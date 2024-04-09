@@ -1,8 +1,9 @@
-<?php
-    dd($productServices);
-?>
+<!-- <?php
 
+var_dump($productServices);
+?> -->
 
+ 
 <?php $__env->startSection('page-title'); ?>
     <?php echo e(__('Manage Product & Services')); ?>
 
@@ -164,4 +165,6 @@
         </div>
     </div>
 <?php $__env->stopSection(); ?>
+
+
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/productservice/index.blade.php ENDPATH**/ ?>

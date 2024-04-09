@@ -1,6 +1,5 @@
 <?php echo e(Form::open(array('url'=>'users','method'=>'post'))); ?>
 
-
 <div class="modal-body">
     <div class="row">
         <div class="col-md-6">
@@ -23,7 +22,7 @@ endif;
 unset($__errorArgs, $__bag); ?>
             </div>
         </div>
-        <!-- <div class="col-md-6">
+        <div class="col-md-6">
             <div class="form-group">
                 <?php echo e(Form::label('email',__('Email'),['class'=>'form-label'])); ?>
 
@@ -42,67 +41,7 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
             </div>
-        </div> -->
-        <div class="col-md-6">
-            <div class="form-group">
-                <?php echo e(Form::label('address',__('Address'),['class'=>'form-label'])); ?>
-
-                <?php echo e(Form::text('address',null,array('class'=>'form-control','placeholder'=>__('Enter Your Address'),'required'=>'required'))); ?>
-
-                <?php $__errorArgs = ['address'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                <small class="invalid-address" role="alert">
-                    <strong class="text-danger"><?php echo e($message); ?></strong>
-                </small>
-                <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-            </div>
         </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <?php echo e(Form::label('contact',__('Contact'),['class'=>'form-label'])); ?>
-
-                <?php echo e(Form::text('contact',null,array('class'=>'form-control','placeholder'=>__('+2547123456'),'required'=>'required'))); ?>
-
-                <?php $__errorArgs = ['contact'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                <small class="invalid-contact" role="alert">
-                    <strong class="text-danger"><?php echo e($message); ?></strong>
-                </small>
-                <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-            </div>
-        </div>
-       <div class="col-md-6">
-            <div class="form-group">
-                <?php echo e(Form::label('remark',__('Remark'),['class'=>'form-label'])); ?>
-
-                <?php echo e(Form::text('remark',null,array('class'=>'form-control','placeholder'=>__('Enter Your Remarks'),'required'=>'required'))); ?>
-
-                <?php $__errorArgs = ['remark'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                <small class="invalid-remark" role="alert">
-                    <strong class="text-danger"><?php echo e($message); ?></strong>
-                </small>
-                <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-            </div>
-        </div> 
         <?php if(\Auth::user()->type != 'super admin'): ?>
             <div class="form-group col-md-6">
                 <?php echo e(Form::label('role', __('User Role'),['class'=>'form-label'])); ?>
@@ -146,7 +85,6 @@ endif;
 unset($__errorArgs, $__bag); ?>
             </div>
         </div>
-        
         <?php if(!$customFields->isEmpty()): ?>
             <div class="col-md-6">
                 <div class="tab-pane fade show" id="tab-2" role="tabpanel">

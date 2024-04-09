@@ -1,7 +1,7 @@
-<?php 
+<!-- <?php
 
- dd($branches);
-?>
+var_dump($branches);
+?> -->
 
 
 <?php $__env->startSection('page-title'); ?>
@@ -43,7 +43,7 @@
                             <tbody class="font-style">
                             <?php $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
-                                    <td><?php echo e($branch->branchUserName); ?></td>
+                                    <td><?php echo e($branch->name); ?></td>
                                     <td class="Action text-end">
                                         <span>
                                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit branch')): ?>
@@ -54,7 +54,7 @@
                                             <?php endif; ?>
                                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete branch')): ?>
                                                 <div class="action-btn bg-danger ms-2">
-                                            <?php echo Form::open(['method' => 'DELETE', 'route' => ['branch.destroy', $branch->branchUserId],'id'=>'delete-form-'.$branch->branchUserId]); ?>
+                                            <?php echo Form::open(['method' => 'DELETE', 'route' => ['branch.destroy', $branch->id],'id'=>'delete-form-'.$branch->id]); ?>
 
 
                                                 <a href="#" class="mx-3 btn btn-sm align-items-center bs-pass-para" data-bs-toggle="tooltip" title="<?php echo e(__('Delete')); ?>" data-original-title="<?php echo e(__('Delete')); ?>" data-confirm="<?php echo e(__('Are You Sure?').'|'.__('This action can not be undone. Do you want to continue?')); ?>" data-confirm-yes="document.getElementById('delete-form-<?php echo e($branch->id); ?>').submit();"><i class="ti ti-trash text-white text-white"></i></a>

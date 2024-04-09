@@ -43,9 +43,52 @@ class PurchaseController extends Controller
 
 
         return view('purchase.index', compact('purchases', 'status', 'vender'));
-
-
     }
+
+
+    /**
+     * Using Api Endpoint
+     *  
+     */
+    // public function index()
+    // {
+    //     $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+    //     $vender->prepend('Select Vendor', '');
+    //     $status = Purchase::$statues;
+        
+    //     try {
+    //         // $response = Http::withHeaders([
+    //         //     'accept' => 'application/json',
+    //         //     'Content-Type' => 'application/json',
+    //         //     'key' => '123456',
+    //         // ])->get('https://etims.your-apps.biz/api/GetPurchaseList', [
+    //         //         'date' => date('2024-04-09'),
+    //         //     ]);
+
+    //         $response = Http::withHeaders([
+    //             'accept' => 'application/json',
+    //             'Content-Type' => 'application/json',
+    //             'key' => '123456',
+    //         ])->timeout(600)->get('https://etims.your-apps.biz/api/GetPurchaseList', [
+    //                     'date' => date('2024-04-09'),
+    //                 ]);
+
+
+    //         if ($response->successful()) {
+    //             $purchases = $response->json();
+    //             // return view('purchase.index', compact('purchases'));
+    //             return view('purchase.index', compact('purchases', 'status', 'vender'));
+    //         } else {
+    //             // Log error and handle error response
+    //             \Log::error('Failed to fetch purchases from API: ' . $response->status() . ' ' . $response->body());
+    //             return redirect()->back()->with('error', 'Failed to fetch purchases from API.');
+    //         }
+    //     } catch (\Exception $e) {
+    //         // Log exception and handle exception
+    //         \Log::error('Exception occurred while fetching purchases: ' . $e->getMessage());
+    //         return redirect()->back()->with('error', 'Failed to fetch purchases from API.');
+    //     }
+    // }
 
     /**
      * Show the form for creating a new resource.

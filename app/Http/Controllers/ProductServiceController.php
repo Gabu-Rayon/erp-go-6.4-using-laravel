@@ -54,33 +54,44 @@ class ProductServiceController extends Controller
      * Using Api Endpoint
      *  
      */
-
     // public function index()
     // {
     //     if (\Auth::user()->can('manage product & service')) {
-    //         $response = Http::withHeaders([
-    //             'accept' => 'application/json',
-    //             'Content-Type' => 'application/json',
-    //             'key' => '123456',
-    //         ])->get('https://etims.your-apps.biz/api/GetItemInformation', [
-    //                     'date' => date('2024-04-08'),
-    //                 ]);
-    //         if ($response->successful()) {
-    //             $productServices = $response->json();
-    //         } else {
-    //             // Log the error
-    //             \Log::error('Failed to fetch users from API: ' . $response->status() . ' ' . $response->body());
+    //         try {
+    //             // $response = Http::withHeaders([
+    //             //     'accept' => 'application/json',
+    //             //     'Content-Type' => 'application/json',
+    //             //     'key' => '123456',
+    //             // ])->get('https://etims.your-apps.biz/api/GetItemInformation', [
+    //             //         'date' => date('2024-04-09'),
+    //             //     ]);
 
-    //             // Handle error response
-    //             return redirect()->back()->with('error', 'Failed to fetch users from API.');
+    //             $response = Http::withHeaders([
+    //                 'accept' => 'application/json',
+    //                 'Content-Type' => 'application/json',
+    //                 'key' => '123456',
+    //             ])->timeout(300)->get('https://etims.your-apps.biz/api/GetItemInformation', [
+    //                         'date' => date('2024-04-09'),
+    //                     ]);
+
+
+    //             if ($response->successful()) {
+    //                 $productServices = $response->json();
+    //                 return view('productservice.index', compact('productServices'));
+    //             } else {
+    //                 // Log error and handle error response
+    //                 \Log::error('Failed to fetch products & Services from API: ' . $response->status() . ' ' . $response->body());
+    //                 return redirect()->back()->with('error', 'Failed to fetch products & Services from API.');
+    //             }
+    //         } catch (\Exception $e) {
+    //             // Log exception and handle exception
+    //             \Log::error('Exception occurred while fetching products & Services: ' . $e->getMessage());
+    //             return redirect()->back()->with('error', 'Failed to fetch products & Services from API.');
     //         }
-    //         return view('productservice.index')->with('productServices', $productServices);
     //     } else {
     //         return redirect()->back();
     //     }
     // }
-
-    
 
 
     public function create()
@@ -359,7 +370,7 @@ class ProductServiceController extends Controller
                 'accept' => 'application/json',
                 'Content-Type' => 'application/json',
                 'key' => '123456', // Assuming this is your API key
-            ])->post('https://etims.your-apps.biz/api/SaveItems', $products);
+            ])->post('https://etims.your-apps.biz/api/AddItemsList', $products);
 
             // Log the API response
             \Log::info('API Request Data: ' . json_encode($products));
@@ -407,7 +418,7 @@ class ProductServiceController extends Controller
             "saftyQuantity" => $request->input("safety_quantity.$key", $request->safety_quantity),
             "isInrcApplicable" => true,
             "isUsed" => true,
-            "openingBalance" => $request->input("opening_balance.$key", $request->opening_balance),
+            "quantity"  => $request->input("quantity.$key", $request->quantity),
             "packageQuantity" => $request->input("quantity.$key", $request->quantity),
         ];
         return $productData;

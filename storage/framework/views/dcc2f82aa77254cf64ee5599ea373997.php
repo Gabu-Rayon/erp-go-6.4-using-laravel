@@ -12,6 +12,15 @@
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create plan')): ?>
+            <a href="#" data-size="lg" data-url="<?php echo e(route('plans.create')); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Create')); ?>" data-title="<?php echo e(__('Create New Plan')); ?>" class="btn btn-sm btn-primary">
+                <i class="ti ti-plus"></i>
+            </a>
+        <?php endif; ?>
+    </div>
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('action-btn'); ?>
+    <div class="float-end">
+        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create plan')): ?>
             <?php if(isset($admin_payment_setting) && !empty($admin_payment_setting)): ?>
                 <?php if(
                     $admin_payment_setting['is_manually_payment_enabled'] == 'on' ||

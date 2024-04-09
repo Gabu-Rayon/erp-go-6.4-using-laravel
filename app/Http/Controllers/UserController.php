@@ -2,37 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CustomField;
+use App\Models\Employee;
+use App\Models\ExperienceCertificate;
+use App\Models\GenerateOfferLetter;
+use App\Models\JoiningLetter;
+use App\Models\LoginDetail;
+use App\Models\NOC;
+use App\Models\User;
+use App\Models\UserCompany;
 use Auth;
 use File;
-use Session;
-use App\Models\NOC;
-use App\Models\Plan;
-use App\Models\User;
-use App\Models\Order;
 use App\Models\Utility;
-use App\Models\Employee;
+use App\Models\Order;
+use App\Models\Plan;
 use App\Models\UserToDo;
-use App\Models\CustomField;
-use App\Models\LoginDetail;
-use App\Models\UserCompany;
 use Illuminate\Http\Request;
-use App\Models\JoiningLetter;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Role;
-use App\Models\GenerateOfferLetter;
-use Lab404\Impersonate\Impersonate;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
-use App\Models\ExperienceCertificate;
-use Illuminate\Support\Str;
+use Session;
+use Spatie\Permission\Models\Role;
+use Lab404\Impersonate\Impersonate;
+
 
 class UserController extends Controller
 {
-
-    /********
-     * Method to get  All  companies/Branches for both local and  using API Endpoint 
-     */
 
     public function index()
     {
@@ -50,35 +45,6 @@ class UserController extends Controller
         }
 
     }
-    /**
-     * Using Api Endpoint
-     *  
-     */
-
-    // public function index()
-    // {
-    //     if (\Auth::user()->can('manage user') && (\Auth::user()->type == 'super admin')) {
-    //         $response = Http::withHeaders([
-    //             'accept' => 'application/json',
-    //             'Content-Type' => 'application/json',
-    //             'key' => '123456',
-    //         ])->get('https://etims.your-apps.biz/api/GetBranchList', [
-    //                     'date' => date('2024-04-08'),
-    //                 ]);
-    //         if ($response->successful()) {
-    //             $users = $response->json();
-    //         } else {
-    //             // Log the error
-    //             \Log::error('Failed to fetch users from API: ' . $response->status() . ' ' . $response->body());
-
-    //             // Handle error response
-    //             return redirect()->back()->with('error', 'Failed to fetch users from API.');
-    //         }
-    //         return view('user.index')->with('users', $users);
-    //     } else {
-    //         return redirect()->back();
-    //     }
-    // }
 
     public function create()
     {
@@ -93,164 +59,19 @@ class UserController extends Controller
         }
     }
 
-    /********
-     * Method to create  new company/Branch for both local and  using API Endpoint 
-     */
-    /****
-  public function store(Request $request){
-
-      if(\Auth::user()->can('create user'))
-      {
-          $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->where('created_by', '=', \Auth::user()->creatorId())->first();
-          $objUser    = \Auth::user()->creatorId();
-
-          if(\Auth::user()->type == 'super admin')
-          {
-              $validator = \Validator::make(
-                  $request->all(), [
-
-                      'name' => 'required|max:120',
-                      'email' => 'required|email|unique:users',
-                      'address' => 'required',
-                      'contact' => 'required',
-                      'remark' => 'required',
-                      'password' => 'required|min:6',
-                                 ]
-              );
-              if($validator->fails())
-              {
-                  $messages = $validator->getMessageBag();
-
-                  return redirect()->back()->with('error', $messages->first());
-              }
-              $user               = new User();
-              $user['name'] = $request->name;
-              $user['email'] = $request->email;
-              $user['address'] = $request->address;
-              $user['contact'] = $request->contact;
-              $user['remark'] = $request->remark;
-              $psw                = $request->password;
-              $user['password']   = Hash::make($request->password);
-              $user['type']       = 'company';
-              $user['default_pipeline'] = 1;
-              $user['plan'] = 1;
-              $user['lang']       = !empty($default_language) ? $default_language->value : 'en';
-              $user['created_by'] = \Auth::user()->creatorId();
-              $user['plan']       = Plan::first()->id;
-              $user['email_verified_at'] = date('Y-m-d H:i:s');
-
-              $user->save();
-              $role_r = Role::findByName('company');
-              $user->assignRole($role_r);
-                  //                $user->userDefaultData();
-              $user->userDefaultDataRegister($user->id);
-              $user->userWarehouseRegister($user->id);
-
-              //default bank account for new company
-              $user->userDefaultBankAccount($user->id);
-
-              Utility::chartOfAccountTypeData($user->id);
-              // Utility::chartOfAccountData($user);
-              // default chart of account for new company
-              Utility::chartOfAccountData1($user->id);
-
-              Utility::pipeline_lead_deal_Stage($user->id);
-              Utility::project_task_stages($user->id);
-              Utility::labels($user->id);
-              Utility::sources($user->id);
-              Utility::jobStage($user->id);
-              GenerateOfferLetter::defaultOfferLetterRegister($user->id);
-              ExperienceCertificate::defaultExpCertificatRegister($user->id);
-              JoiningLetter::defaultJoiningLetterRegister($user->id);
-              NOC::defaultNocCertificateRegister($user->id);
-          }
-          else
-          {
-              $validator = \Validator::make(
-                  $request->all(), [
-                      'name' => 'required|max:120',
-                      'email' => 'required|email|unique:users',
-                      'address' => 'required',
-                      'contact' => 'required',
-                      'remark' => 'required',
-                                  //    'email' => 'required|email|unique:users,email,NULL,id,created_by,' . $objUser,
-                                     'password' => 'required|min:6',
-                                     'role' => 'required',
-                                 ]
-              );
-              if($validator->fails())
-              {
-                  $messages = $validator->getMessageBag();
-                  return redirect()->back()->with('error', $messages->first());
-              }
-              $objUser =User::find($objUser);
-              $user = User::find(\Auth::user()->created_by);
-              $total_user = $objUser->countUsers();
-              $plan       = Plan::find($objUser->plan);
-              if($total_user < $plan->max_users || $plan->max_users == -1)
-              {
-                  $role_r                = Role::findById($request->role);
-                  $psw                   = $request->password;
-                  $request['password']   = Hash::make($request->password);
-                  $request['type']       = $role_r->name;
-                  $request['lang']       = !empty($default_language) ? $default_language->value : 'en';
-                  $request['created_by'] = \Auth::user()->creatorId();
-                  $request['email_verified_at'] = date('Y-m-d H:i:s');
-
-                  $user = User::create($request->all());
-                  $user->assignRole($role_r);
-                  if($request['type'] != 'client')
-                    \App\Models\Utility::employeeDetails($user->id,\Auth::user()->creatorId());
-              }
-              else
-              {
-                  return redirect()->back()->with('error', __('Your user limit is over, Please upgrade plan.'));
-              }
-          }
-          // Send Email
-          $setings = Utility::settings();
-          if($setings['new_user'] == 1)
-          {
-
-              $user->password = $psw;
-              $user->type = $role_r->name;
-              $user->userDefaultDataRegister($user->id);
-
-              $userArr = [
-                  'email' => $user->email,
-                  'password' => $user->password,
-              ];
-              $resp = Utility::sendEmailTemplate('new_user', [$user->id => $user->email], $userArr);
-
-
-              return redirect()->route('users.index')->with('success', __('User successfully created.') . ((!empty($resp) && $resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
-          }
-          return redirect()->route('users.index')->with('success', __('User successfully created.'));
-
-      }
-      else
-      {
-          return redirect()->back();
-      }
-
-  }   
-  ***/
     public function store(Request $request)
     {
+
         if (\Auth::user()->can('create user')) {
             $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->where('created_by', '=', \Auth::user()->creatorId())->first();
             $objUser = \Auth::user()->creatorId();
 
             if (\Auth::user()->type == 'super admin') {
-
                 $validator = \Validator::make(
                     $request->all(),
                     [
                         'name' => 'required|max:120',
-                        // 'email' => 'required|email|unique:users',
-                        'address' => 'required',
-                        'contact' => 'required',
-                        'remark' => 'required',
+                        'email' => 'required|email|unique:users',
                         'password' => 'required|min:6',
                     ]
                 );
@@ -259,52 +80,105 @@ class UserController extends Controller
 
                     return redirect()->back()->with('error', $messages->first());
                 }
-                $uuid = Str::uuid()->toString();
-                $branchUserId = substr($uuid, 0, 20);
-                $authenticationCode = mt_rand(1000, 9999);
+                $user = new User();
+                $user['name'] = $request->name;
+                $user['email'] = $request->email;
+                $psw = $request->password;
+                $user['password'] = Hash::make($request->password);
+                $user['type'] = 'company';
+                $user['default_pipeline'] = 1;
+                $user['plan'] = 1;
+                $user['lang'] = !empty($default_language) ? $default_language->value : 'en';
+                $user['created_by'] = \Auth::user()->creatorId();
+                $user['plan'] = Plan::first()->id;
+                $user['email_verified_at'] = date('Y-m-d H:i:s');
 
-                //array containing the data to be sent to the API
-                $requestData = [
-                    'branchUserId' => $branchUserId,
-                    'branchUserName' => $request->name,
-                    'password' => Hash::make($request->password),
-                    'address' => $request->address,
-                    'contactNo' => $request->contact,
-                    'authenticationCode' => $authenticationCode,
-                    'remark' => $request->remark,
+                $user->save();
+                $role_r = Role::findByName('company');
+                $user->assignRole($role_r);
+                //                $user->userDefaultData();
+                $user->userDefaultDataRegister($user->id);
+                $user->userWarehouseRegister($user->id);
 
-                    //we set is true
-                    'isUsed' => true,
-                ];
+                //default bank account for new company
+                $user->userDefaultBankAccount($user->id);
 
-                // Make API call
-                $response = Http::withHeaders([
-                    'accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                    'key' => '123456',
-                ])->post('https://etims.your-apps.biz/api/AddBranchUser', $requestData);
+                Utility::chartOfAccountTypeData($user->id);
+                // Utility::chartOfAccountData($user);
+                // default chart of account for new company
+                Utility::chartOfAccountData1($user->id);
+
+                Utility::pipeline_lead_deal_Stage($user->id);
+                Utility::project_task_stages($user->id);
+                Utility::labels($user->id);
+                Utility::sources($user->id);
+                Utility::jobStage($user->id);
+                GenerateOfferLetter::defaultOfferLetterRegister($user->id);
+                ExperienceCertificate::defaultExpCertificatRegister($user->id);
+                JoiningLetter::defaultJoiningLetterRegister($user->id);
+                NOC::defaultNocCertificateRegister($user->id);
+            } else {
+                $validator = \Validator::make(
+                    $request->all(),
+                    [
+                        'name' => 'required|max:120',
+                        'email' => 'required|email|unique:users',
+                        //    'email' => 'required|email|unique:users,email,NULL,id,created_by,' . $objUser,
+                        'password' => 'required|min:6',
+                        'role' => 'required',
+                    ]
+                );
+                if ($validator->fails()) {
+                    $messages = $validator->getMessageBag();
+                    return redirect()->back()->with('error', $messages->first());
+                }
 
 
-                // Log the API response
-                \Log::info('API Request Data: ' . json_encode($requestData));
-                \Log::info('API Response: ' . $response->body());
-                \Log::info('API Response Status Code: ' . $response->status());
+                $objUser = User::find($objUser);
+                $user = User::find(\Auth::user()->created_by);
+                $total_user = $objUser->countUsers();
+                $plan = Plan::find($objUser->plan);
+                if ($total_user < $plan->max_users || $plan->max_users == -1) {
+                    $role_r = Role::findById($request->role);
+                    $psw = $request->password;
+                    $request['password'] = Hash::make($request->password);
+                    $request['type'] = $role_r->name;
+                    $request['lang'] = !empty($default_language) ? $default_language->value : 'en';
+                    $request['created_by'] = \Auth::user()->creatorId();
+                    $request['email_verified_at'] = date('Y-m-d H:i:s');
 
-
-                // Check if API call was successful
-                if ($response->successful()) {
-                    return redirect()->route('user.index')->with('success', __('Customer successfully created.'));
+                    $user = User::create($request->all());
+                    $user->assignRole($role_r);
+                    if ($request['type'] != 'client')
+                        \App\Models\Utility::employeeDetails($user->id, \Auth::user()->creatorId());
                 } else {
-                    // If API call failed, return with error message
-                    return redirect()->back()->with('error', __('Failed to create customer.'));
+                    return redirect()->back()->with('error', __('Your user limit is over, Please upgrade plan.'));
                 }
             }
+            // Send Email
+            $setings = Utility::settings();
+            if ($setings['new_user'] == 1) {
+
+                $user->password = $psw;
+                $user->type = $role_r->name;
+                $user->userDefaultDataRegister($user->id);
+
+                $userArr = [
+                    'email' => $user->email,
+                    'password' => $user->password,
+                ];
+                $resp = Utility::sendEmailTemplate('new_user', [$user->id => $user->email], $userArr);
+
+
+                return redirect()->route('users.index')->with('success', __('User successfully created.') . ((!empty($resp) && $resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
+            }
+            return redirect()->route('users.index')->with('success', __('User successfully created.'));
 
         } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return redirect()->back();
         }
-    }
 
+    }
     public function show()
     {
         return redirect()->route('user.index');
@@ -321,9 +195,7 @@ class UserController extends Controller
 
             return view('user.edit', compact('user', 'roles', 'customFields'));
         } else {
-
             return redirect()->back();
-
         }
 
     }
@@ -449,7 +321,6 @@ class UserController extends Controller
     public function editprofile(Request $request)
     {
         $userDetail = \Auth::user();
-
         $user = User::findOrFail($userDetail['id']);
 
         $validator = \Validator::make(
