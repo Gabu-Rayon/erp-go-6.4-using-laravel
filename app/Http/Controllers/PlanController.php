@@ -127,7 +127,8 @@ class PlanController extends Controller
     }
     
     /***
-     * Create a Plan or Insurance using Api Endpoint
+     * Create a Insurance Plan using Api Endpoint
+     * 
      */
     
       /****
