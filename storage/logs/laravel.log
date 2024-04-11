@@ -189,3 +189,33 @@ sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mi
 [2024-04-11 10:03:51] local.ERROR: Failed to fetch products & Services from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
 [2024-04-11 10:05:25] local.ERROR: Failed to fetch branches from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
 [2024-04-11 10:06:08] local.ERROR: Failed to fetch products & Services from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+[2024-04-11 12:16:55] local.ERROR: Failed to fetch purchases from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+[2024-04-11 12:16:59] local.ERROR: Failed to fetch purchases from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+[2024-04-11 12:17:03] local.ERROR: Failed to fetch purchases from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+[2024-04-11 12:17:07] local.ERROR: Failed to fetch purchases from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+[2024-04-11 12:17:11] local.ERROR: Failed to fetch purchases from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+[2024-04-11 12:17:16] local.ERROR: Failed to fetch purchases from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+[2024-04-11 12:17:22] local.ERROR: Failed to fetch purchases from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+[2024-04-11 12:19:07] local.ERROR: Failed to fetch purchases from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+[2024-04-11 12:19:13] local.ERROR: Failed to fetch purchases from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+[2024-04-11 12:19:17] local.ERROR: Failed to fetch purchases from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+[2024-04-11 12:19:25] local.ERROR: Failed to fetch purchases from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+
+[2024-04-11 12:38:49] local.ERROR: Exception occurred while fetching purchases: cURL error 28: SSL connection timeout (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000  
+[2024-04-11 12:39:00] local.ERROR: Exception occurred while fetching purchases: cURL error 28: SSL connection timeout (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000  
+[2024-04-11 12:39:11] local.ERROR: Exception occurred while fetching purchases: cURL error 28: SSL connection timeout (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000  
+[2024-04-11 12:39:22] local.ERROR: Exception occurred while fetching purchases: cURL error 28: Failed to connect to etims.your-apps.biz port 443 after 10008 ms: Timeout was reached (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000  
+[2024-04-11 13:03:31] local.ERROR: Maximum execution time of 60 seconds exceeded {"userId":2,"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Maximum execution time of 60 seconds exceeded at C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\guzzlehttp\\guzzle\\src\\Handler\\CurlFactory.php:595)
+[stacktrace]
+#0 {main}
+"} 
+[2024-04-11 13:04:21] local.ERROR: Failed to fetch purchases from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+[2024-04-11 13:06:32] local.ERROR: Failed to fetch branches from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+[2024-04-11 13:06:51] local.ERROR: Failed to fetch purchases from API: 500 {"statusCode":500,"message":"Internal Server Error","data":"An error occurred while sending the request."}  
+[]
+[]
+[]
+[]
+[]
+[]
+#

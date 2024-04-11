@@ -11,53 +11,53 @@ use Illuminate\Support\Facades\Http;
 
 class BranchController extends Controller
 {
-    public function index()
-    {
-        if (\Auth::user()->can('manage branch')) {
-            $branches = Branch::where('created_by', '=', \Auth::user()->creatorId())->get();
-
-            return view('branch.index', compact('branches'));
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
-        }
-    }
-
     // public function index()
     // {
     //     if (\Auth::user()->can('manage branch')) {
-    //         try {
-    //             // $response = Http::withHeaders([
-    //             //     'accept' => '/',
-    //             //     'key' => '123456',
-    //             // ])->get('https://etims.your-apps.biz/api/GetBranchList', [
-    //             //         'date' => date('20220409120000'),
-    //             //     ]);
+    //         $branches = Branch::where('created_by', '=', \Auth::user()->creatorId())->get();
 
-    //             $response = Http::withHeaders([
-    //                  'accept' => '/',
-    //                 'key' => '123456',
-    //             ])->timeout(300)->get('https://etims.your-apps.biz/api/GetBranchList', [
-    //                         'date' => date('20220409120000'),
-    //                     ]);
-
-
-    //             if ($response->successful()) {
-    //                 $branches = $response->json();
-    //                 return view('branch.index', compact('branches'));
-    //             } else {
-    //                 // Log error and handle error response
-    //                 \Log::error('Failed to fetch branches from API: ' . $response->status() . ' ' . $response->body());
-    //                 return redirect()->back()->with('error', 'Failed to fetch branches from API.');
-    //             }
-    //         } catch (\Exception $e) {
-    //             // Log exception and handle exception
-    //             \Log::error('Exception occurred while fetching branches: ' . $e->getMessage());
-    //             return redirect()->back()->with('error', 'Failed to fetch branches from API.');
-    //         }
+    //         return view('branch.index', compact('branches'));
     //     } else {
     //         return redirect()->back()->with('error', __('Permission denied.'));
     //     }
     // }
+
+    public function index()
+    {
+        if (\Auth::user()->can('manage branch')) {
+            try {
+                // $response = Http::withHeaders([
+                //     'accept' => '/',
+                //     'key' => '123456',
+                // ])->get('https://etims.your-apps.biz/api/GetBranchList', [
+                //         'date' => date('20220409120000'),
+                //     ]);
+
+                $response = Http::withHeaders([
+                     'accept' => '/',
+                    'key' => '123456',
+                ])->timeout(300)->get('https://etims.your-apps.biz/api/GetBranchList', [
+                            'date' => date('20220409120000'),
+                        ]);
+
+
+                if ($response->successful()) {
+                    $branches = $response->json();
+                    return view('branch.index', compact('branches'));
+                } else {
+                    // Log error and handle error response
+                    \Log::error('Failed to fetch branches from API: ' . $response->status() . ' ' . $response->body());
+                    return redirect()->back()->with('error', 'Failed to fetch branches from API.');
+                }
+            } catch (\Exception $e) {
+                // Log exception and handle exception
+                \Log::error('Exception occurred while fetching branches: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Failed to fetch branches from API.');
+            }
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
 
     public function create()
     {
