@@ -39,98 +39,98 @@ class PlanController extends Controller
         }
     }
 
-    public function store(Request $request)
-    {
+    // public function store(Request $request)
+    // {
 
-        if (\Auth::user()->can('create plan')) {
-            $admin_payment_setting = Utility::getAdminPaymentSetting();
+    //     if (\Auth::user()->can('create plan')) {
+    //         $admin_payment_setting = Utility::getAdminPaymentSetting();
 
-            if (
-                !empty($admin_payment_setting) && ($admin_payment_setting['is_manually_payment_enabled'] == 'on'
-                    || $admin_payment_setting['is_bank_transfer_enabled'] == 'on' || $admin_payment_setting['is_stripe_enabled'] == 'on'
-                    || $admin_payment_setting['is_paypal_enabled'] == 'on' || $admin_payment_setting['is_paystack_enabled'] == 'on'
-                    || $admin_payment_setting['is_flutterwave_enabled'] == 'on' || $admin_payment_setting['is_razorpay_enabled'] == 'on'
-                    || $admin_payment_setting['is_mercado_enabled'] == 'on' || $admin_payment_setting['is_paytm_enabled'] == 'on'
-                    || $admin_payment_setting['is_mollie_enabled'] == 'on' || $admin_payment_setting['is_skrill_enabled'] == 'on'
-                    || $admin_payment_setting['is_coingate_enabled'] == 'on' || $admin_payment_setting['is_paymentwall_enabled'] == 'on'
-                    || $admin_payment_setting['is_toyyibpay_enabled'] == 'on' || $admin_payment_setting['is_payfast_enabled'] == 'on'
-                    || $admin_payment_setting['is_iyzipay_enabled'] == 'on' || $admin_payment_setting['is_sspay_enabled'] == 'on'
-                    || $admin_payment_setting['is_paytab_enabled'] == 'on' || $admin_payment_setting['is_benefit_enabled'] == 'on'
-                    || $admin_payment_setting['is_cashfree_enabled'] == 'on' || $admin_payment_setting['is_aamarpay_enabled'] == 'on'
-                    || $admin_payment_setting['is_paytr_enabled'] == 'on')
-            ) {
+    //         if (
+    //             !empty($admin_payment_setting) && ($admin_payment_setting['is_manually_payment_enabled'] == 'on'
+    //                 || $admin_payment_setting['is_bank_transfer_enabled'] == 'on' || $admin_payment_setting['is_stripe_enabled'] == 'on'
+    //                 || $admin_payment_setting['is_paypal_enabled'] == 'on' || $admin_payment_setting['is_paystack_enabled'] == 'on'
+    //                 || $admin_payment_setting['is_flutterwave_enabled'] == 'on' || $admin_payment_setting['is_razorpay_enabled'] == 'on'
+    //                 || $admin_payment_setting['is_mercado_enabled'] == 'on' || $admin_payment_setting['is_paytm_enabled'] == 'on'
+    //                 || $admin_payment_setting['is_mollie_enabled'] == 'on' || $admin_payment_setting['is_skrill_enabled'] == 'on'
+    //                 || $admin_payment_setting['is_coingate_enabled'] == 'on' || $admin_payment_setting['is_paymentwall_enabled'] == 'on'
+    //                 || $admin_payment_setting['is_toyyibpay_enabled'] == 'on' || $admin_payment_setting['is_payfast_enabled'] == 'on'
+    //                 || $admin_payment_setting['is_iyzipay_enabled'] == 'on' || $admin_payment_setting['is_sspay_enabled'] == 'on'
+    //                 || $admin_payment_setting['is_paytab_enabled'] == 'on' || $admin_payment_setting['is_benefit_enabled'] == 'on'
+    //                 || $admin_payment_setting['is_cashfree_enabled'] == 'on' || $admin_payment_setting['is_aamarpay_enabled'] == 'on'
+    //                 || $admin_payment_setting['is_paytr_enabled'] == 'on')
+    //         ) {
 
-                $validation = [];
-                $validation['name'] = 'required|unique:plans';
-                $validation['price'] = 'required|numeric|min:0';
-                $validation['duration'] = 'required';
-                $validation['max_users'] = 'required|numeric';
-                $validation['max_customers'] = 'required|numeric';
-                $validation['max_venders'] = 'required|numeric';
-                $validation['storage_limit'] = 'required|numeric';
+    //             $validation = [];
+    //             $validation['name'] = 'required|unique:plans';
+    //             $validation['price'] = 'required|numeric|min:0';
+    //             $validation['duration'] = 'required';
+    //             $validation['max_users'] = 'required|numeric';
+    //             $validation['max_customers'] = 'required|numeric';
+    //             $validation['max_venders'] = 'required|numeric';
+    //             $validation['storage_limit'] = 'required|numeric';
 
-                if ($request->image) {
-                    $validation['image'] = 'required|max:20480';
-                }
-                $request->validate($validation);
-                $post = $request->all();
-                if (isset($request->enable_project)) {
-                    $post['project'] = 1;
-                }
-                if (isset($request->enable_crm)) {
-                    $post['crm'] = 1;
-                }
-                if (isset($request->enable_hrm)) {
-                    $post['hrm'] = 1;
-                }
-                if (isset($request->enable_account)) {
-                    $post['account'] = 1;
-                }
-                if (isset($request->enable_pos)) {
-                    $post['pos'] = 1;
-                }
-                if (isset($request->enable_chatgpt)) {
-                    $post['chatgpt'] = 1;
-                }
-                if (isset($request->trial)) {
-                    $post['trial'] = 1;
-                }
-                if ($request->hasFile('image')) {
-                    $filenameWithExt = $request->file('image')->getClientOriginalName();
-                    $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                    $extension = $request->file('image')->getClientOriginalExtension();
-                    $fileNameToStore = 'plan_' . time() . '.' . $extension;
+    //             if ($request->image) {
+    //                 $validation['image'] = 'required|max:20480';
+    //             }
+    //             $request->validate($validation);
+    //             $post = $request->all();
+    //             if (isset($request->enable_project)) {
+    //                 $post['project'] = 1;
+    //             }
+    //             if (isset($request->enable_crm)) {
+    //                 $post['crm'] = 1;
+    //             }
+    //             if (isset($request->enable_hrm)) {
+    //                 $post['hrm'] = 1;
+    //             }
+    //             if (isset($request->enable_account)) {
+    //                 $post['account'] = 1;
+    //             }
+    //             if (isset($request->enable_pos)) {
+    //                 $post['pos'] = 1;
+    //             }
+    //             if (isset($request->enable_chatgpt)) {
+    //                 $post['chatgpt'] = 1;
+    //             }
+    //             if (isset($request->trial)) {
+    //                 $post['trial'] = 1;
+    //             }
+    //             if ($request->hasFile('image')) {
+    //                 $filenameWithExt = $request->file('image')->getClientOriginalName();
+    //                 $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+    //                 $extension = $request->file('image')->getClientOriginalExtension();
+    //                 $fileNameToStore = 'plan_' . time() . '.' . $extension;
 
-                    $dir = storage_path('uploads/plan/');
-                    if (!file_exists($dir)) {
-                        mkdir($dir, 0777, true);
-                    }
-                    $path = $request->file('image')->storeAs('uploads/plan/', $fileNameToStore);
-                    $post['image'] = $fileNameToStore;
-                }
+    //                 $dir = storage_path('uploads/plan/');
+    //                 if (!file_exists($dir)) {
+    //                     mkdir($dir, 0777, true);
+    //                 }
+    //                 $path = $request->file('image')->storeAs('uploads/plan/', $fileNameToStore);
+    //                 $post['image'] = $fileNameToStore;
+    //             }
 
 
 
-                if (Plan::create($post)) {
-                    return redirect()->back()->with('success', __('Plan Successfully created.'));
-                } else {
-                    return redirect()->back()->with('error', __('Something is wrong.'));
-                }
+    //             if (Plan::create($post)) {
+    //                 return redirect()->back()->with('success', __('Plan Successfully created.'));
+    //             } else {
+    //                 return redirect()->back()->with('error', __('Something is wrong.'));
+    //             }
 
-            } else {
-                return redirect()->back()->with('error', __('Please set stripe or paypal api key & secret key for add new plan.'));
-            }
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
-        }
+    //         } else {
+    //             return redirect()->back()->with('error', __('Please set stripe or paypal api key & secret key for add new plan.'));
+    //         }
+    //     } else {
+    //         return redirect()->back()->with('error', __('Permission denied.'));
+    //     }
 
-    }
+    // }
     
     /***
      * Create a Plan or Insurance using Api Endpoint
      */
     
-      /****
+
     public function store(Request $request)
     {
 
@@ -172,18 +172,17 @@ class PlanController extends Controller
             // Check if the request was successful
             if ($response->successful()) {
                 return redirect()->back()->with('success', __('Insurance Plan Successfully created.'));
-                return redirect()->route('plan.index')->with('success', __('Insurance Plan Successfully created.'));
             } else {
                 // API call failed, log the error and return an error response
                 \Log::error('Failed to add insurance via API: ' . $response->status() . ' ' . $response->body());
-                return response()->json(['error' => 'Failed to add insurance Plan via API'], $response->status());
+                 return redirect()->back()->with('error', __('Failed to add insurance Plan via API.'));
             }
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
 
     }
-    ****/
+    
     public function edit($plan_id)
     {
         if (\Auth::user()->can('edit plan')) {

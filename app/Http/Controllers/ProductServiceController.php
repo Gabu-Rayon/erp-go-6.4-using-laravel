@@ -59,19 +59,17 @@ class ProductServiceController extends Controller
     //     if (\Auth::user()->can('manage product & service')) {
     //         try {
     //             // $response = Http::withHeaders([
-    //             //     'accept' => 'application/json',
-    //             //     'Content-Type' => 'application/json',
+    //             //     'accept' => '/',
     //             //     'key' => '123456',
     //             // ])->get('https://etims.your-apps.biz/api/GetItemInformation', [
-    //             //         'date' => date('2024-04-09'),
+    //             //         'date' => date('20220409120000'),
     //             //     ]);
 
     //             $response = Http::withHeaders([
-    //                 'accept' => 'application/json',
-    //                 'Content-Type' => 'application/json',
+    //                 'accept' => '/',
     //                 'key' => '123456',
     //             ])->timeout(300)->get('https://etims.your-apps.biz/api/GetItemInformation', [
-    //                         'date' => date('2024-04-09'),
+    //                         'date' => date('20220409120000'),
     //                     ]);
 
 
@@ -397,14 +395,14 @@ class ProductServiceController extends Controller
     private function constructProductData($request, $key)
     {
         $productData = [
-            "itemCode" => $request->input("sku.$key", $request->sku),
-            "itemClassifiCode" => $request->input("category_id.$key", $request->category_id),
+            "itemCode" => $request->input("item_code.$key", $request->item_code),
+            "itemClassifiCode" => $request->input("product_classified_code.$key", $request->product_classified_code),
             "itemTypeCode" => $request->input("product_type_code.$key", $request->product_type_code),
             "itemName" => $request->input("name.$key", $request->name),
             "itemStrdName" => $request->input("standard_name.$key", $request->standard_name),
             "countryCode" => $request->input("country_code.$key", $request->country_code),
-            "pkgUnitCode" => $request->input("unit_id.$key", $request->unit_id),
-            "qtyUnitCode" => $request->input("unit_id.$key", $request->unit_id),
+            "pkgUnitCode" => $request->input("pkg_unit_code.$key", $request->pkg_unit_code),
+            "qtyUnitCode" => $request->input("pkg_unit_code.$key", $request->pkg_unit_code),
             "taxTypeCode" => $request->input("tax_type_code.$key", $request->tax_type_code),
             "batchNo" => $request->input("batch_no.$key", $request->batch_no),
             "barcode" => $request->input("bar_code.$key", $request->bar_code),

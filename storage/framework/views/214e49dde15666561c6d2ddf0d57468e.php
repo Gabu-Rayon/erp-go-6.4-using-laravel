@@ -1,4 +1,4 @@
-<?php echo e(Form::open(['url' => 'plans', 'enctype' => 'multipart/form-data'])); ?>
+<!-- <?php echo e(Form::open(['url' => 'plans', 'enctype' => 'multipart/form-data'])); ?>
 
 <div class="modal-body">
     
@@ -144,14 +144,13 @@
     <input type="button" value="<?php echo e(__('Cancel')); ?>" class="btn  btn-light" data-bs-dismiss="modal">
     <input type="submit" value="<?php echo e(__('Create')); ?>" class="btn  btn-primary">
 </div>
-<?php echo e(Form::close()); ?>
-
+<?php echo e(Form::close()); ?> -->
 
 
 
 
 <!-- Form for Creating Insurance Plan to Post to Api -->
-<!--
+
 
 <?php echo e(Form::open(['url' => 'plans', 'enctype' => 'multipart/form-data'])); ?>
 
@@ -194,5 +193,5 @@
     <input type="button" value="<?php echo e(__('Cancel')); ?>" class="btn  btn-light" data-bs-dismiss="modal">
     <input type="submit" value="<?php echo e(__('Create')); ?>" class="btn  btn-primary">
 </div>
-    <?php echo e(Form::close()); ?> -->
+    <?php echo e(Form::close()); ?> 
 <?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/plan/create.blade.php ENDPATH**/ ?>

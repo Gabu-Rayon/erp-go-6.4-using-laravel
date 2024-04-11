@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bill;
-use App\Models\ChartOfAccount;
 use App\Models\Invoice;
-use App\Models\ProductService;
-use App\Models\ProductServiceCategory;
 use Illuminate\Http\Request;
+use App\Models\ChartOfAccount;
+use App\Models\ProductService;
+use Illuminate\Support\Facades\Http;
+use App\Models\ProductServiceCategory;
 
 class ProductServiceCategoryController extends Controller
 {
@@ -22,6 +23,44 @@ class ProductServiceCategoryController extends Controller
         }
     }
 
+    public function index()
+    {
+        if (\Auth::user()->can('manage constant category')) {
+            try {
+                // $response = Http::withHeaders([
+                //     'accept' => 'application/json',
+                //     'Content-Type' => 'application/json',
+                //     'key' => '123456',
+                // ])->get('https://etims.your-apps.biz/ItemClassificationList', [
+                //         'date' => date('2024-04-09'),
+                //     ]);
+
+                $response = Http::withHeaders([
+                    //set the headers for the api 
+                    'accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                    'key' => '123456',
+                ])->timeout(300)->get('https://etims.your-apps.biz//api/GetItemClassificationList', [
+                            'date' => date('2024-04-09'),
+                        ]);
+
+                if ($response->successful()) {
+                    $ItemClassificationLists = $response->json();
+                    return view('productServiceCategory.index', compact('ItemClassificationLists'));
+                } else {
+                    // Log error and handle error response
+                    \Log::error('Failed to fetch Item Classification Lists from API: ' . $response->status() . ' ' . $response->body());
+                    return redirect()->back()->with('error', 'Failed to fetch Item Classification Lists from API');
+                }
+            } catch (\Exception $e) {
+                // Log exception and handle exception
+                \Log::error('Exception occurred while fetching Item Classification Lists: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Failed to fetch Item Classification  Lists from the API');
+            }
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
     public function create()
     {
         if (\Auth::user()->can('create constant category')) {
@@ -47,7 +86,8 @@ class ProductServiceCategoryController extends Controller
         if (\Auth::user()->can('create constant category')) {
 
             $validator = \Validator::make(
-                $request->all(), [
+                $request->all(),
+                [
                     'name' => 'required|max:200',
                     'type' => 'required',
                     'color' => 'required',
@@ -93,7 +133,8 @@ class ProductServiceCategoryController extends Controller
             $category = ProductServiceCategory::find($id);
             if ($category->created_by == \Auth::user()->creatorId()) {
                 $validator = \Validator::make(
-                    $request->all(), [
+                    $request->all(),
+                    [
                         'name' => 'required|max:200',
                         'type' => 'required',
                         'color' => 'required',
@@ -180,60 +221,60 @@ class ProductServiceCategoryController extends Controller
         $chart_accounts = [];
         if ($request->type == 'income') {
             $chart_accounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-            ->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type')
-            ->where('chart_of_account_types.name' ,'Income')
-            ->where('parent', '=', 0)
-            ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-            ->pluck('code_name', 'id');
+                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
+                ->where('chart_of_account_types.name', 'Income')
+                ->where('parent', '=', 0)
+                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+                ->pluck('code_name', 'id');
         } elseif ($request->type == 'expense') {
             $chart_accounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-            ->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type')
-            ->where('chart_of_account_types.name' ,'Expenses')
-            ->where('parent', '=', 0)
-            ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-            ->pluck('code_name', 'id');
+                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
+                ->where('chart_of_account_types.name', 'Expenses')
+                ->where('parent', '=', 0)
+                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+                ->pluck('code_name', 'id');
         } elseif ($request->type == 'asset') {
             $chart_accounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-            ->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type')
-            ->where('chart_of_account_types.name' ,'Assets')
-            ->where('parent', '=', 0)
-            ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-            ->pluck('code_name', 'id');
+                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
+                ->where('chart_of_account_types.name', 'Assets')
+                ->where('parent', '=', 0)
+                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+                ->pluck('code_name', 'id');
         } elseif ($request->type == 'liability') {
             $chart_accounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-            ->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type')
-            ->where('chart_of_account_types.name' ,'Liabilities')
-            ->where('parent', '=', 0)
-            ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-            ->pluck('code_name', 'id');
+                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
+                ->where('chart_of_account_types.name', 'Liabilities')
+                ->where('parent', '=', 0)
+                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+                ->pluck('code_name', 'id');
         } elseif ($request->type == 'equity') {
             $chart_accounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-            ->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type')
-            ->where('chart_of_account_types.name' ,'Equity')
-            ->where('parent', '=', 0)
-            ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-            ->pluck('code_name', 'id');
+                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
+                ->where('chart_of_account_types.name', 'Equity')
+                ->where('parent', '=', 0)
+                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+                ->pluck('code_name', 'id');
         } elseif ($request->type == 'costs of good sold') {
             $chart_accounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-            ->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type')
-            ->where('chart_of_account_types.name' ,'Costs of Goods Sold')
-            ->where('parent', '=', 0)
-            ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-            ->pluck('code_name', 'id');
+                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
+                ->where('chart_of_account_types.name', 'Costs of Goods Sold')
+                ->where('parent', '=', 0)
+                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+                ->pluck('code_name', 'id');
         } else {
             $chart_accounts = 0;
         }
 
-        $subAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name' , 'chart_of_account_parents.account');
+        $subAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name', 'chart_of_account_parents.account');
         $subAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
         $subAccounts->where('chart_of_accounts.parent', '!=', 0);
         $subAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
         $subAccounts = $subAccounts->get()->toArray();
 
-    $response = [
-        'chart_accounts' => $chart_accounts,
-        'sub_accounts' => $subAccounts,
-    ];
+        $response = [
+            'chart_accounts' => $chart_accounts,
+            'sub_accounts' => $subAccounts,
+        ];
 
         return response()->json($response);
 

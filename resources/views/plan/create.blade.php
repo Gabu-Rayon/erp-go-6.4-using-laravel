@@ -1,4 +1,4 @@
-{{ Form::open(['url' => 'plans', 'enctype' => 'multipart/form-data']) }}
+<!-- {{ Form::open(['url' => 'plans', 'enctype' => 'multipart/form-data']) }}
 <div class="modal-body">
     {{-- start for ai module --}}
     @php
@@ -123,13 +123,13 @@
     <input type="button" value="{{ __('Cancel') }}" class="btn  btn-light" data-bs-dismiss="modal">
     <input type="submit" value="{{ __('Create') }}" class="btn  btn-primary">
 </div>
-{{ Form::close() }}
+{{ Form::close() }} -->
 
 
 
 
 <!-- Form for Creating Insurance Plan to Post to Api -->
-<!--
+
 
 {{ Form::open(['url' => 'plans', 'enctype' => 'multipart/form-data']) }}
 <div class="modal-body">
@@ -165,4 +165,4 @@
     <input type="button" value="{{ __('Cancel') }}" class="btn  btn-light" data-bs-dismiss="modal">
     <input type="submit" value="{{ __('Create') }}" class="btn  btn-primary">
 </div>
-    {{ Form::close() }} -->
+    {{ Form::close() }} 

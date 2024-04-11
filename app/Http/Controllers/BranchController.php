@@ -22,26 +22,22 @@ class BranchController extends Controller
         }
     }
 
-
-
     // public function index()
     // {
     //     if (\Auth::user()->can('manage branch')) {
     //         try {
     //             // $response = Http::withHeaders([
-    //             //     'accept' => 'application/json',
-    //             //     'Content-Type' => 'application/json',
+    //             //     'accept' => '/',
     //             //     'key' => '123456',
     //             // ])->get('https://etims.your-apps.biz/api/GetBranchList', [
-    //             //         'date' => date('2024-04-09'),
+    //             //         'date' => date('20220409120000'),
     //             //     ]);
 
     //             $response = Http::withHeaders([
-    //                 'accept' => 'application/json',
-    //                 'Content-Type' => 'application/json',
+    //                  'accept' => '/',
     //                 'key' => '123456',
     //             ])->timeout(300)->get('https://etims.your-apps.biz/api/GetBranchList', [
-    //                         'date' => date('2024-04-09'),
+    //                         'date' => date('20220409120000'),
     //                     ]);
 
 
@@ -62,7 +58,6 @@ class BranchController extends Controller
     //         return redirect()->back()->with('error', __('Permission denied.'));
     //     }
     // }
-
 
     public function create()
     {

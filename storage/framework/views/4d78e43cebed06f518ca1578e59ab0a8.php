@@ -45,7 +45,6 @@ $admin_payment_setting = Utility::getAdminPaymentSetting();
                                     <td><?php echo e($order->user_name); ?></td>
                                     <td><?php echo e($order->plan_name); ?></td>
                                     <td><?php echo e(isset($admin_payment_setting['currency_symbol']) ? $admin_payment_setting['currency_symbol'] : '$'); ?><?php echo e(number_format($order->price)); ?></td>
-
                                     <td>
                                         <?php if($order->payment_status == 'success' || $order->payment_status == 'Approved'): ?>
                                             <span class="status_badge badge bg-primary p-2 px-3 rounded"><?php echo e(ucfirst($order->payment_status)); ?></span>
