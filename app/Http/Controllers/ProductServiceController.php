@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\Tax;
 use App\Models\User;
 use App\Models\Vender;
+use GuzzleHttp\Client;
 use App\Models\Product;
 use App\Models\Utility;
+use App\Models\CodeList;
 use App\Models\Countries;
 use App\Models\CustomField;
 use Illuminate\Http\Request;
 use App\Models\ChartOfAccount;
+use App\Models\CodeListDetail;
 use App\Models\ProductService;
 use Illuminate\Validation\Rule;
 use App\Models\WarehouseProduct;
@@ -24,10 +28,7 @@ use App\Exports\ProductServiceExport;
 use App\Imports\ProductServiceImport;
 use App\Models\ProductServiceCategory;
 use Illuminate\Support\Facades\Storage;
-
-
-
-
+use GuzzleHttp\Exception\RequestException;
 class ProductServiceController extends Controller
 {
     public function index(Request $request)
@@ -416,7 +417,7 @@ class ProductServiceController extends Controller
             "saftyQuantity" => $request->input("safety_quantity.$key", $request->safety_quantity),
             "isInrcApplicable" => true,
             "isUsed" => true,
-            "quantity"  => $request->input("quantity.$key", $request->quantity),
+            "quantity" => $request->input("quantity.$key", $request->quantity),
             "packageQuantity" => $request->input("quantity.$key", $request->quantity),
         ];
         return $productData;
@@ -1205,5 +1206,111 @@ class ProductServiceController extends Controller
             return redirect()->back()->with('error', __('This Product is not found!'));
         }
     }
+
+
+    public function fetchDataAndStoreForCodeList(Request $request)
+    {
+        // Fetch data from the API
+        $dataFromApi = $this->fetchDataFromApi();
+
+        if ($dataFromApi === null) {
+            return redirect()->back()->with('error', __('Failed to fetch Code List data from API'));
+        }
+
+        // Extract code lists and details from the API data
+        $codeListsData = $this->extractCodeListsData($dataFromApi);
+        $codeListDetailsData = $this->extractCodeListDetailsData($dataFromApi);
+
+        // Insert data into the local database
+        $this->insertData($codeListsData, $codeListDetailsData);
+
+        return redirect()->back()->with('success', __('Code List Data fetched and stored successfully'));
+    }
+
+    private function fetchDataFromApi()
+    {
+        $client = new Client();
+
+        try {
+            $response = $client->request('GET', 'https://etims.your-apps.biz/api/GetCodeList?date=20220409120000', [
+                'headers' => [
+                    'accept' => '*/*',
+                    'key' => '123456',
+                ],
+            ]);
+
+            if ($response->getStatusCode() === 200) {
+                return json_decode($response->getBody(), true);
+            }
+
+            return null;
+        } catch (RequestException $e) {
+            \Log::error('Failed to make request to API: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    private function extractCodeListsData($dataFromApi)
+    {
+        $codeListsData = [];
+
+        if (isset($dataFromApi['data']) && isset($dataFromApi['data']['clsList'])) {
+            foreach ($dataFromApi['data']['clsList'] as $clsList) {
+                $codeListsData[] = [
+                    'codeClass' => $clsList['cdCls'],
+                    'codeClassName' => $clsList['cdClsNm'],
+                    'codeClassDescription' => $clsList['cdClsDesc'],
+                    'useYearno' => $clsList['useYn'],
+                    'userDefineName1' => $clsList['userDfnNm1'],
+                    'userDefinneName2' => $clsList['userDfnNm2'],
+                    'userDefineName3' => $clsList['userDfnNm3'],
+                ];
+            }
+        }
+
+        return $codeListsData;
+    }
+
+    private function extractCodeListDetailsData($dataFromApi)
+    {
+        $codeListDetailsData = [];
+
+        if (isset($dataFromApi['data']) && isset($dataFromApi['data']['clsList'])) {
+            foreach ($dataFromApi['data']['clsList'] as $clsList) {
+                if (isset($clsList['dtlList'])) {
+                    foreach ($clsList['dtlList'] as $detail) {
+                        $codeListDetailsData[] = [
+                            'code' => $detail['cd'],
+                            'codeName' => $detail['cdNm'],
+                            'codeDescription' => $detail['cdDesc'],
+                            'useYearno' => $detail['useYn'],
+                            'srtOrder' => $detail['srtOrd'],
+                            'userDefineCode1' => $detail['userDfnCd1'],
+                            'userDefinneCode2' => $detail['userDfnCd2'],
+                            'userDefineCode3' => $detail['userDfnCd3'],
+                        ];
+                    }
+                }
+            }
+        }
+
+        return $codeListDetailsData;
+    }
+
+    private function insertData($codeListsData, $codeListDetailsData)
+    {
+        try {
+            CodeList::insert($codeListsData);
+
+            foreach ($codeListDetailsData as $detail) {
+                CodeListDetail::create($detail);
+            }
+        } catch (Exception $e) {
+            \Log::error('Failed to insert data: ' . $e->getMessage());
+            return redirect()->back()->with('error', __('Failed to insert data'));
+        }
+    }
+
+
 
 }

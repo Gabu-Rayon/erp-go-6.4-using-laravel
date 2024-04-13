@@ -389,6 +389,8 @@ Route::group(['middleware' => ['verified']], function () {
     Route::post('empty-cart', [ProductServiceController::class, 'emptyCart'])->middleware(['auth', 'XSS']);
     Route::post('warehouse-empty-cart', [ProductServiceController::class, 'warehouseemptyCart'])->name('warehouse-empty-cart')->middleware(['auth', 'XSS']);
     Route::resource('productservice', ProductServiceController::class)->middleware(['auth', 'XSS', 'revalidate']);
+    // routes/web.php
+    Route::get('/fetch-data', [ProductServiceController::class, 'fetchDataAndStoreForCodeList'])->name('fetch.data.and.store');
 
     //Product Stock
     Route::resource('productstock', ProductStockController::class)->middleware(['auth', 'XSS']);

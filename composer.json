@@ -11,7 +11,7 @@
         "arkitecht/laravel-twilio": "^1.6",
         "coingate/coingate-php": "^4.1",
         "doctrine/dbal": "^3.7",
-        "guzzlehttp/guzzle": "^7.8",
+        "guzzlehttp/guzzle": "*",
         "iyzico/iyzipay-php": "^2.0",
         "kkomelin/laravel-translatable-string-exporter": "^1.21",
         "lab404/laravel-impersonate": "^1.7",

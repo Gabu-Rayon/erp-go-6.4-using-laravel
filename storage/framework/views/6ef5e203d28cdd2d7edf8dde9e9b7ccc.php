@@ -27,7 +27,13 @@ var_dump($productServices);
             <i class="ti ti-plus"></i>
         </a>
 
+         <!-- Button to trigger the fetchDataAndStore() method -->
+        <a href="#" class="btn btn-sm btn-primary" onclick="fetchDataAndStore()">
+            <?php echo e(__('Fetch and Store Data')); ?>
+
+        </a>
     </div>
+
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -165,6 +171,15 @@ var_dump($productServices);
         </div>
     </div>
 <?php $__env->stopSection(); ?>
+
+<script>
+    function fetchDataAndStore() {
+        $.get('<?php echo e(route("fetch.data.and.store")); ?>', function(response) {
+            console.log(response);
+        });
+    }
+</script>
+
 
 
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/productservice/index.blade.php ENDPATH**/ ?>

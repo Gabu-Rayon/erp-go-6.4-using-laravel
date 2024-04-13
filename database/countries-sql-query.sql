@@ -10,6 +10,8 @@ CREATE TABLE `countries` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 --------------------------GIT HUB REPO -----------------------------------------
 ------https://gist.github.com/jgornick/766738/63c1d6325b53cbafe37a3aa2523448a1d8505e3a-----------------------------------------
+
+
 INSERT INTO countries (name, alpha2_code, alpha3_code, numeric_code, iso31662_code) VALUES ('Afghanistan', 'AF', 'AFG', '004', 'ISO 3166-2:AF');
 INSERT INTO countries (name, alpha2_code, alpha3_code, numeric_code, iso31662_code) VALUES ('Åland Islands', 'AX', 'ALA', '248', 'ISO 3166-2:AX');
 INSERT INTO countries (name, alpha2_code, alpha3_code, numeric_code, iso31662_code) VALUES ('Albania', 'AL', 'ALB', '008', 'ISO 3166-2:AL');

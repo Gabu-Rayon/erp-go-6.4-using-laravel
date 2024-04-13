@@ -26,7 +26,12 @@ var_dump($productServices);
             <i class="ti ti-plus"></i>
         </a>
 
+         <!-- Button to trigger the fetchDataAndStore() method -->
+        <a href="#" class="btn btn-sm btn-primary" onclick="fetchDataAndStore()">
+            {{__('Fetch and Store Data')}}
+        </a>
     </div>
+
 @endsection
 
 @section('content')
@@ -158,4 +163,13 @@ var_dump($productServices);
         </div>
     </div>
 @endsection
+
+<script>
+    function fetchDataAndStore() {
+        $.get('{{ route("fetch.data.and.store") }}', function(response) {
+            console.log(response);
+        });
+    }
+</script>
+
 
