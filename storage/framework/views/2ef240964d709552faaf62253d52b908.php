@@ -1365,6 +1365,15 @@
                 </a>
             </li>
         <?php endif; ?>
+        <?php if(\Auth::user()->type == 'company'): ?>
+            <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'notices' ? 'active' : ''); ?>">
+                <a href="<?php echo e(route('notices.index')); ?>" class="dash-link">
+                    <span class="dash-micon"><i class="ti ti-notification"></i></span><span
+                        class="dash-mtext"><?php echo e(__('Notices')); ?></span>
+                </a>
+            </li>
+        <?php endif; ?>
+
 
         <!--------------------- Start System Setup ----------------------------------->
 

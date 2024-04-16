@@ -13,6 +13,7 @@ return new class extends Migration
    {
         Schema::create('code_list_details', function (Blueprint $table) {
             $table->id();
+            $table->unsignedInteger('class_id');
             $table->string('code');
             $table->string('codeName');
             $table->text('codeDescription')->nullable();
@@ -22,9 +23,8 @@ return new class extends Migration
             $table->string('userDefineCode2')->nullable();
             $table->string('userDefineCode3')->nullable();
             $table->timestamps();
-
             // Foreign key constraint
-            $table->foreign('codeClass')->references('codeClass')->on('code_lists')->onDelete('cascade');
+            $table->foreign('class_id')->references('id')->on('code_lists_classes')->onDelete('cascade');
         });
     }
 

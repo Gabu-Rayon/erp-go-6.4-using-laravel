@@ -43,7 +43,7 @@ class CustomerController extends Controller
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
-
+    
     public function create()
     {
         if (\Auth::user()->can('create customer')) {

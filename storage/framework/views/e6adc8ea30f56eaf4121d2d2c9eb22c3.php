@@ -1,3 +1,4 @@
+
 <?php $__env->startPush('css-page'); ?>
     <?php echo $__env->make('Chatify::layouts.headLinks', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 <?php $__env->stopPush(); ?>

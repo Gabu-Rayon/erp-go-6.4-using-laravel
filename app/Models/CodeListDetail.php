@@ -12,6 +12,7 @@ class CodeListDetail extends Model
 
     protected $fillable = [
         'code',
+        'class_id',
         'codeName',
         'codeDescription',
         'useYearno',
@@ -22,8 +23,8 @@ class CodeListDetail extends Model
     ];
 
     // Define the relationship with CodeList model
-    public function codeList()
+    public function codeListClasses()
     {
-        return $this->belongsTo(CodeList::class, 'codeClass', 'codeClass');
+        return $this->belongsTo(CodeListClasses::class, 'class_id', 'id');
     }
 }

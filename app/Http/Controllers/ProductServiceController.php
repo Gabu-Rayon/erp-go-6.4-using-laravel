@@ -9,12 +9,12 @@ use App\Models\Vender;
 use GuzzleHttp\Client;
 use App\Models\Product;
 use App\Models\Utility;
-use App\Models\CodeList;
+use App\Models\CodeListClasses;
+use App\Models\CodeListDetail;
 use App\Models\Countries;
 use App\Models\CustomField;
 use Illuminate\Http\Request;
 use App\Models\ChartOfAccount;
-use App\Models\CodeListDetail;
 use App\Models\ProductService;
 use Illuminate\Validation\Rule;
 use App\Models\WarehouseProduct;
@@ -1210,27 +1210,7 @@ class ProductServiceController extends Controller
 
     public function fetchDataAndStoreForCodeList(Request $request)
     {
-        // Fetch data from the API
-        $dataFromApi = $this->fetchDataFromApi();
-
-        if ($dataFromApi === null) {
-            return redirect()->back()->with('error', __('Failed to fetch Code List data from API'));
-        }
-
-        // Extract code lists and details from the API data
-        $codeListsData = $this->extractCodeListsData($dataFromApi);
-        $codeListDetailsData = $this->extractCodeListDetailsData($dataFromApi);
-
-        // Insert data into the local database
-        $this->insertData($codeListsData, $codeListDetailsData);
-
-        return redirect()->back()->with('success', __('Code List Data fetched and stored successfully'));
-    }
-
-    private function fetchDataFromApi()
-    {
         $client = new Client();
-
         try {
             $response = $client->request('GET', 'https://etims.your-apps.biz/api/GetCodeList?date=20220409120000', [
                 'headers' => [
@@ -1240,77 +1220,79 @@ class ProductServiceController extends Controller
             ]);
 
             if ($response->getStatusCode() === 200) {
-                return json_decode($response->getBody(), true);
-            }
+                $data = json_decode($response->getBody(), true);
+                \Log::info('API Response JSON Data:', $data);
+                 //Accesing Data[] Array First ,then clsList[] then we access the access another array  inside it of clsList[]
+                if (isset($data['data']['clsList']) && is_array($data['data']['clsList'])) {
+                    foreach ($data['data']['clsList'] as $class_data) {
+                        // Store class data
+                        $class = new CodeListClasses;
+                        $class->classCode = $class_data['cdCls'];
+                        $class->className = $class_data['cdClsNm'];
+                        $class->classDescription = $class_data['cdClsDesc'];
+                        $class->useYearno = $class_data['useYn'];
+                        $class->userDefineName1 = $class_data['userDfnNm1'];
+                        $class->userDefineName2 = $class_data['userDfnNm2'];
+                        $class->userDefineName3 = $class_data['userDfnNm3'];
+                        $class->save();
 
-            return null;
+                        // Store detail data
+                        if (isset($class_data['dtlList']) && is_array($class_data['dtlList'])) {
+                            foreach ($class_data['dtlList'] as $detail_data) {
+                                $detail = new CodeListDetail;
+                                $detail->class_id = $class->id; // Assuming you have a foreign key relationship
+                                $detail->code = $detail_data['cd'];
+                                $detail->codeName = $detail_data['cdNm'];
+                                $detail->codeDescription = $detail_data['cdDesc'];
+                                $detail->useYearno = $detail_data['useYn'];
+                                $detail->srtOrder = $detail_data['srtOrd'];
+                                $detail->userDefineCode1 = $detail_data['userDfnCd1'];
+                                $detail->userDefineCode2 = $detail_data['userDfnCd2'];
+                                $detail->userDefineCode3 = $detail_data['userDfnCd3'];
+                                $detail->save();
+                            }
+                        }
+                    }
+
+                    return redirect()->back()->with('success', __('Code List Data fetched and stored successfully'));
+                } else {
+                    \Log::error('Invalid response data structure or missing data fields');
+                    return redirect()->back()->with('error', __('Failed to fetch Code List data from API: Invalid response data structure or missing data fields'));
+                }
+            } else {
+                \Log::error('Failed to fetch Code List data from API. Status code: ' . $response->getStatusCode());
+                return redirect()->back()->with('error', __('Failed to fetch Code List data from API'));
+            }
         } catch (RequestException $e) {
             \Log::error('Failed to make request to API: ' . $e->getMessage());
-            return null;
+            return redirect()->back()->with('error', __('Failed to make request to API'));
         }
     }
 
-    private function extractCodeListsData($dataFromApi)
+    
+    public function fetchDataAndStoreForCodeList(Request $request)
     {
-        $codeListsData = [];
-
-        if (isset($dataFromApi['data']) && isset($dataFromApi['data']['clsList'])) {
-            foreach ($dataFromApi['data']['clsList'] as $clsList) {
-                $codeListsData[] = [
-                    'codeClass' => $clsList['cdCls'],
-                    'codeClassName' => $clsList['cdClsNm'],
-                    'codeClassDescription' => $clsList['cdClsDesc'],
-                    'useYearno' => $clsList['useYn'],
-                    'userDefineName1' => $clsList['userDfnNm1'],
-                    'userDefinneName2' => $clsList['userDfnNm2'],
-                    'userDefineName3' => $clsList['userDfnNm3'],
-                ];
-            }
-        }
-
-        return $codeListsData;
-    }
-
-    private function extractCodeListDetailsData($dataFromApi)
-    {
-        $codeListDetailsData = [];
-
-        if (isset($dataFromApi['data']) && isset($dataFromApi['data']['clsList'])) {
-            foreach ($dataFromApi['data']['clsList'] as $clsList) {
-                if (isset($clsList['dtlList'])) {
-                    foreach ($clsList['dtlList'] as $detail) {
-                        $codeListDetailsData[] = [
-                            'code' => $detail['cd'],
-                            'codeName' => $detail['cdNm'],
-                            'codeDescription' => $detail['cdDesc'],
-                            'useYearno' => $detail['useYn'],
-                            'srtOrder' => $detail['srtOrd'],
-                            'userDefineCode1' => $detail['userDfnCd1'],
-                            'userDefinneCode2' => $detail['userDfnCd2'],
-                            'userDefineCode3' => $detail['userDfnCd3'],
-                        ];
-                    }
-                }
-            }
-        }
-
-        return $codeListDetailsData;
-    }
-
-    private function insertData($codeListsData, $codeListDetailsData)
-    {
-        try {
-            CodeList::insert($codeListsData);
-
-            foreach ($codeListDetailsData as $detail) {
-                CodeListDetail::create($detail);
-            }
-        } catch (Exception $e) {
-            \Log::error('Failed to insert data: ' . $e->getMessage());
-            return redirect()->back()->with('error', __('Failed to insert data'));
+        $client = new Client();
+        $response = $client->request('GET', 'https://etims.your-apps.biz/api/GetCodeList?date=20220409120000', [
+            'headers' => [
+                'accept' => '*/*',
+                'key' => '123456',
+            ],
+        ]);
+        $response_data = json_decode($response->getbody());
+        \Log::info('API Response JSON Data:', $response_data);
+        
+        foreach ($response_data['clsList'] as $item) {
+            $class = new CodeListClasses;
+            $class->classCode = $item['cdCls'];
+            $class->className = $item['cdClsNm'];
+            $class->classDescription = $item['cdClsDesc'];
+            $class->useYearno = $item['useYn'];
+            $class->userDefineName1 = $item['userDfnNm1'];
+            $class->userDefineName2 = $item['userDfnNm2'];
+            $class->userDefineName3 = $item['userDfnNm3'];
+            
+            $class->save();
         }
     }
-
-
-
 }

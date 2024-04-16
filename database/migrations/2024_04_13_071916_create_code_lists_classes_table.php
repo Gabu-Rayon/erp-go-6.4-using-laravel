@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
        {
-        Schema::create('code_lists', function (Blueprint $table) {
+        Schema::create('code_lists_classes', function (Blueprint $table) {
             $table->id();
             $table->string('codedClass');
             $table->string('codeClassName');
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('code_list');
+        Schema::dropIfExists('code_lists_classes');
     }
 };
