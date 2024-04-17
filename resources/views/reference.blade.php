@@ -470,3 +470,13 @@ private function insertData($codeListsData, $codeListDetailsData)
 
 
 }
+
+
+<!-- @if (\Auth::user()->type == 'company')
+            <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'notices' ? 'active' : '' }}">
+                <a href="{{ route('notices.index') }}" class="dash-link">
+                    <span class="dash-micon"><i class="ti ti-notification"></i></span><span
+                        class="dash-mtext">{{ __('Notices') }}</span>
+                </a>
+            </li>
+        @endif -->
