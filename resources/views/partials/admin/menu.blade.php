@@ -1337,6 +1337,12 @@
                         class="dash-mtext">{{ __('Support System') }}</span>
                 </a>
             </li>
+            <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'api-initialization' ? 'active' : '' }}">
+                <a href="{{ route('apiinitialization.index') }}" class="dash-link">
+                    <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
+                        class="dash-mtext">{{ __('API Initialization') }}</span>
+                </a>
+            </li>
             <li
                 class="dash-item dash-hasmenu {{ Request::segment(1) == 'zoom-meeting' || Request::segment(1) == 'zoom-meeting-calender' ? 'active' : '' }}">
                 <a href="{{ route('zoom-meeting.index') }}" class="dash-link">
@@ -1360,6 +1366,7 @@
                 </a>
             </li>
         @endif
+<<<<<<< HEAD
         @if (\Auth::user()->type == 'company')
             <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'compositionlist' ? 'active' : '' }}">
                 <a href="{{ route('add.compostion.list') }}" class="dash-link">
@@ -1369,6 +1376,9 @@
             </li>
         @endif
         
+=======
+
+>>>>>>> 11404ba13abf376c68910ca5d2d6f8d32adb686b
 
         <!--------------------- Start System Setup ----------------------------------->
 

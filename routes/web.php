@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ApiInitializationController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\TaxController;
@@ -1393,6 +1394,19 @@ Route::group(['middleware' => ['verified']], function () {
             Route::post('support/{id}/reply', [SupportController::class, 'replyAnswer'])->name('support.reply.answer');
             Route::get('support/grid', [SupportController::class, 'grid'])->name('support.grid');
             Route::resource('support', SupportController::class);
+
+        }
+    );
+
+    Route::group(
+        [
+            'middleware' => [
+                'auth',
+                'XSS',
+                'revalidate',
+            ],
+        ], function () {
+            Route::resource('apiinitialization', ApiInitializationController::class);
 
         }
     );
