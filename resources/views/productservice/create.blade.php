@@ -43,31 +43,31 @@
                   {{ Form::text('product_type_code', '', ['class' => 'form-control', 'required' => 'required']) }}
               </div>
           </div>
-          <div class="col-md-6">
+         <!--  <div class="col-md-6">
               <div class="form-group">
                   {{ Form::label('product_classified_code', __('Product Classified Code'), ['class' => 'form-label']) }}<span
                       class="text-danger">*</span>
                   {{ Form::text('product_classified_code', '', ['class' => 'form-control', 'required' => 'required']) }}
               </div>
-          </div>
+          </div> -->
 
           <div class="form-group col-md-6">
               {{ Form::label('country_code', __('Country Code'), ['class' => 'form-label']) }}
               <select name="country_code" class="form-control" required="required">
                   <option value="">Select Country Code</option>
-                  @foreach ($countries as $country)
-                      <option value="{{ $country['alpha3_code'] }}">{{ $country['name'] }} -
-                          ({{ $country['alpha3_code'] }})
+                  @foreach ($countries_codes as $country_code)
+                      <option value="{{ $country_code['cd'] }}">{{ $country_code['cd'] }} -
+                          ({{ $country_code['cdNm'] }})
                       </option>
                   @endforeach
               </select>
           </div>
           <div class="form-group col-md-6">
-              {{ Form::label('item_classifications', __('Item Classifications'), ['class' => 'form-label']) }}
-              <select name="country_code" class="form-control" required="required">
-                  <option value="">Select Item Classifications</option>
+              {{ Form::label('item_classifications', __('Item Classifications Code'), ['class' => 'form-label']) }}
+              <select name="product_classified_code" class="form-control" required="required">
+                  <option value="">Select Item Classifications Code</option>
                   @foreach ($item_classifications as $item_classification)
-                      <option value="{{ $item_classification['id'] }}">{{ $item_classification['itemClsNm'] }}  -
+                      <option value="{{ $item_classification['itemClsCd'] }}">{{ $item_classification['itemClsCd'] }}  -
                           ({{ $item_classification['itemClsNm']}})
                       </option>
                   @endforeach

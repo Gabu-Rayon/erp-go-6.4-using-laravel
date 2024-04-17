@@ -200,10 +200,10 @@ class CustomerController extends Controller
             ])->post('https://etims.your-apps.biz/api/AddCustomer', $requestData);
 
 
-            // Log the response body
-            \Log::info('API Response: ' . $response->body());
-
             // Log the response status code
+            \Log::info('API Response Status Code: ' . $response->status());
+            \Log::info('API Request Data: ' . json_encode($requestData));
+            \Log::info('API Response: ' . $response->body());
             \Log::info('API Response Status Code: ' . $response->status());
 
 

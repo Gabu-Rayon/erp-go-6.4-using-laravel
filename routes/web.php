@@ -25,6 +25,7 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CouponController;
+use App\Http\Controllers\NoticeController;
 use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\PaytabController;
 use App\Http\Controllers\ReportController;
@@ -1676,17 +1677,10 @@ Route::group(['middleware' => ['verified']], function () {
     );
 
 });
-
-
- //Notices Controller Routes
- 
- Route::get('notices', [GetNoticeListController::class, 'index'])->name('notices.index')->middleware(['auth', 'XSS']);
-
-
-
 Route::any('/cookie-consent', [SystemController::class, 'CookieConsent'])->name('cookie-consent');
 
 
 Route::get('/code', [CodeController::class, 'getCodesList']);
 Route::get('/getItemClassifications', [ItemClassificationsController::class, 'addCategories']);
 Route::get('/details', [DetailsController::class, 'getDetailsList']);
+Route::get('/getnotices', [NoticeController::class, 'getNoticeList']);

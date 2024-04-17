@@ -27,11 +27,7 @@ var_dump($productServices);
             <i class="ti ti-plus"></i>
         </a>
 
-         <!-- Button to trigger the fetchDataAndStore() method -->
-        <a href="#" class="btn btn-sm btn-primary" onclick="fetchDataAndStore()">
-            <?php echo e(__('Fetch and Store Data')); ?>
-
-        </a>
+         <!-- Button to trigger the fetchDataAndStore() method -->        
     </div>
 
 <?php $__env->stopSection(); ?>
@@ -171,14 +167,6 @@ var_dump($productServices);
         </div>
     </div>
 <?php $__env->stopSection(); ?>
-
-<script>
-    function fetchDataAndStore() {
-        $.get('<?php echo e(route("fetch.data.and.store")); ?>', function(response) {
-            console.log(response);
-        });
-    }
-</script>
 
 
 

@@ -19,8 +19,12 @@ class CodeController extends Controller
             $response = Http::withHeaders([
                 'key' => '123456'
             ])->get($url);
-            $data = $response->json();
+            $data = $response->json();                    
             $classList = $data['data']['data']['clsList'];
+            
+            \Log::info('API Request Data: ' . json_encode($response));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
 
             if (isset($classList)) {
                 foreach ($classList as $class) {

@@ -20,6 +20,11 @@ class ItemClassificationsController extends Controller
         ])->get($url);
         $data = $response->json()['data'];
 
+
+        \Log::info('API Request Data: ' . json_encode($response));
+        \Log::info('API Response: ' . $response->body());
+        \Log::info('API Response Status Code: ' . $response->status());
+
         if (isset($data['data'])) {
             try {
                 foreach ($data['data']['itemClsList'] as $item) {

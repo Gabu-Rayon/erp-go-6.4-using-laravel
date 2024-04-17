@@ -48,34 +48,34 @@
 
               </div>
           </div>
-          <div class="col-md-6">
+         <!--  <div class="col-md-6">
               <div class="form-group">
                   <?php echo e(Form::label('product_classified_code', __('Product Classified Code'), ['class' => 'form-label'])); ?><span
                       class="text-danger">*</span>
                   <?php echo e(Form::text('product_classified_code', '', ['class' => 'form-control', 'required' => 'required'])); ?>
 
               </div>
-          </div>
+          </div> -->
 
           <div class="form-group col-md-6">
               <?php echo e(Form::label('country_code', __('Country Code'), ['class' => 'form-label'])); ?>
 
               <select name="country_code" class="form-control" required="required">
                   <option value="">Select Country Code</option>
-                  <?php $__currentLoopData = $countries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $country): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                      <option value="<?php echo e($country['alpha3_code']); ?>"><?php echo e($country['name']); ?> -
-                          (<?php echo e($country['alpha3_code']); ?>)
+                  <?php $__currentLoopData = $countries_codes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $country_code): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                      <option value="<?php echo e($country_code['cd']); ?>"><?php echo e($country_code['cd']); ?> -
+                          (<?php echo e($country_code['cdNm']); ?>)
                       </option>
                   <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </select>
           </div>
           <div class="form-group col-md-6">
-              <?php echo e(Form::label('item_classifications', __('Item Classifications'), ['class' => 'form-label'])); ?>
+              <?php echo e(Form::label('item_classifications', __('Item Classifications Code'), ['class' => 'form-label'])); ?>
 
-              <select name="country_code" class="form-control" required="required">
-                  <option value="">Select Item Classifications</option>
+              <select name="product_classified_code" class="form-control" required="required">
+                  <option value="">Select Item Classifications Code</option>
                   <?php $__currentLoopData = $item_classifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item_classification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                      <option value="<?php echo e($item_classification['id']); ?>"><?php echo e($item_classification['itemClsNm']); ?>  -
+                      <option value="<?php echo e($item_classification['itemClsCd']); ?>"><?php echo e($item_classification['itemClsCd']); ?>  -
                           (<?php echo e($item_classification['itemClsNm']); ?>)
                       </option>
                   <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

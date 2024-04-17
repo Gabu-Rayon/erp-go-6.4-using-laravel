@@ -7,6 +7,7 @@ use App\Models\Tax;
 use App\Models\User;
 use App\Models\Vender;
 use GuzzleHttp\Client;
+use App\Models\Details;
 use App\Models\Product;
 use App\Models\Utility;
 use App\Models\Countries;
@@ -112,7 +113,7 @@ class ProductServiceController extends Controller
                 ->pluck('code_name', 'id');
             $incomeChartAccounts->prepend('Select Account', 0);
             // $item_classifications = ItemClassification::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('id');
-            $item_classifications = ItemClassification::all()->pluck('itemClsNm','id');
+            $item_classifications = ItemClassification::all();
 
             
             $incomeSubAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name,chart_of_accounts.id, chart_of_accounts.code, chart_of_account_parents.account'));
@@ -140,10 +141,10 @@ class ProductServiceController extends Controller
             $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
 
             // Fetch countries data from the Countries model
-            $countries = Countries::all();
+            $countries_codes = Details::all();
 
 
-            return view('productservice.create', compact('category', 'unit', 'tax','item_classifications', 'customFields', 'incomeChartAccounts', 'incomeSubAccounts', 'expenseChartAccounts', 'expenseSubAccounts', 'countries'));
+            return view('productservice.create', compact('category', 'unit', 'tax','item_classifications', 'customFields', 'incomeChartAccounts', 'incomeSubAccounts', 'expenseChartAccounts', 'expenseSubAccounts', 'countries_codes'));
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }

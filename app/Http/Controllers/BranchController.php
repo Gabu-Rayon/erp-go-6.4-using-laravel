@@ -162,10 +162,10 @@ class BranchController extends Controller
 
             // Check if API call was successful
             if ($response->successful()) {
-                return redirect()->route('branch.index')->with('success', __('Branch  successfully created.'));
+                return redirect()->route('branch.index')->with('success', __('Branch User successfully created.'));
             } else {
                 // If API call failed, return with error message
-                return redirect()->back()->with('error', __('Failed to create Branch.'));
+                return redirect()->back()->with('error', __('Failed to create Branch User.'));
             }
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));

@@ -21,6 +21,11 @@ class DetailsController extends Controller
             $data = $response->json();
             $classList = $data['data']['data']['clsList'];
 
+
+            \Log::info('API Request Data: ' . json_encode($response));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+
             if (isset($classList)) {
                 foreach ($classList as $class) {
                     $detailsList = $class['dtlList'];
