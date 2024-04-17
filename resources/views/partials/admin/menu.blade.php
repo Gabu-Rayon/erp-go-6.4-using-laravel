@@ -1366,7 +1366,19 @@
                 </a>
             </li>
         @endif
+<<<<<<< HEAD
+        @if (\Auth::user()->type == 'company')
+            <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'compositionlist' ? 'active' : '' }}">
+                <a href="{{ route('add.compostion.list') }}" class="dash-link">
+                    <span class="dash-micon"><i class="ti ti-notification"></i></span><span
+                        class="dash-mtext">{{ __('Composition List') }}</span>
+                </a>
+            </li>
+        @endif
+        
+=======
 
+>>>>>>> 11404ba13abf376c68910ca5d2d6f8d32adb686b
 
         <!--------------------- Start System Setup ----------------------------------->
 

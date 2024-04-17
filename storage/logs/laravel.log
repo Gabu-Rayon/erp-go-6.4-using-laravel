@@ -270,43 +270,21 @@ The field CustomerTin must be a string or array type with a maximum length of '1
 "remark":"thank you"}  
 [2024-04-17 11:10:36] local.INFO: API Response: {"statusCode":200,"message":"Success",
 "data":{"resultCd":"910","resultMsg":"Request parameter error[<email> : not a well-formed email address]","resultDt":"20240417141042","data":null}}  
-[2024-04-17 11:10:36] local.INFO: API Response Status Code: 200  
-[2024-04-17 11:19:38] local.ERROR: SQLSTATE[42S01]: Base table or view already exists: 1050 Table 'code' already exists (Connection: mysql, SQL: create table `code` (`id` bigint unsigned not null auto_increment primary key, `cdCls` varchar(10) not null, `cdClsNm` varchar(100) not null, `cdClsDesc` varchar(100) null, `useYn` char(1) not null default 'Y', `userDfnNm1` varchar(100) null, `userDfnNm2` varchar(100) null, `userDfnNm3` varchar(100) null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci') {"exception":"[object] (Illuminate\\Database\\QueryException(code: 42S01): SQLSTATE[42S01]: Base table or view already exists: 1050 Table 'code' already exists (Connection: mysql, SQL: create table `code` (`id` bigint unsigned not null auto_increment primary key, `cdCls` varchar(10) not null, `cdClsNm` varchar(100) not null, `cdClsDesc` varchar(100) null, `useYn` char(1) not null default 'Y', `userDfnNm1` varchar(100) null, `userDfnNm2` varchar(100) null, `userDfnNm3` varchar(100) null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci') at C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php:801)
-[stacktrace]
-#0 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(755): Illuminate\\Database\\Connection->runQueryCallback('create table `c...', Array, Object(Closure))
-#1 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(569): Illuminate\\Database\\Connection->run('create table `c...', Array, Object(Closure))
-#2 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Schema\\Blueprint.php(110): Illuminate\\Database\\Connection->statement('create table `c...')
-#3 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Schema\\Builder.php(439): Illuminate\\Database\\Schema\\Blueprint->build(Object(Illuminate\\Database\\MySqlConnection), Object(Illuminate\\Database\\Schema\\Grammars\\MySqlGrammar))
-#4 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Schema\\Builder.php(281): Illuminate\\Database\\Schema\\Builder->build(Object(Illuminate\\Database\\Schema\\Blueprint))
-#5 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\Facades\\Facade.php(353): Illuminate\\Database\\Schema\\Builder->create('code', Object(Closure))
-#6 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\database\\migrations\\2024_04_17_085326_code.php(13): Illuminate\\Support\\Facades\\Facade::__callStatic('create', Array)
-#7 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Migrations\\Migrator.php(493): Illuminate\\Database\\Migrations\\Migration@anonymous->up()
-#8 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Migrations\\Migrator.php(410): Illuminate\\Database\\Migrations\\Migrator->runMethod(Object(Illuminate\\Database\\MySqlConnection), Object(Illuminate\\Database\\Migrations\\Migration@anonymous), 'up')
-#9 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Migrations\\Migrator.php(419): Illuminate\\Database\\Migrations\\Migrator->Illuminate\\Database\\Migrations\\{closure}()
-#10 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Migrations\\Migrator.php(216): Illuminate\\Database\\Migrations\\Migrator->runMigration(Object(Illuminate\\Database\\Migrations\\Migration@anonymous), 'up')
-#11 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\View\\Components\\Task.php(37): Illuminate\\Database\\Migrations\\Migrator->Illuminate\\Database\\Migrations\\{closure}()
-#12 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Migrations\\Migrator.php(756): Illuminate\\Console\\View\\Components\\Task->render('2024_04_17_0853...', Object(Closure))
-#13 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Migrations\\Migrator.php(216): Illuminate\\Database\\Migrations\\Migrator->write('Illuminate\\\\Cons...', '2024_04_17_0853...', Object(Closure))
-#14 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Migrations\\Migrator.php(181): Illuminate\\Database\\Migrations\\Migrator->runUp('C:\\\\xampp\\\\htdocs...', 7, false)
-#15 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Migrations\\Migrator.php(124): Illuminate\\Database\\Migrations\\Migrator->runPending(Array, Array)
-#16 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Console\\Migrations\\MigrateCommand.php(90): Illuminate\\Database\\Migrations\\Migrator->run(Array, Array)
-#17 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Migrations\\Migrator.php(633): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->Illuminate\\Database\\Console\\Migrations\\{closure}()
-#18 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Console\\Migrations\\MigrateCommand.php(83): Illuminate\\Database\\Migrations\\Migrator->usingConnection(NULL, Object(Closure))
-#19 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->handle()
-#20 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(41): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
-#21 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(93): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
-#22 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
-#23 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
-#24 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Command.php(211): Illuminate\\Container\\Container->call(Array)
-#25 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\symfony\\console\\Command\\Command.php(326): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
-#26 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Command.php(180): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
-#27 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\symfony\\console\\Application.php(1081): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
-#28 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\symfony\\console\\Application.php(320): Symfony\\Component\\Console\\Application->doRunCommand(Object(Illuminate\\Database\\Console\\Migrations\\MigrateCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
-#29 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\symfony\\console\\Application.php(174): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
-#30 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(201): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
-#31 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\artisan(35): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
-#32 {main}
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
 
+<<<<<<< HEAD
+=======
 [previous exception] [object] (PDOException(code: 42S01): SQLSTATE[42S01]: Base table or view already exists: 1050 Table 'code' already exists at C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php:580)
 [stacktrace]
 #0 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(580): PDOStatement->execute()
@@ -2468,3 +2446,4 @@ The field CustomerTin must be a string or array type with a maximum length of '1
 #54 /home/chrisdroid/Desktop/projects/php/erp-go-6.4-using-laravel/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(16): require_once('...')
 #55 {main}
 "} 
+>>>>>>> 11404ba13abf376c68910ca5d2d6f8d32adb686b

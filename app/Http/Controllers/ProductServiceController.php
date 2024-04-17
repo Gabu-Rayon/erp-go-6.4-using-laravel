@@ -350,7 +350,6 @@ class ProductServiceController extends Controller
             $rules = [
                 // Your validation rules here
             ];
-
             // Validate the request data
             $validator = \Validator::make($request->all(), $rules);
 
