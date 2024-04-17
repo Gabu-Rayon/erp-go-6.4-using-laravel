@@ -9,16 +9,17 @@ use App\Models\Vender;
 use GuzzleHttp\Client;
 use App\Models\Product;
 use App\Models\Utility;
-use App\Models\CodeListClasses;
-use App\Models\CodeListDetail;
 use App\Models\Countries;
 use App\Models\CustomField;
 use Illuminate\Http\Request;
 use App\Models\ChartOfAccount;
+use App\Models\CodeListDetail;
 use App\Models\ProductService;
+use App\Models\CodeListClasses;
 use Illuminate\Validation\Rule;
 use App\Models\WarehouseProduct;
 use App\Models\ChartOfAccountType;
+use App\Models\ItemClassification;
 use App\Models\ProductServiceUnit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +30,7 @@ use App\Imports\ProductServiceImport;
 use App\Models\ProductServiceCategory;
 use Illuminate\Support\Facades\Storage;
 use GuzzleHttp\Exception\RequestException;
+
 class ProductServiceController extends Controller
 {
     public function index(Request $request)
@@ -38,6 +40,8 @@ class ProductServiceController extends Controller
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
 
+            $item_classifications = ItemClassification::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('id');
+
             if (!empty($request->category)) {
 
                 $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', $request->category)->with(['category', 'unit'])->get();
@@ -45,7 +49,7 @@ class ProductServiceController extends Controller
                 $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->with(['category', 'unit'])->get();
             }
 
-            return view('productservice.index', compact('productServices', 'category'));
+            return view('productservice.index', compact('productServices', 'category','item_classifications'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -107,7 +111,10 @@ class ProductServiceController extends Controller
                 ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
                 ->pluck('code_name', 'id');
             $incomeChartAccounts->prepend('Select Account', 0);
+            // $item_classifications = ItemClassification::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('id');
+            $item_classifications = ItemClassification::all()->pluck('itemClsNm','id');
 
+            
             $incomeSubAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name,chart_of_accounts.id, chart_of_accounts.code, chart_of_account_parents.account'));
             $incomeSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
             $incomeSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
@@ -136,7 +143,7 @@ class ProductServiceController extends Controller
             $countries = Countries::all();
 
 
-            return view('productservice.create', compact('category', 'unit', 'tax', 'customFields', 'incomeChartAccounts', 'incomeSubAccounts', 'expenseChartAccounts', 'expenseSubAccounts', 'countries'));
+            return view('productservice.create', compact('category', 'unit', 'tax','item_classifications', 'customFields', 'incomeChartAccounts', 'incomeSubAccounts', 'expenseChartAccounts', 'expenseSubAccounts', 'countries'));
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
@@ -1208,91 +1215,4 @@ class ProductServiceController extends Controller
     }
 
 
-    public function fetchDataAndStoreForCodeList(Request $request)
-    {
-        $client = new Client();
-        try {
-            $response = $client->request('GET', 'https://etims.your-apps.biz/api/GetCodeList?date=20220409120000', [
-                'headers' => [
-                    'accept' => '*/*',
-                    'key' => '123456',
-                ],
-            ]);
-
-            if ($response->getStatusCode() === 200) {
-                $data = json_decode($response->getBody(), true);
-                \Log::info('API Response JSON Data:', $data);
-                 //Accesing Data[] Array First ,then clsList[] then we access the access another array  inside it of clsList[]
-                if (isset($data['data']['clsList']) && is_array($data['data']['clsList'])) {
-                    foreach ($data['data']['clsList'] as $class_data) {
-                        // Store class data
-                        $class = new CodeListClasses;
-                        $class->classCode = $class_data['cdCls'];
-                        $class->className = $class_data['cdClsNm'];
-                        $class->classDescription = $class_data['cdClsDesc'];
-                        $class->useYearno = $class_data['useYn'];
-                        $class->userDefineName1 = $class_data['userDfnNm1'];
-                        $class->userDefineName2 = $class_data['userDfnNm2'];
-                        $class->userDefineName3 = $class_data['userDfnNm3'];
-                        $class->save();
-
-                        // Store detail data
-                        if (isset($class_data['dtlList']) && is_array($class_data['dtlList'])) {
-                            foreach ($class_data['dtlList'] as $detail_data) {
-                                $detail = new CodeListDetail;
-                                $detail->class_id = $class->id; // Assuming you have a foreign key relationship
-                                $detail->code = $detail_data['cd'];
-                                $detail->codeName = $detail_data['cdNm'];
-                                $detail->codeDescription = $detail_data['cdDesc'];
-                                $detail->useYearno = $detail_data['useYn'];
-                                $detail->srtOrder = $detail_data['srtOrd'];
-                                $detail->userDefineCode1 = $detail_data['userDfnCd1'];
-                                $detail->userDefineCode2 = $detail_data['userDfnCd2'];
-                                $detail->userDefineCode3 = $detail_data['userDfnCd3'];
-                                $detail->save();
-                            }
-                        }
-                    }
-
-                    return redirect()->back()->with('success', __('Code List Data fetched and stored successfully'));
-                } else {
-                    \Log::error('Invalid response data structure or missing data fields');
-                    return redirect()->back()->with('error', __('Failed to fetch Code List data from API: Invalid response data structure or missing data fields'));
-                }
-            } else {
-                \Log::error('Failed to fetch Code List data from API. Status code: ' . $response->getStatusCode());
-                return redirect()->back()->with('error', __('Failed to fetch Code List data from API'));
-            }
-        } catch (RequestException $e) {
-            \Log::error('Failed to make request to API: ' . $e->getMessage());
-            return redirect()->back()->with('error', __('Failed to make request to API'));
-        }
-    }
-
-    
-    public function fetchDataAndStoreForCodeList(Request $request)
-    {
-        $client = new Client();
-        $response = $client->request('GET', 'https://etims.your-apps.biz/api/GetCodeList?date=20220409120000', [
-            'headers' => [
-                'accept' => '*/*',
-                'key' => '123456',
-            ],
-        ]);
-        $response_data = json_decode($response->getbody());
-        \Log::info('API Response JSON Data:', $response_data);
-        
-        foreach ($response_data['clsList'] as $item) {
-            $class = new CodeListClasses;
-            $class->classCode = $item['cdCls'];
-            $class->className = $item['cdClsNm'];
-            $class->classDescription = $item['cdClsDesc'];
-            $class->useYearno = $item['useYn'];
-            $class->userDefineName1 = $item['userDfnNm1'];
-            $class->userDefineName2 = $item['userDfnNm2'];
-            $class->userDefineName3 = $item['userDfnNm3'];
-            
-            $class->save();
-        }
-    }
 }

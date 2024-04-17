@@ -69,6 +69,18 @@
                   <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </select>
           </div>
+          <div class="form-group col-md-6">
+              <?php echo e(Form::label('item_classifications', __('Item Classifications'), ['class' => 'form-label'])); ?>
+
+              <select name="country_code" class="form-control" required="required">
+                  <option value="">Select Item Classifications</option>
+                  <?php $__currentLoopData = $item_classifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item_classification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                      <option value="<?php echo e($item_classification['id']); ?>"><?php echo e($item_classification['itemClsNm']); ?>  -
+                          (<?php echo e($item_classification['itemClsNm']); ?>)
+                      </option>
+                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+              </select>
+          </div>
           <div class="col-md-6">
               <div class="form-group">
                   <?php echo e(Form::label('batch_no', __('Batch No'), ['class' => 'form-label'])); ?><span

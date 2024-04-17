@@ -5,6 +5,7 @@ use App\Http\Controllers\JobController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\BillController;
+use App\Http\Controllers\CodeController;
 use App\Http\Controllers\DealController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\LeadController;
@@ -31,6 +32,7 @@ use App\Http\Controllers\SourceController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\TravelController;
 use App\Http\Controllers\VenderController;
+use App\Http\Controllers\DetailsController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\InvoiceController;
@@ -141,6 +143,7 @@ use App\Http\Controllers\PaymentWallPaymentController;
 use App\Http\Controllers\ProductServiceUnitController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\BankTransferPaymentController;
+use App\Http\Controllers\ItemClassificationsController;
 use App\Http\Controllers\SaturationDeductionController;
 use App\Http\Controllers\NotificationTemplatesController;
 use App\Http\Controllers\ProductServiceCategoryController;
@@ -390,8 +393,7 @@ Route::group(['middleware' => ['verified']], function () {
     Route::post('empty-cart', [ProductServiceController::class, 'emptyCart'])->middleware(['auth', 'XSS']);
     Route::post('warehouse-empty-cart', [ProductServiceController::class, 'warehouseemptyCart'])->name('warehouse-empty-cart')->middleware(['auth', 'XSS']);
     Route::resource('productservice', ProductServiceController::class)->middleware(['auth', 'XSS', 'revalidate']);
-    // routes/web.php
-   Route::match(['get', 'post'], '/fetch-data', [ProductServiceController::class, 'fetchDataAndStoreForCodeList'])->name('fetch.data.and.store');
+
     //Product Stock
     Route::resource('productstock', ProductStockController::class)->middleware(['auth', 'XSS']);
 
@@ -1683,3 +1685,8 @@ Route::group(['middleware' => ['verified']], function () {
 
 
 Route::any('/cookie-consent', [SystemController::class, 'CookieConsent'])->name('cookie-consent');
+
+
+Route::get('/code', [CodeController::class, 'getCodesList']);
+Route::get('/getItemClassifications', [ItemClassificationsController::class, 'addCategories']);
+Route::get('/details', [DetailsController::class, 'getDetailsList']);

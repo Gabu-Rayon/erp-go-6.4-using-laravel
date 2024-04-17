@@ -62,6 +62,17 @@
                   @endforeach
               </select>
           </div>
+          <div class="form-group col-md-6">
+              {{ Form::label('item_classifications', __('Item Classifications'), ['class' => 'form-label']) }}
+              <select name="country_code" class="form-control" required="required">
+                  <option value="">Select Item Classifications</option>
+                  @foreach ($item_classifications as $item_classification)
+                      <option value="{{ $item_classification['id'] }}">{{ $item_classification['itemClsNm'] }}  -
+                          ({{ $item_classification['itemClsNm']}})
+                      </option>
+                  @endforeach
+              </select>
+          </div>
           <div class="col-md-6">
               <div class="form-group">
                   {{ Form::label('batch_no', __('Batch No'), ['class' => 'form-label']) }}<span
