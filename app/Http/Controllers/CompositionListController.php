@@ -2,80 +2,88 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CustomField;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
+use App\Models\CompositionItem;
+use App\Models\MainItem;
 
 class CompositionListController extends Controller
 {
-    public function addCompositionList()
+    //
+    public function index()
     {
-
         return view('compositionlist.index');
     }
 
-
-    public function createCompositionList(Request $request)
+    public function create()
     {
-
-        $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'customer')->get();
-
-        return view('compositionlist.create', compact('customFields'));
-
-        // return view('compositionlist.create');
+        return view('compositionlist.create');
     }
-    public function postCompositionList(Request $request)
+
+
+    public function store(Request $request)
     {
         // Validate the incoming request data
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'main_item_code' => 'required|string',
-            'composition_item_code' => 'required|array',
-            'composition_item_quantity' => 'required|array',
-            // Add validation rules for other fields if needed
+            'composition_item_code.*' => 'required|string',
+            'composition_item_quantity.*' => 'required|numeric',
         ]);
 
-        // Prepare the data to be sent to the API
-        $data = [
-            'mainItemCode' => $request->input('main_item_code'),
-            'compositionItems' => [],
-        ];
-
-        // Combine composition item codes and quantities into arrays
-        $compositionItemCodes = $request->input('composition_item_code');
-        $compositionItemQuantities = $request->input('composition_item_quantity');
-
-        // Loop through the composition items and add them to the data array
-        foreach ($compositionItemCodes as $key => $compositionItemCode) {
-            $data['compositionItems'][] = [
-                'compoItemCode' => $compositionItemCode,
-                'compoItemQty' => $compositionItemQuantities[$key],
-            ];
+        if ($validator->fails()) {
+            $messages = $validator->getMessageBag();
+            return redirect()->back()->with('error', $messages->first());
         }
 
-        // Log the request body
-        \Log::info('Request Body:', $data);
+        try {
+            // Prepare the data to be sent to the API
+            $data = [
+                'mainItemCode' => $request->input('main_item_code'),
+                'compositionItems' => [],
+            ];
 
-        // Send the POST request to the API endpoint
-        $response = Http::post('https://etims.your-apps.biz/api/PostCompositionList', $data, [
-            'accept' => '*/*',
-            'key' => '123456',
-        ]);
+            // Get the composition item codes and quantities
+            $compositionItemCodes = $request->input('composition_item_code');
+            $compositionItemQuantities = $request->input('composition_item_quantity');
 
-        // Log the response status code
-        \Log::info('API Response Status Code: ' . $response->status());
-        \Log::info('API Response: ' . $response->body());
-        \Log::info('API Response Status Code: ' . $response->status());
+            // Make sure compositionItemCodes is an array
+            if (!is_array($compositionItemCodes)) {
+                throw new \Exception('Composition item codes must be an array');
+            }
+
+            // Loop through the composition item codes and add them to the data array
+            foreach ($compositionItemCodes as $key => $compositionItemCode) {
+                $data['compositionItems'][] = [
+                    'compoItemCode' => $compositionItemCode,
+                    'compoItemQty' => $compositionItemQuantities[$key],
+                ];
+            }
+
+            // Send the POST request to the API endpoint
+            $response = Http::withHeaders([
+                'accept' => 'application/json',
+                'key' => '123456',
+            ])->post('https://etims.your-apps.biz/api/AddCompositionItemList', $data);
 
 
-        // Check if the request was successful
-        if ($response->successful()) {
-            // API call was successful
-            return redirect()->back()->with('success', __('Composition List created successfully'));
-        } else {
-            // API call failed
-            \Log::error('Failed to post Composition List data to API. Status code: ' . $response->status());
-            return redirect()->back()->with('error', __('Failed to post Composition List data to API'));
+            \Log::info('API Request Data: ' . json_encode($data));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+
+            // Check if the request was successful
+            if ($response->successful()) {
+                // API call was successful
+                return redirect()->route('compositionlist.index')->with('success', __('Composition List created successfully'));
+            } else {
+                // API call failed
+                Log::error('Failed to post Composition List data to API. Status code: ' . $response->status());
+                return redirect()->back()->with('error', __('Failed to post Composition List data to API'));
+            }
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while posting data to the API');
         }
     }
-
 }

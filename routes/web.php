@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ApiInitializationController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\TaxController;
@@ -138,11 +137,13 @@ use App\Http\Controllers\PerformanceTypeController;
 use App\Http\Controllers\RazorpayPaymentController;
 use App\Http\Controllers\TerminationTypeController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\ApiInitializationController;
 use App\Http\Controllers\InterviewScheduleController;
 use App\Http\Controllers\WarehouseTransferController;
 use App\Http\Controllers\AddCompositionListController;
 use App\Http\Controllers\AttendanceEmployeeController;
 use App\Http\Controllers\FlutterwavePaymentController;
+use App\Http\Controllers\GetItemInformationController;
 use App\Http\Controllers\PaymentWallPaymentController;
 use App\Http\Controllers\ProductServiceUnitController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -393,6 +394,9 @@ Route::group(['middleware' => ['verified']], function () {
     );
 
     Route::get('productservice/index', [ProductServiceController::class, 'index'])->name('productservice.index');
+
+    Route::get('productservice/getcodelist', [ProductServiceController::class, 'getCodeList'])->name('productservice.getcodelist');
+    Route::get('productservice/getiteminformation', [ProductServiceController::class, 'getItemInformation'])->name('productservice.synchronize');    
     Route::get('productservice/{id}/detail', [ProductServiceController::class, 'warehouseDetail'])->name('productservice.detail');
     Route::post('empty-cart', [ProductServiceController::class, 'emptyCart'])->middleware(['auth', 'XSS']);
     Route::post('warehouse-empty-cart', [ProductServiceController::class, 'warehouseemptyCart'])->name('warehouse-empty-cart')->middleware(['auth', 'XSS']);
@@ -1694,13 +1698,37 @@ Route::group(['middleware' => ['verified']], function () {
 
 });
 Route::any('/cookie-consent', [SystemController::class, 'CookieConsent'])->name('cookie-consent');
-
-
 Route::get('/code', [CodeController::class, 'getCodesList']);
 Route::get('/getItemClassifications', [ItemClassificationsController::class, 'addCategories']);
 Route::get('/details', [DetailsController::class, 'getDetailsList']);
 Route::get('/getnotices', [NoticeController::class, 'getNoticeList']);
-Route::get('/add-composition',[CompositionListController::class,'addCompositionList'])->name('add.compostion.list');
-// compositionlist.create
-Route::get('/create-compositionlist',[CompositionListController::class,'createCompositionList'])->name('compositionlist.create');
-Route::post('/postcompositionlist', [CompositionListController::class, 'postCompositionList'])->name('compositionlist.post');
+Route::get('/get-item-information', [GetItemInformationController::class,'getItemInformation']);
+
+Route::group(
+    [
+        'middleware' => [
+            'auth',
+            'XSS',
+            'revalidate',
+        ],
+    ],
+    function () {
+        Route::resource('compositionlist', CompositionListController::class);
+
+    }
+);
+
+
+
+Route::group(
+    [
+        'middleware' => [
+            'auth',
+            'XSS',
+            'revalidate',
+        ],
+    ],
+    function () {
+        Route::resource('iteminformation', GetItemInformationController::class);
+    }
+);

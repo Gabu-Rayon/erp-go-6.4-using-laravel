@@ -2,21 +2,21 @@
 @push('script-page')
 @endpush
 @section('page-title')
-    {{__('API Initialization')}}
+    {{__('Manage Item Information')}}
 @endsection
 @section('title')
     <div class="d-inline-block">
-        <h5 class="h4 d-inline-block font-weight-400 mb-0 ">{{__('API Initialization')}}</h5>
+        <h5 class="h4 d-inline-block font-weight-400 mb-0 ">{{__('Item Information')}}</h5>
     </div>Support
 @endsection
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
-    <li class="breadcrumb-item">{{__('API Initialization')}}</li>
+    <li class="breadcrumb-item">{{__('Manage Item Information')}}</li>
 @endsection
 
 @section('action-btn')
     <div class="float-end">
-       <a href="#" data-size="lg" data-url="{{ route('apiinitialization.create') }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Create')}}" data-title="{{__('Create API Initialization')}}" class="btn btn-sm btn-primary">
+       <a href="#" data-size="lg" data-url="{{ route('iteminformation.create') }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Create Item Information')}}" data-title="{{__('Create Item Information')}}" class="btn btn-sm btn-primary">
             <i class="ti ti-plus"></i>
         </a>
     </div>
@@ -31,13 +31,14 @@
                     <table class="table datatable">
                         <thead>
                         <tr>
-                            <th scope="col">{{__('SrNo')}}</th>
-                            <th scope="col">{{__('Tin')}}</th>
-                            <th scope="col">{{__('BHF Id')}}</th>
-                            <th scope="col">{{__('DVC SrINo')}}</th>
-                            <th scope="col">{{__('Taxpr Nm')}}</th>
-                            <th scope="col">{{__('Status')}}</th>
-                            <th scope="col">{{__('Action')}}</th>
+                            <th scope="col">{{__('#')}}</th>
+                            <th scope="col">{{__('Data')}}</th>
+                            <th scope="col">{{__('Data')}}</th>
+                            <th scope="col">{{__('Data')}}</th>
+                            <th scope="col">{{__('Data')}}</th>
+                            <th scope="col">{{__('Data')}}</th>
+                            <th scope="col">{{__('Data')}}</th>
+                            <th scope="col" >{{__('Data')}}</th>
                         </tr>
                         </thead>
                         <tbody class="list">
