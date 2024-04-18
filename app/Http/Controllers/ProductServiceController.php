@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\Tax;
+use App\Models\Code;
 use App\Models\User;
 use App\Models\Vender;
 use GuzzleHttp\Client;
@@ -17,6 +18,7 @@ use App\Models\ChartOfAccount;
 use App\Models\CodeListDetail;
 use App\Models\ProductService;
 use App\Models\CodeListClasses;
+use App\Models\ItemInformation;
 use Illuminate\Validation\Rule;
 use App\Models\WarehouseProduct;
 use App\Models\ChartOfAccountType;
@@ -38,64 +40,13 @@ class ProductServiceController extends Controller
     {
 
         if (\Auth::user()->can('manage product & service')) {
-            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
-            $category->prepend('Select Category', '');
+            $itemlists =  ItemInformation::all();
 
-            $item_classifications = ItemClassification::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('id');
-
-            if (!empty($request->category)) {
-
-                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', $request->category)->with(['category', 'unit'])->get();
-            } else {
-                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->with(['category', 'unit'])->get();
-            }
-
-            return view('productservice.index', compact('productServices', 'category','item_classifications'));
+            return view('productservice.index', compact('itemlists'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
-
-    /**
-     * Using Api Endpoint
-     *  
-     */
-    // public function index()
-    // {
-    //     if (\Auth::user()->can('manage product & service')) {
-    //         try {
-    //             // $response = Http::withHeaders([
-    //             //     'accept' => '/',
-    //             //     'key' => '123456',
-    //             // ])->get('https://etims.your-apps.biz/api/GetItemInformation', [
-    //             //         'date' => date('20220409120000'),
-    //             //     ]);
-
-    //             $response = Http::withHeaders([
-    //                 'accept' => '/',
-    //                 'key' => '123456',
-    //             ])->timeout(300)->get('https://etims.your-apps.biz/api/GetItemInformation', [
-    //                         'date' => date('20220409120000'),
-    //                     ]);
-
-
-    //             if ($response->successful()) {
-    //                 $productServices = $response->json();
-    //                 return view('productservice.index', compact('productServices'));
-    //             } else {
-    //                 // Log error and handle error response
-    //                 \Log::error('Failed to fetch products & Services from API: ' . $response->status() . ' ' . $response->body());
-    //                 return redirect()->back()->with('error', 'Failed to fetch products & Services from API.');
-    //             }
-    //         } catch (\Exception $e) {
-    //             // Log exception and handle exception
-    //             \Log::error('Exception occurred while fetching products & Services: ' . $e->getMessage());
-    //             return redirect()->back()->with('error', 'Failed to fetch products & Services from API.');
-    //         }
-    //     } else {
-    //         return redirect()->back();
-    //     }
-    // }
 
 
     public function create()
@@ -104,47 +55,16 @@ class ProductServiceController extends Controller
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
             $unit = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $tax = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $incomeChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
-                ->where('chart_of_account_types.name', 'income')
-                ->where('parent', '=', 0)
-                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-                ->pluck('code_name', 'id');
-            $incomeChartAccounts->prepend('Select Account', 0);
+            $taxes = Details::where('cdCls', '04')->get();
+           
             // $item_classifications = ItemClassification::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('id');
             $item_classifications = ItemClassification::all();
 
-            
-            $incomeSubAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name,chart_of_accounts.id, chart_of_accounts.code, chart_of_account_parents.account'));
-            $incomeSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
-            $incomeSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
-            $incomeSubAccounts->where('chart_of_account_types.name', 'income');
-            $incomeSubAccounts->where('chart_of_accounts.parent', '!=', 0);
-            $incomeSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
-            $incomeSubAccounts = $incomeSubAccounts->get()->toArray();
-
-
-            $expenseChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
-                ->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold'])
-                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-                ->pluck('code_name', 'id');
-            $expenseChartAccounts->prepend('Select Account', '');
-
-            $expenseSubAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name,chart_of_accounts.id, chart_of_accounts.code, chart_of_account_parents.account'));
-            $expenseSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
-            $expenseSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
-            $expenseSubAccounts->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold']);
-            $expenseSubAccounts->where('chart_of_accounts.parent', '!=', 0);
-            $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
-            $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
-
             // Fetch countries data from the Countries model
-            $countries_codes = Details::all();
+            $countries_codes = Details::where('cdCls', '05')->get();
 
 
-            return view('productservice.create', compact('category', 'unit', 'tax','item_classifications', 'customFields', 'incomeChartAccounts', 'incomeSubAccounts', 'expenseChartAccounts', 'expenseSubAccounts', 'countries_codes'));
+            return view('productservice.create', compact('category', 'unit', 'taxes','item_classifications', 'customFields', 'countries_codes'));
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
@@ -422,8 +342,8 @@ class ProductServiceController extends Controller
             "group5UnitPrice" => $request->input("group5_unit_price.$key", $request->group5_unit_price),
             "additionalInfo" => $request->input("description.$key", $request->description),
             "saftyQuantity" => $request->input("safety_quantity.$key", $request->safety_quantity),
-            "isInrcApplicable" => true,
-            "isUsed" => true,
+            "isInrcApplicable" => $request->input("insurance_applicable.$key", $request->insurance_applicable),
+            "isUsed" => $request->input("used.$key", $request->used),
             "quantity" => $request->input("quantity.$key", $request->quantity),
             "packageQuantity" => $request->input("quantity.$key", $request->quantity),
         ];
@@ -1213,6 +1133,69 @@ class ProductServiceController extends Controller
             return redirect()->back()->with('error', __('This Product is not found!'));
         }
     }
+    public function getCodeList(){
+
+      $codelists = Code::all();
+      
+        return view('productservice.getcodelist',compact('codelists'));
+    }
+    public function getItemInformation()
+    {
+        $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';
+
+        $response = Http::withHeaders([
+            'key' => '123456'
+        ])->get($url);
+
+        $data = $response->json()['data'];
+
+        \Log::info('API Request Data: ' . json_encode($data));
+        \Log::info('API Response: ' . $response->body());
+        \Log::info('API Response Status Code: ' . $response->status());
+
+        if (isset($data['data'])) {
+            try {
+                foreach ($data['data']['itemList'] as $item) {
+                    ItemInformation::create([
+                        'tin' => $item['tin'],
+                        'itemCd' => $item['itemCd'],
+                        'itemClsCd' => $item['itemClsCd'],
+                        'itemTyCd' => $item['itemTyCd'],
+                        'itemNm' => $item['itemNm'],
+                        'itemStdNm' => $item['itemStdNm'],
+                        'orgnNatCd' => $item['orgnNatCd'],
+                        'pkgUnitCd' => $item['pkgUnitCd'],
+                        'qtyUnitCd' => $item['qtyUnitCd'],
+                        'taxTyCd' => $item['taxTyCd'],
+                        'btchNo' => $item['btchNo'],
+                        'regBhfId' => $item['regBhfId'],
+                        'bcd' => $item['bcd'],
+                        'dftPrc' => $item['dftPrc'],
+                        'grpPrcL1' => $item['grpPrcL1'],
+                        'grpPrcL2' => $item['grpPrcL2'],
+                        'grpPrcL3' => $item['grpPrcL3'],
+                        'grpPrcL4' => $item['grpPrcL4'],
+                        'grpPrcL5' => $item['grpPrcL5'],
+                        'addInfo' => $item['addInfo'],
+                        'sftyQty' => $item['sftyQty'],
+                        'isrcAplcbYn' => $item['isrcAplcbYn'],
+                        'rraModYn' => $item['rraModYn'],
+                        'useYn' => $item['useYn']
+                    ]);
+                }
+                // return redirect()->back()->with('success', 'Item Information added successfully.');
+                return redirect()->route('productservice.index')->with('success', __('Item Information added successfully created.'));
+            } catch (Exception $e) {
+                \Log::error('Error adding Item Information from the API: ' . $e->getMessage());
+                // return redirect()->back()->with('error', 'Error adding Item Information from the API.');
+                return redirect()->route('productservice.index')->with('error', __('Error adding Item Information from the API.'));
+            }
+        } else {
+            // return redirect()->back()->with('error', 'No data found in the API response.');
+            return redirect()->route('productservice.index')->with('error', __('No data found in the API response.'));
+        }
+    }
+
 
 
 }

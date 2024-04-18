@@ -1243,6 +1243,13 @@
                         </li>
                     @endif
                     @if (Gate::check('manage product & service'))
+                        <li class="dash-item {{ Request::segment(1) == 'getcodelist' ? 'active' : '' }}">
+                            <a href="{{ route('productservice.getcodelist') }}"
+                                class="dash-link">{{ __('Code List') }}
+                            </a>
+                        </li>
+                    @endif
+                    @if (Gate::check('manage product & service'))
                         <li class="dash-item {{ Request::segment(1) == 'productstock' ? 'active' : '' }}">
                             <a href="{{ route('productstock.index') }}"
                                 class="dash-link">{{ __('Product Stock') }}
@@ -1366,20 +1373,24 @@
                 </a>
             </li>
         @endif
-<<<<<<< HEAD
         @if (\Auth::user()->type == 'company')
             <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'compositionlist' ? 'active' : '' }}">
-                <a href="{{ route('add.compostion.list') }}" class="dash-link">
+                <a href="{{ route('compositionlist.index') }}" class="dash-link">
                     <span class="dash-micon"><i class="ti ti-notification"></i></span><span
                         class="dash-mtext">{{ __('Composition List') }}</span>
                 </a>
             </li>
         @endif
-        
-=======
 
->>>>>>> 11404ba13abf376c68910ca5d2d6f8d32adb686b
-
+         <!-- @if (\Auth::user()->type == 'company')
+            <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'iteminfomation' ? 'active' : '' }}">
+                <a href="{{ route('iteminformation.index') }}" class="dash-link">
+                    <span class="dash-micon"><i class="ti ti-notification"></i></span><span
+                        class="dash-mtext">{{ __('Items Information') }}</span>
+                </a>
+            </li>
+        @endif
+         -->
         <!--------------------- Start System Setup ----------------------------------->
 
         @if (\Auth::user()->type != 'super admin')
