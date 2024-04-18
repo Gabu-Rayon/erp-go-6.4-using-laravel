@@ -1339,8 +1339,14 @@
             </li>
             <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'api-initialization' ? 'active' : '' }}">
                 <a href="{{ route('apiinitialization.index') }}" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
+                    <span class="dash-micon"><i class="ti ti-server"></i></span><span
                         class="dash-mtext">{{ __('API Initialization') }}</span>
+                </a>
+            </li>
+            <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'item-classification' ? 'active' : '' }}">
+                <a href="{{ route('itemclassificationcode.index') }}" class="dash-link">
+                    <span class="dash-micon"><i class="ti ti-briefcase"></i></span><span
+                        class="dash-mtext">{{ __('Item Classification List') }}</span>
                 </a>
             </li>
             <li
@@ -1366,19 +1372,6 @@
                 </a>
             </li>
         @endif
-<<<<<<< HEAD
-        @if (\Auth::user()->type == 'company')
-            <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'compositionlist' ? 'active' : '' }}">
-                <a href="{{ route('add.compostion.list') }}" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-notification"></i></span><span
-                        class="dash-mtext">{{ __('Composition List') }}</span>
-                </a>
-            </li>
-        @endif
-        
-=======
-
->>>>>>> 11404ba13abf376c68910ca5d2d6f8d32adb686b
 
         <!--------------------- Start System Setup ----------------------------------->
 

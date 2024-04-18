@@ -21,7 +21,7 @@
         </a>
     </div>
     <div class="float-end">
-       <a href="#" data-size="lg" data-url="<?php echo e(route('apiinitialization.addexisting')); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Add Existing Initialization')); ?>" data-title="<?php echo e(__('Add Existing API Initialization')); ?>" class="btn btn-sm btn-primary">
+       <a href="#" data-size="lg" data-url="<?php echo e(route('apiinitialization.create')); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Add Existing Initialization')); ?>" data-title="<?php echo e(__('Add Existing API Initialization')); ?>" class="btn btn-sm btn-primary">
             <i class="ti ti-plus"></i>
         </a>
     </div>
@@ -37,21 +37,21 @@
                         <thead>
                         <tr>
                             <th scope="col"><?php echo e(__('SrNo')); ?></th>
-                            <th scope="col"><?php echo e(__('Tin')); ?></th>
-                            <th scope="col"><?php echo e(__('BHF ID')); ?></th>
+                            <th scope="col"><?php echo e(__('Code')); ?></th>
+                            <th scope="col"><?php echo e(__('Name')); ?></th>
                             <th scope="col"><?php echo e(__('DVC SrlNo')); ?></th>
-                            <th scope="col"><?php echo e(__('Taxpr Nm')); ?></th>
-                            <th scope="col"><?php echo e(__('Status')); ?></th>
+                            <th scope="col"><?php echo e(__('Level')); ?></th>
+                            <th scope="col"><?php echo e(__('Mapping')); ?></th>
                             <th scope="col"><?php echo e(__('Action')); ?></th>
                         </tr>
                         </thead>
                         <tbody class="list">
-                        <?php $__currentLoopData = $apiinitializations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $apiinitialization): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <td><?php echo e($apiinitialization->id); ?></td>
-                                <td><?php echo e($apiinitialization->tin); ?></td>
-                                <td><?php echo e($apiinitialization->bhfId); ?></td>
-                                <td><?php echo e($apiinitialization->dvcSrlNo); ?></td>
-                                <td><?php echo e($apiinitialization->taxprNm); ?></td>
+                        <?php $__currentLoopData = $itemclassifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $itemclassification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <td><?php echo e($itemclassification->id); ?></td>
+                                <td><?php echo e($itemclassification->itemClsCd); ?></td>
+                                <td><?php echo e($itemclassification->itemClsNm); ?></td>
+                                <td><?php echo e($itemclassification->itemClsLvl); ?></td>
+                                <td><?php echo e($itemclassification->taxprNm); ?></td>
                                 <td>
                                     <?php if($apiinitialization->hqYn == 'Y'): ?>
                                         <span class="btn btn-sm btn-success">Default</span>
@@ -91,4 +91,4 @@
 <?php $__env->stopSection(); ?>
 
 
-<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/chrisdroid/Desktop/projects/php/erp-go-6.4-using-laravel/resources/views/apiinitialization/index.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/chrisdroid/Desktop/projects/php/erp-go-6.4-using-laravel/resources/views/itemclassificationcode/index.blade.php ENDPATH**/ ?>

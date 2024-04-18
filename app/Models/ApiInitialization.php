@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ApiInitialization extends Model
 {
     use HasFactory;
+    protected $table="api_initialization";
 
     protected $fillable = [
         'tin',

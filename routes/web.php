@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiInitializationController;
+use App\Http\Controllers\ItemClassificationCodeController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\TaxController;
@@ -1407,9 +1408,22 @@ Route::group(['middleware' => ['verified']], function () {
             ],
         ], function () {
             Route::resource('apiinitialization', ApiInitializationController::class);
-
         }
     );
+    Route::get('apiinitialization/addexisting', [ApiInitializationController::class, 'addexisting'])->name('apiinitialization.addexisting');
+
+    Route::group(
+        [
+            'middleware' => [
+                'auth',
+                'XSS',
+                'revalidate',
+            ],
+        ], function () {
+            Route::resource('itemclassificationcode', ItemClassificationCodeController::class);
+        }
+    );
+
 
     Route::resource('competencies', CompetenciesController::class)->middleware(['auth', 'XSS']);
 

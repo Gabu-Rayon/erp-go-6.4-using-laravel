@@ -13,12 +13,25 @@ class ApiInitializationController extends Controller
     //
     public function index()
     {
+        if (\Auth::user()->type == 'company') {
+            try {
+                $apiinitializations = ApiInitialization::all();
+            return view('apiinitialization.index', compact('apiinitializations'));
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+            }
+        }
         return view('apiinitialization.index');
     }
 
     public function create () {
         return view('apiinitialization.create');
     }
+    
+    public function addexisting() {
+        return view('apiinitialization.addexisting');
+    }
+    
 
     public function store (Request $request) {
 

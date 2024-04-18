@@ -1344,8 +1344,14 @@
             </li>
             <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'api-initialization' ? 'active' : ''); ?>">
                 <a href="<?php echo e(route('apiinitialization.index')); ?>" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
+                    <span class="dash-micon"><i class="ti ti-server"></i></span><span
                         class="dash-mtext"><?php echo e(__('API Initialization')); ?></span>
+                </a>
+            </li>
+            <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'item-classification' ? 'active' : ''); ?>">
+                <a href="<?php echo e(route('itemclassificationcode.index')); ?>" class="dash-link">
+                    <span class="dash-micon"><i class="ti ti-briefcase"></i></span><span
+                        class="dash-mtext"><?php echo e(__('Item Classification List')); ?></span>
                 </a>
             </li>
             <li
@@ -1371,7 +1377,6 @@
                 </a>
             </li>
         <?php endif; ?>
-
 
         <!--------------------- Start System Setup ----------------------------------->
 
