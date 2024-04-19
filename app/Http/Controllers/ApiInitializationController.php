@@ -17,6 +17,7 @@ class ApiInitializationController extends Controller
             Log::info(\Auth::user()->type);
             try {
                 $apiinitializations = ApiInitialization::all();
+                
                 return view('apiinitialization.index', compact('apiinitializations'));
             } catch (\Exception $e) {
                 Log::error($e->getMessage());

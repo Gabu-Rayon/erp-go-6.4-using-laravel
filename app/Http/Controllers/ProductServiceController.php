@@ -1151,6 +1151,12 @@ class ProductServiceController extends Controller
         \Log::info($itemtypes);
         return view('productservice.getiteminformation', compact('iteminformations', 'itemtypes'));
       }
+
+     public function  showItemClassfication(){
+          $itemclassfications = ItemClassification::all();
+
+        return view('productservice.itemclassfications', compact('itemclassfications'));
+     }
     public function getItemInformation()
     {
         $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';

@@ -2,8 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JobController;
-use App\Http\Controllers\ApiInitializationController;
-use App\Http\Controllers\ItemClassificationCodeController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\BillController;
@@ -139,6 +137,7 @@ use App\Http\Controllers\PerformanceTypeController;
 use App\Http\Controllers\RazorpayPaymentController;
 use App\Http\Controllers\TerminationTypeController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\ApiInitializationController;
 use App\Http\Controllers\InterviewScheduleController;
 use App\Http\Controllers\WarehouseTransferController;
 use App\Http\Controllers\AddCompositionListController;
@@ -152,6 +151,7 @@ use App\Http\Controllers\BankTransferPaymentController;
 use App\Http\Controllers\ItemClassificationsController;
 use App\Http\Controllers\SaturationDeductionController;
 use App\Http\Controllers\NotificationTemplatesController;
+use App\Http\Controllers\ItemClassificationCodeController;
 use App\Http\Controllers\ProductServiceCategoryController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
@@ -398,6 +398,8 @@ Route::group(['middleware' => ['verified']], function () {
     Route::get('productservice/synchronize', [ProductServiceController::class, 'synchronize'])->name('productservice.synchronize');
 
     Route::get('productservice/getcodelist', [ProductServiceController::class, 'getCodeList'])->name('productservice.getcodelist');
+    Route::get('productservice/itemclassfications', [ProductServiceController::class, 'showItemClassfication'])->name('productservice.itemclassfications');
+
     Route::get('productservice/getiteminformation', [ProductServiceController::class, 'viewItemInformation'])->name('productservice.getiteminformation');    
     Route::get('productservice/{id}/detail', [ProductServiceController::class, 'warehouseDetail'])->name('productservice.detail');
     Route::post('empty-cart', [ProductServiceController::class, 'emptyCart'])->middleware(['auth', 'XSS']);
@@ -1706,6 +1708,20 @@ Route::get('/getItemClassifications', [ItemClassificationCodeController::class, 
 Route::get('/details', [DetailsController::class, 'getDetailsList']);
 Route::get('/getnotices', [NoticeController::class, 'getNoticeList']);
 Route::get('/get-item-information', [GetItemInformationController::class,'getItemInformation']);
+
+Route::group(
+    [
+        'middleware' => [
+            'auth',
+            'XSS',
+            'revalidate',
+        ],
+    ],
+    function () {
+        Route::resource('basicdata', NoticeController::class);
+
+    }
+);
 
 Route::group(
     [

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\ItemClassification;
 use Illuminate\Support\Facades\Http;
 
-class ItemClassificationCodeController extends Controller
+class ItemClassificationController extends Controller
 {
     //
     public function index()

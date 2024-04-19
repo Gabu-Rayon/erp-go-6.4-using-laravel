@@ -36,6 +36,46 @@
     <div class="navbar-content">
         @if (\Auth::user()->type != 'client')
             <ul class="dash-navbar">
+
+                            <!--------------------- Start Products System ----------------------------------->
+
+        @if (Gate::check('manage product & service') || Gate::check('manage product & service'))
+            <li class="dash-item dash-hasmenu">
+                <a href="#!" class="dash-link ">
+                    <span class="dash-micon"><i class="ti ti-template"></i></span><span
+                        class="dash-mtext">{{ __('Basic Data') }}</span><span class="dash-arrow">
+                        <i data-feather="chevron-right"></i></span>
+                </a>
+                <ul class="dash-submenu">
+                    @if (Gate::check('manage product & service'))
+                        <li class="dash-item {{ Request::segment(1) == 'basicdata' ? 'active' : '' }}">
+                            <a href="{{ route('basicdata.index') }}"
+                                class="dash-link">{{ __('Notices List') }}
+                            </a>
+                        </li>
+                    @endif
+                    @if (Gate::check('manage product & service'))
+                        <li class="dash-item {{ Request::segment(1) == 'branchlist' ? 'active' : '' }}">
+                            <a href="#"
+                                class="dash-link">{{ __('Branch List') }}
+                            </a>
+                        </li>
+                    @endif
+                    @if (Gate::check('manage product & service'))
+                        <li class="dash-item {{ Request::segment(1) == 'customerbypin' ? 'active' : '' }}">
+                            <a href="#"
+                                class="dash-link">{{ __('Get Customer By Pin') }}
+                            </a>
+                        </li>
+                    @endif
+                </ul>
+            </li>
+        @endif
+
+        <!--------------------- End Products System ----------------------------------->
+
+
+
                 <!--------------------- Start Dashboard ----------------------------------->
                 @if (Gate::check('show hrm dashboard') ||
                         Gate::check('show project dashboard') ||
@@ -1353,7 +1393,7 @@
             </li>
             <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'api-initialization' ? 'active' : '' }}">
                 <a href="{{ route('apiinitialization.index') }}" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-server"></i></span><span
+                    <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
                         class="dash-mtext">{{ __('API Initialization') }}</span>
                 </a>
             </li>
@@ -1556,6 +1596,16 @@
                         <a href="{{ route('users.index') }}" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-users"></i></span><span
                                 class="dash-mtext">{{ __('Companies') }}</span>
+                        </a>
+                    </li>
+                @endcan
+                 
+                @can('manage user')
+                    <li
+                       class="dash-item dash-hasmenu {{ Request::segment(1) == 'api-initialization' ? 'active' : '' }}">
+                        <a href="{{ route('users.index') }}" class="dash-link">
+                            <span class="dash-micon"><i class="ti ti-settings"></i></span><span
+                                class="dash-mtext">{{ __('Initialization') }}</span>
                         </a>
                     </li>
                 @endcan

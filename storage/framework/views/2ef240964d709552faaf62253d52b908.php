@@ -36,6 +36,49 @@
     <div class="navbar-content">
         <?php if(\Auth::user()->type != 'client'): ?>
             <ul class="dash-navbar">
+
+                            <!--------------------- Start Products System ----------------------------------->
+
+        <?php if(Gate::check('manage product & service') || Gate::check('manage product & service')): ?>
+            <li class="dash-item dash-hasmenu">
+                <a href="#!" class="dash-link ">
+                    <span class="dash-micon"><i class="ti ti-template"></i></span><span
+                        class="dash-mtext"><?php echo e(__('Basic Data')); ?></span><span class="dash-arrow">
+                        <i data-feather="chevron-right"></i></span>
+                </a>
+                <ul class="dash-submenu">
+                    <?php if(Gate::check('manage product & service')): ?>
+                        <li class="dash-item <?php echo e(Request::segment(1) == 'basicdata' ? 'active' : ''); ?>">
+                            <a href="<?php echo e(route('basicdata.index')); ?>"
+                                class="dash-link"><?php echo e(__('Notices List')); ?>
+
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                    <?php if(Gate::check('manage product & service')): ?>
+                        <li class="dash-item <?php echo e(Request::segment(1) == 'branchlist' ? 'active' : ''); ?>">
+                            <a href="#"
+                                class="dash-link"><?php echo e(__('Branch List')); ?>
+
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                    <?php if(Gate::check('manage product & service')): ?>
+                        <li class="dash-item <?php echo e(Request::segment(1) == 'customerbypin' ? 'active' : ''); ?>">
+                            <a href="#"
+                                class="dash-link"><?php echo e(__('Get Customer By Pin')); ?>
+
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
+            </li>
+        <?php endif; ?>
+
+        <!--------------------- End Products System ----------------------------------->
+
+
+
                 <!--------------------- Start Dashboard ----------------------------------->
                 <?php if(Gate::check('show hrm dashboard') ||
                         Gate::check('show project dashboard') ||
@@ -1352,8 +1395,8 @@
             </li>
             <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'api-initialization' ? 'active' : ''); ?>">
                 <a href="<?php echo e(route('apiinitialization.index')); ?>" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
-                        class="dash-mtext"><?php echo e(__('API Initialization')); ?></span>
+                    <span class="dash-micon"><i class="ti ti-settings"></i></span><span
+                        class="dash-mtext"><?php echo e(__('Initialization')); ?></span>
                 </a>
             </li>
             <li
@@ -1555,6 +1598,16 @@
                         <a href="<?php echo e(route('users.index')); ?>" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-users"></i></span><span
                                 class="dash-mtext"><?php echo e(__('Companies')); ?></span>
+                        </a>
+                    </li>
+                <?php endif; ?>
+                 
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage user')): ?>
+                    <li
+                       class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'api-initialization' ? 'active' : ''); ?>">
+                        <a href="<?php echo e(route('users.index')); ?>" class="dash-link">
+                            <span class="dash-micon"><i class="ti ti-settings"></i></span><span
+                                class="dash-mtext"><?php echo e(__('Initialization')); ?></span>
                         </a>
                     </li>
                 <?php endif; ?>
