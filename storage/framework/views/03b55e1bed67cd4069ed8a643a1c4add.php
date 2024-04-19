@@ -1247,6 +1247,14 @@
                         </li>
                     <?php endif; ?>
                     <?php if(Gate::check('manage product & service')): ?>
+                        <li class="dash-item <?php echo e(Request::segment(1) == 'getcodelist' ? 'active' : ''); ?>">
+                            <a href="<?php echo e(route('productservice.getcodelist')); ?>"
+                                class="dash-link"><?php echo e(__('Code List')); ?>
+
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                    <?php if(Gate::check('manage product & service')): ?>
                         <li class="dash-item <?php echo e(Request::segment(1) == 'productstock' ? 'active' : ''); ?>">
                             <a href="<?php echo e(route('productstock.index')); ?>"
                                 class="dash-link"><?php echo e(__('Product Stock')); ?>
@@ -1344,7 +1352,7 @@
             </li>
             <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'api-initialization' ? 'active' : ''); ?>">
                 <a href="<?php echo e(route('apiinitialization.index')); ?>" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
+                    <span class="dash-micon"><i class="ti ti-server"></i></span><span
                         class="dash-mtext"><?php echo e(__('API Initialization')); ?></span>
                 </a>
             </li>
@@ -1371,8 +1379,24 @@
                 </a>
             </li>
         <?php endif; ?>
+        <?php if(\Auth::user()->type == 'company'): ?>
+            <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'compositionlist' ? 'active' : ''); ?>">
+                <a href="<?php echo e(route('compositionlist.index')); ?>" class="dash-link">
+                    <span class="dash-micon"><i class="ti ti-notification"></i></span><span
+                        class="dash-mtext"><?php echo e(__('Composition List')); ?></span>
+                </a>
+            </li>
+        <?php endif; ?>
 
-
+         <!-- <?php if(\Auth::user()->type == 'company'): ?>
+            <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'iteminfomation' ? 'active' : ''); ?>">
+                <a href="<?php echo e(route('iteminformation.index')); ?>" class="dash-link">
+                    <span class="dash-micon"><i class="ti ti-notification"></i></span><span
+                        class="dash-mtext"><?php echo e(__('Items Information')); ?></span>
+                </a>
+            </li>
+        <?php endif; ?>
+         -->
         <!--------------------- Start System Setup ----------------------------------->
 
         <?php if(\Auth::user()->type != 'super admin'): ?>

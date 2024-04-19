@@ -16,7 +16,7 @@
     
     <div class="row">
         <div class="form-group col-md-12">
-            <?php echo e(Form::label('taxpayeridno', __('TaxPayer ID'),['class'=>'form-label'])); ?>
+            <?php echo e(Form::label('taxpayeridno', __('Tin'),['class'=>'form-label'])); ?>
 
             <?php echo e(Form::text('taxpayeridno', '', array('class' => 'form-control ','required'=>'required'))); ?>
 
@@ -37,7 +37,7 @@
 </div>
 <div class="modal-footer">
     <input type="button" value="<?php echo e(__('Cancel')); ?>" class="btn btn-light" data-bs-dismiss="modal">
-    <input type="submit" value="<?php echo e(__('Create')); ?>" class="btn btn-primary">
+    <input type="submit" value="<?php echo e(__('Send')); ?>" class="btn btn-primary">
 </div>
     <?php echo e(Form::close()); ?>
 
