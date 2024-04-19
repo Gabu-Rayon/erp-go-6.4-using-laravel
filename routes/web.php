@@ -66,6 +66,7 @@ use App\Http\Controllers\YooKassaController;
 use App\Http\Controllers\AllowanceController;
 use App\Http\Controllers\AppraisalController;
 use App\Http\Controllers\AwardTypeController;
+use App\Http\Controllers\BasicDataController;
 use App\Http\Controllers\BugStatusController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\DashboardController;
@@ -91,6 +92,7 @@ use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\DesignationController;
 use App\Http\Controllers\FormBuilderController;
 use App\Http\Controllers\JobCategoryController;
+use App\Http\Controllers\NoticesListController;
 use App\Http\Controllers\PayslipTypeController;
 use App\Http\Controllers\PlanRequestController;
 use App\Http\Controllers\ProjectTaskController;
@@ -101,6 +103,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ZoomMeetingController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\BankTransferController;
+use App\Http\Controllers\BranchesListController;
 use App\Http\Controllers\CompetenciesController;
 use App\Http\Controllers\ContractTypeController;
 use App\Http\Controllers\GoalTrackingController;
@@ -1706,8 +1709,22 @@ Route::any('/cookie-consent', [SystemController::class, 'CookieConsent'])->name(
 Route::get('/code', [CodeController::class, 'getCodesList']);
 Route::get('/getItemClassifications', [ItemClassificationCodeController::class, 'addCategories']);
 Route::get('/details', [DetailsController::class, 'getDetailsList']);
-Route::get('/getnotices', [NoticeController::class, 'getNoticeList']);
+Route::get('/getnotices', [NoticesListController::class, 'getNoticeList']);
 Route::get('/get-item-information', [GetItemInformationController::class,'getItemInformation']);
+Route::group(
+    [
+        'middleware' => [
+            'auth',
+            'XSS',
+            'revalidate',
+        ],
+    ],
+    function () {
+        Route::resource('noticelist', NoticesListController::class);
+
+    }
+);
+
 
 Route::group(
     [
@@ -1718,7 +1735,7 @@ Route::group(
         ],
     ],
     function () {
-        Route::resource('basicdata', NoticeController::class);
+        Route::resource('brancheslist', BranchesListController::class);
 
     }
 );
