@@ -536,3 +536,11 @@ The field CustomerTin must be a string or array type with a maximum length of '1
 #68 C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(16): require_once('C:\\\\xampp\\\\htdocs...')
 #69 {main}
 "} 
+[2024-04-19 06:51:47] local.ERROR: Cannot use App\Http\Controllers\ApiInitializationController as ApiInitializationController because the name is already in use {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot use App\\Http\\Controllers\\ApiInitializationController as ApiInitializationController because the name is already in use at C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\routes\\web.php:142)
+[stacktrace]
+#0 {main}
+"} 
+[2024-04-19 06:51:47] local.ERROR: Cannot use App\Http\Controllers\ApiInitializationController as ApiInitializationController because the name is already in use {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot use App\\Http\\Controllers\\ApiInitializationController as ApiInitializationController because the name is already in use at C:\\xampp\\htdocs\\erp-go-6.4-using-laravel\\routes\\web.php:142)
+[stacktrace]
+#0 {main}
+"} 

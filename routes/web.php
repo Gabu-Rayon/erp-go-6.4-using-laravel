@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\ApiInitializationController;
+use App\Http\Controllers\ItemClassificationCodeController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\BillController;
@@ -137,7 +139,6 @@ use App\Http\Controllers\PerformanceTypeController;
 use App\Http\Controllers\RazorpayPaymentController;
 use App\Http\Controllers\TerminationTypeController;
 use App\Http\Controllers\Auth\VerifyEmailController;
-use App\Http\Controllers\ApiInitializationController;
 use App\Http\Controllers\InterviewScheduleController;
 use App\Http\Controllers\WarehouseTransferController;
 use App\Http\Controllers\AddCompositionListController;
@@ -1414,6 +1415,7 @@ Route::group(['middleware' => ['verified']], function () {
 
         }
     );
+    Route::get('apiinitialization/addexisting', [ApiInitializationController::class, 'addexisting'])->name('apiinitialization.addexisting');
 
     Route::resource('competencies', CompetenciesController::class)->middleware(['auth', 'XSS']);
 
