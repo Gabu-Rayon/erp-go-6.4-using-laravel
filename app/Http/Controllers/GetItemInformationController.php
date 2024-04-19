@@ -28,25 +28,26 @@ class GetItemInformationController extends Controller
     }
     public function getItemInformation()
     {
-        $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';
 
-        // $response = Http::withHeaders([
-        //     'key' => '123456'
-        // ])->get($url);
+        // Increase maximum execution time to 300 seconds (5 minutes)
+        ini_set('max_execution_time', 300);
+
+        $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';
 
         $response = Http::withHeaders([
             'key' => '123456'
-        ])->timeout(3000)->get($url);;
+        ])->get($url);
 
-        $data = $response->json()['data'];
-
+        $data = $response->json();
+        $itemLists = $data['data']['data']['itemList'];
+        
         \Log::info('API Request Data: ' . json_encode($data));
         \Log::info('API Response: ' . $response->body());
         \Log::info('API Response Status Code: ' . $response->status());
 
-        if (isset($data['data'])) {
+        if (isset($itemLists)) {
             try {
-                foreach ($data['data']['itemList'] as $item) {
+                foreach ($itemLists as $item) {
                     ItemInformation::create([
                         'tin' => $item['tin'],
                         'itemCd' => $item['itemCd'],
