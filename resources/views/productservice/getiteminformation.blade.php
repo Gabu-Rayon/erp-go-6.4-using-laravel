@@ -46,7 +46,7 @@
                                 <td>{{ $iteminformation->id }}</td>
                                 <td>{{ $iteminformation->itemCd }}</td>
                                 <td>{{ $iteminformation->itemClsCd }}</td>
-                                <td>{{ $itemtypes[$iteminformation->itemTyCd]['item_type_name'] }}</td>
+                                <td>{{ $itemtypes[$iteminformation->itemTyCd - 1]['item_type_name'] }}</td>
                                 <td>{{ $iteminformation->itemNm }}</td>
                                 <td>{{ $iteminformation->dftPrc }}</td>
                                 <td>
