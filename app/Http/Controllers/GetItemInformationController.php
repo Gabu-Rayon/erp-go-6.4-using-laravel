@@ -92,7 +92,6 @@ class GetItemInformationController extends Controller
     //     }
     // }
 
-
     public function getItemInformation()
     {
         //execution time to 300 seconds (5 minutes)
