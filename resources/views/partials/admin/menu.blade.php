@@ -1250,6 +1250,13 @@
                         </li>
                     @endif
                     @if (Gate::check('manage product & service'))
+                        <li class="dash-item {{ Request::segment(1) == 'getiteminformation' ? 'active' : '' }}">
+                            <a href="{{ route('productservice.getiteminformation') }}"
+                                class="dash-link">{{ __('Item Information') }}
+                            </a>
+                        </li>
+                    @endif
+                    @if (Gate::check('manage product & service'))
                         <li class="dash-item {{ Request::segment(1) == 'productstock' ? 'active' : '' }}">
                             <a href="{{ route('productstock.index') }}"
                                 class="dash-link">{{ __('Product Stock') }}

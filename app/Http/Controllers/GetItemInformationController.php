@@ -5,14 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ItemInformation;
 use Illuminate\Support\Facades\Http;
+use App\Models\CustomField;
+use App\Models\ItemClassification;
+use App\Models\ItemType;
+use App\Models\Details;
 
 class GetItemInformationController extends Controller
 {
 
     public function index()
     {
-        return view('iteminformation.index');
+        return view('productservice.index');
+    }
 
+    public function show (ItemInformation $iteminformation) {
+        return view('iteminformation.show', compact('iteminformation'));
     }
 
     public function create()
@@ -20,11 +27,43 @@ class GetItemInformationController extends Controller
         return view('iteminformation.create');
     }
 
-
-    public function edit()
+    public function update(Request $request, ItemInformation $iteminformation)
     {
-        return view('iteminformation.edit');
-        
+        try {
+            $request->validate([
+                'itemCd' => 'required',
+                'itemClsCd' => 'required',
+                'itemTyCd' => 'required',
+                'itemNm' => 'required',
+                'orgnNatCd' => 'required',
+                'pkgUnitCd' => 'required',
+                'qtyUnitCd' => 'required',
+                'taxTyCd' => 'required',
+                'dftPrc' => 'required',
+                'isrcAplcbYn' => 'required',
+                'useYn' => 'required',
+            ]);
+            $iteminformation->update($request->all());
+            return redirect()->route('productservice.getiteminformation')->with('success', 'Item Information updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('productservice.getiteminformation')->with('error', 'Error updating Item Information.');
+        }
+    }
+
+
+    public function edit(ItemInformation $iteminformation){
+        $customFields = CustomField::where('module', '=', 'iteminformation')->get();
+        $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
+        $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
+        $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
+        $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
+        return view('iteminformation.edit', compact(
+            'iteminformation',
+            'itemclassifications',
+            'itemtypes',
+            'countrynames',
+            'taxationtype'
+        ));
     }
     public function getItemInformation()
     {
@@ -93,13 +132,13 @@ class GetItemInformationController extends Controller
     // }
 
 
-    public function store(Request $request)
-    {
-
+    public function store(Request $request) {
     }
     /**
      * Using Api Endpoint
      *  
      */
+
+     
 
 }

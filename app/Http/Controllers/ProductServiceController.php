@@ -14,6 +14,7 @@ use App\Models\Utility;
 use App\Models\Countries;
 use App\Models\CustomField;
 use Illuminate\Http\Request;
+use App\Models\ItemType;
 use App\Models\ChartOfAccount;
 use App\Models\CodeListDetail;
 use App\Models\ProductService;
@@ -1133,12 +1134,23 @@ class ProductServiceController extends Controller
             return redirect()->back()->with('error', __('This Product is not found!'));
         }
     }
+
+    public function synchronize() {}
     public function getCodeList(){
 
       $codelists = Code::all();
       
         return view('productservice.getcodelist',compact('codelists'));
     }
+
+    public function viewItemInformation(){
+
+        $iteminformations = ItemInformation::all();
+        $itemtypes = ItemType::all();
+        
+        \Log::info($itemtypes);
+        return view('productservice.getiteminformation', compact('iteminformations', 'itemtypes'));
+      }
     public function getItemInformation()
     {
         $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';

@@ -395,9 +395,10 @@ Route::group(['middleware' => ['verified']], function () {
     );
 
     Route::get('productservice/index', [ProductServiceController::class, 'index'])->name('productservice.index');
+    Route::get('productservice/synchronize', [ProductServiceController::class, 'synchronize'])->name('productservice.synchronize');
 
     Route::get('productservice/getcodelist', [ProductServiceController::class, 'getCodeList'])->name('productservice.getcodelist');
-    Route::get('productservice/getiteminformation', [ProductServiceController::class, 'getItemInformation'])->name('productservice.synchronize');    
+    Route::get('productservice/getiteminformation', [ProductServiceController::class, 'viewItemInformation'])->name('productservice.getiteminformation');    
     Route::get('productservice/{id}/detail', [ProductServiceController::class, 'warehouseDetail'])->name('productservice.detail');
     Route::post('empty-cart', [ProductServiceController::class, 'emptyCart'])->middleware(['auth', 'XSS']);
     Route::post('warehouse-empty-cart', [ProductServiceController::class, 'warehouseemptyCart'])->name('warehouse-empty-cart')->middleware(['auth', 'XSS']);
@@ -1701,7 +1702,7 @@ Route::group(['middleware' => ['verified']], function () {
 });
 Route::any('/cookie-consent', [SystemController::class, 'CookieConsent'])->name('cookie-consent');
 Route::get('/code', [CodeController::class, 'getCodesList']);
-Route::get('/getItemClassifications', [ItemClassificationsController::class, 'addCategories']);
+Route::get('/getItemClassifications', [ItemClassificationCodeController::class, 'addCategories']);
 Route::get('/details', [DetailsController::class, 'getDetailsList']);
 Route::get('/getnotices', [NoticeController::class, 'getNoticeList']);
 Route::get('/get-item-information', [GetItemInformationController::class,'getItemInformation']);
