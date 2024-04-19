@@ -17,44 +17,41 @@
 @section('action-btn')
     <div class="float-end">
        <a href="#" data-size="lg" data-url="{{ route('apiinitialization.create') }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Create')}}" data-title="{{__('Create API Initialization')}}" class="btn btn-sm btn-primary">
-                <i class="ti ti-plus"></i>
+            <i class="ti ti-plus"></i>
         </a>
     </div>
     <div class="float-end">
-       <a href="#" data-size="lg" data-url="{{ route('apiinitialization.addexisting') }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Add Existing Initialization')}}" data-title="{{__('Add Existing API Initialization')}}" class="btn btn-sm btn-primary">
+       <a href="#" data-size="lg" data-url="{{ route('apiinitialization.create') }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Add Existing Initialization')}}" data-title="{{__('Add Existing API Initialization')}}" class="btn btn-sm btn-primary">
             <i class="ti ti-plus"></i>
         </a>
     </div>
 @endsection
 
 @section('content')
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body table-border-style">
+                <div class="table-responsive">
                     <table class="table datatable">
                         <thead>
                         <tr>
-                            <th scope="col">{{__('Tax Payer ID')}}</th>
                             <th scope="col">{{__('SrNo')}}</th>
-                            <th scope="col">{{__('Tin')}}</th>
-                            <th scope="col">{{__('BHF ID')}}</th>
-                            <th scope="col">{{__('Device Serial No')}}</th>
-                            <th scope="col">{{__('Tax Payer Name')}}</th>
-                            <th scope="col">{{__('Business Activity')}}</th>
-                            <th scope="col">{{__('BHF Name')}}</th>
-                            <th scope="col">{{__('BHF Open Date')}}</th>
-                            <th scope="col" >{{__('Province Number')}}</th>
+                            <th scope="col">{{__('Code')}}</th>
+                            <th scope="col">{{__('Name')}}</th>
                             <th scope="col">{{__('DVC SrlNo')}}</th>
-                            <th scope="col">{{__('Taxpr Nm')}}</th>
-                            <th scope="col">{{__('Status')}}</th>
+                            <th scope="col">{{__('Level')}}</th>
+                            <th scope="col">{{__('Mapping')}}</th>
                             <th scope="col">{{__('Action')}}</th>
                         </tr>
                         </thead>
                         <tbody class="list">
-
-                        @foreach ($apiinitializations as $apiinitialization)
-                                <td>{{ $apiinitialization->id }}</td>
-                                <td>{{ $apiinitialization->tin }}</td>
-                                <td>{{ $apiinitialization->bhfId }}</td>
-                                <td>{{ $apiinitialization->dvcSrlNo }}</td>
-                                <td>{{ $apiinitialization->taxprNm }}</td>
+                        @foreach ($itemclassifications as $itemclassification)
+                                <td>{{ $itemclassification->id }}</td>
+                                <td>{{ $itemclassification->itemClsCd }}</td>
+                                <td>{{ $itemclassification->itemClsNm }}</td>
+                                <td>{{ $itemclassification->itemClsLvl }}</td>
+                                <td>{{ $itemclassification->taxprNm }}</td>
                                 <td>
                                     @if ($apiinitialization->hqYn == 'Y')
                                         <span class="btn btn-sm btn-success">Default</span>
@@ -87,3 +84,8 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+        </div>
+    </div>
+@endsection

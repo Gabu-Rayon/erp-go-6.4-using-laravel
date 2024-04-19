@@ -2,13 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ItemClassification;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use App\Models\ItemClassification;
 
-class ItemClassificationsController extends Controller
+class ItemClassificationCodeController extends Controller
 {
     //
+    public function index()
+    {
+        if (\Auth::user()->type == 'company') {
+            $itemclassifications = ItemClassification::all();
+            \Log::info($itemclassifications);
+            return view('itemclassificationcode.index', compact('itemclassifications'));
+        }
+        return view('itemclassificationcode.index');
+    }
 
     public function addCategories()
     {
