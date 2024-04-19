@@ -1346,7 +1346,7 @@
             </li>
             <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'api-initialization' ? 'active' : '' }}">
                 <a href="{{ route('apiinitialization.index') }}" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
+                    <span class="dash-micon"><i class="ti ti-server"></i></span><span
                         class="dash-mtext">{{ __('API Initialization') }}</span>
                 </a>
             </li>

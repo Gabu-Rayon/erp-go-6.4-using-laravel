@@ -14,6 +14,7 @@ class ApiInitializationController extends Controller
     public function index()
     {
         if (\Auth::user()->type == 'company') {
+            Log::info(\Auth::user()->type);
             try {
                 $apiinitializations = ApiInitialization::all();
                 return view('apiinitialization.index', compact('apiinitializations'));
@@ -22,6 +23,11 @@ class ApiInitializationController extends Controller
             }
         }
         return view('apiinitialization.index');
+    }
+
+    public function show(APIInitialization $apiinitialization) {
+        
+        return view('apiinitialization.show', compact('apiinitialization'));
     }
 
     public function create () {
@@ -103,5 +109,9 @@ class ApiInitializationController extends Controller
         
         
         return redirect()->route('apiinitialization.index')->with('success', __('Successfully Initialized.'));
+    }
+
+    public function edit() {
+        redirect()->back()->with('error', 'This feature is not available');
     }
 }
