@@ -46,7 +46,7 @@
                                 <td><?php echo e($iteminformation->id); ?></td>
                                 <td><?php echo e($iteminformation->itemCd); ?></td>
                                 <td><?php echo e($iteminformation->itemClsCd); ?></td>
-                                <td><?php echo e($itemtypes[$iteminformation->itemTyCd]['item_type_name']); ?></td>
+                                <td><?php echo e($itemtypes[$iteminformation->itemTyCd - 1]['item_type_name']); ?></td>
                                 <td><?php echo e($iteminformation->itemNm); ?></td>
                                 <td><?php echo e($iteminformation->dftPrc); ?></td>
                                 <td>
