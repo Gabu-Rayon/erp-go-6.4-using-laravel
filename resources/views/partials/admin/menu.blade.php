@@ -71,6 +71,7 @@
                             <span class="dash-mtext">{{ __('Dashboard') }}</span>
                             <span class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
                         <ul class="dash-submenu">
+                        
                             @if ($userPlan->account == 1 && Gate::check('show account dashboard'))
                                 <li
                                     class="dash-item dash-hasmenu {{ Request::segment(1) == null || Request::segment(1) == 'account-dashboard' || Request::segment(1) == 'report' || Request::segment(1) == 'reports-monthly-cashflow' || Request::segment(1) == 'reports-quarterly-cashflow' ? ' active dash-trigger' : '' }}">
