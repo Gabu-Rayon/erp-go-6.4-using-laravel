@@ -49,14 +49,14 @@
                 <ul class="dash-submenu">
                     @if (Gate::check('manage product & service'))
                         <li class="dash-item {{ Request::segment(1) == 'basicdata' ? 'active' : '' }}">
-                            <a href="{{ route('basicdata.index') }}"
+                            <a href="{{ route('noticelist.index') }}"
                                 class="dash-link">{{ __('Notices List') }}
                             </a>
                         </li>
                     @endif
                     @if (Gate::check('manage product & service'))
                         <li class="dash-item {{ Request::segment(1) == 'branchlist' ? 'active' : '' }}">
-                            <a href="#"
+                            <a href="{{ route('brancheslist.index') }}"
                                 class="dash-link">{{ __('Branch List') }}
                             </a>
                         </li>
@@ -71,7 +71,6 @@
                 </ul>
             </li>
         @endif
-
         <!--------------------- End Products System ----------------------------------->
 
 
@@ -1387,7 +1386,7 @@
             <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'api-initialization' ? 'active' : '' }}">
                 <a href="{{ route('apiinitialization.index') }}" class="dash-link">
                     <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
-                        class="dash-mtext">{{ __('API Initialization') }}</span>
+                        class="dash-mtext">{{ __('Initialization') }}</span>
                 </a>
             </li>
             <li

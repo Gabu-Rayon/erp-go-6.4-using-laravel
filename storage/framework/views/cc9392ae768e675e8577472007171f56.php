@@ -42,13 +42,4 @@
     <?php echo e(Form::close()); ?>
 
 
-
-
-
-<script>
-    // document.getElementById('attachment').onchange = function () {
-    //     var src = URL.createObjectURL(this.files[0])
-    //     document.getElementById('image').src = src
-    // }
-</script>
 <?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/compositionlist/create.blade.php ENDPATH**/ ?>

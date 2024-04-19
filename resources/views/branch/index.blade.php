@@ -30,11 +30,6 @@
                 <div class="card-body table-border-style">
 
                     <div class="table-responsive">
-                        @if (isset($branches) && $branches['statusCode'] === 200 && $branches['message'] === 'success')
-                            @php
-                                $data = $branches['data'];
-                            @endphp
-
                             <table class="table datatable">
                                 <thead>
                                     <tr>
@@ -52,7 +47,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="font-style">
-                                    @foreach ($data['data']['bhfList'] as $branch)
+                                    @foreach ($branches as $branch)
                                         <tr>
                                             <td>{{ $branch['tin'] }}</td>
                                             <td>{{ $branch['bhfId'] }}</td>
@@ -108,9 +103,6 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                        @else
-                            <p>Failed to fetch branches from API.</p>
-                        @endif
                     </div>
                 </div>
             </div>

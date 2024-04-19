@@ -26,16 +26,15 @@
         </a>
 
         <!-- Button to trigger the getItemInformationApi and Synchronize it to my Database() method -->
-        <a href="#" id="synchronizeBtn" data-size="lg"
-            data-url="{{ route('productservice.synchronize') }}" data-ajax-popup="true" data-bs-toggle="tooltip"
-            title="{{ __('Synchronize') }}" class="btn btn-sm btn-primary">
+        <a href="#" id="synchronizeBtn" data-size="lg" data-url="{{ route('productservice.synchronize') }}"
+            data-ajax-popup="true" data-bs-toggle="tooltip" title="{{ __('Synchronize') }}" class="btn btn-sm btn-primary">
             <i class="#">Synchronize</i>
         </a>
     </div>
 @endsection
 
 @section('content')
-       <div class="row">
+    <div class="row">
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-body table-border-style">
@@ -48,7 +47,6 @@
                                     <th>{{ __('Classification Code') }}</th>
                                     <th>{{ __('Type Code') }}</th>
                                     <th>{{ __('Name') }}</th>
-                                    <th>{{ __('Stock Qty') }}</th>
                                     <th>{{ __('Status') }}</th>
                                     <th>{{ __('Action') }}</th>
                                 </tr>
@@ -58,11 +56,10 @@
                                     <tr class="font-style">
                                         <td>{{ $item->id }}</td>
                                         <td>{{ $item->itemCd }}</td>
-                                            <td>{{ $item->itemClsCd }}</td>
+                                        <td>{{ $item->itemClsCd }}</td>
                                         <td>{{ $item->itemTyCd }}</td>
-                                            <td>{{ $item->itemNm }}</td>
-                                        <td>{{ $item->sftQty}}</td>
-                                                                           </tr>
+                                        <td>{{ $item->itemNm }}</td>
+                                    </tr>
                                 @endforeach
 
                             </tbody>
@@ -74,27 +71,27 @@
     </div>
 @endsection
 @push('script-page')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('synchronizeBtn').addEventListener('click', function() {
-            // Show loading spinner
-            showLoadingSpinner();
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('synchronizeBtn').addEventListener('click', function() {
+                // Show loading spinner
+                showLoadingSpinner();
+            });
+
+            function showLoadingSpinner() {
+                // Create a loading spinner element
+                var spinner = document.createElement('div');
+                spinner.classList.add('spinner-border', 'text-light');
+                spinner.setAttribute('role', 'status');
+
+                // Create a container for the spinner
+                var spinnerContainer = document.createElement('div');
+                spinnerContainer.classList.add('loading-spinner-container');
+                spinnerContainer.appendChild(spinner);
+
+                // Append the spinner container to the body
+                document.body.appendChild(spinnerContainer);
+            }
         });
-
-        function showLoadingSpinner() {
-            // Create a loading spinner element
-            var spinner = document.createElement('div');
-            spinner.classList.add('spinner-border', 'text-light');
-            spinner.setAttribute('role', 'status');
-
-            // Create a container for the spinner
-            var spinnerContainer = document.createElement('div');
-            spinnerContainer.classList.add('loading-spinner-container');
-            spinnerContainer.appendChild(spinner);
-
-            // Append the spinner container to the body
-            document.body.appendChild(spinnerContainer);
-        }
-    });
-</script>
+    </script>
 @endpush
