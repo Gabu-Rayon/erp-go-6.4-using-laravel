@@ -5,14 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ItemInformation;
 use Illuminate\Support\Facades\Http;
+use App\Models\CustomField;
+use App\Models\ItemClassification;
+use App\Models\ItemType;
+use App\Models\Details;
 
 class GetItemInformationController extends Controller
 {
 
     public function index()
     {
-        return view('iteminformation.index');
+        return view('productservice.index');
+    }
 
+    public function show (ItemInformation $iteminformation) {
+        return view('iteminformation.show', compact('iteminformation'));
     }
 
     public function create()
@@ -24,7 +31,7 @@ class GetItemInformationController extends Controller
     public function edit()
     {
         return view('iteminformation.edit');
-
+        
     }
     // public function getItemInformation()
     // {
@@ -156,6 +163,15 @@ class GetItemInformationController extends Controller
             return redirect()->back()->with('error', 'No data found in the API response.');
         }
     }
+
+
+    // public function items()
+    // {
+    //     $ItemInformations = ItemInformation::all();
+    //     return response()->json($ItemInformations);
+    // }
+
+
     public function store(Request $request)
     {
 
@@ -164,5 +180,7 @@ class GetItemInformationController extends Controller
      * Using Api Endpoint
      *  
      */
+
+     
 
 }
