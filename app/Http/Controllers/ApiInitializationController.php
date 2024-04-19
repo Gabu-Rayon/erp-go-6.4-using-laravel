@@ -16,6 +16,7 @@ class ApiInitializationController extends Controller
         if (\Auth::user()->type == 'company') {
             try {
                 $apiinitializations = ApiInitialization::all();
+                
                 return view('apiinitialization.index', compact('apiinitializations'));
             } catch (\Exception $e) {
                 Log::error($e->getMessage());

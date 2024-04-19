@@ -8,7 +8,15 @@ use App\Models\Notice;
 
 class NoticeController extends Controller
 {
-    //
+    
+
+    public function index(){
+
+
+        $notices =  Notice::all();
+
+        return view('basicdata.index',compact('notices'));
+    }
 
     public function getNoticeList()
     {

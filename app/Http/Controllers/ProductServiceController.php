@@ -1139,6 +1139,12 @@ class ProductServiceController extends Controller
       
         return view('productservice.getcodelist',compact('codelists'));
     }
+
+     public function  showItemClassfication(){
+          $itemclassfications = ItemClassification::all();
+
+        return view('productservice.itemclassfications', compact('itemclassfications'));
+     }
     public function getItemInformation()
     {
         $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';

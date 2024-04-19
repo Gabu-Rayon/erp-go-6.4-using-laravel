@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ItemClassification;
 
-class ItemClassificationCodeController extends Controller
+class ItemClassificationController extends Controller
 {
     //
     public function index()
