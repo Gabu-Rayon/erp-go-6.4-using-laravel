@@ -8,7 +8,7 @@
     <div class="text-end">
         <a href="#" data-size="md" class="btn  btn-primary btn-icon btn-sm" data-ajax-popup-over="true" data-url="{{ route('generate',['productservice']) }}"
            data-bs-placement="top" data-title="{{ __('Generate content with AI') }}">
-            <i class="fas fa-robot"></i> <span>{{__('Generate with AI')}}</span>
+            <i class="fas fa-robot"></i> <span>{{__('Generate with AI Also')}}</span>
         </a>
     </div>
     @endif

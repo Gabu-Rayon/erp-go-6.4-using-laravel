@@ -14,9 +14,8 @@ class ItemClassificationController extends Controller
         if (\Auth::user()->type == 'company') {
             $itemclassifications = ItemClassification::all();
             \Log::info($itemclassifications);
-            return view('itemclassificationcode.index', compact('itemclassifications'));
+            return view('itemclassification.index', compact('itemclassifications'));
         }
-        return view('itemclassificationcode.index');
     }
 
     public function addCategories()
