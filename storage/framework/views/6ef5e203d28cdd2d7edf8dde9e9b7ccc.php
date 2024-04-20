@@ -24,7 +24,6 @@
             class="btn btn-sm btn-primary">
             <i class="ti ti-file-export"></i>
         </a>
-
         <a href="#" data-size="lg" data-url="<?php echo e(route('productservice.create')); ?>" data-ajax-popup="true"
             data-bs-toggle="tooltip" title="<?php echo e(__('Create New Product')); ?>" class="btn btn-sm btn-primary">
             <i class="ti ti-plus"></i>
