@@ -352,145 +352,185 @@ class ProductServiceController extends Controller
     }
 
 
-    public function show(ItemInformation $iteminformation)
+    public function show($id)
     {
+        $iteminformation= ItemInformation::find($id);
         return view('productservice.show', compact('iteminformation'));
     }
 
+    // public function edit($id)
+    // {
+    //     $productService = ProductService::find($id);
+    //     if (\Auth::user()->can('edit product & service')) {
+    //         if ($productService->created_by == \Auth::user()->creatorId()) {
+    //             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
+    //             $unit = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+    //             $tax = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
-    public function edit($id)
+    //             $productService->customField = CustomField::getData($productService, 'product');
+    //             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
+    //             $productService->tax_id = explode(',', $productService->tax_id);
+    //             $incomeChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
+    //                 ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
+    //                 ->where('chart_of_account_types.name', 'income')
+    //                 ->where('parent', '=', 0)
+    //                 ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+    //                 ->pluck('code_name', 'id');
+    //             $incomeChartAccounts->prepend('Select Account', 0);
+
+    //             $incomeSubAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name', 'chart_of_account_parents.account');
+    //             $incomeSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
+    //             $incomeSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
+    //             $incomeSubAccounts->where('chart_of_account_types.name', 'income');
+    //             $incomeSubAccounts->where('chart_of_accounts.parent', '!=', 0);
+    //             $incomeSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
+    //             $incomeSubAccounts = $incomeSubAccounts->get()->toArray();
+
+
+    //             $expenseChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
+    //                 ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
+    //                 ->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold'])
+    //                 ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+    //                 ->pluck('code_name', 'id');
+    //             $expenseChartAccounts->prepend('Select Account', '');
+
+    //             $expenseSubAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name', 'chart_of_account_parents.account');
+    //             $expenseSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
+    //             $expenseSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
+    //             $expenseSubAccounts->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold']);
+    //             $expenseSubAccounts->where('chart_of_accounts.parent', '!=', 0);
+    //             $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
+    //             $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
+
+    //             return view('productservice.edit', compact('category', 'unit', 'tax', 'productService', 'customFields', 'incomeChartAccounts', 'expenseChartAccounts', 'incomeSubAccounts', 'expenseSubAccounts'));
+    //         } else {
+    //             return response()->json(['error' => __('Permission denied.')], 401);
+    //         }
+    //     } else {
+    //         return response()->json(['error' => __('Permission denied.')], 401);
+    //     }
+    // }
+
+//     public function update(Request $request, $id)
+//     {
+
+//         if (\Auth::user()->can('edit product & service')) {
+//             $productService = ProductService::find($id);
+//             if ($productService->created_by == \Auth::user()->creatorId()) {
+//                 $rules = [
+//                     'name' => 'required',
+//                     'sku' => 'required',
+//                     Rule::unique('product_services')->ignore($productService->id),
+//                     'sale_price' => 'required|numeric',
+//                     'purchase_price' => 'required|numeric',
+//                     'category_id' => 'required',
+//                     'unit_id' => 'required',
+//                     'type' => 'required',
+
+//                 ];
+
+//                 $validator = \Validator::make($request->all(), $rules);
+
+//                 if ($validator->fails()) {
+//                     $messages = $validator->getMessageBag();
+
+//                     return redirect()->route('productservice.index')->with('error', $messages->first());
+//                 }
+
+//                 $productService->name = $request->name;
+//                 $productService->description = $request->description;
+//                 $productService->sku = $request->sku;
+//                 $productService->sale_price = $request->sale_price;
+//                 $productService->purchase_price = $request->purchase_price;
+//                 $productService->tax_id = !empty($request->tax_id) ? implode(',', $request->tax_id) : '';
+//                 $productService->unit_id = $request->unit_id;
+
+//                 if (!empty($request->quantity)) {
+//                     $productService->quantity = $request->quantity;
+//                 } else {
+//                     $productService->quantity = 0;
+//                 }
+//                 $productService->type = $request->type;
+//                 $productService->sale_chartaccount_id = $request->sale_chartaccount_id;
+//                 $productService->expense_chartaccount_id = $request->expense_chartaccount_id;
+//                 $productService->category_id = $request->category_id;
+
+//                 if (!empty($request->pro_image)) {
+//                     //storage limit
+//                     $file_path = '/uploads/pro_image/' . $productService->pro_image;
+//                     $image_size = $request->file('pro_image')->getSize();
+//                     $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
+//                     if ($result == 1) {
+//                         if ($productService->pro_image) {
+//                             Utility::changeStorageLimit(\Auth::user()->creatorId(), $file_path);
+//                             $path = storage_path('uploads/pro_image' . $productService->pro_image);
+//                             //                            if(file_exists($path))
+// //                            {
+// //                                \File::delete($path);
+// //                            }
+//                         }
+//                         $fileName = $request->pro_image->getClientOriginalName();
+//                         $productService->pro_image = $fileName;
+//                         $dir = 'uploads/pro_image';
+//                         $path = Utility::upload_file($request, 'pro_image', $fileName, $dir, []);
+//                     }
+
+//                 }
+
+//                 $productService->created_by = \Auth::user()->creatorId();
+//                 $productService->save();
+//                 CustomField::saveData($productService, $request->customField);
+
+//                 return redirect()->route('productservice.index')->with('success', __('Product successfully updated.'));
+//             } else {
+//                 return redirect()->back()->with('error', __('Permission denied.'));
+//             }
+//         } else {
+//             return redirect()->back()->with('error', __('Permission denied.'));
+//         }
+//     }
+      
+ public function update(Request $request, ItemInformation $iteminformation)
     {
-        $productService = ProductService::find($id);
-        if (\Auth::user()->can('edit product & service')) {
-            if ($productService->created_by == \Auth::user()->creatorId()) {
-                $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
-                $unit = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-                $tax = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-
-                $productService->customField = CustomField::getData($productService, 'product');
-                $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
-                $productService->tax_id = explode(',', $productService->tax_id);
-                $incomeChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-                    ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
-                    ->where('chart_of_account_types.name', 'income')
-                    ->where('parent', '=', 0)
-                    ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-                    ->pluck('code_name', 'id');
-                $incomeChartAccounts->prepend('Select Account', 0);
-
-                $incomeSubAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name', 'chart_of_account_parents.account');
-                $incomeSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
-                $incomeSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
-                $incomeSubAccounts->where('chart_of_account_types.name', 'income');
-                $incomeSubAccounts->where('chart_of_accounts.parent', '!=', 0);
-                $incomeSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
-                $incomeSubAccounts = $incomeSubAccounts->get()->toArray();
-
-
-                $expenseChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-                    ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
-                    ->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold'])
-                    ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-                    ->pluck('code_name', 'id');
-                $expenseChartAccounts->prepend('Select Account', '');
-
-                $expenseSubAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name', 'chart_of_account_parents.account');
-                $expenseSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
-                $expenseSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
-                $expenseSubAccounts->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold']);
-                $expenseSubAccounts->where('chart_of_accounts.parent', '!=', 0);
-                $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
-                $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
-
-                return view('productservice.edit', compact('category', 'unit', 'tax', 'productService', 'customFields', 'incomeChartAccounts', 'expenseChartAccounts', 'incomeSubAccounts', 'expenseSubAccounts'));
-            } else {
-                return response()->json(['error' => __('Permission denied.')], 401);
-            }
-        } else {
-            return response()->json(['error' => __('Permission denied.')], 401);
+        try {
+            $request->validate([
+                'itemCd' => 'required',
+                'itemClsCd' => 'required',
+                'itemTyCd' => 'required',
+                'itemNm' => 'required',
+                'orgnNatCd' => 'required',
+                'pkgUnitCd' => 'required',
+                'qtyUnitCd' => 'required',
+                'taxTyCd' => 'required',
+                'dftPrc' => 'required',
+                'isrcAplcbYn' => 'required',
+                'useYn' => 'required',
+            ]);
+            $iteminformation->update($request->all());
+            return redirect()->route('productservice.getiteminformation')->with('success', 'Item Information updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('productservice.getiteminformation')->with('error', 'Error updating Item Information.');
         }
     }
 
-    public function update(Request $request, $id)
-    {
 
-        if (\Auth::user()->can('edit product & service')) {
-            $productService = ProductService::find($id);
-            if ($productService->created_by == \Auth::user()->creatorId()) {
-                $rules = [
-                    'name' => 'required',
-                    'sku' => 'required',
-                    Rule::unique('product_services')->ignore($productService->id),
-                    'sale_price' => 'required|numeric',
-                    'purchase_price' => 'required|numeric',
-                    'category_id' => 'required',
-                    'unit_id' => 'required',
-                    'type' => 'required',
-
-                ];
-
-                $validator = \Validator::make($request->all(), $rules);
-
-                if ($validator->fails()) {
-                    $messages = $validator->getMessageBag();
-
-                    return redirect()->route('productservice.index')->with('error', $messages->first());
-                }
-
-                $productService->name = $request->name;
-                $productService->description = $request->description;
-                $productService->sku = $request->sku;
-                $productService->sale_price = $request->sale_price;
-                $productService->purchase_price = $request->purchase_price;
-                $productService->tax_id = !empty($request->tax_id) ? implode(',', $request->tax_id) : '';
-                $productService->unit_id = $request->unit_id;
-
-                if (!empty($request->quantity)) {
-                    $productService->quantity = $request->quantity;
-                } else {
-                    $productService->quantity = 0;
-                }
-                $productService->type = $request->type;
-                $productService->sale_chartaccount_id = $request->sale_chartaccount_id;
-                $productService->expense_chartaccount_id = $request->expense_chartaccount_id;
-                $productService->category_id = $request->category_id;
-
-                if (!empty($request->pro_image)) {
-                    //storage limit
-                    $file_path = '/uploads/pro_image/' . $productService->pro_image;
-                    $image_size = $request->file('pro_image')->getSize();
-                    $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
-                    if ($result == 1) {
-                        if ($productService->pro_image) {
-                            Utility::changeStorageLimit(\Auth::user()->creatorId(), $file_path);
-                            $path = storage_path('uploads/pro_image' . $productService->pro_image);
-                            //                            if(file_exists($path))
-//                            {
-//                                \File::delete($path);
-//                            }
-                        }
-                        $fileName = $request->pro_image->getClientOriginalName();
-                        $productService->pro_image = $fileName;
-                        $dir = 'uploads/pro_image';
-                        $path = Utility::upload_file($request, 'pro_image', $fileName, $dir, []);
-                    }
-
-                }
-
-                $productService->created_by = \Auth::user()->creatorId();
-                $productService->save();
-                CustomField::saveData($productService, $request->customField);
-
-                return redirect()->route('productservice.index')->with('success', __('Product successfully updated.'));
-            } else {
-                return redirect()->back()->with('error', __('Permission denied.'));
-            }
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
-        }
+    public function edit($id){
+        $iteminformation = ItemInformation::find($id);
+        $customFields = CustomField::where('module', '=', 'iteminformation')->get();
+        $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
+        $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
+        \Log::info($itemtypes);
+        $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
+        $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
+        return view('iteminformation.edit', compact(
+            'iteminformation',
+            'itemclassifications',
+            'itemtypes',
+            'countrynames',
+            'taxationtype'
+        ));
     }
-
-    public function destroy($id)
+      public function destroy($id)
     {
         if (\Auth::user()->can('delete product & service')) {
             $productService = ProductService::find($id);

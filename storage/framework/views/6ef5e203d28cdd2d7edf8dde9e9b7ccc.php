@@ -62,7 +62,7 @@
                                 <td><?php echo e($iteminformation->id); ?></td>
                                 <td><?php echo e($iteminformation->itemCd); ?></td>
                                 <td><?php echo e($iteminformation->itemClsCd); ?></td>
-                                <td></td>                             
+                                <td></td>
                                 <td><?php echo e($iteminformation->itemNm); ?></td>
                                 <td><?php echo e($iteminformation->dftPrc); ?></td>
                                 <td>

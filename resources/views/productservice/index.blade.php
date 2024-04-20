@@ -61,7 +61,7 @@
                                 <td>{{ $iteminformation->id }}</td>
                                 <td>{{ $iteminformation->itemCd }}</td>
                                 <td>{{ $iteminformation->itemClsCd }}</td>
-                                <td></td>                             
+                                <td></td>
                                 <td>{{ $iteminformation->itemNm }}</td>
                                 <td>{{ $iteminformation->dftPrc }}</td>
                                 <td>
