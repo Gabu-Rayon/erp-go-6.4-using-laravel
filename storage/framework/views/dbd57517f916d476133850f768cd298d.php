@@ -9,6 +9,15 @@
     <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
     <li class="breadcrumb-item"><?php echo e(__('Item Classifications')); ?></li>
 <?php $__env->stopSection(); ?>
+<?php $__env->startSection('action-btn'); ?>
+    <div class="float-end">
+                <!-- Button to trigger the getItemInformationApi and Synchronize it to my Database() method -->
+       <a href="#" id="synchronizeBtn" data-size="lg" data-url="<?php echo e(route('productservice.synchronizeitemclassifications')); ?>"
+            data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Synchronize Item Classifications')); ?>" class="btn btn-sm btn-primary">
+            <i class="#">Synchronize</i>
+        </a>
+    </div>
+<?php $__env->stopSection(); ?>
 <?php $__env->startSection('content'); ?>
     <div class="row">
         <div class="col-xl-12">

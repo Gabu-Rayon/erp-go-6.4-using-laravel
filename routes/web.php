@@ -400,7 +400,10 @@ Route::group(['middleware' => ['verified']], function () {
 
     Route::get('productservice/index', [ProductServiceController::class, 'index'])->name('productservice.index');
     Route::get('productservice/synchronize', [ProductServiceController::class, 'synchronize'])->name('productservice.synchronize');
-
+    // productservice.synchronizeitemclassifications
+      Route::get('productservice/synchronizeitemclassifications', [ProductServiceController::class, 'synchronizeItemClassifications'])->name('productservice.synchronizeitemclassifications');
+   
+      
     Route::get('productservice/getcodelist', [ProductServiceController::class, 'getCodeList'])->name('productservice.getcodelist');
     Route::get('productservice/itemclassifications', [ProductServiceController::class, 'showItemClassification'])->name('productservice.classifications');
 

@@ -505,23 +505,23 @@ class ProductServiceController extends Controller
                 'isrcAplcbYn' => 'required',
                 'useYn' => 'required',
             ]);
-            
+
             $url = 'https://etims.your-apps.biz/api/UpdateItem';
-            
+
             $response = Http::withHeaders([
                 'accept' => 'application/json',
                 'Content-Type' => 'application/json',
                 'key' => '123456'
-                ])->post($url, $request->all());
-                
-                $data = $response->json();
-                
-                \Log::info('API Request Data: ' . json_encode($request->all()));
+            ])->post($url, $request->all());
 
-                $iteminformation->update($request->all());
-                
-                return redirect()->route('productservice.index')->with('success', 'Item Information updated successfully.');
-            } catch (\Exception $e) {
+            $data = $response->json();
+
+            \Log::info('API Request Data: ' . json_encode($request->all()));
+
+            $iteminformation->update($request->all());
+
+            return redirect()->route('productservice.index')->with('success', 'Item Information updated successfully.');
+        } catch (\Exception $e) {
             return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
         }
     }
@@ -536,13 +536,15 @@ class ProductServiceController extends Controller
             \Log::info($itemtypes);
             $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
             $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
-            return view('productservice.edit', compact(
-                'iteminformation',
-                'itemclassifications',
-                'itemtypes',
-                'countrynames',
-                'taxationtype'
-            )
+            return view(
+                'productservice.edit',
+                compact(
+                    'iteminformation',
+                    'itemclassifications',
+                    'itemtypes',
+                    'countrynames',
+                    'taxationtype'
+                )
             );
 
         } else {
@@ -821,7 +823,8 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function edititem(ItemInformation $iteminformation){
+    public function edititem(ItemInformation $iteminformation)
+    {
         $customFields = CustomField::where('module', '=', 'iteminformation')->get();
         $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
         $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
@@ -834,7 +837,8 @@ class ProductServiceController extends Controller
             'itemtypes',
             'countrynames',
             'taxationtype'
-        ));
+        )
+        );
     }
 
 
@@ -1277,7 +1281,8 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function synchronize() {
+    public function synchronize()
+    {
         try {
             $iteminfo = ItemInformation::all();
             $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';
@@ -1288,6 +1293,11 @@ class ProductServiceController extends Controller
 
             $data = $response->json()['data'];
             $remoterecords = $data['data']['itemList'];
+
+            \Log::info('API Request Data: ' . json_encode($data));
+            \Log::info('API Request Data: ' . json_encode($remoterecords));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
 
             if (isset($remoterecords) && isset($iteminfo)) {
                 $dup = collect($iteminfo)->diff($remoterecords);
@@ -1322,9 +1332,51 @@ class ProductServiceController extends Controller
             }
             return redirect()->route('productservice.index')->with('success', __('Item Information Edited successfully.'));
         } catch (\Exception $e) {
-            \Log::info($e);
+            \Log::error('Synchronizing Item Infromations from the API successfully: ' . $e->getMessage());
             return redirect()->back()->with('error', __('This Product is not found!'));
         }
+    }
+
+    public function synchronizeItemClassifications()
+    {
+
+        try {
+            $iteminfo = ItemClassification::all();
+            $url = 'https://etims.your-apps.biz/api/GetItemClassificationList?date=20220409120000';
+
+            $response = Http::withHeaders([
+                'key' => '123456'
+            ])->get($url);
+
+            $data = $response->json()['data'];
+            $remoterecords = $data['data']['itemClsList'];
+            
+            \Log::info('API Request Data: ' . json_encode($data));
+            \Log::info('API Request Data: ' . json_encode($remoterecords));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+
+            if (isset($remoterecords) && isset($iteminfo)) {
+                $dup = collect($iteminfo)->diff($remoterecords);
+                foreach ($dup as $item) {
+                    ItemClassification::create([
+                        'itemClsCd' => $item['itemClsCd'],
+                        'itemClsNm' => $item['itemClsNm'],
+                        'itemClsLvl' => $item['itemClsLvl'],
+                        'taxTyCd' => $item['taxTyCd'],
+                        'mjrTgYn' => $item['mjrTgYn'],
+                        'useYn' => $item['useYn']
+                    ]);
+                }
+            }
+            return redirect()->route('productservice.classifications')->with('success', __('Synchronizing Item Classifications from the API successfully.'));
+        } catch (\Exception $e) {
+            //  adding Item Classification from the API: Array to string conversion  
+            \Log::error('Error synchronizing Item Classifications from the API: ' . $e->getMessage());
+            // return redirect()->back()->with('error', __('Error synchronizing Item Classifications from the API!'));
+             return redirect()->route('productservice.classifications')->with('success', __('Error synchronizing Item Classifications from the API.'));
+        }
+
     }
     public function getCodeList()
     {
@@ -1342,7 +1394,7 @@ class ProductServiceController extends Controller
 
         \Log::info($itemtypes);
         return view('productservice.getiteminformation', compact('iteminformations', 'itemtypes'));
-      }
+    }
 
     public function showItemClassification()
     {

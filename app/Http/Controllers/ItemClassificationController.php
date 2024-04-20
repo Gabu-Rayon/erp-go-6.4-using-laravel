@@ -24,7 +24,7 @@ class ItemClassificationController extends Controller
 
         if (isset($data['data'])) {
             try {
-                foreach ($data['data']['itemList'] as $item) {
+                foreach ($data['data']['itemClsList'] as $item) {
                     ItemInformation::create([
                         'itemClsCd' => $item['itemClsCd'],
                         'itemClsNm' => $item['itemClsNm'],

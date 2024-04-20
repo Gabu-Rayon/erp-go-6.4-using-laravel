@@ -8,6 +8,15 @@
     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
     <li class="breadcrumb-item">{{ __('Item Classifications') }}</li>
 @endsection
+@section('action-btn')
+    <div class="float-end">
+                <!-- Button to trigger the getItemInformationApi and Synchronize it to my Database() method -->
+       <a href="#" id="synchronizeBtn" data-size="lg" data-url="{{ route('productservice.synchronizeitemclassifications') }}"
+            data-ajax-popup="true" data-bs-toggle="tooltip" title="{{ __('Synchronize Item Classifications') }}" class="btn btn-sm btn-primary">
+            <i class="#">Synchronize</i>
+        </a>
+    </div>
+@endsection
 @section('content')
     <div class="row">
         <div class="col-xl-12">
