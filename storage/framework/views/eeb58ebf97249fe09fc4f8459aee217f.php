@@ -17,8 +17,23 @@
 
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
-       <a href="#" data-size="lg" data-url="<?php echo e(route('iteminformation.create')); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Create Item Information')); ?>" data-title="<?php echo e(__('Create Item Information')); ?>" class="btn btn-sm btn-primary">
+        <a href="#" data-size="md" data-bs-toggle="tooltip" title="<?php echo e(__('Import')); ?>" data-url="<?php echo e(route('productservice.file.import')); ?>" data-ajax-popup="true" data-title="<?php echo e(__('Import product CSV file')); ?>" class="btn btn-sm btn-primary">
+            <i class="ti ti-file-import"></i>
+        </a>
+        <a href="<?php echo e(route('productservice.export')); ?>" data-bs-toggle="tooltip" title="<?php echo e(__('Export')); ?>"
+            class="btn btn-sm btn-primary">
+            <i class="ti ti-file-export"></i>
+        </a>
+
+        <a href="#" data-size="lg" data-url="<?php echo e(route('productservice.create')); ?>" data-ajax-popup="true"
+            data-bs-toggle="tooltip" title="<?php echo e(__('Create New Product')); ?>" class="btn btn-sm btn-primary">
             <i class="ti ti-plus"></i>
+        </a>
+
+        <!-- Button to trigger the getItemInformationApi and Synchronize it to my Database() method -->
+        <a href="#" id="synchronizeBtn" data-size="lg" data-url="<?php echo e(route('productservice.synchronize')); ?>"
+            data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Synchronize')); ?>" class="btn btn-sm btn-primary">
+            <i class="#">Synchronize</i>
         </a>
     </div>
 <?php $__env->stopSection(); ?>

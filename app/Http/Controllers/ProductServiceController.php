@@ -1135,57 +1135,7 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function synchronize() {
-        try {
-            $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';
-
-        $response = Http::withHeaders([
-            'key' => '123456'
-        ])->get($url);
-
-        $data = $response->json()['data'];
-
-        $iteminformations = ItemInformation::all();
-
-        $notinlocal = collect($data['data']['itemList'])->diff($iteminformations);
-
-        foreach ($notinlocal as $item) {
-            ItemInformation::create([
-                'tin' => $item['tin'],
-                'itemCd' => $item['itemCd'],
-                'itemClsCd' => $item['itemClsCd'],
-                'itemTyCd' => $item['itemTyCd'],
-                'itemNm' => $item['itemNm'],
-                'itemStdNm' => $item['itemStdNm'],
-                'orgnNatCd' => $item['orgnNatCd'],
-                'pkgUnitCd' => $item['pkgUnitCd'],
-                'qtyUnitCd' => $item['qtyUnitCd'],
-                'taxTyCd' => $item['taxTyCd'],
-                'btchNo' => $item['btchNo'],
-                'regBhfId' => $item['regBhfId'],
-                'bcd' => $item['bcd'],
-                'dftPrc' => $item['dftPrc'],
-                'grpPrcL1' => $item['grpPrcL1'],
-                'grpPrcL2' => $item['grpPrcL2'],
-                'grpPrcL3' => $item['grpPrcL3'],
-                'grpPrcL4' => $item['grpPrcL4'],
-                'grpPrcL5' => $item['grpPrcL5'],
-                'addInfo' => $item['addInfo'],
-                'sftyQty' => $item['sftyQty'],
-                'isrcAplcbYn' => $item['isrcAplcbYn'],
-                'rraModYn' => $item['rraModYn'],
-                'useYn' => $item['useYn']
-            ]);
-
-            return redirect()->route('productservice.getiteminformation')->with('success', __('Item Information added successfully created.'));
-
-        }
-        } catch (\Exception $e) {
-            \Log::error('Error synchronizing Item Information from the API: ' . $e->getMessage());
-            return redirect()->route('productservice.getiteminformation')->with('error', __('Error synchronizing Item Information from the API.'));
-        }
-
-    }
+    public function synchronize() {}
     public function getCodeList(){
 
       $codelists = Code::all();

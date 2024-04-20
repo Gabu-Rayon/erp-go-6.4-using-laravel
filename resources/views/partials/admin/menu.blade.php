@@ -1275,8 +1275,8 @@
                 </a>
                 <ul class="dash-submenu">
                     @if (Gate::check('manage product & service'))
-                        <li class="dash-item {{ Request::segment(1) == 'getiteminformation' ? 'active' : '' }}">
-                            <a href="{{ route('productservice.getiteminformation') }}"
+                        <li class="dash-item {{ Request::segment(1) == 'index' ? 'active' : '' }}">
+                            <a href="{{ route('productservice.index') }}"
                                 class="dash-link">{{ __('Products & Services') }}
                             </a>
                         </li>
@@ -1285,6 +1285,13 @@
                         <li class="dash-item {{ Request::segment(1) == 'getcodelist' ? 'active' : '' }}">
                             <a href="{{ route('productservice.getcodelist') }}"
                                 class="dash-link">{{ __('Code List') }}
+                            </a>
+                        </li>
+                    @endif
+                      @if (Gate::check('manage product & service'))
+                        <li class="dash-item {{ Request::segment(1) == 'itemclassifications' ? 'active' : '' }}">
+                            <a href="{{ route('productservice.classifications') }}"
+                                class="dash-link">{{ __('Item Classifications') }}
                             </a>
                         </li>
                     @endif
