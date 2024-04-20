@@ -515,6 +515,7 @@ class ProductServiceController extends Controller
 
 
     public function edit($id){
+           if (\Auth::user()->can('manage product & service')) {
         $iteminformation = ItemInformation::find($id);
         $customFields = CustomField::where('module', '=', 'iteminformation')->get();
         $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
@@ -522,13 +523,17 @@ class ProductServiceController extends Controller
         \Log::info($itemtypes);
         $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
         $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
-        return view('iteminformation.edit', compact(
+        return view('productservice.edit', compact(
             'iteminformation',
             'itemclassifications',
             'itemtypes',
             'countrynames',
             'taxationtype'
         ));
+
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
     }
       public function destroy($id)
     {
@@ -553,8 +558,7 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function export()
-    {
+    public function export(){
         $name = 'product_service_' . date('Y-m-d i:h:s');
         $data = Excel::download(new ProductServiceExport(), $name . '.xlsx');
 
@@ -758,22 +762,6 @@ class ProductServiceController extends Controller
         }
     }
 
-
-    public function edititem(ItemInformation $iteminformation){
-        $customFields = CustomField::where('module', '=', 'iteminformation')->get();
-        $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
-        $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
-        \Log::info($itemtypes);
-        $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
-        $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
-        return view('productservice.edit', compact(
-            'iteminformation',
-            'itemclassifications',
-            'itemtypes',
-            'countrynames',
-            'taxationtype'
-        ));
-    }
 
 
 
