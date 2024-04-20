@@ -506,9 +506,23 @@ class ProductServiceController extends Controller
                 'isrcAplcbYn' => 'required',
                 'useYn' => 'required',
             ]);
-            $iteminformation->update($request->all());
-            return redirect()->route('productservice.getiteminformation')->with('success', 'Item Information updated successfully.');
-        } catch (\Exception $e) {
+            
+            $url = 'https://etims.your-apps.biz/api/UpdateItem';
+            
+            $response = Http::withHeaders([
+                'accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'key' => '123456'
+                ])->post($url, $request->all());
+                
+                $data = $response->json();
+                
+                \Log::info('API Request Data: ' . json_encode($request->all()));
+
+                $iteminformation->update($request->all());
+                
+                return redirect()->route('productservice.getiteminformation')->with('success', 'Item Information updated successfully.');
+            } catch (\Exception $e) {
             return redirect()->route('productservice.getiteminformation')->with('error', 'Error updating Item Information.');
         }
     }
@@ -756,6 +770,8 @@ class ProductServiceController extends Controller
                 'useYn' => 'required',
             ]);
             $iteminformation->update($request->all());
+
+
             return redirect()->route('productservice.index')->with('success', 'Item Information updated successfully.');
         } catch (Exception $e) {
             return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
