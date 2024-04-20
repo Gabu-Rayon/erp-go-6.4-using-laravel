@@ -1,5 +1,5 @@
 
-{{ Form::model($iteminformation, array('route' => array('iteminformation.update', $iteminformation->id), 'method' => 'PUT')) }}
+{{ Form::model($iteminformation, array('route' => array('productservice.update', $iteminformation->id), 'method' => 'PUT')) }}
 <div class="modal-body">
     <div class="row">
         <div class="col-md-6">

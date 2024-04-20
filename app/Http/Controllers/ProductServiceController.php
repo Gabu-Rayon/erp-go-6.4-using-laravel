@@ -505,9 +505,23 @@ class ProductServiceController extends Controller
                 'isrcAplcbYn' => 'required',
                 'useYn' => 'required',
             ]);
-            $iteminformation->update($request->all());
-            return redirect()->route('productservice.index')->with('success', 'Item Information updated successfully.');
-        } catch (\Exception $e) {
+            
+            $url = 'https://etims.your-apps.biz/api/UpdateItem';
+            
+            $response = Http::withHeaders([
+                'accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'key' => '123456'
+                ])->post($url, $request->all());
+                
+                $data = $response->json();
+                
+                \Log::info('API Request Data: ' . json_encode($request->all()));
+
+                $iteminformation->update($request->all());
+                
+                return redirect()->route('productservice.index')->with('success', 'Item Information updated successfully.');
+            } catch (\Exception $e) {
             return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
         }
     }
@@ -783,6 +797,46 @@ class ProductServiceController extends Controller
         }
 
     }
+
+    public function updateitem(Request $request, ItemInformation $iteminformation)
+    {
+        try {
+            $request->validate([
+                'itemCd' => 'required',
+                'itemClsCd' => 'required',
+                'itemTyCd' => 'required',
+                'itemNm' => 'required',
+                'orgnNatCd' => 'required',
+                'pkgUnitCd' => 'required',
+                'qtyUnitCd' => 'required',
+                'taxTyCd' => 'required',
+                'dftPrc' => 'required',
+                'isrcAplcbYn' => 'required',
+                'useYn' => 'required',
+            ]);
+            $iteminformation->update($request->all());
+            return redirect()->route('productservice.index')->with('success', 'Item Information updated successfully.');
+        } catch (Exception $e) {
+            return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
+        }
+    }
+
+    public function edititem(ItemInformation $iteminformation){
+        $customFields = CustomField::where('module', '=', 'iteminformation')->get();
+        $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
+        $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
+        \Log::info($itemtypes);
+        $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
+        $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
+        return view('productservice.edit', compact(
+            'iteminformation',
+            'itemclassifications',
+            'itemtypes',
+            'countrynames',
+            'taxationtype'
+        ));
+    }
+
 
 
 
@@ -1223,8 +1277,7 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function synchronize()
-    {
+    public function synchronize() {
         try {
             $iteminfo = ItemInformation::all();
             $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';
@@ -1289,7 +1342,7 @@ class ProductServiceController extends Controller
 
         \Log::info($itemtypes);
         return view('productservice.getiteminformation', compact('iteminformations', 'itemtypes'));
-    }
+      }
 
     public function showItemClassification()
     {

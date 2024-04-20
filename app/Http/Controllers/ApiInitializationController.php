@@ -72,8 +72,9 @@ class ApiInitializationController extends Controller
 
             $data = $response->json();
 
-            if ($data['resultCd'] != '0000') {
-                return redirect()->back()->with('error', $data['resultMsg']);
+            if ($data['data']['resultCd'] != '0000') {
+                \Log::info($data);
+                return redirect()->back()->with('error', $data['data']['resultMsg']);
             }
 
             $apiInitialization = new ApiInitialization();
