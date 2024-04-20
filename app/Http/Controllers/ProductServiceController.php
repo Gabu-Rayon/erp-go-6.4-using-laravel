@@ -1234,6 +1234,7 @@ class ProductServiceController extends Controller
     }
 
     public function synchronize() {
+        \Log::info('Function Runs');
         try {
             $iteminfo = ItemInformation::all();
         $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';
@@ -1295,7 +1296,7 @@ class ProductServiceController extends Controller
         $itemtypes = ItemType::all();
         
         \Log::info($itemtypes);
-        return view('productservice.getiteminformation', compact('iteminformations', 'itemtypes'));
+        return view('productservice.index', compact('iteminformations', 'itemtypes'));
       }
 
      public function  showItemClassfication(){
