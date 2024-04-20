@@ -695,6 +695,46 @@ class ProductServiceController extends Controller
 
     }
 
+    public function updateitem(Request $request, ItemInformation $iteminformation)
+    {
+        try {
+            $request->validate([
+                'itemCd' => 'required',
+                'itemClsCd' => 'required',
+                'itemTyCd' => 'required',
+                'itemNm' => 'required',
+                'orgnNatCd' => 'required',
+                'pkgUnitCd' => 'required',
+                'qtyUnitCd' => 'required',
+                'taxTyCd' => 'required',
+                'dftPrc' => 'required',
+                'isrcAplcbYn' => 'required',
+                'useYn' => 'required',
+            ]);
+            $iteminformation->update($request->all());
+            return redirect()->route('productservice.getiteminformation')->with('success', 'Item Information updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('productservice.getiteminformation')->with('error', 'Error updating Item Information.');
+        }
+    }
+
+
+    public function edititem(ItemInformation $iteminformation){
+        $customFields = CustomField::where('module', '=', 'iteminformation')->get();
+        $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
+        $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
+        \Log::info($itemtypes);
+        $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
+        $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
+        return view('iteminformation.edit', compact(
+            'iteminformation',
+            'itemclassifications',
+            'itemtypes',
+            'countrynames',
+            'taxationtype'
+        ));
+    }
+
 
 
 
