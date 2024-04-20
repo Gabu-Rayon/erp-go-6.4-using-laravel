@@ -63,7 +63,7 @@
                   <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </select>
           </div> 
-          <div class="form-group col-md-6">
+         <!--  <div class="form-group col-md-6">
               <?php echo e(Form::label('item_classifications', __('Item Classifications Code'), ['class' => 'form-label'])); ?>
 
               <select name="product_classified_code" class="form-control select2" required="required">
@@ -77,6 +77,15 @@
                   <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </select>
           </div>
+ -->
+           <div class="form-group col-md-6">
+            <?php echo e(Form::label('item_classifications', __('Item Classifications Code'),['class'=>'form-label'])); ?>
+
+            <?php echo e(Form::select('product_classified_code', $item_classifications,null, array('class' => 'form-control select','required'=>'required'))); ?>
+
+        </div>
+
+        
           <div class="col-md-6">
               <div class="form-group">
                   <?php echo e(Form::label('batch_no', __('Batch No'), ['class' => 'form-label'])); ?><span
