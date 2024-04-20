@@ -69,7 +69,7 @@
                                         <a href="{{ route('iteminformation.show',$iteminformation->id) }}" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="{{__('Details')}}"><i class="ti ti-eye text-white"></i></a>
                                     </div>
                                     <div class="action-btn bg-info ms-2">
-                                        <a href="#" class="mx-3 btn btn-sm  align-items-center" data-url="{{ route('iteminformation.edititem',$iteminformation->id) }}" data-ajax-popx="true"  data-size="lg " data-bs-toggle="tooltip" title="{{__('Edit')}}"  data-title="{{__('Edit Item Info')}}">
+                                        <a href="#" class="mx-3 btn btn-sm  align-items-center" data-url="{{ route('iteminformation.edit',$iteminformation->id) }}" data-ajax-popx="true"  data-size="lg " data-bs-toggle="tooltip" title="{{__('Edit')}}"  data-title="{{__('Edit Item Info')}}">
                                             <i class="ti ti-pencil text-white"></i>
                                         </a>
                                     </div>                                 
