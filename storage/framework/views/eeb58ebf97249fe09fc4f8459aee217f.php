@@ -70,7 +70,7 @@
                                         <a href="<?php echo e(route('iteminformation.show',$iteminformation->id)); ?>" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="<?php echo e(__('Details')); ?>"><i class="ti ti-eye text-white"></i></a>
                                     </div>
                                     <div class="action-btn bg-info ms-2">
-                                        <a href="#" class="mx-3 btn btn-sm  align-items-center" data-url="<?php echo e(route('iteminformation.edit',$iteminformation->id)); ?>" data-ajax-popup="true"  data-size="lg " data-bs-toggle="tooltip" title="<?php echo e(__('Edit')); ?>"  data-title="<?php echo e(__('Edit Item Info')); ?>">
+                                        <a href="#" class="mx-3 btn btn-sm  align-items-center" data-url="<?php echo e(route('iteminformation.edit',$iteminformation->id)); ?>" data-ajax-popx="true"  data-size="lg " data-bs-toggle="tooltip" title="<?php echo e(__('Edit')); ?>"  data-title="<?php echo e(__('Edit Item Info')); ?>">
                                             <i class="ti ti-pencil text-white"></i>
                                         </a>
                                     </div>                                 

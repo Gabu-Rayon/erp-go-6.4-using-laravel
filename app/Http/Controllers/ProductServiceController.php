@@ -41,9 +41,9 @@ class ProductServiceController extends Controller
     {
 
         if (\Auth::user()->can('manage product & service')) {
-            $itemlists =  ItemInformation::all();
+            $iteminformations =  ItemInformation::all();
 
-            return view('productservice.index', compact('itemlists'));
+            return view('productservice.index', compact('iteminformations'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -352,15 +352,15 @@ class ProductServiceController extends Controller
     }
 
 
-    public function show()
+    public function show(ItemInformation $iteminformation)
     {
-        return redirect()->route('productservice.index');
+        return view('productservice.show', compact('iteminformation'));
     }
+
 
     public function edit($id)
     {
         $productService = ProductService::find($id);
-
         if (\Auth::user()->can('edit product & service')) {
             if ($productService->created_by == \Auth::user()->creatorId()) {
                 $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
@@ -712,9 +712,9 @@ class ProductServiceController extends Controller
                 'useYn' => 'required',
             ]);
             $iteminformation->update($request->all());
-            return redirect()->route('productservice.getiteminformation')->with('success', 'Item Information updated successfully.');
+            return redirect()->route('productservice.index')->with('success', 'Item Information updated successfully.');
         } catch (\Exception $e) {
-            return redirect()->route('productservice.getiteminformation')->with('error', 'Error updating Item Information.');
+            return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
         }
     }
 
@@ -726,7 +726,7 @@ class ProductServiceController extends Controller
         \Log::info($itemtypes);
         $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
         $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
-        return view('iteminformation.edit', compact(
+        return view('productservice.edit', compact(
             'iteminformation',
             'itemclassifications',
             'itemtypes',
