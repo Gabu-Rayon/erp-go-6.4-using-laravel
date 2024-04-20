@@ -56,11 +56,10 @@
                       </option>
                   @endforeach
               </select>
-          </div>
-
+          </div> 
           <div class="form-group col-md-6">
               {{ Form::label('item_classifications', __('Item Classifications Code'), ['class' => 'form-label']) }}
-              <select name="product_classified_code" class="form-control" required="required">
+              <select name="product_classified_code" class="form-control select2" required="required">
                   <option value="">Select Item Classifications Code</option>
                   @foreach ($item_classifications as $item_classification)
                       <option value="{{ $item_classification['itemClsCd'] }}">{{ $item_classification['itemClsNm'] }}

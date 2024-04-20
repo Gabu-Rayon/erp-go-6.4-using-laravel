@@ -757,7 +757,7 @@ class ProductServiceController extends Controller
             ]);
             $iteminformation->update($request->all());
             return redirect()->route('productservice.index')->with('success', 'Item Information updated successfully.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
         }
     }
@@ -1219,7 +1219,9 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function synchronize() {}
+    public function synchronize() {
+        
+    }
     public function getCodeList(){
 
       $codelists = Code::all();
