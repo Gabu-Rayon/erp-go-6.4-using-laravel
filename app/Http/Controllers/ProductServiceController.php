@@ -763,6 +763,22 @@ class ProductServiceController extends Controller
     }
 
 
+    public function edititem(ItemInformation $iteminformation){
+        $customFields = CustomField::where('module', '=', 'iteminformation')->get();
+        $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
+        $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
+        \Log::info($itemtypes);
+        $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
+        $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
+        return view('productservice.edit', compact(
+            'iteminformation',
+            'itemclassifications',
+            'itemtypes',
+            'countrynames',
+            'taxationtype'
+        ));
+    }
+
 
 
 
