@@ -41,7 +41,7 @@ class ProductServiceController extends Controller
     {
 
         if (\Auth::user()->can('manage product & service')) {
-            $iteminformations =  ItemInformation::all();
+            $iteminformations = ItemInformation::all();
 
             return view('productservice.index', compact('iteminformations'));
         } else {
@@ -57,7 +57,7 @@ class ProductServiceController extends Controller
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
             $unit = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $taxes = Details::where('cdCls', '04')->get();
-           
+
             // $item_classifications = ItemClassification::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('id');
             $item_classifications = ItemClassification::all();
 
@@ -65,7 +65,7 @@ class ProductServiceController extends Controller
             $countries_codes = Details::where('cdCls', '05')->get();
 
 
-            return view('productservice.create', compact('category', 'unit', 'taxes','item_classifications', 'customFields', 'countries_codes'));
+            return view('productservice.create', compact('category', 'unit', 'taxes', 'item_classifications', 'customFields', 'countries_codes'));
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
@@ -354,7 +354,7 @@ class ProductServiceController extends Controller
 
     public function show($id)
     {
-        $iteminformation= ItemInformation::find($id);
+        $iteminformation = ItemInformation::find($id);
         return view('productservice.show', compact('iteminformation'));
     }
 
@@ -411,10 +411,10 @@ class ProductServiceController extends Controller
     //     }
     // }
 
-//     public function update(Request $request, $id)
+    //     public function update(Request $request, $id)
 //     {
 
-//         if (\Auth::user()->can('edit product & service')) {
+    //         if (\Auth::user()->can('edit product & service')) {
 //             $productService = ProductService::find($id);
 //             if ($productService->created_by == \Auth::user()->creatorId()) {
 //                 $rules = [
@@ -427,17 +427,17 @@ class ProductServiceController extends Controller
 //                     'unit_id' => 'required',
 //                     'type' => 'required',
 
-//                 ];
+    //                 ];
 
-//                 $validator = \Validator::make($request->all(), $rules);
+    //                 $validator = \Validator::make($request->all(), $rules);
 
-//                 if ($validator->fails()) {
+    //                 if ($validator->fails()) {
 //                     $messages = $validator->getMessageBag();
 
-//                     return redirect()->route('productservice.index')->with('error', $messages->first());
+    //                     return redirect()->route('productservice.index')->with('error', $messages->first());
 //                 }
 
-//                 $productService->name = $request->name;
+    //                 $productService->name = $request->name;
 //                 $productService->description = $request->description;
 //                 $productService->sku = $request->sku;
 //                 $productService->sale_price = $request->sale_price;
@@ -445,7 +445,7 @@ class ProductServiceController extends Controller
 //                 $productService->tax_id = !empty($request->tax_id) ? implode(',', $request->tax_id) : '';
 //                 $productService->unit_id = $request->unit_id;
 
-//                 if (!empty($request->quantity)) {
+    //                 if (!empty($request->quantity)) {
 //                     $productService->quantity = $request->quantity;
 //                 } else {
 //                     $productService->quantity = 0;
@@ -455,7 +455,7 @@ class ProductServiceController extends Controller
 //                 $productService->expense_chartaccount_id = $request->expense_chartaccount_id;
 //                 $productService->category_id = $request->category_id;
 
-//                 if (!empty($request->pro_image)) {
+    //                 if (!empty($request->pro_image)) {
 //                     //storage limit
 //                     $file_path = '/uploads/pro_image/' . $productService->pro_image;
 //                     $image_size = $request->file('pro_image')->getSize();
@@ -475,13 +475,13 @@ class ProductServiceController extends Controller
 //                         $path = Utility::upload_file($request, 'pro_image', $fileName, $dir, []);
 //                     }
 
-//                 }
+    //                 }
 
-//                 $productService->created_by = \Auth::user()->creatorId();
+    //                 $productService->created_by = \Auth::user()->creatorId();
 //                 $productService->save();
 //                 CustomField::saveData($productService, $request->customField);
 
-//                 return redirect()->route('productservice.index')->with('success', __('Product successfully updated.'));
+    //                 return redirect()->route('productservice.index')->with('success', __('Product successfully updated.'));
 //             } else {
 //                 return redirect()->back()->with('error', __('Permission denied.'));
 //             }
@@ -489,8 +489,7 @@ class ProductServiceController extends Controller
 //             return redirect()->back()->with('error', __('Permission denied.'));
 //         }
 //     }
-      
- public function update(Request $request, ItemInformation $iteminformation)
+    public function update(Request $request, ItemInformation $iteminformation)
     {
         try {
             $request->validate([
@@ -513,28 +512,74 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function edit($id){
-           if (\Auth::user()->can('manage product & service')) {
-        $iteminformation = ItemInformation::find($id);
-        $customFields = CustomField::where('module', '=', 'iteminformation')->get();
-        $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
-        $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
-        \Log::info($itemtypes);
-        $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
-        $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
-        return view('productservice.edit', compact(
-            'iteminformation',
-            'itemclassifications',
-            'itemtypes',
-            'countrynames',
-            'taxationtype'
-        ));
+    public function edit($id)
+    {
+        if (\Auth::user()->can('manage product & service')) {
+            $iteminformation = ItemInformation::find($id);
+            $customFields = CustomField::where('module', '=', 'iteminformation')->get();
+            $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
+            $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
+            \Log::info($itemtypes);
+            $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
+            $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
+            return view('productservice.edit', compact(
+                'iteminformation',
+                'itemclassifications',
+                'itemtypes',
+                'countrynames',
+                'taxationtype'
+            )
+            );
 
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
-      public function destroy($id)
+
+
+
+    // public function updateitem(Request $request, ItemInformation $iteminformation)
+    // {
+    //     try {
+    //         $request->validate([
+    //             'itemCd' => 'required',
+    //             'itemClsCd' => 'required',
+    //             'itemTyCd' => 'required',
+    //             'itemNm' => 'required',
+    //             'orgnNatCd' => 'required',
+    //             'pkgUnitCd' => 'required',
+    //             'qtyUnitCd' => 'required',
+    //             'taxTyCd' => 'required',
+    //             'dftPrc' => 'required',
+    //             'isrcAplcbYn' => 'required',
+    //             'useYn' => 'required',
+    //         ]);
+    //         $iteminformation->update($request->all());
+    //         return redirect()->route('productservice.index')->with('success', 'Item Information updated successfully.');
+    //     } catch (Exception $e) {
+    //         return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
+    //     }
+    // }
+
+    // public function edititem(ItemInformation $iteminformation)
+    // {
+    //     $customFields = CustomField::where('module', '=', 'iteminformation')->get();
+    //     $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
+    //     $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
+    //     \Log::info($itemtypes);
+    //     $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
+    //     $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
+    //     return view('productservice.edit', compact(
+    //         'iteminformation',
+    //         'itemclassifications',
+    //         'itemtypes',
+    //         'countrynames',
+    //         'taxationtype'
+    //     )
+    //     );
+    // }
+
+    public function destroy($id)
     {
         if (\Auth::user()->can('delete product & service')) {
             $productService = ProductService::find($id);
@@ -557,7 +602,8 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function export(){
+    public function export()
+    {
         $name = 'product_service_' . date('Y-m-d i:h:s');
         $data = Excel::download(new ProductServiceExport(), $name . '.xlsx');
 
@@ -737,46 +783,6 @@ class ProductServiceController extends Controller
         }
 
     }
-
-    public function updateitem(Request $request, ItemInformation $iteminformation)
-    {
-        try {
-            $request->validate([
-                'itemCd' => 'required',
-                'itemClsCd' => 'required',
-                'itemTyCd' => 'required',
-                'itemNm' => 'required',
-                'orgnNatCd' => 'required',
-                'pkgUnitCd' => 'required',
-                'qtyUnitCd' => 'required',
-                'taxTyCd' => 'required',
-                'dftPrc' => 'required',
-                'isrcAplcbYn' => 'required',
-                'useYn' => 'required',
-            ]);
-            $iteminformation->update($request->all());
-            return redirect()->route('productservice.index')->with('success', 'Item Information updated successfully.');
-        } catch (Exception $e) {
-            return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
-        }
-    }
-
-    public function edititem(ItemInformation $iteminformation){
-        $customFields = CustomField::where('module', '=', 'iteminformation')->get();
-        $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
-        $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
-        \Log::info($itemtypes);
-        $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
-        $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
-        return view('productservice.edit', compact(
-            'iteminformation',
-            'itemclassifications',
-            'itemtypes',
-            'countrynames',
-            'taxationtype'
-        ));
-    }
-
 
 
 
@@ -1217,76 +1223,80 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function synchronize() {
+    public function synchronize()
+    {
         try {
             $iteminfo = ItemInformation::all();
-        $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';
+            $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';
 
-        $response = Http::withHeaders([
-            'key' => '123456'
-        ])->get($url);
+            $response = Http::withHeaders([
+                'key' => '123456'
+            ])->get($url);
 
-        $data = $response->json()['data'];
-        $remoterecords = $data['data']['itemList'];
+            $data = $response->json()['data'];
+            $remoterecords = $data['data']['itemList'];
 
-        if (isset($remoterecords) && isset($iteminfo)) {
-            $dup = collect($iteminfo)->diff($remoterecords);
-            foreach ($dup as $item) {
-                ItemInformation::create([
-                    'tin' => $item['tin'],
-                    'itemCd' => $item['itemCd'],
-                    'itemClsCd' => $item['itemClsCd'],
-                    'itemTyCd' => $item['itemTyCd'],
-                    'itemNm' => $item['itemNm'],
-                    'itemStdNm' => $item['itemStdNm'],
-                    'orgnNatCd' => $item['orgnNatCd'],
-                    'pkgUnitCd' => $item['pkgUnitCd'],
-                    'qtyUnitCd' => $item['qtyUnitCd'],
-                    'taxTyCd' => $item['taxTyCd'],
-                    'btchNo' => $item['btchNo'],
-                    'regBhfId' => $item['regBhfId'],
-                    'bcd' => $item['bcd'],
-                    'dftPrc' => $item['dftPrc'],
-                    'grpPrcL1' => $item['grpPrcL1'],
-                    'grpPrcL2' => $item['grpPrcL2'],
-                    'grpPrcL3' => $item['grpPrcL3'],
-                    'grpPrcL4' => $item['grpPrcL4'],
-                    'grpPrcL5' => $item['grpPrcL5'],
-                    'addInfo' => $item['addInfo'],
-                    'sftyQty' => $item['sftyQty'],
-                    'isrcAplcbYn' => $item['isrcAplcbYn'],
-                    'rraModYn' => $item['rraModYn'],
-                    'useYn' => $item['useYn']
-                ]);
+            if (isset($remoterecords) && isset($iteminfo)) {
+                $dup = collect($iteminfo)->diff($remoterecords);
+                foreach ($dup as $item) {
+                    ItemInformation::create([
+                        'tin' => $item['tin'],
+                        'itemCd' => $item['itemCd'],
+                        'itemClsCd' => $item['itemClsCd'],
+                        'itemTyCd' => $item['itemTyCd'],
+                        'itemNm' => $item['itemNm'],
+                        'itemStdNm' => $item['itemStdNm'],
+                        'orgnNatCd' => $item['orgnNatCd'],
+                        'pkgUnitCd' => $item['pkgUnitCd'],
+                        'qtyUnitCd' => $item['qtyUnitCd'],
+                        'taxTyCd' => $item['taxTyCd'],
+                        'btchNo' => $item['btchNo'],
+                        'regBhfId' => $item['regBhfId'],
+                        'bcd' => $item['bcd'],
+                        'dftPrc' => $item['dftPrc'],
+                        'grpPrcL1' => $item['grpPrcL1'],
+                        'grpPrcL2' => $item['grpPrcL2'],
+                        'grpPrcL3' => $item['grpPrcL3'],
+                        'grpPrcL4' => $item['grpPrcL4'],
+                        'grpPrcL5' => $item['grpPrcL5'],
+                        'addInfo' => $item['addInfo'],
+                        'sftyQty' => $item['sftyQty'],
+                        'isrcAplcbYn' => $item['isrcAplcbYn'],
+                        'rraModYn' => $item['rraModYn'],
+                        'useYn' => $item['useYn']
+                    ]);
+                }
             }
-        }
-        return redirect()->route('productservice.index')->with('success', __('Item Information Edited successfully.'));
+            return redirect()->route('productservice.index')->with('success', __('Item Information Edited successfully.'));
         } catch (\Exception $e) {
             \Log::info($e);
             return redirect()->back()->with('error', __('This Product is not found!'));
         }
     }
-    public function getCodeList(){
+    public function getCodeList()
+    {
 
-      $codelists = Code::all();
-      
-        return view('productservice.getcodelist',compact('codelists'));
+        $codelists = Code::all();
+
+        return view('productservice.getcodelist', compact('codelists'));
     }
 
-    public function viewItemInformation(){
+    public function viewItemInformation()
+    {
 
         $iteminformations = ItemInformation::all();
         $itemtypes = ItemType::all();
-        
+
         \Log::info($itemtypes);
         return view('productservice.getiteminformation', compact('iteminformations', 'itemtypes'));
-      }
+    }
 
-     public function  showItemClassfication(){
-          $itemclassfications = ItemClassification::all();
+    public function showItemClassification()
+    {
+        $itemclassifications = ItemClassification::all();
 
-        return view('productservice.itemclassfications', compact('itemclassfications'));
-     }
+        return view('productservice.itemclassifications', compact('itemclassifications'));
+    }
     public function getItemInformation()
     {
         $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';
@@ -1334,6 +1344,46 @@ class ProductServiceController extends Controller
                 // return redirect()->back()->with('success', 'Item Information added successfully.');
                 return redirect()->route('productservice.index')->with('success', __('Item Information added successfully created.'));
             } catch (Exception $e) {
+                \Log::error('Error adding Item Information from the API: ' . $e->getMessage());
+                // return redirect()->back()->with('error', 'Error adding Item Information from the API.');
+                return redirect()->route('productservice.index')->with('error', __('Error adding Item Information from the API.'));
+            }
+        } else {
+            // return redirect()->back()->with('error', 'No data found in the API response.');
+            return redirect()->route('productservice.index')->with('error', __('No data found in the API response.'));
+        }
+    }
+
+
+    public function getItemClassifications()
+    {
+        $url = 'https://etims.your-apps.biz/api/GetItemClassificationList?date=20220409120000';
+
+        $response = Http::withHeaders([
+            'key' => '123456'
+        ])->get($url);
+
+        $data = $response->json()['data'];
+
+        \Log::info('API Request Data: ' . json_encode($data));
+        \Log::info('API Response: ' . $response->body());
+        \Log::info('API Response Status Code: ' . $response->status());
+
+        if (isset($data['data'])) {
+            try {
+                foreach ($data['data']['itemList'] as $item) {
+                    ItemInformation::create([
+                        'itemClsCd' => $item['itemClsCd'],
+                        'itemClsNm' => $item['itemClsNm'],
+                        'itemClsLvl' => $item['itemClsLvl'],
+                        'taxTyCd' => $item['taxTyCd'],
+                        'mjrTgYn' => $item['mjrTgYn'],
+                        'useYn' => $item['useYn']
+                    ]);
+                }
+                // return redirect()->back()->with('success', 'Item Information added successfully.');
+                return redirect()->route('productservice.index')->with('success', __('Item Information added successfully created.'));
+            } catch (\Exception $e) {
                 \Log::error('Error adding Item Information from the API: ' . $e->getMessage());
                 // return redirect()->back()->with('error', 'Error adding Item Information from the API.');
                 return redirect()->route('productservice.index')->with('error', __('Error adding Item Information from the API.'));

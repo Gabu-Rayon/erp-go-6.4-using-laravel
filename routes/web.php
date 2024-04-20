@@ -1711,7 +1711,7 @@ Route::get('/code', [CodeController::class, 'getCodesList']);
 Route::get('/getItemClassifications', [ItemClassificationController::class, 'addCategories']);
 Route::get('/details', [DetailsController::class, 'getDetailsList']);
 Route::get('/getnotices', [NoticesListController::class, 'getNoticeList']);
-Route::get('/get-item-information', [GetItemInformationController::class,'getItemInformation']);
+Route::get('/get-item-information', [ProductServiceCategoryController::class,'getItemInformation']);
 Route::group(
     [
         'middleware' => [
@@ -1766,6 +1766,6 @@ Route::group(
         ],
     ],
     function () {
-        Route::resource('iteminformation', GetItemInformationController::class);
+        Route::resource('iteminformation', ProductServiceController::class);
     }
 );
