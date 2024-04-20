@@ -26,16 +26,15 @@
         </a>
 
         <!-- Button to trigger the getItemInformationApi and Synchronize it to my Database() method -->
-        <a href="#" id="synchronizeBtn" data-size="lg"
-            data-url="<?php echo e(route('productservice.synchronize')); ?>" data-ajax-popup="true" data-bs-toggle="tooltip"
-            title="<?php echo e(__('Synchronize')); ?>" class="btn btn-sm btn-primary">
+        <a href="#" id="synchronizeBtn" data-size="lg" data-url="<?php echo e(route('productservice.synchronize')); ?>"
+            data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Synchronize')); ?>" class="btn btn-sm btn-primary">
             <i class="#">Synchronize</i>
         </a>
     </div>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
-       <div class="row">
+    <div class="row">
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-body table-border-style">
@@ -48,7 +47,6 @@
                                     <th><?php echo e(__('Classification Code')); ?></th>
                                     <th><?php echo e(__('Type Code')); ?></th>
                                     <th><?php echo e(__('Name')); ?></th>
-                                    <th><?php echo e(__('Stock Qty')); ?></th>
                                     <th><?php echo e(__('Status')); ?></th>
                                     <th><?php echo e(__('Action')); ?></th>
                                 </tr>
@@ -58,11 +56,10 @@
                                     <tr class="font-style">
                                         <td><?php echo e($item->id); ?></td>
                                         <td><?php echo e($item->itemCd); ?></td>
-                                            <td><?php echo e($item->itemClsCd); ?></td>
+                                        <td><?php echo e($item->itemClsCd); ?></td>
                                         <td><?php echo e($item->itemTyCd); ?></td>
-                                            <td><?php echo e($item->itemNm); ?></td>
-                                        <td><?php echo e($item->sftQty); ?></td>
-                                                                           </tr>
+                                        <td><?php echo e($item->itemNm); ?></td>
+                                    </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                             </tbody>
@@ -74,29 +71,29 @@
     </div>
 <?php $__env->stopSection(); ?>
 <?php $__env->startPush('script-page'); ?>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('synchronizeBtn').addEventListener('click', function() {
-            // Show loading spinner
-            showLoadingSpinner();
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('synchronizeBtn').addEventListener('click', function() {
+                // Show loading spinner
+                showLoadingSpinner();
+            });
+
+            function showLoadingSpinner() {
+                // Create a loading spinner element
+                var spinner = document.createElement('div');
+                spinner.classList.add('spinner-border', 'text-light');
+                spinner.setAttribute('role', 'status');
+
+                // Create a container for the spinner
+                var spinnerContainer = document.createElement('div');
+                spinnerContainer.classList.add('loading-spinner-container');
+                spinnerContainer.appendChild(spinner);
+
+                // Append the spinner container to the body
+                document.body.appendChild(spinnerContainer);
+            }
         });
-
-        function showLoadingSpinner() {
-            // Create a loading spinner element
-            var spinner = document.createElement('div');
-            spinner.classList.add('spinner-border', 'text-light');
-            spinner.setAttribute('role', 'status');
-
-            // Create a container for the spinner
-            var spinnerContainer = document.createElement('div');
-            spinnerContainer.classList.add('loading-spinner-container');
-            spinnerContainer.appendChild(spinner);
-
-            // Append the spinner container to the body
-            document.body.appendChild(spinnerContainer);
-        }
-    });
-</script>
+    </script>
 <?php $__env->stopPush(); ?>
 
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/chrisdroid/Desktop/projects/php/erp-go-6.4-using-laravel/resources/views/productservice/index.blade.php ENDPATH**/ ?>
