@@ -62,11 +62,12 @@
                       </option>
                   <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </select>
-          </div> 
-         <!--  <div class="form-group col-md-6">
+          </div>
+
+          <div class="form-group col-md-6">
               <?php echo e(Form::label('item_classifications', __('Item Classifications Code'), ['class' => 'form-label'])); ?>
 
-              <select name="product_classified_code" class="form-control select2" required="required">
+              <select name="product_classified_code" class="form-control" required="required">
                   <option value="">Select Item Classifications Code</option>
                   <?php $__currentLoopData = $item_classifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item_classification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                       <option value="<?php echo e($item_classification['itemClsCd']); ?>"><?php echo e($item_classification['itemClsNm']); ?>
@@ -77,15 +78,6 @@
                   <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </select>
           </div>
- -->
-           <div class="form-group col-md-6">
-            <?php echo e(Form::label('item_classifications', __('Item Classifications Code'),['class'=>'form-label'])); ?>
-
-            <?php echo e(Form::select('product_classified_code', $item_classifications,null, array('class' => 'form-control select','required'=>'required'))); ?>
-
-        </div>
-
-        
           <div class="col-md-6">
               <div class="form-group">
                   <?php echo e(Form::label('batch_no', __('Batch No'), ['class' => 'form-label'])); ?><span
