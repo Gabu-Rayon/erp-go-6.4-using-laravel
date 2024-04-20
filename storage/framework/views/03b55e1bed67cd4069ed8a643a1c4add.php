@@ -49,7 +49,7 @@
                 <ul class="dash-submenu">
                     <?php if(Gate::check('manage product & service')): ?>
                         <li class="dash-item <?php echo e(Request::segment(1) == 'basicdata' ? 'active' : ''); ?>">
-                            <a href="<?php echo e(route('basicdata.index')); ?>"
+                            <a href="<?php echo e(route('noticelist.index')); ?>"
                                 class="dash-link"><?php echo e(__('Notices List')); ?>
 
                             </a>
@@ -57,7 +57,7 @@
                     <?php endif; ?>
                     <?php if(Gate::check('manage product & service')): ?>
                         <li class="dash-item <?php echo e(Request::segment(1) == 'branchlist' ? 'active' : ''); ?>">
-                            <a href="#"
+                            <a href="<?php echo e(route('brancheslist.index')); ?>"
                                 class="dash-link"><?php echo e(__('Branch List')); ?>
 
                             </a>
@@ -74,7 +74,6 @@
                 </ul>
             </li>
         <?php endif; ?>
-
         <!--------------------- End Products System ----------------------------------->
 
 
@@ -1282,9 +1281,9 @@
                 </a>
                 <ul class="dash-submenu">
                     <?php if(Gate::check('manage product & service')): ?>
-                        <li class="dash-item <?php echo e(Request::segment(1) == 'productservice' ? 'active' : ''); ?>">
-                            <a href="<?php echo e(route('productservice.index')); ?>"
-                                class="dash-link"><?php echo e(__('Product & Services')); ?>
+                        <li class="dash-item <?php echo e(Request::segment(1) == 'getiteminformation' ? 'active' : ''); ?>">
+                            <a href="<?php echo e(route('productservice.getiteminformation')); ?>"
+                                class="dash-link"><?php echo e(__('Products & Services')); ?>
 
                             </a>
                         </li>
@@ -1293,14 +1292,6 @@
                         <li class="dash-item <?php echo e(Request::segment(1) == 'getcodelist' ? 'active' : ''); ?>">
                             <a href="<?php echo e(route('productservice.getcodelist')); ?>"
                                 class="dash-link"><?php echo e(__('Code List')); ?>
-
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                    <?php if(Gate::check('manage product & service')): ?>
-                        <li class="dash-item <?php echo e(Request::segment(1) == 'getiteminformation' ? 'active' : ''); ?>">
-                            <a href="<?php echo e(route('productservice.getiteminformation')); ?>"
-                                class="dash-link"><?php echo e(__('Item Information')); ?>
 
                             </a>
                         </li>
@@ -1404,7 +1395,7 @@
             <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'api-initialization' ? 'active' : ''); ?>">
                 <a href="<?php echo e(route('apiinitialization.index')); ?>" class="dash-link">
                     <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
-                        class="dash-mtext"><?php echo e(__('API Initialization')); ?></span>
+                        class="dash-mtext"><?php echo e(__('Initialization')); ?></span>
                 </a>
             </li>
             <li
