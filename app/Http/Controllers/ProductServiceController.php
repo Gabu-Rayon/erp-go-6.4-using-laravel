@@ -357,7 +357,6 @@ class ProductServiceController extends Controller
         $iteminformation = ItemInformation::find($id);
         return view('productservice.show', compact('iteminformation'));
     }
-
     // public function edit($id)
     // {
     //     $productService = ProductService::find($id);
@@ -1346,32 +1345,6 @@ class ProductServiceController extends Controller
     {
         try {
             // Fetch local items  information
-            // $localiteminfo = ItemInformation::select(
-            //     'tin',
-            //     'itemCd',
-            //     'itemClsCd',
-            //     'itemTyCd',
-            //     'itemNm',
-            //     'itemStdNm',
-            //     'orgnNatCd',
-            //     'pkgUnitCd',
-            //     'qtyUnitCd',
-            //     'taxTyCd',
-            //     'btchNo',
-            //     'regBhfId',
-            //     'bcd',
-            //     'dftPrc',
-            //     'grpPrcL1',
-            //     'grpPrcL1',
-            //     'grpPrcL2',
-            //     'grpPrcL3',
-            //     'grpPrcL4',
-            //     'grpPrcL5',
-            //     'addInfo',
-            //     'sftyQty',
-            //     'isrcAplcbYn',
-            //     'useYn'
-            // )->get();
             $localiteminfo = ItemInformation::select(
                 'tin',
                 'itemCd',
@@ -1418,7 +1391,8 @@ class ProductServiceController extends Controller
             });
 
             if (empty($newItemsInfo)) {
-                return redirect()->back()->with('info', __('No new items to be added from the API Items are up to date'));
+                \Log::info('No new items Information to be added from the API Items are up to date');
+                return response()->json(['info' => 'No new items Information to be added from the API Items are up to date']);
             }
 
             foreach ($newItemsInfo as $item) {
@@ -1449,98 +1423,18 @@ class ProductServiceController extends Controller
                     'useYn' => $item['useYn']
                 ]);
             }
-            return redirect()->route('productservice.index')->with('success', __('Synchronizing Item Informations from the API successfully successfully.'));
+            \Log::info('Synchronizing Item Informations from the API successfully successfully');
+            return response()->json(['success' => 'Synchronizing Item Informations from the API successfully successfully']);
         } catch (\Exception $e) {
             \Log::error('Error Synchronizing Item Informations from the API: ' . $e->getMessage());
-            return redirect()->back()->with('error', __('Error Synchronizing Item Informations from the API !'));
+            return response()->json(['error' => 'Error Synchronizing Item Informations from the API']);
         }
     }
-
-    // public function synchronizeItemClassifications()
-    // {
-
-    //     try {
-    //         // $hiddenIdItems = ItemClassification::all();
-    //         // $iteminfo = $hiddenIdItems->makeHidden(['id', 'updated_at', 'created_at']);
-    //         // $iteminfo = ItemClassification::select('itemClsCd', 'itemClsNm', 'itemClsLvl', 'taxTyCd', 'mjrTgYn', 'useYn')->get();
-    //         $iteminformations = ItemClassification::pluck('itemClsCd', 'itemClsNm')->pluck('itemClsLvl', 'taxTyCd')->pluck('mjrTgYn', 'useYn');
-    //         $localData = [];
-
-    //         foreach ($iteminformations as $iteminfo) {
-    //             $localData[] = [
-    //                 'itemClsCd' => $iteminfo->itemClsCd,
-    //                 'itemClsNm' => $iteminfo->itemClsNm,
-    //                 'itemClsLvl' => $iteminfo->itemClsLvl,
-    //                 'taxTyCd' => $iteminfo->taxTyCd,
-    //                 'mjrTgYn' => $iteminfo->mjrTgYn,
-
-    //                 'useYn' => $iteminfo->useYn,
-    //             ];
-    //         }
-    //         // $array is now an array of the format [{},{},{}]
-
-    //         $url = 'https://etims.your-apps.biz/api/GetItemClassificationList?date=20220409120000';
-
-    //         $response = Http::withHeaders([
-    //             'key' => '123456'
-    //         ])->get($url);
-
-    //         $data = $response->json()['data'];
-    //         $remoterecords = $data['data']['itemClsList'];
-
-    //         \Log::info('API Request Data: ' . json_encode($data));
-    //         \Log::info('API Request Data: ' . json_encode($remoterecords));
-    //         \Log::info('API Response: ' . $response->body());
-    //         \Log::info('API Response Status Code: ' . $response->status());
-
-    //         // Compare local and remote classifications
-    //         $newClassifications = array_diff($remoterecords, $localData);
-    //         foreach ($newClassifications as $item) {
-    //             ItemClassification::create([
-    //                     'itemClsCd' => $item['itemClsCd'],
-    //                     'itemClsNm' => $item['itemClsNm'],
-    //                     'itemClsLvl' => $item['itemClsLvl'],
-    //                     'taxTyCd' => $item['taxTyCd'],
-    //                     'mjrTgYn' => $item['mjrTgYn'],
-    //                     'useYn' => $item['useYn']
-    //             ]);
-    //         }
-    //         // if (isset($remoterecords) && isset($localData)) {
-    //         //     $dup = collect($remoterecords)->diff($localData);
-    //         //     foreach ($dup as $item) {
-    //         //         ItemClassification::create([
-    //         //             'itemClsCd' => $item['itemClsCd'],
-    //         //             'itemClsNm' => $item['itemClsNm'],
-    //         //             'itemClsLvl' => $item['itemClsLvl'],
-    //         //             'taxTyCd' => $item['taxTyCd'],
-    //         //             'mjrTgYn' => $item['mjrTgYn'],
-    //         //             'useYn' => $item['useYn']
-    //         //         ]);
-    //         //     }
-    //         // }
-    //         return redirect()->back()->with('success', 'Synchronizing Item Classifications from the API successfully,');
-    //         // return redirect()->route('productservice.classifications')->with('success', __('Synchronizing Item Classifications from the API successfully.'));
-    //     } catch (\Exception $e) {
-    //         //  adding Item Classification from the API: Array to string conversion  
-    //         \Log::error('Error synchronizing Item Classifications from the API: ' . $e);
-    //         return redirect()->back()->with('error', __('Error synchronizing Item Classifications from the API!'));
-    //         //  return redirect()->route('productservice.classifications')->with('success', __('Error synchronizing Item Classifications from the API.'));
-    //     }
-
-    // }
     public function synchronizeItemClassifications()
     {
 
         try {
             // Fetch local item classifications
-            // $localClassifications = ItemClassification::select(
-            //     'itemClsCd',
-            //     'itemClsNm',
-            //     'itemClsLvl',
-            //     'taxTyCd',
-            //     'mjrTgYn',
-            //     'useYn'
-            // )->get();
             $localClassifications = ItemClassification::select(
                 'itemClsCd',
                 'itemClsNm',
@@ -1554,13 +1448,9 @@ class ProductServiceController extends Controller
 
             // Fetch remote item classifications
             $url = 'https://etims.your-apps.biz/api/GetItemClassificationList?date=20220409120000';
-            // $response = Http::withHeaders([
-            //     'key' => '123456'
-            // ])->get($url);
-
             $response = Http::withHeaders([
-                'key' => '123456'])
-                ->timeout(60)->get($url); 
+                'key' => '123456'
+            ])->get($url);
 
             $data = $response->json()['data'];
             $remoteClassifications = $data['data']['itemClsList'];

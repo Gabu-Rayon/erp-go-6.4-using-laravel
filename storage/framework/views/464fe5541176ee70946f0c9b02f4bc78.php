@@ -16,11 +16,11 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('action-btn'); ?>
-    <div class="float-end">
-       <a href="#" data-size="lg" data-url="<?php echo e(route('iteminformation.create')); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Create Item Information')); ?>" data-title="<?php echo e(__('Create Item Information')); ?>" class="btn btn-sm btn-primary">
-            <i class="ti ti-plus"></i>
-        </a>
-    </div>
+<div class="float-end">
+    <button class="btn btn-sm btn-primary sync">
+        <i class="#">Synchronize</i>
+    </button>
+</div>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -61,4 +61,49 @@
 <?php $__env->stopSection(); ?>
 
 
+<?php $__env->startPush('script-page'); ?>
+    <script>
+        const sync = document.querySelector('.sync');
+        sync.addEventListener('click', async function(){
+            try {
+                const response = await fetch('http://localhost:8000/productservice/synccodelist', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+            const data = await response.json();
+            
+            console.log('success');
+            const popup = document.createElement('div');
+            popup.classList.add('alert', 'alert-success');
+            popup.innerHTML = data.info || data.success || 'Synced Successfully';
+            popup.style.position = 'absolute';
+            popup.style.top = '50%';
+            popup.style.left = '50%';
+            popup.style.transform = 'translate(-50%, -50%)';
+            popup.style.zIndex = '9999';
+            document.body.appendChild(popup);
+            setTimeout(() => {
+                location.reload();
+            }, 3000);
+            } catch (error) {
+                console.log('error');
+                const popup = document.createElement('div');
+                popup.classList.add('alert', 'alert-danger');
+                popup.innerHTML = data.error || 'Sync Failed';
+                popup.style.position = 'absolute';
+                popup.style.top = '50%';
+                popup.style.left = '50%';
+                popup.style.transform = 'translate(-50%, -50%)';
+                popup.style.zIndex = '9999';
+                document.body.appendChild(popup);
+                setTimeout(() => {
+                    location.reload();
+                }, 3000);
+            }
+        });
+    </script>
+<?php $__env->stopPush(); ?>
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/productservice/getcodelist.blade.php ENDPATH**/ ?>

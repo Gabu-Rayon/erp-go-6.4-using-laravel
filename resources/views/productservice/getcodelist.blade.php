@@ -79,8 +79,8 @@
             popup.classList.add('alert', 'alert-success');
             popup.innerHTML = data.info || data.success || 'Synced Successfully';
             popup.style.position = 'absolute';
-            popup.style.top = '5';
-            popup.style.left = '5';
+            popup.style.top = '50%';
+            popup.style.left = '50%';
             popup.style.transform = 'translate(-50%, -50%)';
             popup.style.zIndex = '9999';
             document.body.appendChild(popup);
@@ -93,8 +93,8 @@
                 popup.classList.add('alert', 'alert-danger');
                 popup.innerHTML = data.error || 'Sync Failed';
                 popup.style.position = 'absolute';
-                popup.style.top = '5';
-                popup.style.left = '5';
+                popup.style.top = '50%';
+                popup.style.left = '50%';
                 popup.style.transform = 'translate(-50%, -50%)';
                 popup.style.zIndex = '9999';
                 document.body.appendChild(popup);
