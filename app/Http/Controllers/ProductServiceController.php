@@ -1579,7 +1579,7 @@ class ProductServiceController extends Controller
                 \Log::info('No new item Classification  to be added from the API Item Classification are up to date'); 
                 return response()->json(['info' => 'No new item Classification  to be added from the API Item Classification are up to date']);
             }
-
+            
             // Insert new classifications
             foreach ($newClassifications as $classification) {
                 if (!is_null($classification)) {
