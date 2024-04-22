@@ -36,7 +36,7 @@ class ApiInitializationController extends Controller
     }
 
     
-    public function addexisting() {
+    public function addExisting() {
         return view('apiinitialization.addexisting');
     }
 
@@ -112,13 +112,6 @@ class ApiInitializationController extends Controller
         
         return redirect()->route('apiinitialization.index')->with('success', __('Successfully Initialized.'));
     }
-
-    public function edit() {
-        redirect()->back()->with('error', 'This feature is not available');
-    }
-
-
-
 
  
 }
