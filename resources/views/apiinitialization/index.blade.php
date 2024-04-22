@@ -17,10 +17,7 @@
 @section('action-btn')
     <div class="float-end">
         <a href="#" data-url="{{ route('apiinitialization.create') }}" class="btn btn-sm btn-primary" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Create New Initialization')}}">
-            <i class="ti ti-plus"></i>
-        </a>
-        <a href="{{ route('apiinitialization.addexisting') }}" class="btn btn-sm btn-primary" title="{{__('Add Existing Initialization')}}">
-            <i class="ti ti-pencil"></i>
+            Initialization New
         </a>
     </div>
 @endsection

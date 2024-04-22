@@ -17,8 +17,8 @@
 
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
-       <a href="#" data-size="lg" data-url="<?php echo e(route('apiinitialization.create')); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Create')); ?>" data-title="<?php echo e(__('Create API Initialization')); ?>" class="btn btn-sm btn-primary">
-            <i class="ti ti-plus"></i>
+        <a href="#" data-url="<?php echo e(route('apiinitialization.create')); ?>" class="btn btn-sm btn-primary" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Create New Initialization')); ?>">
+            Initialization New
         </a>
     </div>
 <?php $__env->stopSection(); ?>

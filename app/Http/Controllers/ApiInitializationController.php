@@ -34,11 +34,7 @@ class ApiInitializationController extends Controller
     public function create () {
         return view('apiinitialization.create');
     }
-
     
-    public function addExisting() {
-        return view('apiinitialization.addexisting');
-    }
 
     public function store (Request $request) {
 
@@ -67,7 +63,6 @@ class ApiInitializationController extends Controller
                 'bhfId' => $bhfId,
                 'dvcSrlNo' => $devicesrlno
             ]);
-
             // Log::info($response->body());
 
             $data = $response->json();
@@ -76,7 +71,6 @@ class ApiInitializationController extends Controller
                 \Log::info($data);
                 return redirect()->back()->with('error', $data['data']['resultMsg']);
             }
-
             $apiInitialization = new ApiInitialization();
             $apiInitialization->tin = $data['tin'];
             $apiInitialization->bhfId = $data['bhfId'];

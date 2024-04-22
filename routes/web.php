@@ -1425,8 +1425,6 @@ Route::group(['middleware' => ['verified']], function () {
             Route::resource('apiinitialization', ApiInitializationController::class);
         },
     );
-    
-    
 
     Route::resource('competencies', CompetenciesController::class)->middleware(['auth', 'XSS']);
 
@@ -1773,7 +1771,3 @@ Route::group(
         Route::resource('iteminformation', ProductServiceController::class);
     }
 );
-
-
-
-Route::get('apiinitialization/addexisting', [ApiInitializationController::class, 'addExisting'])->name('apiinitialization.addexisting');

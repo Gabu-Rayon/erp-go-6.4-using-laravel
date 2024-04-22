@@ -506,7 +506,36 @@ class ProductServiceController extends Controller
             ]);
 
             $url = 'https://etims.your-apps.biz/api/UpdateItem';
-
+            //Mapped the into 
+            /****
+             * [
+{
+  "itemCode": "string",
+  "itemClassifiCode": "string",
+  "itemTypeCode": "string",
+  "itemName": "string",
+  "itemStrdName": "string",
+  "countryCode": "string",
+  "pkgUnitCode": "string",
+  "qtyUnitCode": "string",
+  "taxTypeCode": "string",
+  "batchNo": "string",
+  "barcode": "string",
+  "unitPrice": 0,
+  "group1UnitPrice": 0,
+  "group2UnitPrice": 0,
+  "group3UnitPrice": 0,
+  "group4UnitPrice": 0,
+  "group5UnitPrice": 0,
+  "additionalInfo": "string",
+  "saftyQuantity": 0,
+  "isInrcApplicable": true,
+  "isUsed": true,
+  "quantity": 0,
+  "packageQuantity": 0
+}
+]
+             */
             $response = Http::withHeaders([
                 'accept' => 'application/json',
                 'Content-Type' => 'application/json',
@@ -1282,7 +1311,8 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function syncCodeList () {
+    public function syncCodeList()
+    {
         try {
             $localcodes = Code::select(
                 'cdCls',
@@ -1297,8 +1327,9 @@ class ProductServiceController extends Controller
             $url = 'https://etims.your-apps.biz/api/GetCodeList?date=20210101120000';
 
             $response = Http::withHeaders([
-                'key' => '123456'])
-                ->timeout(60)->get($url); 
+                'key' => '123456'
+            ])
+                ->timeout(60)->get($url);
 
             $data = $response->json()['data'];
             $remotecodes = $data['data']['clsList'];
@@ -1314,7 +1345,7 @@ class ProductServiceController extends Controller
             });
 
             if (empty($newcodes)) {
-                \Log::info('No new Code List  to be added from the API Code Lists are up to date'); 
+                \Log::info('No new Code List  to be added from the API Code Lists are up to date');
                 return response()->json(['info' => 'No new Code List  to be added from the API Code Lists are up to date']);
             }
 
@@ -1331,10 +1362,10 @@ class ProductServiceController extends Controller
                         'userDfnNm3' => $code['userDfnNm3']
                     ]);
                 }
-            }            
+            }
             \Log::info('Synchronizing Code Lists from the API successfully');
             return response()->json(['success' => 'Synchronizing Code Lists from the API successfully']);
-        
+
         } catch (\Exception $e) {
             \Log::error('Error synchronizing Item Classifications from the API: ' . $e);
             return response()->json(['error' => 'Error synchronizing Code Lists from the API']);
@@ -1466,10 +1497,10 @@ class ProductServiceController extends Controller
             });
 
             if (empty($newClassifications)) {
-                \Log::info('No new item Classification  to be added from the API Item Classification are up to date'); 
+                \Log::info('No new item Classification  to be added from the API Item Classification are up to date');
                 return response()->json(['info' => 'No new item Classification  to be added from the API Item Classification are up to date']);
             }
-            
+
             // Insert new classifications
             foreach ($newClassifications as $classification) {
                 if (!is_null($classification)) {
@@ -1482,16 +1513,16 @@ class ProductServiceController extends Controller
                         'useYn' => $classification['useYn']
                     ]);
                 }
-            }            
+            }
             \Log::info('Synchronizing Item Classifications from the API successfully');
             return response()->json(['success' => 'Synchronizing Item Classifications from the API successfully']);
-        
+
         } catch (\Exception $e) {
             \Log::error('Error synchronizing Item Classifications from the API: ' . $e);
             return response()->json(['error' => 'Error synchronizing Item Classifications from the API']);
         }
     }
-        public function getCodeList()
+    public function getCodeList()
     {
 
         $codelists = Code::all();
