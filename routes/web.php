@@ -402,6 +402,7 @@ Route::group(['middleware' => ['verified']], function () {
     Route::get('productservice/synchronize', [ProductServiceController::class, 'synchronize'])->name('productservice.synchronize');
     // productservice.synchronizeitemclassifications
       Route::get('productservice/synchronizeitemclassifications', [ProductServiceController::class, 'synchronizeItemClassifications'])->name('productservice.synchronizeitemclassifications');
+      Route::get('productservice/synccodelist', [ProductServiceController::class, 'syncCodeList'])->name('productservice.synccodelist');
    
       
     Route::get('productservice/getcodelist', [ProductServiceController::class, 'getCodeList'])->name('productservice.getcodelist');
