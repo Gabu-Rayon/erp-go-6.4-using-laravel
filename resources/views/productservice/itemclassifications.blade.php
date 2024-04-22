@@ -10,11 +10,9 @@
 @endsection
 @section('action-btn')
     <div class="float-end">
-                <!-- Button to trigger the getItemInformationApi and Synchronize it to my Database() method -->
-       <a href="#" id="synchronizeBtn" data-size="lg" data-url="{{ route('productservice.synchronizeitemclassifications') }}"
-            data-ajax-popup="true" data-bs-toggle="tooltip" title="{{ __('Synchronize Item Classifications') }}" class="btn btn-sm btn-primary">
+        <button class="btn btn-sm btn-primary sync">
             <i class="#">Synchronize</i>
-        </a>
+        </button>
     </div>
 @endsection
 @section('content')
@@ -54,3 +52,48 @@
     </div>
 @endsection
 
+@push('script-page')
+<script>
+        const sync = document.querySelector('.sync');
+        sync.addEventListener('click', async function(){
+            try {
+                const response = await fetch('http://localhost:8000/productservice/synchronizeitemclassifications', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+            const data = await response.json();
+            
+            console.log('success');
+            const popup = document.createElement('div');
+            popup.classList.add('alert', 'alert-success');
+            popup.innerHTML = data.info || data.success || 'Synced Successfully';
+            popup.style.position = 'absolute';
+            popup.style.top = '5';
+            popup.style.left = '5';
+            popup.style.transform = 'translate(-50%, -50%)';
+            popup.style.zIndex = '9999';
+            document.body.appendChild(popup);
+            setTimeout(() => {
+                location.reload();
+            }, 3000);
+            } catch (error) {
+                console.log('error');
+                const popup = document.createElement('div');
+                popup.classList.add('alert', 'alert-danger');
+                popup.innerHTML = data.error || 'Sync Failed';
+                popup.style.position = 'absolute';
+                popup.style.top = '5';
+                popup.style.left = '5';
+                popup.style.transform = 'translate(-50%, -50%)';
+                popup.style.zIndex = '9999';
+                document.body.appendChild(popup);
+                setTimeout(() => {
+                    location.reload();
+                }, 3000);
+            }
+        });
+    </script>
+@endpush
