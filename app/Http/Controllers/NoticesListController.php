@@ -11,12 +11,14 @@ class NoticesListController extends Controller
 
     public function index()
     {
-
-
-        $notices = Notice::all();
+     
+        $notices = Notice::latest()->first();
 
         return view('noticelist.index', compact('notices'));
     }
+
+    
+
 
     public function getNoticeList()
     {

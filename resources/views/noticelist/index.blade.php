@@ -34,17 +34,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($notices as $notice)
+                                @if ($notices)
                                     <tr class="font-style">
-                                        <td>{{$notice->id }}</td>
-                                        <td>{{ $notice->noticeNo }}</td>
-                                        <td>{{$notice->title }}</td>
-                                        <td>{{$notice->cont }}</td>
-                                        <td>{{$notice->regrNm }}</td>
-                                        <td>{{$notice->dtlUrl }}</td>
+                                        <td>{{ $notices->id }}</td>
+                                        <td>{{ $notices->noticeNo }}</td>
+                                        <td>{{ $notices->title }}</td>
+                                        <td>{{ $notices->cont }}</td>
+                                        <td>{{ $notices->regrNm }}</td>
+                                        <td>{{ $notices->dtlUrl }}</td>
                                     </tr>
-                                @endforeach
-
+                                @else
+                                  
+                                @endif
                             </tbody>
                         </table>
                     </div>
@@ -55,38 +56,38 @@
 @endsection
 
 @push('script-page')
-<script>
+    <script>
         const sync = document.querySelector('.sync');
-        sync.addEventListener('click', async function(){
+        sync.addEventListener('click', async function() {
             try {
                 const loader = document.createElement('div');
                 loader.classList.add('spinner-border', 'text-light', 'spinner-border-sm');
                 loader.role = 'status';
                 sync.appendChild(loader);
                 const response = await fetch('http://localhost:8000/noticeslist/synchronize', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            });
-            const data = await response.json();
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
 
-            sync.removeChild(loader);
-            
-            console.log('success');
-            const popup = document.createElement('div');
-            popup.classList.add('alert', 'alert-success');
-            popup.innerHTML = data['message'] || 'Synced Successfully';
-            popup.style.position = 'absolute';
-            popup.style.top = '50%';
-            popup.style.left = '50%';
-            popup.style.transform = 'translate(-50%, -50%)';
-            popup.style.zIndex = '9999';
-            document.body.appendChild(popup);
-            setTimeout(() => {
-                location.reload();
-            }, 3000);
+                sync.removeChild(loader);
+
+                console.log('success');
+                const popup = document.createElement('div');
+                popup.classList.add('alert', 'alert-success');
+                popup.innerHTML = data['message'] || 'Synced Successfully';
+                popup.style.position = 'absolute';
+                popup.style.top = '50%';
+                popup.style.left = '50%';
+                popup.style.transform = 'translate(-50%, -50%)';
+                popup.style.zIndex = '9999';
+                document.body.appendChild(popup);
+                setTimeout(() => {
+                    location.reload();
+                }, 3000);
             } catch (error) {
                 console.log('error');
                 const popup = document.createElement('div');
@@ -105,4 +106,3 @@
         });
     </script>
 @endpush
-
