@@ -29,10 +29,9 @@
         </a>
 
         <!-- Button to trigger the getItemInformationApi and Synchronize it to my Database() method -->
-        <a href="#" id="synchronizeBtn" data-size="lg" data-url="{{ route('productservice.synchronize') }}"
-            data-ajax-popup="true" data-bs-toggle="tooltip" title="{{ __('Synchronize') }}" class="btn btn-sm btn-primary">
+        <button class="btn btn-sm btn-primary sync">
             <i class="#">Synchronize</i>
-        </a>
+        </button>
     </div>
 @endsection
 
@@ -100,6 +99,7 @@
                 }
             });
             const data = await response.json();
+            console.log(data);
 
             sync.removeChild(loader);
             

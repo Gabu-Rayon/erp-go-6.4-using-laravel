@@ -48,7 +48,10 @@ class CompositionListController extends Controller
             // Prepare the data to be sent to the API
             $data = [
                 'mainItemCode' => $request->input('main_item_code'),
-                'compositionItems' => [],
+                'compositionItems' => [
+                    // Array to hold the composition items
+
+                ],
             ];
 
             // Get the composition item codes and quantities
@@ -68,7 +71,11 @@ class CompositionListController extends Controller
                 ];
             }
 
-            
+            CompositionList::create([
+                'main_item_code' => $request->input('main_item_code'),
+                'composition_item_code' => $compositionItemCodes,
+                'composition_item_quantity' => $compositionItemQuantities,
+            ]);
 
             // Send the POST request to the API endpoint
             $response = Http::withHeaders([
