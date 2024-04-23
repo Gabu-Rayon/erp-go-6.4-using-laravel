@@ -1,5 +1,5 @@
 
-<?php echo e(Form::model($iteminformation, array('route' => array('iteminformation.update', $iteminformation->id), 'method' => 'PUT'))); ?>
+<?php echo e(Form::model($iteminformation, array('route' => array('productservice.update', $iteminformation->id), 'method' => 'PUT'))); ?>
 
 <div class="modal-body">
     <div class="row">
