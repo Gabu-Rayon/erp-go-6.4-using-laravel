@@ -8,14 +8,15 @@ use App\Models\Notice;
 
 class NoticeController extends Controller
 {
-    
 
-    public function index(){
+/****
+    public function index()
+    {
 
 
-        $notices =  Notice::all();
+        $notices = Notice::all();
 
-        return view('basicdata.index',compact('notices'));
+        return view('noticelist.index', compact('notices'));
     }
 
     public function getNoticeList()
@@ -48,4 +49,62 @@ class NoticeController extends Controller
             ], 500);
         }
     }
+    public function synchronize()
+    {
+
+        try {
+            // Fetch local item classifications
+            $localNoticeLists = Notice::select(
+                'noticeNo',
+                'title',
+                'cont',
+                'dtlUrl',
+                'regrNm',
+                'regDt'
+            )->get()->toArray();
+            // Fetch remote item classifications
+            $url = 'https://etims.your-apps.biz/api/GetNoticeList?date=20210101120000';
+            $response = Http::withHeaders([
+                'key' => '123456'
+            ])->get($url);
+
+            $data = $response->json()['data'];
+            $remoteNoticeLists = $data['data']['data']['noticeList'];
+            // Log API request data, response, and status code
+            \Log::info('API Request Data: ' . json_encode($data));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+
+            // Compare local and remote classifications
+            $newNoticeLists = array_udiff($remoteNoticeLists, $localNoticeLists, function ($a, $b) {
+                return $a['noticeNo'] <=> $b['noticeNo'];
+            });
+
+            if (empty($newClassifications)) {
+                \Log::info('No new Notice List  to be added from the API Notice Lists are up to date');
+                return response()->json(['info' => 'No new Notice List to be added from the API  Notice Lists are up to date']);
+            }
+
+            // Insert new classifications
+            foreach ($newNoticeLists as $notice) {
+                if (!is_null($notice)) {
+                    Notice::create([
+                        'NoticeNo' => $notice['NoticeNo'],
+                        'title' => $notice['title'],
+                        'cont' => $notice['cont'],
+                        'dtlUrl' => $notice['dtlUrl'],
+                        'regrNm' => $notice['regrNm'],
+                        'regDt' => $notice['regDt']
+                    ]);
+                }
+            }
+            \Log::info('Synchronizing  Notice Lists from the API successfully');
+            return response()->json(['success' => 'Synchronizing Notice Lists from the API successfully']);
+
+        } catch (\Exception $e) {
+            \Log::error('Error synchronizing Notice Lists from the API: ' . $e);
+            return response()->json(['error' => 'Error synchronizing  Notice Lists from the API']);
+        }
+    }
+    *****/
 }
