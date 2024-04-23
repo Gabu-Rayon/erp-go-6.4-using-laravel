@@ -49,7 +49,10 @@ class NoticesListController extends Controller
         }
     }
 
-     public function show(){
+     //to show the  show blade page 
+
+
+    public function show(){
         
      }
      

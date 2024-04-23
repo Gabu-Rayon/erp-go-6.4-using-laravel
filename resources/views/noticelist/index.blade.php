@@ -11,10 +11,9 @@
 @section('action-btn')
     <div class="float-end">
         <!-- Button to trigger the getNoticeListsApi and Synchronize it to my Database() method -->
-        <a href="#" id="synchronizeBtn" data-size="lg" data-url="{{ route('noticelist.synchronize') }}"
-            data-ajax-popup="true" data-bs-toggle="tooltip" title="{{ __('Synchronize') }}" class="btn btn-sm btn-primary">
+        <button class="btn btn-sm btn-primary sync">
             <i class="#">Synchronize</i>
-        </a>
+        </button>
     </div>
 @endsection
 @section('content')
