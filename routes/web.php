@@ -160,6 +160,8 @@ use App\Http\Controllers\ProductServiceCategoryController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
+use App\Http\Controllers\PurchaseSalesController;
+
 
 
 /*
@@ -1771,3 +1773,5 @@ Route::group(
         Route::resource('iteminformation', ProductServiceController::class);
     }
 );
+
+Route::get('/getpurchasesales', [PurchaseSalesController::class, 'getPurchaseSales']);

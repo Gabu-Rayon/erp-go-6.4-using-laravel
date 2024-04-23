@@ -25,6 +25,7 @@
 @section('content')
 {{ Form::open(array('url' => 'compositionlist','enctype'=>"multipart/form-data")) }}
 <div class="modal-body">
+    Indeksiiii
     {{-- start for ai module--}}
     @php
         $plan= \App\Models\Utility::getChatGPTSettings();
@@ -41,7 +42,7 @@
     <div class="row">
         <div class="form-group col-md-12">
             {{ Form::label('main_item_code', __('Main Item Code'),['class'=>'form-label']) }}
-            {{ Form::text('main_item_code', '', array('class' => 'form-control ','required'=>'required')) }}
+            {{ Form::select('itemCd', $iteminfo, null, array('class' => 'form-control select2','placeholder'=>__('Select Item'),'required'=>'required')) }}
         </div>
         <div class="form-group col-md-12">
             {{ Form::label('composition_item_code', __('Composition Item Code'),['class'=>'form-label']) }}

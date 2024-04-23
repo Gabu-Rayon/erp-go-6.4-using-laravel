@@ -8,13 +8,15 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use App\Models\CompositionItem;
 use App\Models\MainItem;
+use App\Models\ItemInformation;
 
 class CompositionListController extends Controller
 {
     //
     public function index()
     {
-        return view('compositionlist.index');
+        $iteminfo = ItemInformation::all()->pluck('itemCd', 'itemNm');
+        return view('compositionlist.index', compact('iteminfo'));
     }
 
     public function create()
