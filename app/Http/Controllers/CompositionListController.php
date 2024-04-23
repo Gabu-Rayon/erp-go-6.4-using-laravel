@@ -6,8 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
-use App\Models\CompositionItem;
-use App\Models\MainItem;
+use App\Models\CompositionList;
 use App\Models\ItemInformation;
 
 class CompositionListController extends Controller
@@ -15,13 +14,19 @@ class CompositionListController extends Controller
     //
     public function index()
     {
-        $iteminfo = ItemInformation::all()->pluck('itemCd', 'itemNm');
-        return view('compositionlist.index', compact('iteminfo'));
+        $compositionslist = CompositionList::all();
+        return view('compositionlist.index', compact('compositionslist'));
     }
 
     public function create()
     {
-        return view('compositionlist.create');
+        try {
+            $iteminfo = ItemInformation::all()->pluck('itemCd', 'itemNm');
+            return view('compositionlist.create', compact('iteminfo'));
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while fetching data');
+        }
     }
 
 
