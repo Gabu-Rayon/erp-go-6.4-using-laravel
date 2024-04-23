@@ -39,9 +39,9 @@
                         <tbody class="list">
                         <?php $__currentLoopData = $compositionslist; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $compositionlist): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <tr>
-                                <td><?php echo e($compositionlist->main_item_code); ?></td>
-                                <td><?php echo e($compositionlist->composition_item_code); ?></td>
-                                <td><?php echo e($compositionlist->composition_item_quantity); ?></td>
+                                <td><?php echo e($compositionlist->mainItemCode); ?></td>
+                  <td><?php echo e(json_decode($compositionlist->compositionItems, true)[0]['compoItemCode']); ?></td>
+            <td><?php echo e(json_decode($compositionlist->compositionItems, true)[0]['compoItemQty']); ?></td>
                             </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>

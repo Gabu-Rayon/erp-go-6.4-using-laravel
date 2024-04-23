@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use App\Models\CompositionList;
 use App\Models\ItemInformation;
+use App\Models\ItemType;
 
 class CompositionListController extends Controller
 {
@@ -23,7 +24,8 @@ class CompositionListController extends Controller
     {
         try {
             $iteminfo = ItemInformation::all()->pluck('itemCd', 'itemNm');
-            return view('compositionlist.create', compact('iteminfo'));
+            $itemtypes = ItemType::all()->pluck('item_type_name', 'item_type_code');
+            return view('compositionlist.create', compact('iteminfo', 'itemtypes'));
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             return redirect()->back()->with('error', 'An error occurred while fetching data');
