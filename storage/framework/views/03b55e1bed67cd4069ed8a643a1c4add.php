@@ -1281,8 +1281,8 @@
                 </a>
                 <ul class="dash-submenu">
                     <?php if(Gate::check('manage product & service')): ?>
-                        <li class="dash-item <?php echo e(Request::segment(1) == 'getiteminformation' ? 'active' : ''); ?>">
-                            <a href="<?php echo e(route('productservice.getiteminformation')); ?>"
+                        <li class="dash-item <?php echo e(Request::segment(1) == 'index' ? 'active' : ''); ?>">
+                            <a href="<?php echo e(route('productservice.index')); ?>"
                                 class="dash-link"><?php echo e(__('Products & Services')); ?>
 
                             </a>
@@ -1292,6 +1292,14 @@
                         <li class="dash-item <?php echo e(Request::segment(1) == 'getcodelist' ? 'active' : ''); ?>">
                             <a href="<?php echo e(route('productservice.getcodelist')); ?>"
                                 class="dash-link"><?php echo e(__('Code List')); ?>
+
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                      <?php if(Gate::check('manage product & service')): ?>
+                        <li class="dash-item <?php echo e(Request::segment(1) == 'itemclassifications' ? 'active' : ''); ?>">
+                            <a href="<?php echo e(route('productservice.classifications')); ?>"
+                                class="dash-link"><?php echo e(__('Item Classifications')); ?>
 
                             </a>
                         </li>
