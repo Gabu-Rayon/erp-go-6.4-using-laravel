@@ -20,7 +20,7 @@
         </div>
         <div class="form-group col-md-12">
             {{ Form::label('composition_item_code', __('Composition Item Code'),['class'=>'form-label']) }}
-            {{ Form::text('composition_item_code[]', '', array('class' => 'form-control ','required'=>'required')) }}
+            {{ Form::select('composition_item_code', $itemtypes, null, array('class' => 'form-control select2','placeholder'=>__('Select Item Type'),'required'=>'required')) }}
         </div>
         <div class="form-group col-md-12">
             {{ Form::label('composition_item_quantity', __('Composition Item Quantity'),['class'=>'form-label']) }}
