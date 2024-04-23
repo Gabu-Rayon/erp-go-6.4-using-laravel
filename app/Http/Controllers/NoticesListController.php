@@ -74,9 +74,9 @@ class NoticesListController extends Controller
             $response = Http::withHeaders([
                 'key' => '123456'
             ])->get($url);
-
+            
             $data = $response->json()['data'];
-            $remoteNoticeLists = $data['data']['data']['noticeList'];
+            $remoteNoticeLists = $data['data']['noticeList'];
             // Log API request data, response, and status code
             \Log::info('API Request Data: ' . json_encode($data));
             \Log::info('API Response: ' . $response->body());
@@ -87,12 +87,11 @@ class NoticesListController extends Controller
                 return $a['noticeNo'] <=> $b['noticeNo'];
             });
 
-            if (empty($newClassifications)) {
+            if (empty($newNoticeLists)) {
                 \Log::info('No new Notice List  to be added from the API Notice Lists are up to date');
                 return response()->json(['info' => 'No new Notice List to be added from the API  Notice Lists are up to date']);
             }
-
-            // Insert new classifications
+            // Insert new noticelIST
             foreach ($newNoticeLists as $notice) {
                 if (!is_null($notice)) {
                     Notice::create([

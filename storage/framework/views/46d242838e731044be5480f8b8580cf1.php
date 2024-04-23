@@ -11,11 +11,9 @@
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
-        <!-- Button to trigger the getNoticeListsApi and Synchronize it to my Database() method -->
-        <a href="#" id="synchronizeBtn" data-size="lg" data-url="<?php echo e(route('noticelist.synchronize')); ?>"
-            data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Synchronize')); ?>" class="btn btn-sm btn-primary">
+        <button class="btn btn-sm btn-primary sync">
             <i class="#">Synchronize</i>
-        </a>
+        </button>
     </div>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('content'); ?>
@@ -56,11 +54,16 @@
         </div>
     </div>
 <?php $__env->stopSection(); ?>
+
 <?php $__env->startPush('script-page'); ?>
-    <script>
+<script>
         const sync = document.querySelector('.sync');
         sync.addEventListener('click', async function(){
             try {
+                const loader = document.createElement('div');
+                loader.classList.add('spinner-border', 'text-light', 'spinner-border-sm');
+                loader.role = 'status';
+                sync.appendChild(loader);
                 const response = await fetch('http://localhost:8000/noticelist/synchronize', {
                 method: 'GET',
                 headers: {
@@ -69,6 +72,8 @@
                 }
             });
             const data = await response.json();
+
+            sync.removeChild(loader);
             
             console.log('success');
             const popup = document.createElement('div');

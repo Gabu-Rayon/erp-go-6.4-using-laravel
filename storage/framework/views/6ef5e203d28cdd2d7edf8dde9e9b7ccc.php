@@ -89,6 +89,10 @@
         const sync = document.querySelector('.sync');
         sync.addEventListener('click', async function(){
             try {
+                const loader = document.createElement('div');
+                loader.classList.add('spinner-border', 'text-light', 'spinner-border-sm');
+                loader.role = 'status';
+                sync.appendChild(loader);
                 const response = await fetch('http://localhost:8000/productservice/synchronize', {
                 method: 'GET',
                 headers: {
@@ -97,6 +101,8 @@
                 }
             });
             const data = await response.json();
+
+            sync.removeChild(loader);
             
             console.log('success');
             const popup = document.createElement('div');
