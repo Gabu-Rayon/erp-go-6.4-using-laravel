@@ -6,6 +6,7 @@ use File;
 use App\Models\Plan;
 use App\Models\User;
 use App\Models\Utility;
+use App\Models\Insurance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -15,10 +16,10 @@ class PlanController extends Controller
     {
 
         if (\Auth::user()->can('manage plan')) {
-            $plans = Plan::get();
-            $admin_payment_setting = Utility::getAdminPaymentSetting();
+            $plans = Insurance::latest()->get();
 
-            return view('plan.index', compact('plans', 'admin_payment_setting'));
+
+            return view('plan.index', compact('plans'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -125,11 +126,11 @@ class PlanController extends Controller
     //     }
 
     // }
-    
+
     /***
      * Create a Plan or Insurance using Api Endpoint
      */
-    
+
 
     public function store(Request $request)
     {
@@ -156,6 +157,8 @@ class PlanController extends Controller
             //     'premiumRate' => 100,
             //     'isUsed' => true, 
             // ];
+            // Save the data to the local database using the model
+            $insurance = Insurance::create($requestData);
 
             // Send the POST request to the API endpoint
             $response = Http::withHeaders([
@@ -165,8 +168,8 @@ class PlanController extends Controller
             ])->post('https://etims.your-apps.biz/api/AddInsurance', $requestData);
 
             // Log the API response
-            \Log::info('API Request Data: ' . json_encode($requestData));
-            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Request Data Posting Insurance Plan: ' . json_encode($requestData));
+            \Log::info('API Response from posting Insurance Plan: ' . $response->body());
             \Log::info('API Response Status Code: ' . $response->status());
 
             // Check if the request was successful
@@ -175,14 +178,14 @@ class PlanController extends Controller
             } else {
                 // API call failed, log the error and return an error response
                 \Log::error('Failed to add insurance via API: ' . $response->status() . ' ' . $response->body());
-                 return redirect()->back()->with('error', __('Failed to add insurance Plan via API.'));
+                return redirect()->back()->with('error', __('Failed to add insurance Plan via API.'));
             }
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
 
     }
-    
+
     public function edit($plan_id)
     {
         if (\Auth::user()->can('edit plan')) {

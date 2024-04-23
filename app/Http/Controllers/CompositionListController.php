@@ -68,12 +68,13 @@ class CompositionListController extends Controller
                 ];
             }
 
+            
+
             // Send the POST request to the API endpoint
             $response = Http::withHeaders([
                 'accept' => 'application/json',
                 'key' => '123456',
             ])->post('https://etims.your-apps.biz/api/AddCompositionItemList', $data);
-
 
             \Log::info('API Request Data: ' . json_encode($data));
             \Log::info('API Response: ' . $response->body());

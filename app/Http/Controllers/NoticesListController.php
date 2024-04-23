@@ -82,7 +82,7 @@ class NoticesListController extends Controller
             \Log::info('API Response: ' . $response->body());
             \Log::info('API Response Status Code: ' . $response->status());
 
-            // Compare local and remote classifications
+            // Compare local and remote 
             $newNoticeLists = array_udiff($remoteNoticeLists, $localNoticeLists, function ($a, $b) {
                 return $a['noticeNo'] <=> $b['noticeNo'];
             });
