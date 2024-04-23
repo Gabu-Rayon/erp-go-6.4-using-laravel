@@ -23,7 +23,7 @@ return new class extends Migration {
             $table->id();
             $table->string('mainItemCode');
             $table->json('compositionItems');
-            $table->foreign('main_item_code')->references('itemCd')->on('item_list');
+            $table->foreign('mainItemCode')->references('itemCd')->on('item_list');
             $table->timestamps();
         });
     }

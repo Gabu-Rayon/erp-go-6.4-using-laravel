@@ -15,6 +15,7 @@ class CompositionListController extends Controller
     public function index()
     {
         $compositionslist = CompositionList::all();
+        \Log::info($compositionslist);
         return view('compositionlist.index', compact('compositionslist'));
     }
 
@@ -71,11 +72,12 @@ class CompositionListController extends Controller
                 ];
             }
 
-            CompositionList::create([
-                'main_item_code' => $request->input('main_item_code'),
-                'composition_item_code' => $compositionItemCodes,
-                'composition_item_quantity' => $compositionItemQuantities,
+            // Create a new CompositionList record in the local database
+            $compositionList = CompositionList::create([
+                'mainItemCode' => $data['mainItemCode'],
+                'compositionItems' => json_encode($data['compositionItems']), // Encode the array as JSON before storing
             ]);
+
 
             // Send the POST request to the API endpoint
             $response = Http::withHeaders([

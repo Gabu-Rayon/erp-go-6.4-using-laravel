@@ -18,7 +18,7 @@
         <div class="form-group col-md-12">
             <?php echo e(Form::label('main_item_code', __('Main Item Code'),['class'=>'form-label'])); ?>
 
-            <?php echo e(Form::select('itemCd', $iteminfo, null, array('class' => 'form-control select2','placeholder'=>__('Select Item'),'required'=>'required'))); ?>
+            <?php echo e(Form::select('main_item_code', $iteminfo, null, array('class' => 'form-control select2','placeholder'=>__('Select Item'),'required'=>'required'))); ?>
 
         </div>
         <div class="form-group col-md-12">

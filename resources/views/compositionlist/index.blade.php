@@ -39,9 +39,9 @@
                         <tbody class="list">
                         @foreach ($compositionslist as $compositionlist)
                             <tr>
-                                <td>{{ $compositionlist->main_item_code }}</td>
-                                <td>{{ $compositionlist->composition_item_code }}</td>
-                                <td>{{ $compositionlist->composition_item_quantity }}</td>
+                                <td>{{ $compositionlist->mainItemCode }}</td>
+                  <td>{{ json_decode($compositionlist->compositionItems, true)[0]['compoItemCode'] }}</td>
+            <td>{{ json_decode($compositionlist->compositionItems, true)[0]['compoItemQty'] }}</td>
                             </tr>
                         @endforeach
                         </tbody>

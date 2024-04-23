@@ -11,8 +11,7 @@ class CompositionList extends Model
 
     protected $table = 'composition_list';
     protected $fillable = [
-        'main_item_code',
-        'composition_item_code',
-        'composition_item_quantity',
+        'mainItemCode',
+          'compositionItems'
     ];
 }
