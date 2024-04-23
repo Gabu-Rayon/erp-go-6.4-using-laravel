@@ -1590,16 +1590,12 @@ class ProductServiceController extends Controller
                         'useYn' => $item['useYn']
                     ]);
                 }
-                // return redirect()->back()->with('success', 'Item Information added successfully.');
-                return redirect()->route('productservice.index')->with('success', __('Item Information added successfully created.'));
             } catch (Exception $e) {
                 \Log::error('Error adding Item Information from the API: ' . $e->getMessage());
                 // return redirect()->back()->with('error', 'Error adding Item Information from the API.');
-                return redirect()->route('productservice.index')->with('error', __('Error adding Item Information from the API.'));
             }
         } else {
-            // return redirect()->back()->with('error', 'No data found in the API response.');
-            return redirect()->route('productservice.index')->with('error', __('No data found in the API response.'));
+            // return redirect()->back()->with('error', 'No data found in the API response.')
         }
     }
 
