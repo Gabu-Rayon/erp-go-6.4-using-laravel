@@ -73,8 +73,8 @@ class CompositionListController extends Controller
 
             CompositionList::create([
                 'main_item_code' => $request->input('main_item_code'),
-                'composition_item_code' => json_encode($compositionItemCodes),
-                'composition_item_quantity' => json_encode($compositionItemQuantities),
+                'composition_item_code' => $compositionItemCodes,
+                'composition_item_quantity' => $compositionItemQuantities,
             ]);
 
             // Send the POST request to the API endpoint
