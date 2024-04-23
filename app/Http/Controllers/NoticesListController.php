@@ -95,7 +95,7 @@ class NoticesListController extends Controller
             foreach ($newNoticeLists as $notice) {
                 if (!is_null($notice)) {
                     Notice::create([
-                        'NoticeNo' => $notice['NoticeNo'],
+                        'noticeNo' => $notice['noticeNo'],
                         'title' => $notice['title'],
                         'cont' => $notice['cont'],
                         'dtlUrl' => $notice['dtlUrl'],
@@ -108,8 +108,8 @@ class NoticesListController extends Controller
             return response()->json(['success' => 'Synchronizing Notice Lists from the API successfully']);
 
         } catch (\Exception $e) {
-            \Log::error('Error synchronizing Notice Lists from the API: ' . $e);
-            return response()->json(['error' => 'Error synchronizing  Notice Lists from the API']);
+            \Log::error($e);
+            return response()->json(['error' => 'Error synchronizing  Notice Lists from the API'], 500);
         }
     }
 }

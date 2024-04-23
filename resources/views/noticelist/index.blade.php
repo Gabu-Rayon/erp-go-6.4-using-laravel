@@ -63,7 +63,7 @@
                 loader.classList.add('spinner-border', 'text-light', 'spinner-border-sm');
                 loader.role = 'status';
                 sync.appendChild(loader);
-                const response = await fetch('http://localhost:8000/noticelist/synchronize', {
+                const response = await fetch('http://localhost:8000/noticeslist/synchronize', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -77,7 +77,7 @@
             console.log('success');
             const popup = document.createElement('div');
             popup.classList.add('alert', 'alert-success');
-            popup.innerHTML = data.info || data.success || 'Synced Successfully';
+            popup.innerHTML = data['message'] || 'Synced Successfully';
             popup.style.position = 'absolute';
             popup.style.top = '50%';
             popup.style.left = '50%';
@@ -91,7 +91,7 @@
                 console.log('error');
                 const popup = document.createElement('div');
                 popup.classList.add('alert', 'alert-danger');
-                popup.innerHTML = data.error || 'Sync Failed';
+                popup.innerHTML = data['message'] || 'Sync Failed';
                 popup.style.position = 'absolute';
                 popup.style.top = '50%';
                 popup.style.left = '50%';

@@ -1726,10 +1726,9 @@ Route::group(
     ],
     function () {
         Route::resource('noticelist', NoticesListController::class);
-
     }
 );
-Route::get('noticelist/synchronize', [NoticesListController::class, 'synchronize'])->name('noticelist.synchronize');
+Route::get('noticeslist/synchronize', [NoticesListController::class, 'synchronize'])->name('noticelist.synchronize');
 
 
 Route::group(
