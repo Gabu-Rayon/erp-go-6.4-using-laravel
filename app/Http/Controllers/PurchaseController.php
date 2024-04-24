@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Vender;
 use App\Models\Utility;
 use App\Models\Purchase_Sales_Items;
+use App\Models\Purchase;
 use App\Models\Details;
 use App\Models\warehouse;
 use App\Models\BankAccount;
