@@ -636,22 +636,18 @@
         const unitPriceField = document.querySelector('.unit-price-field');
         const qtyCodeField = document.querySelector('.qty-code-field');
         itemCodeField.addEventListener('change', async function () {
-                console.log('changed');
                 const itemCode = this.value;
 
                 try {
                     const response = await fetch(`http://localhost:8000/getitem/${itemCode}`);
                     const data = await response.json();
-                    console.log(data);
                     const unitPrice = data.data.dftPrc;
                     const pkgQuantity = data.data.qtyUnitCd;
-
-                    console.log(unitPrice, pkgQuantity);
 
                     unitPriceField.value = unitPrice;
                     qtyCodeField.value = pkgQuantity;
                 } catch (error) {
-                    console.log(error);
+                    alert(error.data);
                 }
         });
     </script>
