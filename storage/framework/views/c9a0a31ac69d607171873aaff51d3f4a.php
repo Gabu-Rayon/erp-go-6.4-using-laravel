@@ -34,17 +34,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php $__currentLoopData = $notices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $notice): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php if($notices): ?>
                                     <tr class="font-style">
-                                        <td><?php echo e($notice->id); ?></td>
-                                        <td><?php echo e($notice->noticeNo); ?></td>
-                                        <td><?php echo e($notice->title); ?></td>
-                                        <td><?php echo e($notice->cont); ?></td>
-                                        <td><?php echo e($notice->regrNm); ?></td>
-                                        <td><?php echo e($notice->dtlUrl); ?></td>
+                                        <td><?php echo e($notices->id); ?></td>
+                                        <td><?php echo e($notices->noticeNo); ?></td>
+                                        <td><?php echo e($notices->title); ?></td>
+                                        <td><?php echo e($notices->cont); ?></td>
+                                        <td><?php echo e($notices->regrNm); ?></td>
+                                        <td><?php echo e($notices->dtlUrl); ?></td>
                                     </tr>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
+                                <?php else: ?>
+                                  
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -55,38 +56,38 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('script-page'); ?>
-<script>
+    <script>
         const sync = document.querySelector('.sync');
-        sync.addEventListener('click', async function(){
+        sync.addEventListener('click', async function() {
             try {
                 const loader = document.createElement('div');
                 loader.classList.add('spinner-border', 'text-light', 'spinner-border-sm');
                 loader.role = 'status';
                 sync.appendChild(loader);
                 const response = await fetch('http://localhost:8000/noticeslist/synchronize', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            });
-            const data = await response.json();
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
 
-            sync.removeChild(loader);
-            
-            console.log('success');
-            const popup = document.createElement('div');
-            popup.classList.add('alert', 'alert-success');
-            popup.innerHTML = data['message'] || 'Synced Successfully';
-            popup.style.position = 'absolute';
-            popup.style.top = '50%';
-            popup.style.left = '50%';
-            popup.style.transform = 'translate(-50%, -50%)';
-            popup.style.zIndex = '9999';
-            document.body.appendChild(popup);
-            setTimeout(() => {
-                location.reload();
-            }, 3000);
+                sync.removeChild(loader);
+
+                console.log('success');
+                const popup = document.createElement('div');
+                popup.classList.add('alert', 'alert-success');
+                popup.innerHTML = data['message'] || 'Synced Successfully';
+                popup.style.position = 'absolute';
+                popup.style.top = '50%';
+                popup.style.left = '50%';
+                popup.style.transform = 'translate(-50%, -50%)';
+                popup.style.zIndex = '9999';
+                document.body.appendChild(popup);
+                setTimeout(() => {
+                    location.reload();
+                }, 3000);
             } catch (error) {
                 console.log('error');
                 const popup = document.createElement('div');
@@ -105,6 +106,5 @@
         });
     </script>
 <?php $__env->stopPush(); ?>
-
 
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/chrisdroid/Desktop/projects/php/erp-go-6.4-using-laravel/resources/views/noticelist/index.blade.php ENDPATH**/ ?>
