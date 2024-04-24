@@ -320,7 +320,7 @@ class Employee extends Model
 
     public function branch()
     {
-        return $this->hasOne('App\Models\Branch', 'id', 'branch_id');
+        return $this->hasOne('App\Models\BranchesList', 'id', 'branch_id');
     }
 
     public function department()
