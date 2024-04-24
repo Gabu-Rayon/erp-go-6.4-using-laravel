@@ -14,11 +14,12 @@ class Vender extends Authenticatable
     protected $guard_name = 'web';
     protected $fillable   = [
         'vender_id',
-        'tin',
-        'bhf_id',
-        'invc_no',
-        'sdc_id',
-        'mrc_no',
+        'spplrTin',
+        'spplrNm',
+        'spplrBhfId',
+        'spplrInvcNo',
+        'spplrSdcId',
+        'spplrMrcNo',
         'name',
         'email',
         'password',
