@@ -81,7 +81,7 @@ class PurchaseController extends Controller
     //         \Log::error('Exception occurred while fetching purchases: ' . $e->getMessage());
     //         return redirect()->back()->with('error', 'Failed to fetch purchases from API.');
     //     }
-        
+
     // }
 
     /**
@@ -110,7 +110,7 @@ class PurchaseController extends Controller
             // Fetch countries data from the Countries model
             $countries = Countries::pluck('alpha3_code', 'id');
 
-            return view('purchase.create', compact('product_services_Codes','suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
+            return view('purchase.create', compact('product_services_Codes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
@@ -991,7 +991,8 @@ class PurchaseController extends Controller
     //     return json_encode($data);
     // }
 
-    public function item(Request $request){
+    public function item(Request $request)
+    {
         $data['itemCode'] = !empty($product->itemCode) ? $product->itemCode->unitPrice : '';
         return json_encode($data);
     }
