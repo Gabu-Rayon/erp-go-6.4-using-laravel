@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Purchase_Sales extends Model
 {
     use HasFactory;
+
+
+    protected $table = 'purchase_sales'; // Correct table name
     protected $fillable = [
         'spplrTin',
         'spplrNm',

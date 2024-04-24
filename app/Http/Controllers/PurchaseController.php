@@ -995,7 +995,7 @@ class PurchaseController extends Controller
 
     public function item(Request $request)
     {
-        
+
     }
 
     public function productDestroy(Request $request)
@@ -1060,7 +1060,7 @@ class PurchaseController extends Controller
                         'spplrItemNm' => $item['spplrItemNm'],
                         'pkgUnitCd' => $item['pkgUnitCd'],
                         'pkg' => $item['pkg'],
-                         'qtyUnitCd' => $item['qtyUnitCd'],
+                        'qtyUnitCd' => $item['qtyUnitCd'],
                         'qty' => $item['qty'],
                         'prc' => $item['prc'],
                         'splyAmt' => $item['splyAmt'],
@@ -1154,25 +1154,25 @@ class PurchaseController extends Controller
     //     }
     // }
 
-//   public function getSuppliersDetailsForPurchaseSalesFromApi()
+    //   public function getSuppliersDetailsForPurchaseSalesFromApi()
 //     {
 //         try {
 //             $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=202204091200000';
 
-//             $response = Http::withHeaders([
+    //             $response = Http::withHeaders([
 //                 'key' => '123456'
 //             ])->get($url);
 
-//             $data = $response->json()['data'];
+    //             $data = $response->json()['data'];
 //             $purchaseSalesSuppliers = $data['data']['saleList'];
 
-//             \Log::info('API Request Data of Suppliers of Sales and Purchases: ' . json_encode($data));
+    //             \Log::info('API Request Data of Suppliers of Sales and Purchases: ' . json_encode($data));
 //             \Log::info('API Request Data of Suppliers of Sales and Purchases: ' . json_encode($purchaseSalesSuppliers));
 //             \Log::info('API Response: ' . $response->body());
 //             \Log::info('API Response: ' . $purchaseSalesSuppliers->body());
 //             \Log::info('API Response Status Code: ' . $response->status());
 
-//             if (isset($data['data'])) {
+    //             if (isset($data['data'])) {
 //                 foreach ($purchaseSalesSuppliers as $item) {
 //                     Purchase_Sales::create([
 //                         'spplrTin' => $item['spplrTin'],
@@ -1221,69 +1221,71 @@ class PurchaseController extends Controller
 
 
     public function getSuppliersDetailsForPurchaseSalesFromApi()
-{
-    try {
-        $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=202204091200000';
+    {
+        try {
+            $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
 
-        $response = Http::withHeaders([
-            'key' => '123456'
-        ])->timeout(30000)->get($url);
+            $response = Http::withHeaders([
+                'key' => '123456'
+            ])->timeout(30000)->get($url);
 
-        $data = $response->json()['data'];
-        $purchaseSalesSuppliers = $data['data']['saleList'];
+            $data = $response->json()['data'];
+            $purchaseSalesSuppliers = $data['data']['saleList'];
 
-        // Log API request and response details
-        \Log::info('API Request Data of Suppliers of Sales and Purchases: ' . json_encode($data));
-        \Log::info('API Request Data of Suppliers of Sales and Purchases: ' . json_encode($purchaseSalesSuppliers));
-        \Log::info('API Response: ' . $response->body());
-        \Log::info('API Response Status Code: ' . $response->status());
+            // Log API request and response details
+            \Log::info('API Request Data of Suppliers of Sales and Purchases: ' . json_encode($data));
+            \Log::info('API Request Data of Suppliers of Sales and Purchases: ' . json_encode($purchaseSalesSuppliers));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
 
-        // Divide the data into batches of 100 items each
-        $batches = array_chunk($purchaseSalesSuppliers, 100);
+            // Divide the data into batches of 100 items each
+            $batches = array_chunk($purchaseSalesSuppliers, 100);
 
-        foreach ($batches as $item) {
-            // Process each batch
-                Purchase_Sales::create([
-                    'spplrTin' => $item['spplrTin'],
-                    'spplrNm' => $item['spplrNm'],
-                    'spplrBhfId' => $item['spplrBhfId'],
-                    'spplrInvcNo' => $item['spplrInvcNo'],
-                    'spplrSdcId' => $item['spplrSdcId'],
-                    'spplrMrcNo' => $item['spplrMrcNo'],
-                    'rcptTyCd' => $item['rcptTyCd'],
-                    'pmtTyCd' => $item['pmtTyCd'],
-                    'cfmDt' => $item['cfmDt'],
-                    'salesDt' => $item['salesDt'],
-                    'stockRlsDt' => $item['stockRlsDt'],
-                    'totItemCnt' => $item['totItemCnt'],
-                    'taxblAmtA' => $item['taxblAmtA'],
-                    'taxblAmtB' => $item['taxblAmtB'],
-                    'taxblAmtC' => $item['taxblAmtC'],
-                    'taxblAmtD' => $item['taxblAmtD'],
-                    'taxblAmtE' => $item['taxblAmtE'],
-                    'taxRtA' => $item['taxRtA'],
-                    'taxRtB' => $item['taxRtB'],
-                    'taxRtC' => $item['taxRtc'],
-                    'taxRtD' => $item['taxRtD'],
-                    'taxRtE' => $item['taxRtE'],
-                    'taxAmtA' => $item['taxAmtA'],
-                    'taxAmtB' => $item['taxAmtB'],
-                    'taxAmtC' => $item['taxAmtC'],
-                    'taxAmtD' => $item['taxAmtD'],
-                    'taxAmtE' => $item['taxAmtE'],
-                    'totTaxblAmt' => $item['totTaxblAmt'],
-                    'totTaxAmt' => $item['totTaxAmt'],
-                    'totAmt' => $item['totAmt'],
-                    'remark' => $item['remark']
-                ]);
-        }
+            foreach ($batches as $batch) {
+                foreach ($batch as $item) {
+                    // Process each batch
+                    Purchase_Sales::create([
+                        'spplrTin' => $item['spplrTin'],
+                        'spplrNm' => $item['spplrNm'],
+                        'spplrBhfId' => $item['spplrBhfId'],
+                        'spplrInvcNo' => $item['spplrInvcNo'],
+                        'spplrSdcId' => $item['spplrSdcId'],
+                        'spplrMrcNo' => $item['spplrMrcNo'],
+                        'rcptTyCd' => $item['rcptTyCd'],
+                        'pmtTyCd' => $item['pmtTyCd'],
+                        'cfmDt' => $item['cfmDt'],
+                        'salesDt' => $item['salesDt'],
+                        'stockRlsDt' => $item['stockRlsDt'],
+                        'totItemCnt' => $item['totItemCnt'],
+                        'taxblAmtA' => $item['taxblAmtA'],
+                        'taxblAmtB' => $item['taxblAmtB'],
+                        'taxblAmtC' => $item['taxblAmtC'],
+                        'taxblAmtD' => $item['taxblAmtD'],
+                        'taxblAmtE' => $item['taxblAmtE'],
+                        'taxRtA' => $item['taxRtA'],
+                        'taxRtB' => $item['taxRtB'],
+                        'taxRtC' => $item['taxRtC'],
+                        'taxRtD' => $item['taxRtD'],
+                        'taxRtE' => $item['taxRtE'],
+                        'taxAmtA' => $item['taxAmtA'],
+                        'taxAmtB' => $item['taxAmtB'],
+                        'taxAmtC' => $item['taxAmtC'],
+                        'taxAmtD' => $item['taxAmtD'],
+                        'taxAmtE' => $item['taxAmtE'],
+                        'totTaxblAmt' => $item['totTaxblAmt'],
+                        'totTaxAmt' => $item['totTaxAmt'],
+                        'totAmt' => $item['totAmt'],
+                        'remark' => $item['remark']
+                    ]);
+                }
+            }
 
-        return redirect()->route('purchase.index')->with('success', __('Sales Lists Suppliers Details successfully created From Api.'));
-    } catch (\Exception $e) {
+            return redirect()->route('purchase.index')->with('success', __('Sales Lists Suppliers Details successfully created From Api.'));
+        } catch (\Exception $e) {
             \Log::error('Error adding Sales Lists Suppliers Details  from the API: ' . $e->getMessage());
             return redirect()->route('purchase.index')->with('error', __('Error adding Sales Lists Suppliers Details  from the API.'));
         }
-}
+    }
 
 
 }
