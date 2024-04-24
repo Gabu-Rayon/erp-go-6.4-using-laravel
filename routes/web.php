@@ -1532,6 +1532,7 @@ Route::group(['middleware' => ['verified']], function () {
             Route::post('purchase/product/destroy', [PurchaseController::class, 'productDestroy'])->name('purchase.product.destroy');
             Route::post('purchase/vender', [PurchaseController::class, 'vender'])->name('purchase.vender');
             Route::post('purchase/product', [PurchaseController::class, 'product'])->name('purchase.product');
+            Route::post('purchase/item', [PurchaseController::class, 'item'])->name('purchase.item');
             Route::get('purchase/create/{cid}', [PurchaseController::class, 'create'])->name('purchase.create');
             Route::get('purchase/{id}/sent', [PurchaseController::class, 'sent'])->name('purchase.sent');
             Route::get('purchase/{id}/resent', [PurchaseController::class, 'resent'])->name('purchase.resent');

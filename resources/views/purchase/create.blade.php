@@ -361,6 +361,8 @@
 @section('content')
     <div class="row">
         {{ Form::open(array('url' => 'purchase','class'=>'w-100')) }}
+        <div class="row">
+        {{ Form::open(['url' => 'purchase', 'class' => 'w-100']) }}
         <div class="col-12">
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <div class="card">
@@ -368,8 +370,20 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group" id="vender-box">
-                                {{ Form::label('vender_id', __('Vendor'),['class'=>'form-label']) }}
-                                {{ Form::select('vender_id', $venders,$vendorId, array('class' => 'form-control select','id'=>'vender','data-url'=>route('bill.vender'),'required'=>'required')) }}
+                                {{ Form::label('supplierName', __('Supplier Name'), ['class' => 'form-label']) }}
+                                {{ Form::select('supplierName', $suppliers, null, ['class' => 'form-control select2', 'required' => 'required']) }}
+                            </div>
+                            <div class="form-group" id="vender-box">
+                                {{ Form::label('supplierTin', __('Supplier Tin'), ['class' => 'form-label']) }}
+                                {{ Form::text('supplierTin', null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => '239900999900']) }}
+                            </div>
+                            <div class="form-group" id="vender-box">
+                                {{ Form::label('supplierBhfId', __('Supplier BhfId'), ['class' => 'form-label']) }}
+                                {{ Form::text('supplierBhfId', null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => '239900999900']) }}
+                            </div>
+                            <div class="form-group" id="vender-box">
+                                {{ Form::label('supplierInvNo', __('Supplier Invoice No'), ['class' => 'form-label']) }}
+                                {{ Form::text('supplierInvNo', null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'INV200']) }}
                             </div>
                             <div id="vender_detail" class="d-none">
                             </div>
@@ -380,65 +394,71 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        {{ Form::label('warehouse_id', __('Warehouse'),['class'=>'form-label']) }}
-                                        {{ Form::select('warehouse_id', $warehouse,null, array('class' => 'form-control select','required'=>'required')) }}
+                                        {{ Form::label('warehouseDate', __('Ware House Date'), ['class' => 'form-label']) }}
+                                        {{ Form::date('warehouseDate', null, ['class' => 'form-control', 'required' => 'required']) }}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        {{ Form::label('category_id', __('Category'),['class'=>'form-label']) }}
-                                        {{ Form::select('category_id', $category,null, array('class' => 'form-control select','required'=>'required')) }}
+                                        {{ Form::label('pmtTypeCode', __('Pmt Type Code'), ['class' => 'form-label']) }}
+                                        {{ Form::text('pmtTypeCode', null, ['class' => 'form-control', 'required' => 'required']) }}
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        {{ Form::label('purchase_date', __('Purchase Date'),['class'=>'form-label']) }}
-                                        {{Form::date('purchase_date',null,array('class'=>'form-control','required'=>'required'))}}
+                                        {{ Form::label('purchase_date', __('Purchase Date'), ['class' => 'form-label']) }}
+                                        {{ Form::date('purchase_date', null, ['class' => 'form-control', 'required' => 'required']) }}
 
                                     </div>
                                 </div>
-
-
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        {{ Form::label('purchase_number', __('Purchase Number'),['class'=>'form-label']) }}
-                                         <input type="hidden"  name="purchase_number" class="form-control" value="{{$purchase_number}}" >
-                                        <input type="text" class="form-control" value="{{$purchase_number}}" readonly>
+                                        {{ Form::label('purchStatusCode', __('Purchase Status Code'), ['class' => 'form-label']) }}
+                                        {{ Form::date('purchStatusCode', null, ['class' => 'form-control', 'required' => 'required']) }}
 
                                     </div>
                                 </div>
                             </div>
-
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        {{ Form::label('vendor_invoice_no', __('Invoice No'),['class'=>'form-label']) }}
-                                        {{ Form::text('vendor_invoice_no', null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'INV200']) }}
-
-
+                                        {{ Form::label('purchaseTypeCode', __('Purchase Type Code'), ['class' => 'form-label']) }}
+                                        {{ Form::text('purchaseTypeCode', null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'COMPUTERS200']) }}
                                     </div>
                                 </div>
-
 
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        {{ Form::label('purchase_type_code', __('Purchase Type'),['class'=>'form-label']) }}
-                                        {{ Form::text('purchase_type_code', null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'COMPUTERS200']) }}
-
-
-
+                                        {{ Form::label('occuredDate', __('Occured Date'), ['class' => 'form-label']) }}
+                                        {{ Form::date('occuredDate', null, ['class' => 'form-control', 'required' => 'required']) }}
                                     </div>
                                 </div>
-                            </div>                            
-
-
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ Form::label('confirmedDate', __('Confirmed Date'), ['class' => 'form-label']) }}
+                                        {{ Form::date('confirmedDate', null, ['class' => 'form-control', 'required' => 'required']) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ Form::label('mapping', __('Mapping Item'), ['class' => 'form-label']) }}
+                                        {{ Form::text('mapping', null, ['class' => 'form-control', 'required' => 'required']) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ Form::label('remark', __('Remark'), ['class' => 'form-label']) }}
+                                        {{ Form::textarea('remark', null, ['class' => 'form-control pro_description', 'rows' => '2', 'placeholder' => __('Write Remark')]) }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
         <div class="col-12">
             <h5 class=" d-inline-block mb-4">{{__('Product & Services')}}</h5>
@@ -470,8 +490,10 @@
                             </thead>
                             <tbody class="ui-sortable" data-repeater-item>
                             <tr>
-                                <td width="25%" class="form-group pt-1">
-                                    {{ Form::select('item', $product_services,'', array('class' => 'form-control select2 item','data-url'=>route('purchase.product'),'required'=>'required')) }}
+                                <td width="50%" class="form-group pt-1">
+                                {{ Form::label('itemCode', __('Item Code'), ['class' => 'form-label']) }}
+                                {{ Form::select('itemCode', $product_services_Codes, null, ['class' => 'form-control select2', 'required' => 'required']) }}
+
                                 </td>
                                 <td>
                                     <div class="form-group price-input input-group search-form">

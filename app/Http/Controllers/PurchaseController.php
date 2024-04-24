@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Bill;
 use App\Models\User;
 use App\Models\Vender;
+use App\Models\Details;
 use App\Models\Utility;
 use App\Models\Purchase;
 use App\Models\Countries;
@@ -16,6 +17,7 @@ use App\Models\Transaction;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\ProductService;
+use App\Models\ItemInformation;
 use App\Models\PurchasePayment;
 use App\Models\PurchaseProduct;
 use App\Models\WarehouseProduct;
@@ -95,18 +97,20 @@ class PurchaseController extends Controller
             $category->prepend('Select Category', '');
 
             $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
-            $venders = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $venders->prepend('Select Vender', '');
+            $suppliers = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $suppliers->prepend('Select Supplier', '');
 
             $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $warehouse->prepend('Select Warehouse', '');
 
-            $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->where('type', '!=', 'service')->get()->pluck('name', 'id');
+            $product_services = ItemInformation::get()->pluck('itemNm', 'id');
+            $product_services_Codes = ItemInformation::get()->pluck('itemCd', 'id');
+            $product_services_Codes->prepend('--', '');
             $product_services->prepend('--', '');
-            // Fetch countries data from the Countries model
-            $countries = Countries::pluck('alpha3_code', 'id');
+            // Fetch countries code  from the details model
+            $countries = Details::where('cdCls', '05')->get();
 
-            return view('purchase.create', compact('venders', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
+            return view('purchase.create', compact('product_services_Codes','suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
@@ -970,17 +974,25 @@ class PurchaseController extends Controller
 
         return view('purchase.vender_detail', compact('vender'));
     }
-    public function product(Request $request)
-    {
-        $data['product'] = $product = ProductService::find($request->product_id);
-        $data['unit'] = !empty($product->unit) ? $product->unit->name : '';
-        $data['taxRate'] = $taxRate = !empty($product->tax_id) ? $product->taxRate($product->tax_id) : 0;
-        $data['taxes'] = !empty($product->tax_id) ? $product->tax($product->tax_id) : 0;
-        $salePrice = $product->purchase_price;
-        $quantity = 1;
-        $taxPrice = ($taxRate / 100) * ($salePrice * $quantity);
-        $data['totalAmount'] = ($salePrice * $quantity);
 
+
+    //Method for Automfilling the other fileds for the product and services 
+    // public function product(Request $request)
+    // {
+    //     $data['product'] = $product = ProductService::find($request->product_id);
+    //     $data['unit'] = !empty($product->unit) ? $product->unit->name : '';
+    //     $data['taxRate'] = $taxRate = !empty($product->tax_id) ? $product->taxRate($product->tax_id) : 0;
+    //     $data['taxes'] = !empty($product->tax_id) ? $product->tax($product->tax_id) : 0;
+    //     $salePrice = $product->purchase_price;
+    //     $quantity = 1;
+    //     $taxPrice = ($taxRate / 100) * ($salePrice * $quantity);
+    //     $data['totalAmount'] = ($salePrice * $quantity);
+
+    //     return json_encode($data);
+    // }
+
+    public function item(Request $request){
+        $data['itemCode'] = !empty($product->itemCode) ? $product->itemCode->unitPrice : '';
         return json_encode($data);
     }
 
