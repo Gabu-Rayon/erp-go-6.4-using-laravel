@@ -106,6 +106,8 @@ class PurchaseController extends Controller
             $product_services_Codes = ItemInformation::get()->pluck('itemCd', 'id');
             $product_services_Codes->prepend('--', '');
             $product_services->prepend('--', '');
+            // Fetch countries code  from the details model
+            $countries = Details::where('cdCls', '05')->get();
             // Fetch countries data from the Details model where cdCls is 05
             $countries = Details::where('cdCls', '05')->get()->pluck('cdNm', 'cdVal');
 
@@ -975,20 +977,20 @@ class PurchaseController extends Controller
     }
 
 
-    //Method for Automfilling the other fileds for the product and services 
-    // public function product(Request $request)
-    // {
-    //     $data['product'] = $product = ProductService::find($request->product_id);
-    //     $data['unit'] = !empty($product->unit) ? $product->unit->name : '';
-    //     $data['taxRate'] = $taxRate = !empty($product->tax_id) ? $product->taxRate($product->tax_id) : 0;
-    //     $data['taxes'] = !empty($product->tax_id) ? $product->tax($product->tax_id) : 0;
-    //     $salePrice = $product->purchase_price;
-    //     $quantity = 1;
-    //     $taxPrice = ($taxRate / 100) * ($salePrice * $quantity);
-    //     $data['totalAmount'] = ($salePrice * $quantity);
+    // Method for Automfilling the other fileds for the product and services 
+    public function product(Request $request)
+    {
+        $data['product'] = $product = ProductService::find($request->product_id);
+        $data['unit'] = !empty($product->unit) ? $product->unit->name : '';
+        $data['taxRate'] = $taxRate = !empty($product->tax_id) ? $product->taxRate($product->tax_id) : 0;
+        $data['taxes'] = !empty($product->tax_id) ? $product->tax($product->tax_id) : 0;
+        $salePrice = $product->purchase_price;
+        $quantity = 1;
+        $taxPrice = ($taxRate / 100) * ($salePrice * $quantity);
+        $data['totalAmount'] = ($salePrice * $quantity);
 
-    //     return json_encode($data);
-    // }
+        return json_encode($data);
+    }
 
     public function item(Request $request)
     {
