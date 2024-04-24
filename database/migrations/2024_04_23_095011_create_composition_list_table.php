@@ -7,16 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     /**
      * Run the migrations.
-     * {
-  "mainItemCode": "string",
-  "compositionItems": [
-    {
-      "compoItemCode": "string",
-      "compoItemQty": 0
-    }
-  ]
-}
+     * 
      */
+
+     
     public function up(): void
     {
         Schema::create('composition_list', function (Blueprint $table) {

@@ -13,6 +13,26 @@ return new class extends Migration
     {
         Schema::create('purchase__sales__items', function (Blueprint $table) {
             $table->id();
+            $table->string('itemSeq');
+            $table->string('itemCd');
+            $table->string('itemClsCd');
+            $table->string('itemNm');
+            $table->string('bcd');
+            $table->string('spplrItemClsCd');
+            $table->string('spplrItemCd');
+            $table->string('spplrItemNm');
+            $table->string('pkgUnitCd');
+            $table->string('qty');
+            $table->string('prc');
+            $table->string('splyAmt');
+            $table->string('dcRt');
+            $table->string('dcAmt');
+            $table->string('taxTyCd');
+            $table->string('taxblAmt');
+            $table->string('taxAmt');
+            $table->string('totAmt');
+            $table->string('itemExprDt');
+            $table->foreignId('saleItemCode')->references('id')->on('purchase__sales__items');
             $table->timestamps();
         });
     }
