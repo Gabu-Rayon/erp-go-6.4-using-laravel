@@ -361,6 +361,9 @@
     <div class="row">
         <?php echo e(Form::open(array('url' => 'purchase','class'=>'w-100'))); ?>
 
+        <div class="row">
+        <?php echo e(Form::open(['url' => 'purchase', 'class' => 'w-100'])); ?>
+
         <div class="col-12">
             <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
             <div class="card">
@@ -368,9 +371,27 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group" id="vender-box">
-                                <?php echo e(Form::label('vender_id', __('Vendor'),['class'=>'form-label'])); ?>
+                                <?php echo e(Form::label('supplierName', __('Supplier Name'), ['class' => 'form-label'])); ?>
 
-                                <?php echo e(Form::select('vender_id', $venders,$vendorId, array('class' => 'form-control select','id'=>'vender','data-url'=>route('bill.vender'),'required'=>'required'))); ?>
+                                <?php echo e(Form::select('supplierName', $suppliers, null, ['class' => 'form-control select2', 'required' => 'required'])); ?>
+
+                            </div>
+                            <div class="form-group" id="vender-box">
+                                <?php echo e(Form::label('supplierTin', __('Supplier Tin'), ['class' => 'form-label'])); ?>
+
+                                <?php echo e(Form::text('supplierTin', null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => '239900999900'])); ?>
+
+                            </div>
+                            <div class="form-group" id="vender-box">
+                                <?php echo e(Form::label('supplierBhfId', __('Supplier BhfId'), ['class' => 'form-label'])); ?>
+
+                                <?php echo e(Form::text('supplierBhfId', null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => '239900999900'])); ?>
+
+                            </div>
+                            <div class="form-group" id="vender-box">
+                                <?php echo e(Form::label('supplierInvNo', __('Supplier Invoice No'), ['class' => 'form-label'])); ?>
+
+                                <?php echo e(Form::text('supplierInvNo', null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'INV200'])); ?>
 
                             </div>
                             <div id="vender_detail" class="d-none">
@@ -382,17 +403,17 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <?php echo e(Form::label('warehouse_id', __('Warehouse'),['class'=>'form-label'])); ?>
+                                        <?php echo e(Form::label('warehouseDate', __('Ware House Date'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::select('warehouse_id', $warehouse,null, array('class' => 'form-control select','required'=>'required'))); ?>
+                                        <?php echo e(Form::date('warehouseDate', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <?php echo e(Form::label('category_id', __('Category'),['class'=>'form-label'])); ?>
+                                        <?php echo e(Form::label('pmtTypeCode', __('Pmt Type Code'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::select('category_id', $category,null, array('class' => 'form-control select','required'=>'required'))); ?>
+                                        <?php echo e(Form::text('pmtTypeCode', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
                                     </div>
                                 </div>
@@ -400,59 +421,71 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <?php echo e(Form::label('purchase_date', __('Purchase Date'),['class'=>'form-label'])); ?>
+                                        <?php echo e(Form::label('purchase_date', __('Purchase Date'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::date('purchase_date',null,array('class'=>'form-control','required'=>'required'))); ?>
+                                        <?php echo e(Form::date('purchase_date', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
 
                                     </div>
                                 </div>
-
-
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <?php echo e(Form::label('purchase_number', __('Purchase Number'),['class'=>'form-label'])); ?>
+                                        <?php echo e(Form::label('purchStatusCode', __('Purchase Status Code'), ['class' => 'form-label'])); ?>
 
-                                         <input type="hidden"  name="purchase_number" class="form-control" value="<?php echo e($purchase_number); ?>" >
-                                        <input type="text" class="form-control" value="<?php echo e($purchase_number); ?>" readonly>
+                                        <?php echo e(Form::date('purchStatusCode', null, ['class' => 'form-control', 'required' => 'required'])); ?>
+
 
                                     </div>
                                 </div>
                             </div>
-
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <?php echo e(Form::label('vendor_invoice_no', __('Invoice No'),['class'=>'form-label'])); ?>
+                                        <?php echo e(Form::label('purchaseTypeCode', __('Purchase Type Code'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::text('vendor_invoice_no', null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'INV200'])); ?>
-
-
+                                        <?php echo e(Form::text('purchaseTypeCode', null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'COMPUTERS200'])); ?>
 
                                     </div>
                                 </div>
-
 
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <?php echo e(Form::label('purchase_type_code', __('Purchase Type'),['class'=>'form-label'])); ?>
+                                        <?php echo e(Form::label('occuredDate', __('Occured Date'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::text('purchase_type_code', null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'COMPUTERS200'])); ?>
-
-
-
+                                        <?php echo e(Form::date('occuredDate', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
                                     </div>
                                 </div>
-                            </div>                            
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <?php echo e(Form::label('confirmedDate', __('Confirmed Date'), ['class' => 'form-label'])); ?>
 
+                                        <?php echo e(Form::date('confirmedDate', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <?php echo e(Form::label('mapping', __('Mapping Item'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::text('mapping', null, ['class' => 'form-control', 'required' => 'required'])); ?>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <?php echo e(Form::label('remark', __('Remark'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::textarea('remark', null, ['class' => 'form-control pro_description', 'rows' => '2', 'placeholder' => __('Write Remark')])); ?>
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
+        </div>
         <div class="col-12">
             <h5 class=" d-inline-block mb-4"><?php echo e(__('Product & Services')); ?></h5>
             <div class="card repeater">
@@ -471,71 +504,77 @@
                 <div class="card-body table-border-style">
                     <div class="table-responsive">
                         <table class="table mb-0" data-repeater-list="items" id="sortable-table">
-                            <thead>
-                            <tr>
-                                <th><?php echo e(__('Items')); ?></th>
-                                <th><?php echo e(__('Quantity')); ?></th>
-                                <th><?php echo e(__('Price')); ?> </th>
-                                <th><?php echo e(__('Discount')); ?></th>
-                                <th><?php echo e(__('Tax')); ?> (%)</th>
-                                <th class="text-end"><?php echo e(__('Amount')); ?> <br><small class="text-danger font-weight-bold"><?php echo e(__('after tax & discount')); ?></small></th>
-                                <th></th>
-                            </tr>
+                            <thead>                            
                             </thead>
-                            <tbody class="ui-sortable" data-repeater-item>
+                            <tbody class="ui-sortable" data-repeater-item>                            
                             <tr>
-                                <td width="25%" class="form-group pt-1">
-                                    <?php echo e(Form::select('item', $product_services,'', array('class' => 'form-control select2 item','data-url'=>route('purchase.product'),'required'=>'required'))); ?>
+                                <td colspan="2">
+                                    <?php echo e(Form::label('itemCode', __('Item Code'), ['class' => 'form-label'])); ?>
+
+                                    <?php echo e(Form::select('itemCode', $product_services_Codes, null, ['class' => 'form-control select2 item_code', 'required' => 'required'])); ?>
 
                                 </td>
-                                <td>
-                                    <div class="form-group price-input input-group search-form">
-                                        <?php echo e(Form::text('quantity','', array('class' => 'form-control quantity','required'=>'required','placeholder'=>__('Qty'),'required'=>'required'))); ?>
+                                <td colspan="2">
+                                       <?php echo e(Form::label('supplritemClsCode', __('Supplier Item Cls Code'), ['class' => 'form-label'])); ?>
 
+                                        <?php echo e(Form::text('supplieritemClsCode', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
-                                        <span class="unit input-group-text bg-transparent"></span>
-                                    </div>
                                 </td>
-                                <td>
-                                    <div class="form-group price-input input-group search-form">
-                                        <?php echo e(Form::text('price','', array('class' => 'form-control price','required'=>'required','placeholder'=>__('Price'),'required'=>'required'))); ?>
+                                <td colspan="2">
+                                      <?php echo e(Form::label('supplierItemCode', __('Supplier Item Code'), ['class' => 'form-label'])); ?>
 
-                                        <span class="input-group-text bg-transparent"><?php echo e(\Auth::user()->currencySymbol()); ?></span>
-                                    </div>
+                                        <?php echo e(Form::text('supplrItemCode', null, ['class' => 'form-control', 'required' => 'required'])); ?>
+
                                 </td>
-                                <td>
-                                    <div class="form-group price-input input-group search-form">
-                                        <?php echo e(Form::text('discount','', array('class' => 'form-control discount','required'=>'required','placeholder'=>__('Discount')))); ?>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                     <?php echo e(Form::label('quantity', __('Quantity'), ['class' => 'form-label'])); ?>
 
-                                        <span class="input-group-text bg-transparent"><?php echo e(\Auth::user()->currencySymbol()); ?></span>
-                                    </div>
+                                        <?php echo e(Form::number('qauntity', null, ['class' => 'form-control', 'required' => 'required'])); ?>
+
                                 </td>
-                                <td>
-                                    <div class="form-group">
-                                        <div class="input-group">
-                                            <div class="taxes"></div>
-                                            <?php echo e(Form::hidden('tax','', array('class' => 'form-control tax'))); ?>
+                                <td colspan="2">
+                                    <?php echo e(Form::label('unitPrice', __('Unit Price'), ['class' => 'form-label'])); ?>
 
-                                            <?php echo e(Form::hidden('itemTaxPrice','', array('class' => 'form-control itemTaxPrice'))); ?>
+                                    <?php echo e(Form::number('unitPrice', null, ['class' => 'form-control unit-price-field', 'required' => 'required', 'disabled' => true, 'readonly' => true, 'id' => 'unit_price'])); ?>
 
-                                            <?php echo e(Form::hidden('itemTaxRate','', array('class' => 'form-control itemTaxRate'))); ?>
-
-                                        </div>
-                                    </div>
                                 </td>
+                                <td colspan="2">
+                                    <?php echo e(Form::label('pkgQuantity', __('Pkg Quantity Code'), ['class' => 'form-label'])); ?>
 
+                                    <?php echo e(Form::text('pkgQuantity', null, ['class' => 'form-control qty-code-field', 'required' => 'required', 'disabled' => true, 'readonly' => true, 'id' => 'pkg_quantity'])); ?>
+
+                                </td>
+                            </tr>
+                             <tr>
+                                <td colspan="2">
+                                      <?php echo e(Form::label('discountRate', __('Discount Rate'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::text('discountRate', null, ['class' => 'form-control', 'required' => 'required'])); ?>
+
+                                </td>
+                                <td colspan="2">
+                                      <?php echo e(Form::label('discountAmt', __('Discount Amt'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::text('DiscountAmt', null, ['class' => 'form-control', 'required' => 'required'])); ?>
+
+                                </td>
+                                <td colspan="2">
+                                      <?php echo e(Form::label('itemExprDt', __('item Expire Date'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::text('itemExprDt', null, ['class' => 'form-control', 'required' => 'required'])); ?>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-end"><?php echo e(__('Amount')); ?> <br><small class="text-danger font-weight-bold"><?php echo e(__('after tax & discount')); ?></small></td>
                                 <td class="text-end amount">
                                     0.00
                                 </td>
                                 <td>
                                     <a href="#" class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></a>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <div class="form-group"><?php echo e(Form::textarea('description', null, ['class'=>'form-control pro_description','rows'=>'2','placeholder'=>__('Description')])); ?></div>
-                                </td>
-                                <td colspan="5"></td>
                             </tr>
                             </tbody>
                             <tfoot>
@@ -580,8 +619,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-
+        </div>    
         <div class="modal-footer">
             <input type="button" value="<?php echo e(__('Cancel')); ?>" onclick="location.href = '<?php echo e(route("purchase.index")); ?>';" class="btn btn-light">
             <input type="submit" value="<?php echo e(__('Create')); ?>" class="btn  btn-primary">
@@ -592,5 +630,30 @@
 
 <?php $__env->stopSection(); ?>
 
+<?php $__env->startPush('script-page'); ?>
+    <script>
+        const itemCodeField = document.querySelector('.item_code');
+        const unitPriceField = document.querySelector('.unit-price-field');
+        const qtyCodeField = document.querySelector('.qty-code-field');
+        itemCodeField.addEventListener('change', async function () {
+                console.log('changed');
+                const itemCode = this.value;
 
+                try {
+                    const response = await fetch(`http://localhost:8000/getitem/${itemCode}`);
+                    const data = await response.json();
+                    console.log(data);
+                    const unitPrice = data.data.dftPrc;
+                    const pkgQuantity = data.data.qtyUnitCd;
+
+                    console.log(unitPrice, pkgQuantity);
+
+                    unitPriceField.value = unitPrice;
+                    qtyCodeField.value = pkgQuantity;
+                } catch (error) {
+                    console.log(error);
+                }
+        });
+    </script>
+<?php $__env->stopPush(); ?>
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/chrisdroid/Desktop/projects/php/erp-go-6.4-using-laravel/resources/views/purchase/create.blade.php ENDPATH**/ ?>

@@ -482,71 +482,47 @@
                             <tr>
                                 <td colspan="2">
                                     {{ Form::label('itemCode', __('Item Code'), ['class' => 'form-label']) }}
-                                {{ Form::select('itemCode', $product_services_Codes, null, ['class' => 'form-control select2', 'required' => 'required']) }}
+                                    {{ Form::select('itemCode', $product_services_Codes, null, ['class' => 'form-control select2 item_code', 'required' => 'required']) }}
                                 </td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
                                 <td colspan="2">
                                        {{ Form::label('supplritemClsCode', __('Supplier Item Cls Code'), ['class' => 'form-label']) }}
                                         {{ Form::text('supplieritemClsCode', null, ['class' => 'form-control', 'required' => 'required']) }}
                                 </td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
                                 <td colspan="2">
                                       {{ Form::label('supplierItemCode', __('Supplier Item Code'), ['class' => 'form-label']) }}
                                         {{ Form::text('supplrItemCode', null, ['class' => 'form-control', 'required' => 'required']) }}
                                 </td>
-                                <td colspan="5"></td>
                             </tr>
                             <tr>
                                 <td colspan="2">
                                      {{ Form::label('quantity', __('Quantity'), ['class' => 'form-label']) }}
                                         {{ Form::number('qauntity', null, ['class' => 'form-control', 'required' => 'required']) }}
                                 </td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
                                 <td colspan="2">
-                                      {{ Form::label('unitPrice', __('Unit Price'), ['class' => 'form-label']) }}
-                                        {{ Form::number('unitPrice', null, ['class' => 'form-control', 'required' => 'required']) }}
+                                    {{ Form::label('unitPrice', __('Unit Price'), ['class' => 'form-label']) }}
+                                    {{ Form::number('unitPrice', null, ['class' => 'form-control unit-price-field', 'required' => 'required', 'disabled' => true, 'readonly' => true, 'id' => 'unit_price']) }}
                                 </td>
-                                <td colspan="5"></td>
-                            </tr>
-                             <tr>
                                 <td colspan="2">
-                                      {{ Form::label('pkgQuantity', __('Pkg Quantity Code'), ['class' => 'form-label']) }}
-                                        {{ Form::text('pkgQuantity', null, ['class' => 'form-control', 'required' => 'required']) }}
+                                    {{ Form::label('pkgQuantity', __('Pkg Quantity Code'), ['class' => 'form-label']) }}
+                                    {{ Form::text('pkgQuantity', null, ['class' => 'form-control qty-code-field', 'required' => 'required', 'disabled' => true, 'readonly' => true, 'id' => 'pkg_quantity']) }}
                                 </td>
-                                <td colspan="5"></td>
                             </tr>
                              <tr>
                                 <td colspan="2">
                                       {{ Form::label('discountRate', __('Discount Rate'), ['class' => 'form-label']) }}
                                         {{ Form::text('discountRate', null, ['class' => 'form-control', 'required' => 'required']) }}
                                 </td>
-                                <td colspan="5"></td>
-                            </tr>
-                             <tr>
                                 <td colspan="2">
                                       {{ Form::label('discountAmt', __('Discount Amt'), ['class' => 'form-label']) }}
                                         {{ Form::text('DiscountAmt', null, ['class' => 'form-control', 'required' => 'required']) }}
                                 </td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
                                 <td colspan="2">
                                       {{ Form::label('itemExprDt', __('item Expire Date'), ['class' => 'form-label']) }}
                                         {{ Form::text('itemExprDt', null, ['class' => 'form-control', 'required' => 'required']) }}
                                 </td>
-                                <td colspan="5"></td>
                             </tr>
                             <tr>
-                                <th class="text-end">{{__('Amount')}} <br><small class="text-danger font-weight-bold">{{__('after tax & discount')}}</small></th>
-                                <th></th>
-                            </tr>
-                            <tr>
+                                <td class="text-end">{{__('Amount')}} <br><small class="text-danger font-weight-bold">{{__('after tax & discount')}}</small></td>
                                 <td class="text-end amount">
                                     0.00
                                 </td>
@@ -607,3 +583,25 @@
 
 @endsection
 
+@push('script-page')
+    <script>
+        const itemCodeField = document.querySelector('.item_code');
+        const unitPriceField = document.querySelector('.unit-price-field');
+        const qtyCodeField = document.querySelector('.qty-code-field');
+        itemCodeField.addEventListener('change', async function () {
+                const itemCode = this.value;
+
+                try {
+                    const response = await fetch(`http://localhost:8000/getitem/${itemCode}`);
+                    const data = await response.json();
+                    const unitPrice = data.data.dftPrc;
+                    const pkgQuantity = data.data.qtyUnitCd;
+
+                    unitPriceField.value = unitPrice;
+                    qtyCodeField.value = pkgQuantity;
+                } catch (error) {
+                    alert(error.data);
+                }
+        });
+    </script>
+@endpush

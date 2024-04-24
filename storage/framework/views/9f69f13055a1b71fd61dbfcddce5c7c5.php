@@ -29,11 +29,6 @@
                 <div class="card-body table-border-style">
 
                     <div class="table-responsive">
-                        <?php if(isset($branches) && $branches['statusCode'] === 200 && $branches['message'] === 'success'): ?>
-                            <?php
-                                $data = $branches['data'];
-                            ?>
-
                             <table class="table datatable">
                                 <thead>
                                     <tr>
@@ -51,7 +46,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="font-style">
-                                    <?php $__currentLoopData = $data['data']['bhfList']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <tr>
                                             <td><?php echo e($branch['tin']); ?></td>
                                             <td><?php echo e($branch['bhfId']); ?></td>
@@ -109,9 +104,6 @@
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </tbody>
                             </table>
-                        <?php else: ?>
-                            <p>Failed to fetch branches from API.</p>
-                        <?php endif; ?>
                     </div>
                 </div>
             </div>

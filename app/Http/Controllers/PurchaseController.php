@@ -104,11 +104,13 @@ class PurchaseController extends Controller
             $warehouse->prepend('Select Warehouse', '');
 
             $product_services = ItemInformation::get()->pluck('itemNm', 'id');
-            $product_services_Codes = ItemInformation::get()->pluck('itemCd', 'id');
+            $product_services_Codes = ItemInformation::get()->pluck('itemNm', 'itemCd');
             $product_services_Codes->prepend('--', '');
             $product_services->prepend('--', '');
             // Fetch countries code  from the details model
             $countries = Details::where('cdCls', '05')->get();
+            // Fetch countries data from the Details model where cdCls is 05
+            $countries = Details::where('cdCls', '05')->get()->pluck('cdNm', 'cdVal');
 
             return view('purchase.create', compact('product_services_Codes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
         } else {

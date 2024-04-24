@@ -1775,6 +1775,4 @@ Route::group(
     }
 );
 
-Route::get('/getpurchasesalesdetailsforsuppliers', [PurchaseController::class, 'getSuppliersDetailsForPurchaseSalesFromApi']);
-// getPurchaseSalesItemsFromApi
-Route::get('/getPurchaseSalesItemsFromApi', [PurchaseController::class, 'getPurchaseSalesItemsFromApi']);
+Route::get('/getpurchasesales', [PurchaseSalesController::class, 'getPurchaseSales']);

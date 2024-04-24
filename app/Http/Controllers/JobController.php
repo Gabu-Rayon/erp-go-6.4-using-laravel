@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Branch;
+use App\Models\BranchesList;
 use App\Models\CustomQuestion;
 use App\Models\Job;
 use App\Models\JobStage;
@@ -41,7 +41,7 @@ class JobController extends Controller
         $categories = JobCategory::where('created_by', \Auth::user()->creatorId())->get()->pluck('title', 'id');
         $categories->prepend('--', '');
 
-        $branches = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+        $branches = BranchesList::all();
         $branches->prepend('All', 0);
 
         $status = Job::$status;
@@ -120,7 +120,7 @@ class JobController extends Controller
         $categories = JobCategory::where('created_by', \Auth::user()->creatorId())->get()->pluck('title', 'id');
         $categories->prepend('--', '');
 
-        $branches = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+        $branches = BranchesList::all();
         $branches->prepend('All', 0);
 
         $status = Job::$status;

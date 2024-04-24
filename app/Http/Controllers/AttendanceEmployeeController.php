@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Imports\AttendanceImport;
 use App\Models\AttendanceEmployee;
-use App\Models\Branch;
+use App\Models\BranchesList;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\IpRestrict;
@@ -20,7 +20,7 @@ class AttendanceEmployeeController extends Controller
 
         if (\Auth::user()->can('manage attendance')) {
 
-            $branch = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $branch = BranchesList::all();
             $branch->prepend('Select Branch', '');
 
             $department = Department::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -481,7 +481,7 @@ class AttendanceEmployeeController extends Controller
     {
         if (\Auth::user()->can('create attendance')) {
 
-            $branch = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $branch = BranchesList::all();
             $branch->prepend('Select Branch', '');
 
             $department = Department::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');

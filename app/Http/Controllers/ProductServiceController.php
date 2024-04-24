@@ -357,6 +357,23 @@ class ProductServiceController extends Controller
         $iteminformation = ItemInformation::find($id);
         return view('productservice.show', compact('iteminformation'));
     }
+
+    public function getItem($code)
+    {
+        try {
+            $iteminformation = ItemInformation::where('itemCd', $code)->first();
+            return response()->json([
+                'message'=> 'success',
+                'data' => $iteminformation
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message'=> 'error',
+                'data' => $e->getMessage()
+            ]);
+        
+        }
+    }
     // public function edit($id)
     // {
     //     $productService = ProductService::find($id);
