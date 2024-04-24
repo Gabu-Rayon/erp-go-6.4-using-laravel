@@ -103,7 +103,7 @@ class PurchaseController extends Controller
             $warehouse->prepend('Select Warehouse', '');
 
             $product_services = ItemInformation::get()->pluck('itemNm', 'id');
-            $product_services_Codes = ItemInformation::get()->pluck('itemCd', 'id');
+            $product_services_Codes = ItemInformation::get()->pluck('itemNm', 'itemCd');
             $product_services_Codes->prepend('--', '');
             $product_services->prepend('--', '');
             // Fetch countries code  from the details model

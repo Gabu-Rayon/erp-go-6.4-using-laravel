@@ -21,6 +21,8 @@ class Purchase_Sales_Items extends Model
         'spplrItemCd',
         'spplrItemNm',
         'pkgUnitCd',
+        'pkg',
+        'qtyUnitCd',
         'qty',
         'prc',
         'splyAmt',
@@ -30,7 +32,7 @@ class Purchase_Sales_Items extends Model
         'taxblAmt',
         'taxAmt',
         'totAmt',
-        'itemExprDt'
+        'itemExprDt',
     ];
 
 }

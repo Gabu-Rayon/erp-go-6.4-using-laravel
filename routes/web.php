@@ -1776,3 +1776,4 @@ Route::group(
 );
 
 Route::get('/getpurchasesales', [PurchaseSalesController::class, 'getPurchaseSales']);
+Route::get('/getitem/{id}', [ProductServiceController::class, 'getItem']);
