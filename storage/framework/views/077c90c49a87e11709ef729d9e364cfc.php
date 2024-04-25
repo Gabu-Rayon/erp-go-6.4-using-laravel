@@ -513,28 +513,21 @@
                                 <td colspan="2">
                                     <?php echo e(Form::label('itemCode', __('Item Code'), ['class' => 'form-label'])); ?>
 
-                                <?php echo e(Form::select('itemCode', $product_services_Codes, null, ['class' => 'form-control select2', 'required' => 'required'])); ?>
+                                    <?php echo e(Form::select('itemCode', $product_services_Codes, null, ['class' => 'form-control select2 item_code', 'required' => 'required'])); ?>
 
                                 </td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
                                 <td colspan="2">
                                        <?php echo e(Form::label('supplritemClsCode', __('Supplier Item Cls Code'), ['class' => 'form-label'])); ?>
 
                                         <?php echo e(Form::text('supplieritemClsCode', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
                                 </td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
                                 <td colspan="2">
                                       <?php echo e(Form::label('supplierItemCode', __('Supplier Item Code'), ['class' => 'form-label'])); ?>
 
                                         <?php echo e(Form::text('supplrItemCode', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
                                 </td>
-                                <td colspan="5"></td>
                             </tr>
                             <tr>
                                 <td colspan="2">
@@ -543,25 +536,18 @@
                                         <?php echo e(Form::number('qauntity', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
                                 </td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
                                 <td colspan="2">
-                                      <?php echo e(Form::label('unitPrice', __('Unit Price'), ['class' => 'form-label'])); ?>
+                                    <?php echo e(Form::label('unitPrice', __('Unit Price'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::number('unitPrice', null, ['class' => 'form-control', 'required' => 'required'])); ?>
+                                    <?php echo e(Form::number('unitPrice', null, ['class' => 'form-control unit-price-field', 'required' => 'required', 'disabled' => true, 'readonly' => true, 'id' => 'unit_price'])); ?>
 
                                 </td>
-                                <td colspan="5"></td>
-                            </tr>
-                             <tr>
                                 <td colspan="2">
-                                      <?php echo e(Form::label('pkgQuantity', __('Pkg Quantity Code'), ['class' => 'form-label'])); ?>
+                                    <?php echo e(Form::label('pkgQuantity', __('Pkg Quantity Code'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::text('pkgQuantity', null, ['class' => 'form-control', 'required' => 'required'])); ?>
+                                    <?php echo e(Form::text('pkgQuantity', null, ['class' => 'form-control qty-code-field', 'required' => 'required', 'disabled' => true, 'readonly' => true, 'id' => 'pkg_quantity'])); ?>
 
                                 </td>
-                                <td colspan="5"></td>
                             </tr>
                              <tr>
                                 <td colspan="2">
@@ -570,31 +556,21 @@
                                         <?php echo e(Form::text('discountRate', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
                                 </td>
-                                <td colspan="5"></td>
-                            </tr>
-                             <tr>
                                 <td colspan="2">
                                       <?php echo e(Form::label('discountAmt', __('Discount Amt'), ['class' => 'form-label'])); ?>
 
                                         <?php echo e(Form::text('DiscountAmt', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
                                 </td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
                                 <td colspan="2">
                                       <?php echo e(Form::label('itemExprDt', __('item Expire Date'), ['class' => 'form-label'])); ?>
 
                                         <?php echo e(Form::text('itemExprDt', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
                                 </td>
-                                <td colspan="5"></td>
                             </tr>
                             <tr>
-                                <th class="text-end"><?php echo e(__('Amount')); ?> <br><small class="text-danger font-weight-bold"><?php echo e(__('after tax & discount')); ?></small></th>
-                                <th></th>
-                            </tr>
-                            <tr>
+                                <td class="text-end"><?php echo e(__('Amount')); ?> <br><small class="text-danger font-weight-bold"><?php echo e(__('after tax & discount')); ?></small></td>
                                 <td class="text-end amount">
                                     0.00
                                 </td>
@@ -656,5 +632,26 @@
 
 <?php $__env->stopSection(); ?>
 
+<?php $__env->startPush('script-page'); ?>
+    <script>
+        const itemCodeField = document.querySelector('.item_code');
+        const unitPriceField = document.querySelector('.unit-price-field');
+        const qtyCodeField = document.querySelector('.qty-code-field');
+        itemCodeField.addEventListener('change', async function () {
+                const itemCode = this.value;
 
+                try {
+                    const response = await fetch(`http://localhost:8000/getitem/${itemCode}`);
+                    const data = await response.json();
+                    const unitPrice = data.data.dftPrc;
+                    const pkgQuantity = data.data.qtyUnitCd;
+
+                    unitPriceField.value = unitPrice;
+                    qtyCodeField.value = pkgQuantity;
+                } catch (error) {
+                    alert(error.data);
+                }
+        });
+    </script>
+<?php $__env->stopPush(); ?>
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/purchase/create.blade.php ENDPATH**/ ?>
