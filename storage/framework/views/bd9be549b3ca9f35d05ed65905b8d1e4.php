@@ -218,39 +218,6 @@
         const discountRateField = document.querySelector('.discount-rate-field');
         const discountAmountField = document.querySelector('.discount-amount-field');
         const addItemButton = document.querySelector('.add-item-button');
-        // Listen for click events on the parent container
-document.addEventListener('click', function(event) {
-    // Check if the clicked element is the "Add item" button
-    if (event.target.classList.contains('add-item-button')) {
-        // Clone the item section
-        const itemSection = document.querySelector('.item-fieldsss');
-        const itemSectionClone = itemSection.cloneNode(true);
-        const itemSectionParent = itemSection.parentNode;
-        itemSectionParent.appendChild(itemSectionClone);
-
-        // Remove IDs to avoid duplication
-        itemSectionClone.removeAttribute('id');
-
-        // Attach event listener to the cloned item code field
-        const clonedItemCodeField = itemSectionClone.querySelector('.item_code');
-        clonedItemCodeField.addEventListener('change', async function () {
-            // Handle item code change event
-            const itemCode = this.value;
-            try {
-                const response = await fetch(`http://localhost:8000/getitem/${itemCode}`);
-                const data = await response.json();
-                const unitPrice = data.data.dftPrc;
-                const pkgQuantity = data.data.qtyUnitCd;
-                const unitPriceField = itemSectionClone.querySelector('.unit-price-field');
-                const qtyCodeField = itemSectionClone.querySelector('.qty-code-field');
-                unitPriceField.value = unitPrice;
-                qtyCodeField.value = pkgQuantity;
-            } catch (error) {
-                console.log('ITEM CODE', error);
-            }
-        });
-    }
-});
 
 
         itemCodeField.addEventListener('change', async function () {
@@ -297,6 +264,15 @@ document.addEventListener('click', function(event) {
                     console.log('DISCOUNT RATE', error);
                 }
             });
+
+            addItemButton.addEventListener('click', () => {
+                console.log('CLICKED');
+                const itemFields = document.querySelectorAll('.item-fieldsss');
+                const itemField = itemFields[itemFields.length - 1];
+                const itemFieldClone = itemField.cloneNode(true);
+                const itemFieldParent = itemField.parentNode;
+                itemFieldParent.appendChild(itemFieldClone);
+            })
     </script>
 <?php $__env->stopPush(); ?>
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/chrisdroid/Desktop/projects/php/erp-go-6.4-using-laravel/resources/views/purchase/create.blade.php ENDPATH**/ ?>
