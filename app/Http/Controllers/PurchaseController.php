@@ -1093,27 +1093,21 @@ class PurchaseController extends Controller
             // Divide the data into batches of 100 items each
             if (isset($purchaseSalesList)) {
                 foreach ($purchaseSalesList as $class) {
-                    // Initialize $spplrInvcNo as null
-                    $spplrInvcNo = null;
+                    // Initialize    $saleItemCode as null
+                       $saleItemCode = null;
 
                     if (isset($class['spplrInvcNo'])) {
-                        $spplrInvcNo = $class['spplrInvcNo'];
+                           $saleItemCode = $class['spplrInvcNo'];
                     }
-
-                    \Log::info('API Request Data of Sales and Purchases All Invoices No: ' . json_encode($spplrInvcNo));
-
+                    \Log::info('API Request Data of Sales and Purchases All Invoices No: ' . json_encode(   $saleItemCode));
                     $itemlists = $class['itemList'];
                     if (isset($itemlists)) {
                         $batches = array_chunk($itemlists, 100);
                         foreach ($batches as $batch) {
                             foreach ($batch as $item) {
-
-
-                                \Log::info('Processing item with spplrInvcNo: ' . $spplrInvcNo . ' and item: ' . json_encode($item));
-
-                                if (!empty($spplrInvcNo)) {
+                                \Log::info('Processing item with spplrInvcNo: ' .    $saleItemCode . ' and item: ' . json_encode($item));                                if (!empty(   $saleItemCode)) {
                                     Purchase_Sales_Items::create([
-                                        'saleItemCode' => $spplrInvcNo,
+                                        'saleItemCode' =>    $saleItemCode,
                                         'itemSeq' => $item['itemSeq'],
                                         'itemCd' => $item['itemCd'],
                                         'itemClsCd' => $item['itemClsCd'],
@@ -1148,11 +1142,9 @@ class PurchaseController extends Controller
             return redirect()->route('purchase.index')->with('error', __('Error adding Sales Items Lists Details  from the API.'));
         }
     }
-
     public function getSuppliersDetailsForPurchaseSalesFromApi()
     {
         try {
-
             ini_set('max_execution_time', 300);
             $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
 

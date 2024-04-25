@@ -11,6 +11,7 @@ class Purchase_Sales_Items extends Model
 
     protected $table = 'purchase_sales_items'; // Correct table name
     protected $fillable = [     
+        'saleItemCode',
         'itemSeq',
         'itemCd',
         'itemClsCd',
