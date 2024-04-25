@@ -97,7 +97,7 @@ class PurchaseController extends Controller
             $category->prepend('Select Category', '');
 
             $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
-            $suppliers = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $suppliers = Vender::all()->pluck('name', 'id');
             $suppliers->prepend('Select Supplier', '');
 
             $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -115,6 +115,15 @@ class PurchaseController extends Controller
             return view('purchase.create', compact('product_services_Codes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
+        }
+    }
+
+    public function getSupplier($id) {
+        try {
+            $supplier = Vender::find($id);
+            return response()->json(['success' => true, 'data' => $supplier]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 401);
         }
     }
 
@@ -208,65 +217,11 @@ class PurchaseController extends Controller
 
     public function store(Request $request)
     {
-        // Check if the authenticated user has permission to create a purchase
         if (\Auth::user()->can('create purchase')) {
-            // Validation rules for incoming request data
-            $validator = \Validator::make(
-                $request->all(),
-                [
-                    'vender_id' => 'required',
-                    'warehouse_id' => 'required',
-                    'purchase_date' => 'required',
-                    'category_id' => 'required',
-                    'items' => 'required|array',
-                    'vendor_invoice_no' => 'required',
-                    'purchase_type_code' => 'required',
-                    'purchase_number' => 'required',
-                ]
-            );
-
-            // If validation fails, return with error messages
-            if ($validator->fails()) {
-                return redirect()->back()->with('error', $validator->errors()->first());
-            }
-
-            // Prepare data to be sent to the API
-            $requestData = [
-                'supplierInvcNo' => $request->vendor_invoice_no,
-                'purchaseTypeCode' => $request->purchase_type_code,
-                'purchaseStatuCode' => $request->purchase_number,
-                'itemPurchases' => [],
-            ];
-
-            // Process each item and add to the itemPurchases array
-            foreach ($request->items as $item) {
-                $requestData['itemPurchases'][] = [
-                    'supplierItemCode' => $request->vender_id,
-                    'itemCode' => $request->purchase_number,
-                ];
-            }
-
-            // Make API call to store the purchase
-            $response = Http::withHeaders([
-                'accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'key' => '123456',
-            ])->post('https://etims.your-apps.biz/api/AddPurchase', $requestData);
-
-            // Log the API response
-            \Log::info('API Request Data: ' . json_encode($requestData));
-            \Log::info('API Response: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
-
-            // Check if API call was successful
-            if ($response->successful()) {
-                return redirect()->route('purchase.index')->with('success', __('Purchase successfully created.'));
-            } else {
-                // If API call failed, return with error message
-                return redirect()->back()->with('error', __('Failed to create purchase.'));
-            }
+            \Log::info('Deyraa');
+            \Log::info(json_encode($request['items']));
+            return redirect()->back()->with('success', 'Purchase Created Successfully');
         } else {
-            // If user doesn't have permission, return with error message
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -1268,5 +1223,12 @@ class PurchaseController extends Controller
         }
     }
 
-
+    public function getItem ($code) {
+        try {
+            $item = ItemInformation::where('itemCd', $code)->first();
+            return response()->json(['status' => 'success', 'data' => $item]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Item not found']);
+        }
+    }
 }
