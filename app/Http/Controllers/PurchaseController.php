@@ -1086,7 +1086,6 @@ class PurchaseController extends Controller
             $data = $response->json();
             $purchaseSalesList = $data['data']['data']['saleList'];
 
-            // Log API request and response details
             \Log::info('API Request Data  of Sales and Purchases: ' . json_encode($purchaseSalesList));
             \Log::info('API Response: ' . $response->body());
             \Log::info('API Response Status Code: ' . $response->status());
@@ -1098,11 +1097,9 @@ class PurchaseController extends Controller
                     $spplrInvcNo = null;
 
                     if (isset($class['spplrInvcNo'])) {
-                        // Set $spplrInvcNo if it exists in the current $class
                         $spplrInvcNo = $class['spplrInvcNo'];
                     }
 
-                    // Log the value of spplrInvcNo
                     \Log::info('API Request Data of Sales and Purchases All Invoices No: ' . json_encode($spplrInvcNo));
 
                     $itemlists = $class['itemList'];
@@ -1112,7 +1109,6 @@ class PurchaseController extends Controller
                             foreach ($batch as $item) {
 
 
-                                // Log the item and spplrInvcNo value
                                 \Log::info('Processing item with spplrInvcNo: ' . $spplrInvcNo . ' and item: ' . json_encode($item));
 
                                 if (!empty($spplrInvcNo)) {
