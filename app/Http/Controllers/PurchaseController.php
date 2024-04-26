@@ -7,9 +7,7 @@ use App\Models\User;
 use App\Models\Vender;
 use App\Models\Details;
 use App\Models\Utility;
-use App\Models\Purchase_Sales_Items;
 use App\Models\Purchase;
-use App\Models\Purchase_Sales;
 use App\Models\warehouse;
 use App\Models\BankAccount;
 use App\Models\CustomField;
@@ -18,12 +16,18 @@ use App\Models\Transaction;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\ProductService;
+use App\Models\Purchase_Sales;
 use App\Models\ItemInformation;
 use App\Models\PurchasePayment;
 use App\Models\PurchaseProduct;
+use App\Models\PaymentTypeCodes;
+use App\Models\ReceiptTypeCodes;
 use App\Models\WarehouseProduct;
+use App\Models\PurchaseTypeCodes;
 use App\Models\WarehouseTransfer;
 use Illuminate\Support\Facades\DB;
+use App\Models\PurchaseStatusCodes;
+use App\Models\Purchase_Sales_Items;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\ProductServiceCategory;
@@ -111,21 +115,16 @@ class PurchaseController extends Controller
             $countries = Details::where('cdCls', '05')->get();
             // Fetch countries data from the Details model where cdCls is 05
             $countries = Details::where('cdCls', '05')->get()->pluck('cdNm', 'cdVal');
-
-            return view('purchase.create', compact('product_services_Codes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
+            $paymentTypeCodes = PaymentTypeCodes::get()->pluck('payment_type_code');
+            $purchaseTypeCodes = PurchaseTypeCodes::get()->pluck('purchase_type_code');
+            $purchaseStatusCodes = PurchaseStatusCodes::get()->pluck('purchase_status_code');
+            $ReceiptTypesCodes = ReceiptTypeCodes::get()->pluck('receipt_type_code');
+            return view('purchase.create', compact('product_services_Codes','paymentTypeCodes', 'purchaseTypeCodes', 'purchaseStatusCodes', 'ReceiptTypesCodes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
     }
-
-    public function getSupplier($id) {
-        try {
-            $supplier = Vender::find($id);
-            return response()->json(['success' => true, 'data' => $supplier]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 401);
-        }
-    }
+   
 
     /********
      * Store a newly created Purchase in storage.
@@ -217,10 +216,80 @@ class PurchaseController extends Controller
 
     public function store(Request $request)
     {
+
         if (\Auth::user()->can('create purchase')) {
-            \Log::info('Deyraa');
-            \Log::info(json_encode($request['items']));
-            return redirect()->back()->with('success', 'Purchase Created Successfully');
+        $rules = [
+                'supplierTin' => 'required',
+                'supplierBhfId' => 'required',           
+                'supplierInvcNo' => 'required',
+                'purchTypeCode' => 'required',
+                'purchStatusCode' => 'required',
+                'pmtTypeCode' => 'required',
+                'purchDate' => 'required',
+                'occurredDate' => 'required',
+                'confirmDate' => 'required',
+                'warehouseDate' => 'required',
+                'remark' => 'required',
+                'mapping' => 'required',
+                
+                'itemsDataList.*.itemCode' => 'required',
+                'itemsDataList.*.supplrItemClsCode' => 'required',
+                'itemsDataList.*.supplrItemCode' => 'required',
+                'itemsDataList.*.supplrItemName' => 'required',
+                'itemsDataList.*.quantity' => 'required',
+                'itemsDataList.*.unitPrice' => 'required',
+                'itemsDataList.*.pkgQuantity' => 'required',
+                'itemsDataList.*.discountRate' => 'required',
+                'itemsDataList.*.discountAmt' => 'required',
+                'itemsDataList.*.itemExprDt' => 'required',
+    ];
+
+
+        $validator = \Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            $messages = $validator->getMessageBag();
+            return redirect()->route('purchase.index')->with('error', $messages->first());
+        }
+            $requestData = [
+                'supplierTin' => $request->input('supplierTin'),
+                'supplierBhfId' => $request->input('supplierBhfId'),
+                'supplierName' => $request->input('supplierName'),
+                'supplierInvcNo' => $request->input('supplierInvcNo'),
+                'purchTypeCode' => $request->input('purchTypeCode'),
+                'purchStatusCode' => $request->input('purchStatusCode'),
+                'pmtTypeCode' => $request->input('pmtTypeCode'),
+                'purchDate' => $request->input('purchDate'),
+                'occurredDate' => $request->input('occurredDate'),
+                'confirmDate' => $request->input('confirmDate'),
+                'warehouseDate' => $request->input('warehouseDate'),
+                'remark' => $request->input('remark'),
+                'mapping' => $request->input('mapping'),
+                'itemsDataList' => $request->input('itemsDataList')
+            ];
+
+            var_dump($requestData);
+
+            // Send a POST request to the API endpoint
+            $response = Http::withHeaders([
+                'accept' => 'application/json',
+                'key' => '123456',
+                'Content-Type' => 'application/json',
+            ])->post('https://etims.your-apps.biz/api/AddPurchase', $requestData);
+
+
+            // Log the response status code
+            \Log::info('API Response Status  Code For Posting Purchase Data: ' . $response->status());
+            \Log::info('API Request Data  For Posting Purchase Data: ' . json_encode($requestData));
+            \Log::info('API Response  Body For Posting Purchase Data: ' . $response->body());
+            \Log::info('API Response Status Code For Posting Purchase Data: ' . $response->status());
+
+            // Check if the request was successful
+            if ($response->successful()) {
+                return redirect()->back()->with('success', 'Purchase Created Successfully');
+            } else {
+                return redirect()->back()->with('error', 'Failed to create purchase. Please try again.');
+            }
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
