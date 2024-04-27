@@ -1413,6 +1413,29 @@
             </ul>
         </li>
 
+        <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : ''); ?>">
+            <a href="#!" class="dash-link">
+                <span class="dash-micon">
+                    <i class="ti ti-layers-difference"></i>
+                </span>
+                <span class="dash-mtext"><?php echo e(__('Stock Information')); ?></span>
+                <span class="dash-arrow">
+                    <i data-feather="chevron-right"></i>
+                </span>
+            </a>
+            <ul class="dash-submenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' || Request::segment(1) == 'adjust'); ?>">
+                <li class="dash-item <?php echo e(Request::route()->getName() == 'index'); ?>">
+                    <a class="dash-link" href="<?php echo e(route('stockinfo.index')); ?>"><?php echo e(__('Get Move List')); ?></a>
+                </li>
+                <li class="dash-item <?php echo e(Request::route()->getName() == 'index'); ?>">
+                    <a class="dash-link" href="<?php echo e(route('stockinfo.stockadjustment')); ?>"><?php echo e(__('Stock Adjustment List')); ?></a>
+                </li>
+                <li class="dash-item <?php echo e(Request::route()->getName() == 'create'); ?>">
+                    <a class="dash-link" href="<?php echo e(route('stockinfo.create')); ?>"><?php echo e(__('Move Stock')); ?></a>
+                </li>
+            </ul>
+        </li>
+
         <?php if(\Auth::user()->type != 'super admin'): ?>
             <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'support' ? 'active' : ''); ?>">
                 <a href="<?php echo e(route('support.index')); ?>" class="dash-link">

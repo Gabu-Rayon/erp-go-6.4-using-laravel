@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StockMoveListController;
 use App\Http\Controllers\ImportedItemsController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PosController;
@@ -1429,6 +1430,21 @@ Route::group(['middleware' => ['verified']], function () {
         },
     );
 
+    Route::group(
+        [
+            'middleware' => [
+                'auth',
+                'XSS',
+                'revalidate',
+            ],
+        ], function () {
+            Route::resource('stockinfo', StockMoveListController::class);
+        },
+    );
+
+    Route::get('stockinfo/stockadjustment', [StockMoveListController::class, 'stockAdjustment'])->name('stockinfo.stockadjustment');
+    Route::get('stockinfo/getstockmovelistfromapi', [StockMoveListController::class, 'getStockMoveListFromApi']);
+
     Route::resource('competencies', CompetenciesController::class)->middleware(['auth', 'XSS']);
 
     Route::group(
@@ -1537,6 +1553,7 @@ Route::group(['middleware' => ['verified']], function () {
             Route::get('purchase/create/{cid}', [PurchaseController::class, 'create'])->name('purchase.create');
             Route::get('purchase/{id}/sent', [PurchaseController::class, 'sent'])->name('purchase.sent');
             Route::get('purchase/{id}/resent', [PurchaseController::class, 'resent'])->name('purchase.resent');
+            Route::put('purchase/{id}/update', [PurchaseController::class, 'update'])->name('purchase.update');
         }
 
     );
@@ -1794,3 +1811,4 @@ Route::get('/getPurchaseSalesItemsFromApi', [PurchaseController::class, 'getPurc
 Route::get('/getpurchasesalesdetailsforsuppliers', [PurchaseController::class, 'getSuppliersDetailsForPurchaseSalesFromApi']);
 Route::get('/getsupplier/{id}', [PurchaseController::class, 'getSupplier']);
 Route::get('/getitem/{id}', [PurchaseController::class, 'getItem']);
+Route::get('stockinfoo/getstockmovelistfromapi', [StockMoveListController::class, 'getStockMoveListFromApi']);

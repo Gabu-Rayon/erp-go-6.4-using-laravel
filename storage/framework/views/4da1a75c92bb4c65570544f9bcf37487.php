@@ -75,19 +75,19 @@
                                     <td><?php echo e($purchase->pkgUnitCd); ?></td>
                                     <td><?php echo e($purchase->qtyUnitCd); ?></td>
                                     <td><?php echo e($purchase->totAmt); ?></td>
-                                    <td>
+                                    <td class="d-flex" style="gap: 1rem;">
                                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('show purchase')): ?>
-                                            <a href="<?php echo e(route('purchase.show',$purchase->id)); ?>" class="edit-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo e(__('Show')); ?>">
+                                            <a href="<?php echo e(route('purchase.show', $purchase->id)); ?>" class="edit-icon btn btn-info btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo e(__('Show')); ?>">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                         <?php endif; ?>
                                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit purchase')): ?>
-                                            <a href="<?php echo e(route('purchase.edit',$purchase->id)); ?>" class="edit-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo e(__('Edit')); ?>">
+                                            <a href="<?php echo e(route('purchase.edit',$purchase->id)); ?>" class="edit-icon btn btn-sm btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo e(__('Edit')); ?>">
                                                 <i class="fas fa-pencil-alt"></i>
                                             </a>
                                         <?php endif; ?>
                                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete purchase')): ?>
-                                            <a href="#" class="delete-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo e(__('Delete')); ?>" onclick="deleteData(<?php echo e($purchase->id); ?>)">
+                                            <a href="#" class="delete-icon btn btn-sm btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo e(__('Delete')); ?>" onclick="deleteData('<?php echo e($purchase->id); ?>')">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                         <?php endif; ?>

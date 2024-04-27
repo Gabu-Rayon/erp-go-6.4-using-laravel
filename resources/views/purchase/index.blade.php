@@ -75,19 +75,19 @@
                                     <td>{{ $purchase->pkgUnitCd }}</td>
                                     <td>{{ $purchase->qtyUnitCd }}</td>
                                     <td>{{ $purchase->totAmt }}</td>
-                                    <td>
+                                    <td class="d-flex" style="gap: 1rem;">
                                         @can('show purchase')
-                                            <a href="{{ route('purchase.show',$purchase->id) }}" class="edit-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="{{__('Show')}}">
+                                            <a href="{{ route('purchase.show', $purchase->id) }}" class="edit-icon btn btn-info btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="{{__('Show')}}">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                         @endcan
                                         @can('edit purchase')
-                                            <a href="{{ route('purchase.edit',$purchase->id) }}" class="edit-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="{{__('Edit')}}">
+                                            <a href="{{ route('purchase.edit',$purchase->id) }}" class="edit-icon btn btn-sm btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="{{__('Edit')}}">
                                                 <i class="fas fa-pencil-alt"></i>
                                             </a>
                                         @endcan
                                         @can('delete purchase')
-                                            <a href="#" class="delete-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="{{__('Delete')}}" onclick="deleteData({{ $purchase->id }})">
+                                            <a href="#" class="delete-icon btn btn-sm btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="{{__('Delete')}}" onclick="deleteData('{{ $purchase->id }}')">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                         @endcan

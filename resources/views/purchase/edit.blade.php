@@ -488,7 +488,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         {{ Form::label('purchase_number', __('Purchase Number'),['class'=>'form-label']) }}
-                                        <input type="text" class="form-control" value="{{$purchase_number}}" readonly>
+                                        <input type="text" class="form-control" value="{{ $purchase->id}}" readonly>
                                     </div>
                                 </div>
 

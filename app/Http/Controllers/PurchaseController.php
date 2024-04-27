@@ -15,7 +15,6 @@ use App\Models\StockReport;
 use App\Models\Transaction;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\Models\ProductService;
 use App\Models\Purchase_Sales;
 use App\Models\ItemInformation;
 use App\Models\PurchasePayment;
@@ -296,47 +295,41 @@ class PurchaseController extends Controller
     }
 
 
-    public function show($ids)
+    public function show($id)
     {
 
         if (\Auth::user()->can('show purchase')) {
             try {
-                $id = Crypt::decrypt($ids);
-            } catch (\Throwable $th) {
+                \Log::info('ID');
+                \Log::info($id);
+                $purchase = Purchase_Sales_Items::find($id);
+                \Log::info('PURCHASE');
+                \lOG::INFO($purchase);
+                return view('purchase.show', compact('purchase'));
+            } catch (\Exception $e) {
+                \Log::error($e);
                 return redirect()->back()->with('error', __('Purchase Not Found.'));
-            }
-
-            $id = Crypt::decrypt($ids);
-            $purchase = Purchase::find($id);
-
-            if ($purchase->created_by == \Auth::user()->creatorId()) {
-
-                $purchasePayment = PurchasePayment::where('purchase_id', $purchase->id)->first();
-                $vendor = $purchase->vender;
-                $iteams = $purchase->items;
-
-                return view('purchase.view', compact('purchase', 'vendor', 'iteams', 'purchasePayment'));
-            } else {
-                return redirect()->back()->with('error', __('Permission denied.'));
             }
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
 
-    public function edit($idsd)
+    public function edit($id)
     {
         if (\Auth::user()->can('edit purchase')) {
+            \Log::info('EDIT ID');
+            \Log::info($id);
+            $purchase = Purchase_Sales_Items::find($id);
+            $purchase_number = $id;
+            \Log::info('EDIT ITEM');
+            \Log::info($purchase);
+            $category = ProductServiceCategory::all()->pluck('name', 'id');
+            $warehouse = warehouse::all()->pluck('name', 'id');
 
-            $idwww = Crypt::decrypt($idsd);
-            $purchase = Purchase::find($idwww);
-            $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
-            $category->prepend('Select Category', '');
-            $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-
-            $purchase_number = \Auth::user()->purchaseNumberFormat($purchase->purchase_id);
-            $venders = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->where('type', '!=', 'service')->get()->pluck('name', 'id');
+            $purchase_number = $purchase->purchase_id;
+            $venders = Vender::all()->pluck('name', 'id');
+            $product_services = ItemInformation::all()->pluck('itemNm', 'id');
 
             return view('purchase.edit', compact('venders', 'product_services', 'purchase', 'warehouse', 'purchase_number', 'category'));
         } else {
@@ -344,88 +337,20 @@ class PurchaseController extends Controller
         }
     }
 
-    public function update(Request $request, Purchase $purchase)
+    public function update(Request $request, Purchase_Sales_Items $purchase)
     {
-
-
-        if (\Auth::user()->can('edit purchase')) {
-
-            if ($purchase->created_by == \Auth::user()->creatorId()) {
-                $validator = \Validator::make(
-                    $request->all(),
-                    [
-                        'vender_id' => 'required',
-                        'purchase_date' => 'required',
-                        'items' => 'required',
-                    ]
-                );
-                if ($validator->fails()) {
-                    $messages = $validator->getMessageBag();
-
-                    return redirect()->route('purchase.index')->with('error', $messages->first());
-                }
-                $purchase->vender_id = $request->vender_id;
-                $purchase->purchase_date = $request->purchase_date;
-                $purchase->category_id = $request->category_id;
-                $purchase->save();
-                $products = $request->items;
-
-                for ($i = 0; $i < count($products); $i++) {
-                    $purchaseProduct = PurchaseProduct::find($products[$i]['id']);
-
-                    if ($purchaseProduct == null) {
-                        $purchaseProduct = new PurchaseProduct();
-                        $purchaseProduct->purchase_id = $purchase->id;
-
-                        Utility::total_quantity('plus', $products[$i]['quantity'], $products[$i]['item']);
-                        $old_qty = 0;
-                    } else {
-                        $old_qty = $purchaseProduct->quantity;
-                        Utility::total_quantity('minus', $purchaseProduct->quantity, $purchaseProduct->product_id);
-                    }
-
-                    if (isset($products[$i]['item'])) {
-                        $purchaseProduct->product_id = $products[$i]['item'];
-                    }
-
-                    $purchaseProduct->quantity = $products[$i]['quantity'];
-                    $purchaseProduct->tax = $products[$i]['tax'];
-                    $purchaseProduct->discount = $products[$i]['discount'];
-                    $purchaseProduct->price = $products[$i]['price'];
-                    $purchaseProduct->description = $products[$i]['description'];
-                    $purchaseProduct->save();
-
-                    if ($products[$i]['id'] > 0) {
-                        Utility::total_quantity('plus', $products[$i]['quantity'], $purchaseProduct->product_id);
-
-                    }
-
-                    //Product Stock Report
-                    $type = 'purchase';
-                    $type_id = $purchase->id;
-                    StockReport::where('type', '=', 'purchase')->where('type_id', '=', $purchase->id)->delete();
-                    $description = $products[$i]['quantity'] . '  ' . __(' quantity add in purchase') . ' ' . \Auth::user()->purchaseNumberFormat($purchase->purchase_id);
-
-                    if (isset($products[$i]['item'])) {
-                        Utility::addProductStock($products[$i]['item'], $products[$i]['quantity'], $type, $description, $type_id);
-                    }
-
-                    //Warehouse Stock Report
-                    $new_qty = $purchaseProduct->quantity;
-                    $total_qty = $new_qty - $old_qty;
-                    if (isset($products[$i]['item'])) {
-
-                        Utility::addWarehouseStock($products[$i]['item'], $total_qty, $request->warehouse_id);
-                    }
-
-                }
-
-                return redirect()->route('purchase.index')->with('success', __('Purchase successfully updated.'));
-            } else {
-                return redirect()->back()->with('error', __('Permission denied.'));
+        try {
+            if (\Auth::user()->can('edit purchase')) {
+                \Log::info('Permitted');
+                \Log::info('Request: ');
+                \Log::info($request->all());
+                \Log::info('Purchase: ');
+                \Log::info($purchase);
             }
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
+        } catch (\Exception $e) {
+            \Log::error('Update Purchase Error');
+            \Log::error($e);
+            return redirect()->back()->with('error', __('Something went wrong.'));
         }
     }
 
