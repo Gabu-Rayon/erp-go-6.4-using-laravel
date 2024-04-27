@@ -13,7 +13,6 @@ class ApiInitializationController extends Controller
     //
     public function index()
     {
-        if (\Auth::user()->type == 'company') {
             Log::info(\Auth::user()->type);
             try {
                 $apiinitializations = ApiInitialization::all();
@@ -22,8 +21,6 @@ class ApiInitializationController extends Controller
             } catch (\Exception $e) {
                 Log::error($e->getMessage());
             }
-        }
-        return view('apiinitialization.index');
     }
 
     public function show(APIInitialization $apiinitialization) {

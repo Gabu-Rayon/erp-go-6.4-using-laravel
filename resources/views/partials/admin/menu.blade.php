@@ -1383,6 +1383,26 @@
         @endif
         <!--------------------- End POs System ----------------------------------->
 
+        <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : '' }}">
+            <a href="#!" class="dash-link">
+                <span class="dash-micon">
+                    <i class="ti ti-layers-difference"></i>
+                </span>
+                <span class="dash-mtext">{{ __('Import Items') }}</span>
+                <span class="dash-arrow">
+                    <i data-feather="chevron-right"></i>
+                </span>
+            </a>
+            <ul class="dash-submenu {{ Request::segment(1) == 'index' || Request::segment(1) == 'create' }}">
+                <li class="dash-item {{ Request::route()->getName() == 'index' }}">
+                    <a class="dash-link" href="{{ route('importeditems.index') }}">{{ __('Get Import Items') }}</a>
+                </li>
+                <li class="dash-item {{ Request::route()->getName() == 'create' }}">
+                <a class="dash-link" href="{{ route('importeditems.create') }}">{{ __('Send Import Item') }}</a>
+                </li>
+            </ul>
+        </li>
+
         @if (\Auth::user()->type != 'super admin')
             <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'support' ? 'active' : '' }}">
                 <a href="{{ route('support.index') }}" class="dash-link">
@@ -1393,7 +1413,7 @@
             <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'api-initialization' ? 'active' : '' }}">
                 <a href="{{ route('apiinitialization.index') }}" class="dash-link">
                     <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
-                        class="dash-mtext">{{ __('Initialization') }}</span>
+                        class="dash-mtext">{{ __('API Initialization') }}</span>
                 </a>
             </li>
             <li
@@ -1602,9 +1622,9 @@
                 @can('manage user')
                     <li
                        class="dash-item dash-hasmenu {{ Request::segment(1) == 'api-initialization' ? 'active' : '' }}">
-                        <a href="{{ route('users.index') }}" class="dash-link">
+                        <a href="{{ route('apiinitialization.index') }}" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-settings"></i></span><span
-                                class="dash-mtext">{{ __('Initialization') }}</span>
+                                class="dash-mtext">{{ __('API Initialization') }}</span>
                         </a>
                     </li>
                 @endcan
