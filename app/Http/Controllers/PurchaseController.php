@@ -53,173 +53,63 @@ class PurchaseController extends Controller
 
     /**
      * Using Api Endpoint
-     *  
-    //  */
-    // public function index()
-    // {        
-    //     try {
-    //         // $response = Http::withHeaders([
-    //         //     'accept' => '/',
-    //         //     'key' => '123456',
-    //         // ])->get('https://etims.your-apps.biz/api/GetPurchaseList', [
-    //         //         'date' => date('20220409120000'),
-    //         //     ]);
-
-    //         $response = Http::withHeaders([
-    //             'accept' => '/',
-    //             'key' => '123456',
-    //         ])->timeout(600)->get('https://etims.your-apps.biz/api/GetPurchaseList', [
-    //                     'date' => date('20220409120000'),
-    //                 ]);
-    //         if ($response->successful()) { 
-    //             $purchases = $response->json();
-    //             return view('purchase.index', compact('purchases'));
-    //         } else {
-    //             // Log error and handle error response
-    //             \Log::error('Failed to fetch purchases from API: ' . $response->status() . ' ' . $response->body());
-    //             return redirect()->back()->with('error', 'Failed to fetch purchases from API.');
-    //         }
-    //     } catch (\Exception $e) {
-    //         // Log exception and handle exception
-    //         \Log::error('Exception occurred while fetching purchases: ' . $e->getMessage());
-    //         return redirect()->back()->with('error', 'Failed to fetch purchases from API.');
-    //     }
-
-    // }
+     * 
+     *  */
 
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create($vendorId)
-    {
-        if (\Auth::user()->can('create purchase')) {
-            $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
-            $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
-            $category->prepend('Select Category', '');
+    // public function create($vendorId)
+    // {
+    //     if (\Auth::user()->can('create purchase')) {
+    //         $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
+    //         $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
+    //         $category->prepend('Select Category', '');
 
-            $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
-            $suppliers = Vender::all()->pluck('name', 'id');
-            $suppliers->prepend('Select Supplier', '');
+    //         $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
+    //         $suppliers = Vender::all()->pluck('name', 'id');
+    //         $suppliers->prepend('Select Supplier', '');
 
-            $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $warehouse->prepend('Select Warehouse', '');
+    //         $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+    //         $warehouse->prepend('Select Warehouse', '');
 
-            $product_services = ItemInformation::get()->pluck('itemNm', 'id');
-            $product_services_Codes = ItemInformation::get()->pluck('itemNm', 'itemCd');
-            $product_services_Codes->prepend('--', '');
-            $product_services->prepend('--', '');
-            // Fetch countries code  from the details model
-            $countries = Details::where('cdCls', '05')->get();
-            // Fetch countries data from the Details model where cdCls is 05
-            $countries = Details::where('cdCls', '05')->get()->pluck('cdNm', 'cdVal');
-            $paymentTypeCodes = PaymentTypeCodes::get()->pluck('payment_type_code');
-            $purchaseTypeCodes = PurchaseTypeCodes::get()->pluck('purchase_type_code');
-            $purchaseStatusCodes = PurchaseStatusCodes::get()->pluck('purchase_status_code');
-            $ReceiptTypesCodes = ReceiptTypeCodes::get()->pluck('receipt_type_code');
-            return view('purchase.create', compact('product_services_Codes','paymentTypeCodes', 'purchaseTypeCodes', 'purchaseStatusCodes', 'ReceiptTypesCodes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
-        } else {
-            return response()->json(['error' => __('Permission denied.')], 401);
-        }
-    }
-   
-
-    /********
-     * Store a newly created Purchase in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-
-
-    /******
-        public function store(Request $request)
-        {
-
-            if (\Auth::user()->can('create purchase')) {
-                $validator = \Validator::make(
-                    $request->all(),
-                    [
-                        'vender_id' => 'required',
-                        'warehouse_id' => 'required',
-                        'purchase_date' => 'required',
-                        'category_id' => 'required',
-                        'items' => 'required',
-                        'vendor_invoice_no' => 'required',
-                        'purchase_type_code' => 'required',
-                       'purchase_number' => 'required',
-                    ]
-                );
-                if ($validator->fails()) {
-                    $messages = $validator->getMessageBag();
-
-                    return redirect()->back()->with('error', $messages->first());
-                }
-                $purchase = new Purchase();
-                $purchase->purchase_id = $this->purchaseNumber();
-                $purchase->vender_id = $request->vender_id;
-                $purchase->warehouse_id = $request->warehouse_id;
-                $purchase->purchase_date = $request->purchase_date;
-                $purchase->purchase_number = !empty($request->purchase_number) ? $request->purchase_number : 0;
-                $purchase->status = 0;
-                //            $purchase->discount_apply = isset($request->discount_apply) ? 1 : 0;
-                $purchase->category_id = $request->category_id;
-                $purchase->created_by = \Auth::user()->creatorId();
-                $purchase->save();
-
-                $products = $request->items;
-
-                for ($i = 0; $i < count($products); $i++) {
-                    $purchaseProduct = new PurchaseProduct();
-                    $purchaseProduct->purchase_id = $purchase->id;
-                    $purchaseProduct->product_id = $products[$i]['item'];
-                    $purchaseProduct->quantity = $products[$i]['quantity'];
-                    $purchaseProduct->tax = $products[$i]['tax'];
-                    //                $purchaseProduct->discount    = isset($products[$i]['discount']) ? $products[$i]['discount'] : 0;
-                    $purchaseProduct->discount = $products[$i]['discount'];
-                    $purchaseProduct->price = $products[$i]['price'];
-                    $purchaseProduct->description = $products[$i]['description'];
-                    $purchaseProduct->save();
-
-                    //inventory management (Quantity)
-                    Utility::total_quantity('plus', $purchaseProduct->quantity, $purchaseProduct->product_id);
-
-                    //Product Stock Report
-                    $type = 'purchase';
-                    $type_id = $purchase->id;
-                    $description = $products[$i]['quantity'] . '  ' . __(' quantity add in purchase') . ' ' . \Auth::user()->purchaseNumberFormat($purchase->purchase_id);
-                    Utility::addProductStock($products[$i]['item'], $products[$i]['quantity'], $type, $description, $type_id);
-
-                    //Warehouse Stock Report
-                    if (isset($products[$i]['item'])) {
-                        Utility::addWarehouseStock($products[$i]['item'], $products[$i]['quantity'], $request->warehouse_id);
-                    }
-
-                }
-
-                return redirect()->route('purchase.index', $purchase->id)->with('success', __('Purchase successfully created.'));
-            } else {
-                return redirect()->back()->with('error', __('Permission denied.'));
-            }
-        }
-    **/
-
-
-
+    //         $product_services = ItemInformation::get()->pluck('itemNm', 'id');
+    //         $product_services_Codes = ItemInformation::get()->pluck('itemNm', 'itemCd');
+    //         $product_services_Codes->prepend('--', '');
+    //         $product_services->prepend('--', '');
+    //         // Fetch countries code  from the details model
+    //         $countries = Details::where('cdCls', '05')->get();
+    //         // Fetch countries data from the Details model where cdCls is 05
+    //         $countries = Details::where('cdCls', '05')->get()->pluck('cdNm', 'cdVal');
+    //         $paymentTypeCodes = PaymentTypeCodes::get()->pluck('payment_type_code');
+    //         $purchaseTypeCodes = PurchaseTypeCodes::get()->pluck('purchase_type_code');
+    //         $purchaseStatusCodes = PurchaseStatusCodes::get()->pluck('purchase_status_code');
+    //         $ReceiptTypesCodes = ReceiptTypeCodes::get()->pluck('receipt_type_code');
+    //         return view('purchase.create', compact('product_services_Codes','paymentTypeCodes', 'purchaseTypeCodes', 'purchaseStatusCodes', 'ReceiptTypesCodes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
+    //     } else {
+    //         return response()->json(['error' => __('Permission denied.')], 401);
+    //     }
+    // }
     /********************** 
-    
-     * Add Purchase to API END POINT 
-     * 
-     ********************************************/
+ 
+  * Add Purchase to API END POINT 
+  * 
+  ********************************************/
 
     public function store(Request $request)
     {
 
+
+        // Log received request data
+        \Log::info('Received request data From Purchase Form:', $request->all());
+
         if (\Auth::user()->can('create purchase')) {
-        $rules = [
+            $rules = [
                 'supplierTin' => 'required',
-                'supplierBhfId' => 'required',           
+                'supplierBhfId' => 'required',
+                'supplierName' => 'required',
                 'supplierInvcNo' => 'required',
                 'purchTypeCode' => 'required',
                 'purchStatusCode' => 'required',
@@ -230,7 +120,7 @@ class PurchaseController extends Controller
                 'warehouseDate' => 'required',
                 'remark' => 'required',
                 'mapping' => 'required',
-                
+
                 'itemsDataList.*.itemCode' => 'required',
                 'itemsDataList.*.supplrItemClsCode' => 'required',
                 'itemsDataList.*.supplrItemCode' => 'required',
@@ -241,15 +131,15 @@ class PurchaseController extends Controller
                 'itemsDataList.*.discountRate' => 'required',
                 'itemsDataList.*.discountAmt' => 'required',
                 'itemsDataList.*.itemExprDt' => 'required',
-    ];
+            ];
 
 
-        $validator = \Validator::make($request->all(), $rules);
+            $validator = \Validator::make($request->all(), $rules);
 
-        if ($validator->fails()) {
-            $messages = $validator->getMessageBag();
-            return redirect()->route('purchase.index')->with('error', $messages->first());
-        }
+            if ($validator->fails()) {
+                $messages = $validator->getMessageBag();
+                return redirect()->route('purchase.index')->with('error', $messages->first());
+            }
             $requestData = [
                 'supplierTin' => $request->input('supplierTin'),
                 'supplierBhfId' => $request->input('supplierBhfId'),
@@ -293,6 +183,394 @@ class PurchaseController extends Controller
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
+
+    // public function getPurchaseSalesItemsFromApi()
+    // {    
+
+    //     try{
+    //        $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
+
+    //         $response = Http::withHeaders([
+    //             'key' => '123456'
+    //         ])->get($url);
+
+    //         $data = $response->json();
+
+    //         $purchaseSalesList = $data['data']['data']['saleList'];
+
+    //         // Log API request and response details
+    //         // \Log::info('API Request Data  of Sales and Purchases: ' . json_encode($data));
+    //         \Log::info('API Request Data  of Sales and Purchases: ' . json_encode($purchaseSalesList));
+    //         \Log::info('API Response: ' . $response->body());
+    //         \Log::info('API Response Status Code: ' . $response->status());
+    //         // Divide the data into batches of 100 items each
+    //         if(isset($purchaseSalesList)){
+
+    //             foreach($purchaseSalesList as $class){
+
+    //                 $itemlists = $class['itemList'];
+
+    //                 if(isset($itemlists)){
+
+    //                     foreach($itemlists as $item){
+
+    //                        Purchase_Sales_Items::create([
+
+    //                     'itemSeq' => $item['itemSeq'],
+    //                     'itemCd' => $item['itemCd'],
+    //                     'itemClsCd' => $item['itemClsCd'],
+    //                     'itemNm' => $item['itemNm'],
+    //                     'bcd' => $item['bcd'],
+    //                     'spplrItemClsCd' => $item['spplrItemClsCd'],
+    //                     'spplrItemCd' => $item['spplrItemCd'],
+    //                     'spplrItemNm' => $item['spplrItemNm'],
+    //                     'pkgUnitCd' => $item['pkgUnitCd'],
+    //                     'pkg' => $item['pkg'],
+    //                     'qtyUnitCd' => $item['qtyUnitCd'],
+    //                     'qty' => $item['qty'],
+    //                     'prc' => $item['prc'],
+    //                     'splyAmt' => $item['splyAmt'],
+    //                     'dcRt' => $item['dcRt'],
+    //                     'taxTyCd' => $item['taxTyCd'],
+    //                     'taxblAmt' => $item['taxblAmt'],
+    //                     'taxAmt' => $item['taxAmt'],
+    //                     'totAmt' => $item['totAmt'],
+    //                     'itemExprDt' => $item['itemExprDt']
+    //                 ]);
+
+    //               }
+    //                 }
+    //             }
+    //         }            
+    //         // return redirect()->back()->with('success', Sales Items Lists Details successfully created from Api.');
+    //         return redirect()->route('purchase.index')->with('success', __('Sales Items Lists Details successfully created from Api.'));
+
+    //     } catch (\Exception $e) {
+    //         \Log::error('Error adding Item Information from the API: ' . $e->getMessage());
+    //         \Log::info($e);
+    //         // return redirect()->back()->with('error', 'Error adding Sales Items Lists Details  from the API.');
+    //         return redirect()->route('purchase.index')->with('error', __('Error adding Sales Items Lists Details  from the API.'));
+    //     }        
+    // }
+
+
+
+
+    public function getPurchaseSalesItemsFromApi()
+    {
+
+        try {
+
+            ini_set('max_execution_time', 300);
+
+            $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
+
+            // $response = Http::withHeaders([
+            //     'key' => '123456'
+            // ])->get($url);
+
+            $response = Http::withHeaders([
+                'key' => '123456'
+            ])->timeout(300)->get($url);
+
+            //  $response = retry(3, function () use ($url) {
+            //  return Http::withHeaders([
+            //  'key' => '123456'
+            //  ])->timeout(60000)->get($url); 
+            // }, 100); 
+
+
+            $data = $response->json();
+            $purchaseSalesList = $data['data']['data']['saleList'];
+
+            \Log::info('API Request Data  of Sales and Purchases: ' . json_encode($purchaseSalesList));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+
+            // Divide the data into batches of 100 items each
+            if (isset($purchaseSalesList)) {
+                foreach ($purchaseSalesList as $class) {
+                    // Initialize    $saleItemCode as null
+                    $saleItemCode = null;
+
+                    if (isset($class['spplrInvcNo'])) {
+                        $saleItemCode = $class['spplrInvcNo'];
+                    }
+                    \Log::info('API Request Data of Sales and Purchases All Invoices No: ' . json_encode($saleItemCode));
+                    $itemlists = $class['itemList'];
+                    if (isset($itemlists)) {
+                        $batches = array_chunk($itemlists, 100);
+                        foreach ($batches as $batch) {
+                            foreach ($batch as $item) {
+                                \Log::info('Processing item with spplrInvcNo: ' . $saleItemCode . ' and item: ' . json_encode($item));
+                                if (!empty($saleItemCode)) {
+                                    Purchase_Sales_Items::create([
+                                        'saleItemCode' => $saleItemCode,
+                                        'itemSeq' => $item['itemSeq'],
+                                        'itemCd' => $item['itemCd'],
+                                        'itemClsCd' => $item['itemClsCd'],
+                                        'itemNm' => $item['itemNm'],
+                                        'bcd' => $item['bcd'],
+                                        'spplrItemClsCd' => $item['spplrItemClsCd'],
+                                        'spplrItemCd' => $item['spplrItemCd'],
+                                        'spplrItemNm' => $item['spplrItemNm'],
+                                        'pkgUnitCd' => $item['pkgUnitCd'],
+                                        'pkg' => $item['pkg'],
+                                        'qtyUnitCd' => $item['qtyUnitCd'],
+                                        'qty' => $item['qty'],
+                                        'prc' => $item['prc'],
+                                        'splyAmt' => $item['splyAmt'],
+                                        'dcRt' => $item['dcRt'],
+                                        'taxTyCd' => $item['taxTyCd'],
+                                        'taxblAmt' => $item['taxblAmt'],
+                                        'taxAmt' => $item['taxAmt'],
+                                        'totAmt' => $item['totAmt'],
+                                        'itemExprDt' => $item['itemExprDt']
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return redirect()->route('purchase.index')->with('success', __('Sales Items Lists Details successfully created from Api.'));
+        } catch (\Exception $e) {
+            \Log::error('Error adding Item Information from the API: ' . $e->getMessage());
+            \Log::info($e);
+            return redirect()->route('purchase.index')->with('error', __('Error adding Sales Items Lists Details  from the API.'));
+        }
+    }
+    public function getSuppliersDetailsForPurchaseSalesFromApi()
+    {
+        try {
+            ini_set('max_execution_time', 300);
+            $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
+
+            $response = Http::withHeaders([
+                'key' => '123456'
+            ])->timeout(300)->get($url);
+
+            $data = $response->json()['data'];
+            $purchaseSalesSuppliers = $data['data']['saleList'];
+
+            // Log API request and response details
+            \Log::info('API Request Data of Suppliers of Sales and Purchases: ' . json_encode($data));
+            \Log::info('API Request Data of Suppliers of Sales and Purchases: ' . json_encode($purchaseSalesSuppliers));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+
+            // Divide the data into batches of 100 items each
+            $batches = array_chunk($purchaseSalesSuppliers, 100);
+
+            foreach ($batches as $batch) {
+                foreach ($batch as $item) {
+                    // Process each batch
+                    Purchase_Sales::create([
+                        'spplrTin' => $item['spplrTin'],
+                        'spplrNm' => $item['spplrNm'],
+                        'spplrBhfId' => $item['spplrBhfId'],
+                        'spplrInvcNo' => $item['spplrInvcNo'],
+                        'spplrSdcId' => $item['spplrSdcId'],
+                        'spplrMrcNo' => $item['spplrMrcNo'],
+                        'rcptTyCd' => $item['rcptTyCd'],
+                        'pmtTyCd' => $item['pmtTyCd'],
+                        'cfmDt' => $item['cfmDt'],
+                        'salesDt' => $item['salesDt'],
+                        'stockRlsDt' => $item['stockRlsDt'],
+                        'totItemCnt' => $item['totItemCnt'],
+                        'taxblAmtA' => $item['taxblAmtA'],
+                        'taxblAmtB' => $item['taxblAmtB'],
+                        'taxblAmtC' => $item['taxblAmtC'],
+                        'taxblAmtD' => $item['taxblAmtD'],
+                        'taxblAmtE' => $item['taxblAmtE'],
+                        'taxRtA' => $item['taxRtA'],
+                        'taxRtB' => $item['taxRtB'],
+                        'taxRtC' => $item['taxRtC'],
+                        'taxRtD' => $item['taxRtD'],
+                        'taxRtE' => $item['taxRtE'],
+                        'taxAmtA' => $item['taxAmtA'],
+                        'taxAmtB' => $item['taxAmtB'],
+                        'taxAmtC' => $item['taxAmtC'],
+                        'taxAmtD' => $item['taxAmtD'],
+                        'taxAmtE' => $item['taxAmtE'],
+                        'totTaxblAmt' => $item['totTaxblAmt'],
+                        'totTaxAmt' => $item['totTaxAmt'],
+                        'totAmt' => $item['totAmt'],
+                        'remark' => $item['remark']
+                    ]);
+                }
+            }
+
+            return redirect()->route('purchase.index')->with('success', __('Sales Lists Suppliers Details successfully created From Api.'));
+        } catch (\Exception $e) {
+            \Log::error('Error adding Sales Lists Suppliers Details  from the API: ');
+            \Log::info($e);
+            return redirect()->route('purchase.index')->with('error', __('Error adding Sales Lists Suppliers Details  from the API.'));
+        }
+    }
+
+
+
+
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    // public function index(Request $request)
+    // {
+
+    //     $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+    //     $vender->prepend('Select Vendor', '');
+    //     $status = Purchase::$statues;
+    //     $purchases = Purchase::where('created_by', '=', \Auth::user()->creatorId())->with(['vender','category'])->get();
+
+
+    //     return view('purchase.index', compact('purchases', 'status','vender'));
+
+
+    // }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create($vendorId)
+    {
+        // if(\Auth::user()->can('create purchase'))
+        // {
+        $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
+        $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
+        $category->prepend('Select Category', '');
+
+        $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
+        $venders = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+        $venders->prepend('Select Vender', '');
+        $suppliers = Vender::all()->pluck('name', 'id');
+        $suppliers->prepend('Select Supplier', '');
+
+        $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+        $warehouse->prepend('Select Warehouse', '');
+
+        // $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->where('type','!=', 'service')->get()->pluck('name', 'id');
+        // $product_services->prepend('--', '');
+        $product_services = ItemInformation::get()->pluck('itemNm', 'id');
+        $product_services_Codes = ItemInformation::get()->pluck('itemNm', 'itemCd');
+        $product_services_Codes->prepend('--', '');
+        $product_services->prepend('--', '');
+
+        // Fetch countries code  from the details model
+        $countries = Details::where('cdCls', '05')->get();
+        // Fetch countries data from the Details model where cdCls is 05
+        $countries = Details::where('cdCls', '05')->get()->pluck('cdNm', 'cdVal');
+        $paymentTypeCodes = PaymentTypeCodes::get()->pluck('payment_type_code');
+        $purchaseTypeCodes = PurchaseTypeCodes::get()->pluck('purchase_type_code');
+        $purchaseStatusCodes = PurchaseStatusCodes::get()->pluck('purchase_status_code');
+        $ReceiptTypesCodes = ReceiptTypeCodes::get()->pluck('receipt_type_code');
+
+
+        return view('purchase.create', compact('venders', 'product_services_Codes', 'paymentTypeCodes', 'purchaseTypeCodes', 'purchaseStatusCodes', 'ReceiptTypesCodes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
+        // }
+        // else
+        // {
+        //     return response()->json(['error' => __('Permission denied.')], 401);
+        // }
+    }
+
+
+    public function getProductData(Request $request)
+    {
+        $data['product'] = $product = ItemInformation::find($request->product_id);
+        $data['unit'] = !empty($product->unit) ? $product->unit->name : '';
+        $data['taxRate'] = $taxRate = !empty($product->tax_id) ? $product->taxRate($product->tax_id) : 0;
+        $data['taxes'] = !empty($product->tax_id) ? $product->tax($product->tax_id) : 0;
+        $salePrice = $product->purchase_price;
+        $quantity = 1;
+        $taxPrice = ($taxRate / 100) * ($salePrice * $quantity);
+        $data['totalAmount'] = ($salePrice * $quantity);
+
+        return json_encode($data);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    // public function store(Request $request)
+    // {
+
+    //     if(\Auth::user()->can('create purchase'))
+    //     {
+    //         $validator = \Validator::make(
+    //             $request->all(), [
+    //                 'vender_id' => 'required',
+    //                 'warehouse_id' => 'required',
+    //                 'purchase_date' => 'required',
+    //                 'category_id' => 'required',
+    //                 'items' => 'required',
+    //             ]
+    //         );
+    //         if($validator->fails())
+    //         {
+    //             $messages = $validator->getMessageBag();
+
+    //             return redirect()->back()->with('error', $messages->first());
+    //         }
+    //         $purchase                 = new Purchase();
+    //         $purchase->purchase_id    = $this->purchaseNumber();
+    //         $purchase->vender_id      = $request->vender_id;
+    //         $purchase->warehouse_id      = $request->warehouse_id;
+    //         $purchase->purchase_date  = $request->purchase_date;
+    //         $purchase->purchase_number   = !empty($request->purchase_number) ? $request->purchase_number : 0;
+    //         $purchase->status         =  0;
+    //         //            $purchase->discount_apply = isset($request->discount_apply) ? 1 : 0;
+    //         $purchase->category_id    = $request->category_id;
+    //         $purchase->created_by     = \Auth::user()->creatorId();
+    //         $purchase->save();
+
+    //         $products = $request->items;
+
+    //         for($i = 0; $i < count($products); $i++)
+    //         {
+    //             $purchaseProduct              = new PurchaseProduct();
+    //             $purchaseProduct->purchase_id     = $purchase->id;
+    //             $purchaseProduct->product_id  = $products[$i]['item'];
+    //             $purchaseProduct->quantity    = $products[$i]['quantity'];
+    //             $purchaseProduct->tax         = $products[$i]['tax'];
+    //         //                $purchaseProduct->discount    = isset($products[$i]['discount']) ? $products[$i]['discount'] : 0;
+    //             $purchaseProduct->discount    = $products[$i]['discount'];
+    //             $purchaseProduct->price       = $products[$i]['price'];
+    //             $purchaseProduct->description = $products[$i]['description'];
+    //             $purchaseProduct->save();
+
+    //             //inventory management (Quantity)
+    //             Utility::total_quantity('plus',$purchaseProduct->quantity,$purchaseProduct->product_id);
+
+    //             //Product Stock Report
+    //             $type='purchase';
+    //             $type_id = $purchase->id;
+    //             $description=$products[$i]['quantity'].'  '.__(' quantity add in purchase').' '. \Auth::user()->purchaseNumberFormat($purchase->purchase_id);
+    //             Utility::addProductStock( $products[$i]['item'],$products[$i]['quantity'],$type,$description,$type_id);
+
+    //             //Warehouse Stock Report
+    //             if(isset($products[$i]['item']))
+    //             {
+    //                 Utility::addWarehouseStock( $products[$i]['item'],$products[$i]['quantity'],$request->warehouse_id);
+    //             }
+
+    //         }
+
+    //         return redirect()->route('purchase.index', $purchase->id)->with('success', __('Purchase successfully created.'));
+    //     }
+    //     else
+    //     {
+    //         return redirect()->back()->with('error', __('Permission denied.'));
+    //     }
+    // }
 
 
     public function show($id)
@@ -925,9 +1203,6 @@ class PurchaseController extends Controller
 
         return view('purchase.vender_detail', compact('vender'));
     }
-
-
-    // Method for Automfilling the other fileds for the product and services 
     public function product(Request $request)
     {
         $data['product'] = $product = ProductService::find($request->product_id);
@@ -940,11 +1215,6 @@ class PurchaseController extends Controller
         $data['totalAmount'] = ($salePrice * $quantity);
 
         return json_encode($data);
-    }
-
-    public function item(Request $request)
-    {
-
     }
 
     public function productDestroy(Request $request)
@@ -978,239 +1248,20 @@ class PurchaseController extends Controller
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
-
-
-
-    // public function getPurchaseSalesItemsFromApi()
-    // {    
-
-    //     try{
-    //        $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
-
-    //         $response = Http::withHeaders([
-    //             'key' => '123456'
-    //         ])->get($url);
-
-    //         $data = $response->json();
-
-    //         $purchaseSalesList = $data['data']['data']['saleList'];
-
-    //         // Log API request and response details
-    //         // \Log::info('API Request Data  of Sales and Purchases: ' . json_encode($data));
-    //         \Log::info('API Request Data  of Sales and Purchases: ' . json_encode($purchaseSalesList));
-    //         \Log::info('API Response: ' . $response->body());
-    //         \Log::info('API Response Status Code: ' . $response->status());
-    //         // Divide the data into batches of 100 items each
-    //         if(isset($purchaseSalesList)){
-
-    //             foreach($purchaseSalesList as $class){
-
-    //                 $itemlists = $class['itemList'];
-
-    //                 if(isset($itemlists)){
-
-    //                     foreach($itemlists as $item){
-
-    //                        Purchase_Sales_Items::create([
-
-    //                     'itemSeq' => $item['itemSeq'],
-    //                     'itemCd' => $item['itemCd'],
-    //                     'itemClsCd' => $item['itemClsCd'],
-    //                     'itemNm' => $item['itemNm'],
-    //                     'bcd' => $item['bcd'],
-    //                     'spplrItemClsCd' => $item['spplrItemClsCd'],
-    //                     'spplrItemCd' => $item['spplrItemCd'],
-    //                     'spplrItemNm' => $item['spplrItemNm'],
-    //                     'pkgUnitCd' => $item['pkgUnitCd'],
-    //                     'pkg' => $item['pkg'],
-    //                     'qtyUnitCd' => $item['qtyUnitCd'],
-    //                     'qty' => $item['qty'],
-    //                     'prc' => $item['prc'],
-    //                     'splyAmt' => $item['splyAmt'],
-    //                     'dcRt' => $item['dcRt'],
-    //                     'taxTyCd' => $item['taxTyCd'],
-    //                     'taxblAmt' => $item['taxblAmt'],
-    //                     'taxAmt' => $item['taxAmt'],
-    //                     'totAmt' => $item['totAmt'],
-    //                     'itemExprDt' => $item['itemExprDt']
-    //                 ]);
-
-    //               }
-    //                 }
-    //             }
-    //         }            
-    //         // return redirect()->back()->with('success', Sales Items Lists Details successfully created from Api.');
-    //         return redirect()->route('purchase.index')->with('success', __('Sales Items Lists Details successfully created from Api.'));
-
-    //     } catch (\Exception $e) {
-    //         \Log::error('Error adding Item Information from the API: ' . $e->getMessage());
-    //         \Log::info($e);
-    //         // return redirect()->back()->with('error', 'Error adding Sales Items Lists Details  from the API.');
-    //         return redirect()->route('purchase.index')->with('error', __('Error adding Sales Items Lists Details  from the API.'));
-    //     }        
-    // }
-
-
-
-
-    public function getPurchaseSalesItemsFromApi()
+    // getItemToPurchase listing form
+    public function getItemToPurchase(Request $request)
     {
+        // Fetch item information based on the item code
+        $itemCd = $request->input('itemCode');
+        $itemInfo['data'] = ItemInformation::where('itemCd', $itemCd)->first();
 
-        try {
-
-            ini_set('max_execution_time', 300);
-
-            $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
-
-            // $response = Http::withHeaders([
-            //     'key' => '123456'
-            // ])->get($url);
-
-            $response = Http::withHeaders([
-                'key' => '123456'
-            ])->timeout(300)->get($url);
-
-            //  $response = retry(3, function () use ($url) {
-            //  return Http::withHeaders([
-            //  'key' => '123456'
-            //  ])->timeout(60000)->get($url); 
-            // }, 100); 
-
-
-            $data = $response->json();
-            $purchaseSalesList = $data['data']['data']['saleList'];
-
-            \Log::info('API Request Data  of Sales and Purchases: ' . json_encode($purchaseSalesList));
-            \Log::info('API Response: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
-
-            // Divide the data into batches of 100 items each
-            if (isset($purchaseSalesList)) {
-                foreach ($purchaseSalesList as $class) {
-                    // Initialize    $saleItemCode as null
-                       $saleItemCode = null;
-
-                    if (isset($class['spplrInvcNo'])) {
-                           $saleItemCode = $class['spplrInvcNo'];
-                    }
-                    \Log::info('API Request Data of Sales and Purchases All Invoices No: ' . json_encode(   $saleItemCode));
-                    $itemlists = $class['itemList'];
-                    if (isset($itemlists)) {
-                        $batches = array_chunk($itemlists, 100);
-                        foreach ($batches as $batch) {
-                            foreach ($batch as $item) {
-                                \Log::info('Processing item with spplrInvcNo: ' .    $saleItemCode . ' and item: ' . json_encode($item));                                if (!empty(   $saleItemCode)) {
-                                    Purchase_Sales_Items::create([
-                                        'saleItemCode' =>    $saleItemCode,
-                                        'itemSeq' => $item['itemSeq'],
-                                        'itemCd' => $item['itemCd'],
-                                        'itemClsCd' => $item['itemClsCd'],
-                                        'itemNm' => $item['itemNm'],
-                                        'bcd' => $item['bcd'],
-                                        'spplrItemClsCd' => $item['spplrItemClsCd'],
-                                        'spplrItemCd' => $item['spplrItemCd'],
-                                        'spplrItemNm' => $item['spplrItemNm'],
-                                        'pkgUnitCd' => $item['pkgUnitCd'],
-                                        'pkg' => $item['pkg'],
-                                        'qtyUnitCd' => $item['qtyUnitCd'],
-                                        'qty' => $item['qty'],
-                                        'prc' => $item['prc'],
-                                        'splyAmt' => $item['splyAmt'],
-                                        'dcRt' => $item['dcRt'],
-                                        'taxTyCd' => $item['taxTyCd'],
-                                        'taxblAmt' => $item['taxblAmt'],
-                                        'taxAmt' => $item['taxAmt'],
-                                        'totAmt' => $item['totAmt'],
-                                        'itemExprDt' => $item['itemExprDt']
-                                    ]);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return redirect()->route('purchase.index')->with('success', __('Sales Items Lists Details successfully created from Api.'));
-        } catch (\Exception $e) {
-            \Log::error('Error adding Item Information from the API: ' . $e->getMessage());
-            \Log::info($e);
-            return redirect()->route('purchase.index')->with('error', __('Error adding Sales Items Lists Details  from the API.'));
-        }
-    }
-    public function getSuppliersDetailsForPurchaseSalesFromApi()
-    {
-        try {
-            ini_set('max_execution_time', 300);
-            $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
-
-            $response = Http::withHeaders([
-                'key' => '123456'
-            ])->timeout(300)->get($url);
-
-            $data = $response->json()['data'];
-            $purchaseSalesSuppliers = $data['data']['saleList'];
-
-            // Log API request and response details
-            \Log::info('API Request Data of Suppliers of Sales and Purchases: ' . json_encode($data));
-            \Log::info('API Request Data of Suppliers of Sales and Purchases: ' . json_encode($purchaseSalesSuppliers));
-            \Log::info('API Response: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
-
-            // Divide the data into batches of 100 items each
-            $batches = array_chunk($purchaseSalesSuppliers, 100);
-
-            foreach ($batches as $batch) {
-                foreach ($batch as $item) {
-                    // Process each batch
-                    Purchase_Sales::create([
-                        'spplrTin' => $item['spplrTin'],
-                        'spplrNm' => $item['spplrNm'],
-                        'spplrBhfId' => $item['spplrBhfId'],
-                        'spplrInvcNo' => $item['spplrInvcNo'],
-                        'spplrSdcId' => $item['spplrSdcId'],
-                        'spplrMrcNo' => $item['spplrMrcNo'],
-                        'rcptTyCd' => $item['rcptTyCd'],
-                        'pmtTyCd' => $item['pmtTyCd'],
-                        'cfmDt' => $item['cfmDt'],
-                        'salesDt' => $item['salesDt'],
-                        'stockRlsDt' => $item['stockRlsDt'],
-                        'totItemCnt' => $item['totItemCnt'],
-                        'taxblAmtA' => $item['taxblAmtA'],
-                        'taxblAmtB' => $item['taxblAmtB'],
-                        'taxblAmtC' => $item['taxblAmtC'],
-                        'taxblAmtD' => $item['taxblAmtD'],
-                        'taxblAmtE' => $item['taxblAmtE'],
-                        'taxRtA' => $item['taxRtA'],
-                        'taxRtB' => $item['taxRtB'],
-                        'taxRtC' => $item['taxRtC'],
-                        'taxRtD' => $item['taxRtD'],
-                        'taxRtE' => $item['taxRtE'],
-                        'taxAmtA' => $item['taxAmtA'],
-                        'taxAmtB' => $item['taxAmtB'],
-                        'taxAmtC' => $item['taxAmtC'],
-                        'taxAmtD' => $item['taxAmtD'],
-                        'taxAmtE' => $item['taxAmtE'],
-                        'totTaxblAmt' => $item['totTaxblAmt'],
-                        'totTaxAmt' => $item['totTaxAmt'],
-                        'totAmt' => $item['totAmt'],
-                        'remark' => $item['remark']
-                    ]);
-                }
-            }
-
-            return redirect()->route('purchase.index')->with('success', __('Sales Lists Suppliers Details successfully created From Api.'));
-        } catch (\Exception $e) {
-            \Log::error('Error adding Sales Lists Suppliers Details  from the API: ');
-            \Log::info($e);
-            return redirect()->route('purchase.index')->with('error', __('Error adding Sales Lists Suppliers Details  from the API.'));
+        if ($itemInfo['data']) {
+            // Return item information as JSON response
+            return response()->json($itemInfo);
+        } else {
+            // If item information not found, return empty response
+            return response()->json([]);
         }
     }
 
-    public function getItem ($code) {
-        try {
-            $item = ItemInformation::where('itemCd', $code)->first();
-            return response()->json(['status' => 'success', 'data' => $item]);
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Item not found']);
-        }
-    }
 }
