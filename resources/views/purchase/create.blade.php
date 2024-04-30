@@ -144,13 +144,14 @@
                                                 '.itemTaxRate,.discount,.itemTaxPrice,.taxes,.amount')
                                             .trigger('change');
 
+
                                         // Calculate item tax price based on unit price and tax rate
                                         var itemTaxPrice = parseFloat((taxRate / 100) * (item
                                             .dftPrc * 1));
-                                        $('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
+                                          el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
 
                                         // Update total tax rate and display
-                                        $('.itemTaxRate').val(taxRate.toFixed(2));
+                                         el.find('.itemTaxRate').val(taxRate.toFixed(2));
 
                                         // Trigger change event for affected fields
                                         $('.itemTaxRate, .discount, .itemTaxPrice,.taxes,.amount')

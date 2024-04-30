@@ -61,127 +61,133 @@
 
         }
 
-
-
         $(document).ready(function() {
-           $(document).on('change', '.itemCode', function() {
-    var item_id = $(this).val();
-    var url = $(this).data('url');
-    var el = $(this).closest('[data-clone]');
+            $(document).on('change', '.itemCode', function() {
+                var item_id = $(this).val();
+                var url = $(this).data('url');
+                var el = $(this).closest('[data-clone]');
 
-    if (el.length) {
-        console.log("Change event triggered for.itemCode[data-clone]");
+                if (el.length) {
+                    console.log("Change event triggered for.itemCode[data-clone]");
 
-        console.log("item_id:", item_id);
-        console.log("url:", url);
-        console.log("el:", el);
+                    console.log("item_id:", item_id);
+                    console.log("url:", url);
+                    console.log("el:", el);
 
-        $.ajax({
-            url: url,
-            type: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': jQuery('#token').val()
-            },
-            data: {
-                'itemCode': item_id
-            },
-            cache: false,
-            success: function(data) {
-                try {
-                    console.log("Item information:", data.data);
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': jQuery('#token').val()
+                        },
+                        data: {
+                            'itemCode': item_id
+                        },
+                        cache: false,
+                        success: function(data) {
+                            try {
+                                console.log("Item information:", data.data);
 
-                    if (!data.data) {
-                        console.log("Item information is empty.");
-                    } else {
-                        console.log("Item information is not empty. Processing...");
+                                if (!data.data) {
+                                    console.log("Item information is empty.");
+                                } else {
+                                    console.log("Item information is not empty. Processing...");
 
-                        var item = data.data;
+                                    var item = data.data;
 
-                        console.log("Item object:", item);
+                                    console.log("Item object:", item);
 
-                        if (Object.keys(item).length === 0) {
-                            console.log("Item object is empty.");
-                        } else {
-                            console.log("Item object is not empty. Populating fields...");
+                                    if (Object.keys(item).length === 0) {
+                                        console.log("Item object is empty.");
+                                    } else {
+                                        console.log(
+                                            "Item object is not empty. Populating fields..."
+                                            );
 
-                            // Populate fields only for the current cloned form
-                            console.log("Populating unitPrice:", item.dftPrc);
-                            el.find('.unitPrice').val(item.dftPrc);
+                                        // Populate fields only for the current cloned form
+                                        console.log("Populating unitPrice:", item.dftPrc);
+                                        el.find('.unitPrice').val(item.dftPrc);
 
-                            console.log("Populating pkgQuantity:", item.pkgUnitCd);
-                            el.find('.pkgQuantity').val(item.pkgUnitCd);
+                                        console.log("Populating pkgQuantity:", item.pkgUnitCd);
+                                        el.find('.pkgQuantity').val(item.pkgUnitCd);
 
-                            console.log("Populating item_standard_name:", item.itemStdNm);
-                            el.find('.item_standard_name').val(item.itemStdNm);
+                                        console.log("Populating item_standard_name:", item
+                                            .itemStdNm);
+                                        el.find('.item_standard_name').val(item.itemStdNm);
 
-                            console.log("Populating tax:", item.taxTyCd);
-                            el.find('.tax').val(item.taxTyCd);
+                                        console.log("Populating tax:", item.taxTyCd);
+                                        el.find('.tax').val(item.taxTyCd);
 
-                            console.log("Populating country_of_origin:", item.orgnNatCd);
-                            el.find('.country_of_origin').val(item.orgnNatCd);
+                                        console.log("Populating country_of_origin:", item
+                                            .orgnNatCd);
+                                        el.find('.country_of_origin').val(item.orgnNatCd);
 
-                            // Calculate tax based on taxTyCd
-                            var taxTyCd = item.taxTyCd;
-                            var taxRate = 0;
+                                        // Calculate tax based on taxTyCd
+                                        var taxTyCd = item.taxTyCd;
+                                        var taxRate = 0;
 
-                            if (taxTyCd === 'B') {
-                                taxRate = 16; // VAT 16%
-                            } else if (taxTyCd === 'E') {
-                                taxRate = 8; // VAT 8%
+                                        if (taxTyCd === 'B') {
+                                            taxRate = 16; // VAT 16%
+                                        } else if (taxTyCd === 'E') {
+                                            taxRate = 8; // VAT 8%
+                                        }
+
+                                        // Calculate item tax price based on unit price and tax rate
+                                        var itemTaxPrice = parseFloat((taxRate / 100) * (item
+                                            .dftPrc * 1));
+                                        el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
+
+                                        // Update total tax rate and display
+                                        el.find('.itemTaxRate').val(taxRate.toFixed(2));
+
+                                        // Trigger change event for affected fields
+                                        el.find(
+                                                '.itemTaxRate,.discount,.itemTaxPrice,.taxes,.amount')
+                                            .trigger('change');
+
+
+                                        // Calculate item tax price based on unit price and tax rate
+                                        var itemTaxPrice = parseFloat((taxRate / 100) * (item
+                                            .dftPrc * 1));
+                                          el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
+
+                                        // Update total tax rate and display
+                                         el.find('.itemTaxRate').val(taxRate.toFixed(2));
+
+                                        // Trigger change event for affected fields
+                                        $('.itemTaxRate, .discount, .itemTaxPrice,.taxes,.amount')
+                                            .trigger(
+                                                'change');
+
+                                        // Calculate amount
+                                        var amount = parseFloat(item.dftPrc);
+                                        // Update total tax rate and display
+                                        el.find('.amount').val(taxRate.toFixed(2));
+
+                                        // Calculate subtotal
+                                        var subtotal = parseFloat(item.dftPrc);
+                                        // Update subtotal field
+                                        el.find('.subTotal').val(subtotal.toFixed(2));
+
+                                        // Calculate total amount
+                                        var totalAmount = subtotal + parseFloat(itemTaxPrice);
+                                        // Update total amount field
+                                        el.find('.totalAmount').val(totalAmount.toFixed(2));
+
+                                        // Update total tax field
+                                        el.find('.totalTax').val(itemTaxPrice.toFixed(2));
+                                    }
+                                }
+                            } catch (error) {
+                                console.error("Error processing item information:", error);
                             }
-
-                            // Calculate item tax price based on unit price and tax rate
-                            var itemTaxPrice = parseFloat((taxRate / 100) * (item.dftPrc * 1));
-                            el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
-
-                            // Update total tax rate and display
-                            el.find('.itemTaxRate').val(taxRate.toFixed(2));
-
-                            // Trigger change event for affected fields
-                            el.find('.itemTaxRate,.discount,.itemTaxPrice,.taxes,.amount').trigger('change');
-
-                                    // Calculate item tax price based on unit price and tax rate
-                                    var itemTaxPrice = parseFloat((taxRate / 100) * (item
-                                        .dftPrc * 1));
-                                    $('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
-
-                                    // Update total tax rate and display
-                                    $('.itemTaxRate').val(taxRate.toFixed(2));
-
-                                    // Trigger change event for affected fields
-                                    $('.itemTaxRate, .discount, .itemTaxPrice,.taxes,.amount')
-                                        .trigger(
-                                            'change');
-
-                                    // Calculate amount
-                                    var amount = parseFloat(item.dftPrc);
-                                    // Update total tax rate and display
-                            el.find('.amount').val(taxRate.toFixed(2));
-
-                                    // Calculate subtotal
-                                    var subtotal = parseFloat(item.dftPrc);
-                                    // Update subtotal field
-                                    el.find('.subTotal').val(subtotal.toFixed(2));
-
-                                    // Calculate total amount
-                                    var totalAmount = subtotal + parseFloat(itemTaxPrice);
-                                    // Update total amount field
-                                    el.find('.totalAmount').val(totalAmount.toFixed(2));
-
-                                    // Update total tax field
-                                    el.find('.totalTax').val(itemTaxPrice .toFixed(2));
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error retrieving item information:", error);
                         }
-                    }
-                } catch (error) {
-                    console.error("Error processing item information:", error);
+                    });
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error("Error retrieving item information:", error);
-            }
-        });
-    }
-});
+            });
 
             $(document).on('keyup change', '.quantity', function() {
                 var el = $(this).closest('.row');
@@ -219,7 +225,7 @@
 
             $(document).on('keyup change', '.unitPrice', function() {
                 var el = $(this).closest(
-                '.row'); // Use closest() to find the closest ancestor with class 'row'
+                    '.row'); // Use closest() to find the closest ancestor with class 'row'
                 var price = parseFloat($(this).val());
                 var quantity = parseFloat($(el.find('.quantity')).val());
                 var discount = parseFloat($(el.find('.discount')).val()) ||
@@ -616,4 +622,5 @@
 
     </div>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/purchase/create.blade.php ENDPATH**/ ?>
