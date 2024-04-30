@@ -102,7 +102,7 @@
                                     } else {
                                         console.log(
                                             "Item object is not empty. Populating fields..."
-                                            );
+                                        );
 
                                         // Populate fields only for the current cloned form
                                         console.log("Populating unitPrice:", item.dftPrc);
@@ -142,17 +142,18 @@
 
                                         // Trigger change event for affected fields
                                         el.find(
-                                                '.itemTaxRate,.discount,.itemTaxPrice,.taxes,.amount')
+                                                '.itemTaxRate,.discount,.itemTaxPrice,.taxes,.amount'
+                                                )
                                             .trigger('change');
 
 
                                         // Calculate item tax price based on unit price and tax rate
                                         var itemTaxPrice = parseFloat((taxRate / 100) * (item
                                             .dftPrc * 1));
-                                          el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
+                                        el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
 
                                         // Update total tax rate and display
-                                         el.find('.itemTaxRate').val(taxRate.toFixed(2));
+                                        el.find('.itemTaxRate').val(taxRate.toFixed(2));
 
                                         // Trigger change event for affected fields
                                         $('.itemTaxRate, .discount, .itemTaxPrice,.taxes,.amount')
@@ -188,13 +189,13 @@
                     });
                 }
             });
-
             $(document).on('keyup change', '.quantity', function() {
-                var el = $(this).closest('.row');
+                // var el = $(this).closest('.row');
+                var el = $(this).closest('[data-clone]');
                 var quantity = parseFloat($(this).val());
                 var price = parseFloat($(el.find('.unitPrice')).val());
                 var discount = parseFloat($(el.find('.discount')).val()) ||
-                    0; // Use default value if discount is not provided
+                0; // Use default value if discount is not provided
                 var totalItemPrice = (quantity * price) - discount;
                 var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
                 var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
@@ -206,22 +207,21 @@
 
                 // Update total tax price
                 var totalItemTaxPrice = 0;
-                $('.itemTaxPrice').each(function() {
+                el.siblings().find('.itemTaxPrice').each(function() {
                     totalItemTaxPrice += parseFloat($(this).val());
                 });
-                $('.totalTax').html(totalItemTaxPrice.toFixed(2));
+                el.parent().find('.totalTax').html(totalItemTaxPrice.toFixed(2));
 
                 // Update subtotal and total amount
                 var totalItemPrice = 0;
-                $('.quantity').each(function(index) {
+                el.siblings().find('.quantity').each(function(index) {
                     totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(
                         this).val());
                 });
-                $('.subTotal').html(totalItemPrice.toFixed(2));
-                $('.totalAmount').html((totalItemPrice + totalItemTaxPrice).toFixed(2));
+                el.parent().find('.subTotal').html(totalItemPrice.toFixed(2));
+                var totalAmount = totalItemPrice + totalItemTaxPrice;
+                el.parent().find('.totalAmount').html(totalAmount.toFixed(2));
             });
-
-
 
             $(document).on('keyup change', '.unitPrice', function() {
                 var el = $(this).closest(
@@ -255,6 +255,7 @@
                 });
                 $('.subTotal').html(totalItemPrice.toFixed(2));
                 $('.totalAmount').html((totalItemPrice + totalItemTaxPrice).toFixed(2));
+
             });
 
             $(document).on('keyup change', '.discount', function() {
