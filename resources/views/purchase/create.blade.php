@@ -59,103 +59,133 @@
             }
 
         }
+
         $(document).ready(function() {
             $(document).on('change', '.itemCode', function() {
                 var item_id = $(this).val();
                 var url = $(this).data('url');
-                var el = $(this);
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': jQuery('#token').val()
-                    },
-                    data: {
-                        'itemCode': item_id
-                    },
-                    cache: false,
-                    success: function(data) {
-                        try {
-                            console.log("Item information:", data.data);
+                var el = $(this).closest('[data-clone]');
 
-                            if (!data.data) {
-                                console.log("Item information is empty.");
-                            } else {
-                                console.log("Item information is not empty. Processing...");
+                if (el.length) {
+                    console.log("Change event triggered for.itemCode[data-clone]");
 
-                                var item = data.data;
+                    console.log("item_id:", item_id);
+                    console.log("url:", url);
+                    console.log("el:", el);
 
-                                console.log("Item object:", item);
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': jQuery('#token').val()
+                        },
+                        data: {
+                            'itemCode': item_id
+                        },
+                        cache: false,
+                        success: function(data) {
+                            try {
+                                console.log("Item information:", data.data);
 
-                                if (Object.keys(item).length === 0) {
-                                    console.log("Item object is empty.");
+                                if (!data.data) {
+                                    console.log("Item information is empty.");
                                 } else {
-                                    console.log(
-                                        "Item object is not empty. Populating fields...");
+                                    console.log("Item information is not empty. Processing...");
 
-                                    // Populate fields
-                                    $('.unitPrice').val(item.dftPrc);
-                                    $('.pkgQuantity').val(item.pkgUnitCd);
-                                    $('.item_standard_name').val(item.itemStdNm);
-                                    $('.tax').val(item.taxTyCd);
-                                    $('.country_of_origin').val(item.orgnNatCd);
-                                    $('.unitPrice, .pkgQuantity,.item_standard_name,.country_of_origin,.tax')
-                                        .trigger('change');
+                                    var item = data.data;
 
-                                    // Calculate tax based on taxTyCd
-                                    var taxTyCd = item.taxTyCd;
-                                    var taxRate = 0;
+                                    console.log("Item object:", item);
 
-                                    // Determine tax rate based on taxTyCd
-                                    if (taxTyCd === 'B') {
-                                        taxRate = 16; // VAT 16%
-                                    } else if (taxTyCd === 'E') {
-                                        taxRate = 8; // VAT 8%
+                                    if (Object.keys(item).length === 0) {
+                                        console.log("Item object is empty.");
+                                    } else {
+                                        console.log(
+                                            "Item object is not empty. Populating fields..."
+                                            );
+
+                                        // Populate fields only for the current cloned form
+                                        console.log("Populating unitPrice:", item.dftPrc);
+                                        el.find('.unitPrice').val(item.dftPrc);
+
+                                        console.log("Populating pkgQuantity:", item.pkgUnitCd);
+                                        el.find('.pkgQuantity').val(item.pkgUnitCd);
+
+                                        console.log("Populating item_standard_name:", item
+                                            .itemStdNm);
+                                        el.find('.item_standard_name').val(item.itemStdNm);
+
+                                        console.log("Populating tax:", item.taxTyCd);
+                                        el.find('.tax').val(item.taxTyCd);
+
+                                        console.log("Populating country_of_origin:", item
+                                            .orgnNatCd);
+                                        el.find('.country_of_origin').val(item.orgnNatCd);
+
+                                        // Calculate tax based on taxTyCd
+                                        var taxTyCd = item.taxTyCd;
+                                        var taxRate = 0;
+
+                                        if (taxTyCd === 'B') {
+                                            taxRate = 16; // VAT 16%
+                                        } else if (taxTyCd === 'E') {
+                                            taxRate = 8; // VAT 8%
+                                        }
+
+                                        // Calculate item tax price based on unit price and tax rate
+                                        var itemTaxPrice = parseFloat((taxRate / 100) * (item
+                                            .dftPrc * 1));
+                                        el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
+
+                                        // Update total tax rate and display
+                                        el.find('.itemTaxRate').val(taxRate.toFixed(2));
+
+                                        // Trigger change event for affected fields
+                                        el.find(
+                                                '.itemTaxRate,.discount,.itemTaxPrice,.taxes,.amount')
+                                            .trigger('change');
+
+                                        // Calculate item tax price based on unit price and tax rate
+                                        var itemTaxPrice = parseFloat((taxRate / 100) * (item
+                                            .dftPrc * 1));
+                                        $('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
+
+                                        // Update total tax rate and display
+                                        $('.itemTaxRate').val(taxRate.toFixed(2));
+
+                                        // Trigger change event for affected fields
+                                        $('.itemTaxRate, .discount, .itemTaxPrice,.taxes,.amount')
+                                            .trigger(
+                                                'change');
+
+                                        // Calculate amount
+                                        var amount = parseFloat(item.dftPrc);
+                                        // Update total tax rate and display
+                                        el.find('.amount').val(taxRate.toFixed(2));
+
+                                        // Calculate subtotal
+                                        var subtotal = parseFloat(item.dftPrc);
+                                        // Update subtotal field
+                                        el.find('.subTotal').val(subtotal.toFixed(2));
+
+                                        // Calculate total amount
+                                        var totalAmount = subtotal + parseFloat(itemTaxPrice);
+                                        // Update total amount field
+                                        el.find('.totalAmount').val(totalAmount.toFixed(2));
+
+                                        // Update total tax field
+                                        el.find('.totalTax').val(itemTaxPrice.toFixed(2));
                                     }
-
-                                    // Calculate item tax price based on unit price and tax rate
-                                    var itemTaxPrice = parseFloat((taxRate / 100) * (item
-                                        .dftPrc * 1));
-                                    $('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
-
-                                    // Update total tax rate and display
-                                    $('.itemTaxRate').val(taxRate.toFixed(2));
-
-                                    // Trigger change event for affected fields
-                                    $('.itemTaxRate, .discount, .itemTaxPrice,.taxes,.amount')
-                                        .trigger(
-                                            'change');
-
-                                    // Calculate amount
-                                    var amount = parseFloat(item.dftPrc);
-                                    // Update subtotal field
-                                    $('.amount').html(amount.toFixed(2));
-
-                                    // Calculate subtotal
-                                    var subtotal = parseFloat(item.dftPrc);
-                                    // Update subtotal field
-                                    $('.subTotal').html(subtotal.toFixed(2));
-
-                                    // Calculate total amount
-                                    var totalAmount = subtotal + parseFloat(itemTaxPrice);
-                                    // Update total amount field
-                                    $('.totalAmount').html(totalAmount.toFixed(2));
-
-                                    // Update total tax field
-                                    $('.totalTax').html(itemTaxPrice.toFixed(2));
                                 }
+                            } catch (error) {
+                                console.error("Error processing item information:", error);
                             }
-                        } catch (error) {
-                            console.error("Error processing item information:", error);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error retrieving item information:", error);
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error retrieving item information:", error);
-                    }
-                });
+                    });
+                }
             });
-
-
 
             $(document).on('keyup change', '.quantity', function() {
                 var el = $(this).closest('.row');
@@ -193,7 +223,7 @@
 
             $(document).on('keyup change', '.unitPrice', function() {
                 var el = $(this).closest(
-                '.row'); // Use closest() to find the closest ancestor with class 'row'
+                    '.row'); // Use closest() to find the closest ancestor with class 'row'
                 var price = parseFloat($(this).val());
                 var quantity = parseFloat($(el.find('.quantity')).val());
                 var discount = parseFloat($(el.find('.discount')).val()) ||
@@ -380,7 +410,7 @@
                         <table class="table mb-0" data-repeater-list="items" id="sortable-table">
                             <thead>
                             </thead>
-                            <tbody class="ui-sortable" data-repeater-item>
+                            <tbody class="ui-sortable" data-repeater-item data-clone>
                                 <tr>
                                     <td width="25%" class="form-group pt-1">
                                         {{ Form::label('itemCode', __('Item Code'), ['class' => 'form-label']) }}
