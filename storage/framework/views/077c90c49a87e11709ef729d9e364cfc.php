@@ -60,214 +60,219 @@
             }
 
         }
+        $(document).ready(function() {
+            $(document).on('change', '.itemCode', function() {
+                var item_id = $(this).val();
+                var url = $(this).data('url');
+                var el = $(this);
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': jQuery('#token').val()
+                    },
+                    data: {
+                        'itemCode': item_id
+                    },
+                    cache: false,
+                    success: function(data) {
+                        try {
+                            console.log("Item information:", data.data);
 
-        $(document).on('change', '.itemCode', function() {
-            var item_id = $(this).val();
-            var url = $(this).data('url');
-            var el = $(this);
-            $.ajax({
-                url: url,
-                type: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': jQuery('#token').val()
-                },
-                data: {
-                    'itemCode': item_id
-                },
-                cache: false,
-                success: function(data) {
-                    try {
-                        console.log("Item information:", data.data);
-
-                        if (!data.data) {
-                            console.log("Item information is empty.");
-                        } else {
-                            console.log("Item information is not empty. Processing...");
-
-                            var item = data.data;
-
-                            console.log("Item object:", item);
-
-                            if (Object.keys(item).length === 0) {
-                                console.log("Item object is empty.");
+                            if (!data.data) {
+                                console.log("Item information is empty.");
                             } else {
-                                console.log("Item object is not empty. Populating fields...");
+                                console.log("Item information is not empty. Processing...");
 
-                                // Populate fields
-                                $('.unitPrice').val(item.dftPrc);
-                                $('.pkgQuantity').val(item.pkgUnitCd);
-                                $('.item_standard_name').val(item.itemStdNm);
-                                $('.tax').val(item.taxTyCd);
-                                $('.country_of_origin').val(item.orgnNatCd);
-                                $('.unitPrice, .pkgQuantity,.item_standard_name,.country_of_origin,.tax')
-                                    .trigger('change');
+                                var item = data.data;
 
-                                // Calculate tax based on taxTyCd
-                                var taxTyCd = item.taxTyCd;
-                                var taxRate = 0;
+                                console.log("Item object:", item);
 
-                                // Determine tax rate based on taxTyCd
-                                if (taxTyCd === 'B') {
-                                    taxRate = 16; // VAT 16%
-                                } else if (taxTyCd === 'E') {
-                                    taxRate = 8; // VAT 8%
+                                if (Object.keys(item).length === 0) {
+                                    console.log("Item object is empty.");
+                                } else {
+                                    console.log(
+                                        "Item object is not empty. Populating fields...");
+
+                                    // Populate fields
+                                    $('.unitPrice').val(item.dftPrc);
+                                    $('.pkgQuantity').val(item.pkgUnitCd);
+                                    $('.item_standard_name').val(item.itemStdNm);
+                                    $('.tax').val(item.taxTyCd);
+                                    $('.country_of_origin').val(item.orgnNatCd);
+                                    $('.unitPrice, .pkgQuantity,.item_standard_name,.country_of_origin,.tax')
+                                        .trigger('change');
+
+                                    // Calculate tax based on taxTyCd
+                                    var taxTyCd = item.taxTyCd;
+                                    var taxRate = 0;
+
+                                    // Determine tax rate based on taxTyCd
+                                    if (taxTyCd === 'B') {
+                                        taxRate = 16; // VAT 16%
+                                    } else if (taxTyCd === 'E') {
+                                        taxRate = 8; // VAT 8%
+                                    }
+
+                                    // Calculate item tax price based on unit price and tax rate
+                                    var itemTaxPrice = parseFloat((taxRate / 100) * (item
+                                        .dftPrc * 1));
+                                    $('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
+
+                                    // Update total tax rate and display
+                                    $('.itemTaxRate').val(taxRate.toFixed(2));
+
+                                    // Trigger change event for affected fields
+                                    $('.itemTaxRate, .discount, .itemTaxPrice,.taxes,.amount')
+                                        .trigger(
+                                            'change');
+
+                                    // Calculate amount
+                                    var amount = parseFloat(item.dftPrc);
+                                    // Update subtotal field
+                                    $('.amount').html(amount.toFixed(2));
+
+                                    // Calculate subtotal
+                                    var subtotal = parseFloat(item.dftPrc);
+                                    // Update subtotal field
+                                    $('.subTotal').html(subtotal.toFixed(2));
+
+                                    // Calculate total amount
+                                    var totalAmount = subtotal + parseFloat(itemTaxPrice);
+                                    // Update total amount field
+                                    $('.totalAmount').html(totalAmount.toFixed(2));
+
+                                    // Update total tax field
+                                    $('.totalTax').html(itemTaxPrice.toFixed(2));
                                 }
-
-                                // Calculate item tax price based on unit price and tax rate
-                                var itemTaxPrice = parseFloat((taxRate / 100) * (item.dftPrc * 1));
-                                $('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
-
-                                // Update total tax rate and display
-                                $('.itemTaxRate').val(taxRate.toFixed(2));
-
-                                // Trigger change event for affected fields
-                                $('.itemTaxRate, .discount, .itemTaxPrice,.taxes,.amount').trigger(
-                                    'change');
-
-                                // Calculate amount
-                                var amount = parseFloat(item.dftPrc);
-                                // Update subtotal field
-                                $('.amount').html(amount.toFixed(2));
-
-                                // Calculate subtotal
-                                var subtotal = parseFloat(item.dftPrc);
-                                // Update subtotal field
-                                $('.subTotal').html(subtotal.toFixed(2));
-
-                                // Calculate total amount
-                                var totalAmount = subtotal + parseFloat(itemTaxPrice);
-                                // Update total amount field
-                                $('.totalAmount').html(totalAmount.toFixed(2));
-
-                                // Update total tax field
-                                $('.totalTax').html(itemTaxPrice.toFixed(2));
                             }
+                        } catch (error) {
+                            console.error("Error processing item information:", error);
                         }
-                    } catch (error) {
-                        console.error("Error processing item information:", error);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error retrieving item information:", error);
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error retrieving item information:", error);
-                }
+                });
+            });
+
+
+
+            $(document).on('keyup change', '.quantity', function() {
+                var el = $(this).closest('.row');
+                var quantity = parseFloat($(this).val());
+                var price = parseFloat($(el.find('.unitPrice')).val());
+                var discount = parseFloat($(el.find('.discount')).val()) ||
+                    0; // Use default value if discount is not provided
+                var totalItemPrice = (quantity * price) - discount;
+                var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
+                var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
+                $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
+
+                // Calculate total amount including tax
+                var totalAmount = itemTaxPrice + totalItemPrice;
+                $(el.find('.amount')).html(totalAmount.toFixed(2));
+
+                // Update total tax price
+                var totalItemTaxPrice = 0;
+                $('.itemTaxPrice').each(function() {
+                    totalItemTaxPrice += parseFloat($(this).val());
+                });
+                $('.totalTax').html(totalItemTaxPrice.toFixed(2));
+
+                // Update subtotal and total amount
+                var totalItemPrice = 0;
+                $('.quantity').each(function(index) {
+                    totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(
+                        this).val());
+                });
+                $('.subTotal').html(totalItemPrice.toFixed(2));
+                $('.totalAmount').html((totalItemPrice + totalItemTaxPrice).toFixed(2));
+            });
+
+
+
+            $(document).on('keyup change', '.unitPrice', function() {
+                var el = $(this).closest(
+                '.row'); // Use closest() to find the closest ancestor with class 'row'
+                var price = parseFloat($(this).val());
+                var quantity = parseFloat($(el.find('.quantity')).val());
+                var discount = parseFloat($(el.find('.discount')).val()) ||
+                    0; // Use default value if discount is not provided
+                var totalItemPrice = (quantity * price) - discount;
+
+                var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
+                var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
+                $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
+
+                // Calculate total amount including tax
+                var totalAmount = itemTaxPrice + totalItemPrice;
+                $(el.find('.amount')).html(totalAmount.toFixed(2));
+
+                // Update total tax price
+                var totalItemTaxPrice = 0;
+                $('.itemTaxPrice').each(function() {
+                    totalItemTaxPrice += parseFloat($(this).val());
+                });
+                $('.totalTax').html(totalItemTaxPrice.toFixed(2));
+
+                // Update subtotal and total amount
+                var totalItemPrice = 0;
+                $('.quantity').each(function(index) {
+                    totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(
+                        this).val());
+                });
+                $('.subTotal').html(totalItemPrice.toFixed(2));
+                $('.totalAmount').html((totalItemPrice + totalItemTaxPrice).toFixed(2));
+            });
+
+            $(document).on('keyup change', '.discount', function() {
+                var el = $(this).closest('.row');
+                var discountRate = parseFloat($(this).val()) || 0;
+
+                var price = parseFloat($(el.find('.unitPrice')).val());
+                var quantity = parseFloat($(el.find('.quantity')).val());
+
+                var totalItemPrice = (price * quantity) * (1 - discountRate / 100);
+                var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
+                var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
+                $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
+
+                var totalAmount = itemTaxPrice + totalItemPrice;
+                $(el.find('.amount')).html(totalAmount.toFixed(2));
+
+                // Update total tax price
+                var totalItemTaxPrice = 0;
+                $('.itemTaxPrice').each(function() {
+                    totalItemTaxPrice += parseFloat($(this).val());
+                });
+                $('.totalTax').html(totalItemTaxPrice.toFixed(2));
+
+                // Update subtotal and total amount
+                var totalItemPrice = 0;
+                $('.quantity').each(function(index) {
+                    totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(
+                        this).val());
+                });
+                $('.subTotal').html(totalItemPrice.toFixed(2));
+
+                // Calculate total discount amount
+                var totalDiscountAmount = 0;
+                $('.quantity').each(function(index) {
+                    var discountRate = parseFloat($('.discount').eq(index).val()) || 0;
+                    totalDiscountAmount += (parseFloat($('.unitPrice').eq(index).val()) *
+                        parseFloat($(this)
+                            .val())) * (discountRate / 100);
+                });
+                // Update total discount
+                $('.totalDiscount').html(totalDiscountAmount.toFixed(2));
+                // Update Discount Amount input field
+                $('.discountAmt').val(totalDiscountAmount.toFixed(2));
+                // Update total amount
+                var totalAmount = totalItemPrice + totalItemTaxPrice;
+                $('.totalAmount').html(totalAmount.toFixed(2));
             });
         });
-
-
-
-        $(document).on('keyup change', '.quantity', function() {
-            var el = $(this).closest('.row'); 
-            var quantity = parseFloat($(this).val());
-            var price = parseFloat($(el.find('.unitPrice')).val());
-            var discount = parseFloat($(el.find('.discount')).val()) ||
-                0; // Use default value if discount is not provided
-            var totalItemPrice = (quantity * price) - discount;
-            var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
-            var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
-            $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
-
-            // Calculate total amount including tax
-            var totalAmount = itemTaxPrice + totalItemPrice;
-            $(el.find('.amount')).html(totalAmount.toFixed(2));
-
-            // Update total tax price
-            var totalItemTaxPrice = 0;
-            $('.itemTaxPrice').each(function() {
-                totalItemTaxPrice += parseFloat($(this).val());
-            });
-            $('.totalTax').html(totalItemTaxPrice.toFixed(2));
-
-            // Update subtotal and total amount
-            var totalItemPrice = 0;
-            $('.quantity').each(function(index) {
-                totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(this).val());
-            });
-            $('.subTotal').html(totalItemPrice.toFixed(2));
-            $('.totalAmount').html((totalItemPrice + totalItemTaxPrice).toFixed(2));
-        });
-
-
-
-        $(document).on('keyup change', '.unitPrice', function() {
-            var el = $(this).closest('.row'); // Use closest() to find the closest ancestor with class 'row'
-            var price = parseFloat($(this).val());
-            var quantity = parseFloat($(el.find('.quantity')).val());
-            var discount = parseFloat($(el.find('.discount')).val()) ||
-                0; // Use default value if discount is not provided
-            var totalItemPrice = (quantity * price) - discount;
-
-            var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
-            var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
-            $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
-
-            // Calculate total amount including tax
-            var totalAmount = itemTaxPrice + totalItemPrice;
-            $(el.find('.amount')).html(totalAmount.toFixed(2));
-
-            // Update total tax price
-            var totalItemTaxPrice = 0;
-            $('.itemTaxPrice').each(function() {
-                totalItemTaxPrice += parseFloat($(this).val());
-            });
-            $('.totalTax').html(totalItemTaxPrice.toFixed(2));
-
-            // Update subtotal and total amount
-            var totalItemPrice = 0;
-            $('.quantity').each(function(index) {
-                totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(this).val());
-            });
-            $('.subTotal').html(totalItemPrice.toFixed(2));
-            $('.totalAmount').html((totalItemPrice + totalItemTaxPrice).toFixed(2));
-        });
-
-$(document).on('keyup change', '.discount', function() {
-    var el = $(this).closest('.row');
-    var discountRate = parseFloat($(this).val()) || 0; 
-
-    var price = parseFloat($(el.find('.unitPrice')).val());
-    var quantity = parseFloat($(el.find('.quantity')).val());
-
-    var totalItemPrice = (price * quantity) * (1 - discountRate / 100);
-    var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
-    var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
-    $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
-
-    var totalAmount = itemTaxPrice + totalItemPrice;
-    $(el.find('.amount')).html(totalAmount.toFixed(2));
-
-    // Update total tax price
-    var totalItemTaxPrice = 0;
-    $('.itemTaxPrice').each(function() {
-        totalItemTaxPrice += parseFloat($(this).val());
-    });
-    $('.totalTax').html(totalItemTaxPrice.toFixed(2));
-
-    // Update subtotal and total amount
-    var totalItemPrice = 0;
-    $('.quantity').each(function(index) {
-        totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(this).val());
-    });
-    $('.subTotal').html(totalItemPrice.toFixed(2));
-
-    // Calculate total discount amount
-    var totalDiscountAmount = 0;
-    $('.quantity').each(function(index) {
-        var discountRate = parseFloat($('.discount').eq(index).val()) || 0;
-        totalDiscountAmount += (parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(this).val())) * (discountRate / 100);
-    });
-
-    // Update total discount
-    $('.totalDiscount').html(totalDiscountAmount.toFixed(2));
-
-    // Update Discount Amount input field
-    $('.discountAmt').val(totalDiscountAmount.toFixed(2));
-
-    // Update total amount
-    var totalAmount = totalItemPrice + totalItemTaxPrice;
-    $('.totalAmount').html(totalAmount.toFixed(2));
-});
-
-
     </script>
 
     <script>
