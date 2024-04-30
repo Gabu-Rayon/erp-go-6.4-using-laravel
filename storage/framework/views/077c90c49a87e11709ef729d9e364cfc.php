@@ -93,51 +93,45 @@
                             } else {
                                 console.log("Item object is not empty. Populating fields...");
 
-                                $(el.parent().parent().find('.pkgQuantity')).val(item.pkgUnitCd);
-                                $(el.parent().parent().find('.unitPrice')).val(item.dftPrc);
+                                $('.quantity').val(item.pkgUnitCd);
+                                $('.unitPrice').val(item.dftPrc);
+                                $('.pkgQuantity').val(item.pkgUnitCd);
+                                $('.item_standard_name').val(item.itemStdNm);
+                                $('.tax').val(item.taxTyCd);
+                                $('.country_of_origin').val(item.orgnNatCd);
+                                $('.quantity, .unitPrice, .pkgQuantity,.item_standard_name,.country_of_origin,.tax')
+                                    .trigger(
+                                        'change');
 
-                                //  try {
-                                //     const unitPriceField = document.querySelector('.unitPrice');
-                                //     unitPriceField.value = item.dftPrc
-                                // } catch (e) {
-                                //     console.error(e);
-                                // }
-                                //  $('#unit_price').val(item.unitPrice);
-                                // }
-                                
-                                 // $('#unit_price').val(item.unitPrice);
-
-                                $(el.parent().parent().parent().find('.item_standard_name')).val(item.itemStdNm);
+                                // Calculate taxes
                                 var taxTyCd = item.taxTyCd;
                                 var taxNm = '';
 
-                                if (taxTyCd === 'A') {
-                                    taxNm = 'A-exempt';
-                                } else if (taxTyCd === 'B') {
-                                    taxNm = 'B-VAT 16%';
-                                } else if (taxTyCd === 'C') {
-                                    taxNm = 'C-Zero rated';
-                                } else if (taxTyCd === 'D') {
-                                    taxNm = 'Non VAT';
-                                } else if (taxTyCd === 'E') {
-                                    taxNm = 'E-VAT 8%';
+                                switch (taxTyCd) {
+                                    case 'A':
+                                        taxNm = 'A-exempt';
+                                        break;
+                                    case 'B':
+                                        taxNm = 'B-VAT 16%';
+                                        break;
+                                    case 'C':
+                                        taxNm = 'C-Zero rated';
+                                        break;
+                                    case 'D':
+                                        taxNm = 'Non VAT';
+                                        break;
+                                    case 'E':
+                                        taxNm = 'E-VAT 8%';
+                                        break;
+                                    default:
+                                        taxNm = '';
                                 }
 
                                 var taxes = '';
                                 var totalItemTaxRate = 0;
-                                // if (item.taxes && item.taxes.length === 0) {
-                                //     taxes += '-';
-                                // } else {
-                                //     for (var i = 0; i < item.taxes.length; i++) {
-                                //         var tax = item.taxes[i];
-                                //         taxes += '<span class="badge bg-primary mt-1 mr-2">' + tax
-                                //             .name +
-                                //             ' (' + tax.rate + '%)' + '</span>';
-                                //         totalItemTaxRate += parseFloat(tax.rate);
-                                //     }
-                                // }
+
                                 if (!item.taxes || item.taxes.length === 0) {
-                                    taxes += '-';
+                                    taxes = '-';
                                 } else {
                                     for (var i = 0; i < item.taxes.length; i++) {
                                         var tax = item.taxes[i];
@@ -148,42 +142,22 @@
                                     }
                                 }
 
+                                // Calculate item tax price
+                                var itemTaxPrice = parseFloat((totalItemTaxRate / 100) * (item.dftPrc *
+                                    1));
 
-                                var itemTaxPrice = parseFloat((totalItemTaxRate / 100) * (item
-                                    .unitPrice * 1));
+                                $('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
+                                $('.itemTaxRate').val(totalItemTaxRate.toFixed(2));
+                                $('.taxes').html(taxes);
+                                $('.tax').val(taxNm);
+                                $('.discount').val(0);
+                                $('.amount').html(item.totalAmount);
+                                $('.itemTaxPrice, .itemTaxRate, .taxes,.tax,.discount,.amount')
+                                    .trigger(
+                                        'change');
 
-                                $(el.parent().parent().find('.itemTaxPrice')).val(itemTaxPrice.toFixed(
-                                    2));
-                                $(el.parent().parent().find('.itemTaxRate')).val(totalItemTaxRate
-                                    .toFixed(2));
-                                $(el.parent().parent().find('.taxes')).html(taxes);
-                                $(el.parent().parent().find('.tax')).val(taxNm);
-                                $(el.parent().parent().find('.unit')).html(item.unit);
-                                $(el.parent().parent().find('.discount')).val(0);
-                                $(el.parent().parent().find('.amount')).html(item.totalAmount);
-
-                                var inputs = $(".amount");
-                                var subTotal = 0;
-                                for (var i = 0; i < inputs.length; i++) {
-                                    subTotal = parseFloat(subTotal) + parseFloat($(inputs[i]).html());
-                                }
-                                $('.subTotal').html(subTotal.toFixed(2));
-
-                                var totalItemPrice = 0;
-                                var priceInput = $('.price');
-                                for (var j = 0; j < priceInput.length; j++) {
-                                    totalItemPrice += parseFloat(priceInput[j].value);
-                                }
-
-                                var totalItemTaxPrice = 0;
-                                var itemTaxPriceInput = $('.itemTaxPrice');
-                                for (var j = 0; j < itemTaxPriceInput.length; j++) {
-                                    totalItemTaxPrice += parseFloat(itemTaxPriceInput[j].value);
-                                }
-
-                                $('.totalTax').html(totalItemTaxPrice.toFixed(2));
-                                $('.totalAmount').html((parseFloat(subTotal) + parseFloat(
-                                    totalItemTaxPrice)).toFixed(2));
+                                // Update totals
+                                updateTotals();
                             }
                         }
                     } catch (error) {
@@ -196,10 +170,42 @@
             });
         });
 
+        $(document).on('keyup change', '.quantity, .unitPrice, .discount', function() {
+            updateTotals();
+        });
+
+        function updateTotals() {
+            var subTotal = 0;
+            var totalItemTaxPrice = 0;
+
+            $('.repeater-item').each(function() {
+                var row = $(this);
+                var quantity = parseFloat(row.find('.quantity').val());
+                var unitPrice = parseFloat(row.find('.unitPrice').val());
+                var discount = parseFloat(row.find('.discount').val()) || 0;
+                var taxRate = parseFloat(row.find('.itemTaxRate').val());
+
+                var totalItemPrice = (quantity * unitPrice) - discount;
+                var itemTaxPrice = parseFloat((taxRate / 100) * totalItemPrice);
+
+                row.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
+                row.find('.amount').html((totalItemPrice + itemTaxPrice).toFixed(2));
+
+                subTotal += totalItemPrice;
+                totalItemTaxPrice += itemTaxPrice;
+            });
+
+            $('.subTotal').html(subTotal.toFixed(2));
+            $('.totalTax').html(totalItemTaxPrice.toFixed(2));
+            $('.totalAmount').html((subTotal + totalItemTaxPrice).toFixed(2));
+        }
+
+
+
         $(document).on('keyup', '.quantity', function() {
             var el = $(this).closest('.row'); // Use closest() to find the closest ancestor with class 'row'
             var quantity = parseFloat($(this).val());
-            var price = parseFloat($(el.find('.price')).val());
+            var price = parseFloat($(el.find('.unitPrice')).val());
             var discount = parseFloat($(el.find('.discount')).val()) ||
                 0; // Use default value if discount is not provided
             var totalItemPrice = (quantity * price) - discount;
@@ -229,7 +235,7 @@
 
 
 
-        $(document).on('keyup change', '.price', function() {
+        $(document).on('keyup change', '.unitPrice', function() {
             var el = $(this).closest('.row'); // Use closest() to find the closest ancestor with class 'row'
             var price = parseFloat($(this).val());
             var quantity = parseFloat($(el.find('.quantity')).val());
@@ -265,7 +271,7 @@
             var el = $(this).closest('.row');
             var discount = parseFloat($(this).val()) || 0; // Parse discount value to float or set to 0 if empty
 
-            var price = parseFloat($(el.find('.price')).val());
+            var price = parseFloat($(el.find('.unitPrice')).val());
             var quantity = parseFloat($(el.find('.quantity')).val());
 
             var totalItemPrice = (quantity * price) - discount;
@@ -447,14 +453,14 @@
                                     <td width="25%" class="form-group pt-1">
                                         <?php echo e(Form::label('itemCode', __('Item Code'), ['class' => 'form-label'])); ?>
 
-
-                                        <!-- <?php echo e(Form::select('itemCode', $product_services_Codes, null, ['class' => 'form-control select2 itemCode', 'required' => 'required'])); ?> -->
-
-                                        <!-- <?php echo e(Form::select('itemCode', $product_services_Codes, '', ['class' => 'form-control select2 itemCode', 'required' => 'required'])); ?> -->
-
-
                                         <?php echo e(Form::select('itemCode', $product_services_Codes, '', ['class' => 'form-control select2 itemCode', 'data-url' => route('productservice.getiteminformation'), 'required' => 'required'])); ?>
 
+
+                                    </td>
+                                    <td>
+                                        <?php echo e(Form::label('item_standard_name', __('Item Standard Name'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::text('item_standard_name', null, ['class' => 'form-control item_standard_name', 'required' => 'required'])); ?>
 
                                     </td>
 
@@ -482,10 +488,7 @@
                                     <td>
                                         <?php echo e(Form::label('unitPrice', __('Unit Price'), ['class' => 'form-label'])); ?>
 
-                                        <!-- <?php echo e(Form::text('unitPrice', '', ['class' => 'form-control unitPrice', 'required' => 'required', 'placeholder' => __('unitPrice'), 'required' => 'required'])); ?> -->
-
-
-                                        <?php echo e(Form::text('unitPrice', null, ['class' => 'form-control unitPrice', 'id' => 'unit_price', 'required' => 'required', 'placeholder' => __('unitPrice'), 'required' => 'required'])); ?>
+                                        <?php echo e(Form::text('unitPrice', null, ['class' => 'form-control unitPrice', 'required' => 'required', 'placeholder' => __('unitPrice'), 'required' => 'required'])); ?>
 
 
                                     </td>
@@ -521,25 +524,28 @@
                                     <td>
 
                                         <div class="form-group">
-                                            <div class="input-group">
-                                                <div class="taxes"></div>
                                                 <?php echo e(Form::label('tax', __('Tax'), ['class' => 'form-label'])); ?>
 
+                                                <?php echo e(Form::text('tax', '', ['class' => 'form-control tax'])); ?>
 
-                                                <?php echo e(Form::hidden('tax', '', ['class' => 'form-control tax'])); ?>
+                                    </td>
+                                     <td>
+                                                <?php echo e(Form::label('itemtaxprice', __('Item Tax Price'), ['class' => 'form-label'])); ?>
 
-                                                <?php echo e(Form::hidden('itemTaxPrice', '', ['class' => 'form-control itemTaxPrice'])); ?>
+                                                <?php echo e(Form::text('itemTaxPrice', '', ['class' => 'form-control itemTaxPrice'])); ?>
 
-                                                <?php echo e(Form::hidden('itemTaxRate', '', ['class' => 'form-control itemTaxRate'])); ?>
+                                    </td>
+                                     <td>
+                                                <?php echo e(Form::label('itemtaxrate', __('Item Tax Rate'), ['class' => 'form-label'])); ?>
 
-                                            </div>
-                                        </div>
+                                                <?php echo e(Form::text('itemTaxRate', '', ['class' => 'form-control itemTaxRate'])); ?>
+
                                     </td>
                                     <td colspan="2">
-                                        <div class="form-group">
-                                            <?php echo e(Form::text('orgnNatCd', null, ['class' => 'form-control item_standard_name', 'rows' => '2', 'placeholder' => __('Country of Origin')])); ?>
+                                            <?php echo e(Form::label('Country_of_origin', __('Origin Nation Code'), ['class' => 'form-label'])); ?>
 
-                                        </div>
+                                            <?php echo e(Form::text('orgnNatCd', null, ['class' => 'form-control country_of_origin', 'rows' => '2', 'placeholder' => __('Country of Origin')])); ?>
+
                                     </td>
                                     <td colspan="5"></td>
 
