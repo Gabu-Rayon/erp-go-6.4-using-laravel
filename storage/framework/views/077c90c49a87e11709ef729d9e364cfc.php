@@ -220,8 +220,7 @@
             $('.totalAmount').html((totalItemPrice + totalItemTaxPrice).toFixed(2));
         });
 
-
-       $(document).on('keyup change', '.discount', function() {
+$(document).on('keyup change', '.discount', function() {
     var el = $(this).closest('.row');
     var discountRate = parseFloat($(this).val()) || 0; 
 
@@ -250,19 +249,24 @@
     });
     $('.subTotal').html(totalItemPrice.toFixed(2));
 
-    // Update total discount
-    var totalItemDiscountPrice = 0;
-    $('.discount').each(function() {
-        totalItemDiscountPrice += parseFloat($(this).val()) || 0;
+    // Calculate total discount amount
+    var totalDiscountAmount = 0;
+    $('.quantity').each(function(index) {
+        var discountRate = parseFloat($('.discount').eq(index).val()) || 0;
+        totalDiscountAmount += (parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(this).val())) * (discountRate / 100);
     });
-    $('.totalDiscount').html(totalItemDiscountPrice.toFixed(2));
+
+    // Update total discount
+    $('.totalDiscount').html(totalDiscountAmount.toFixed(2));
+
     // Update Discount Amount input field
-    $('.discountAmt').val(totalItemDiscountPrice.toFixed(2));
+    $('.discountAmt').val(totalDiscountAmount.toFixed(2));
 
     // Update total amount
     var totalAmount = totalItemPrice + totalItemTaxPrice;
     $('.totalAmount').html(totalAmount.toFixed(2));
 });
+
 
     </script>
 

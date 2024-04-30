@@ -155,7 +155,7 @@
 
 
         $(document).on('keyup change', '.quantity', function() {
-            var el = $(this).closest('.row'); 
+            var el = $(this).closest('.row');
             var quantity = parseFloat($(this).val());
             var price = parseFloat($(el.find('.unitPrice')).val());
             var discount = parseFloat($(el.find('.discount')).val()) ||
@@ -219,50 +219,53 @@
             $('.totalAmount').html((totalItemPrice + totalItemTaxPrice).toFixed(2));
         });
 
+        $(document).on('keyup change', '.discount', function() {
+            var el = $(this).closest('.row');
+            var discountRate = parseFloat($(this).val()) || 0;
 
-       $(document).on('keyup change', '.discount', function() {
-    var el = $(this).closest('.row');
-    var discountRate = parseFloat($(this).val()) || 0; 
+            var price = parseFloat($(el.find('.unitPrice')).val());
+            var quantity = parseFloat($(el.find('.quantity')).val());
 
-    var price = parseFloat($(el.find('.unitPrice')).val());
-    var quantity = parseFloat($(el.find('.quantity')).val());
+            var totalItemPrice = (price * quantity) * (1 - discountRate / 100);
+            var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
+            var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
+            $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
 
-    var totalItemPrice = (price * quantity) * (1 - discountRate / 100);
-    var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
-    var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
-    $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
+            var totalAmount = itemTaxPrice + totalItemPrice;
+            $(el.find('.amount')).html(totalAmount.toFixed(2));
 
-    var totalAmount = itemTaxPrice + totalItemPrice;
-    $(el.find('.amount')).html(totalAmount.toFixed(2));
+            // Update total tax price
+            var totalItemTaxPrice = 0;
+            $('.itemTaxPrice').each(function() {
+                totalItemTaxPrice += parseFloat($(this).val());
+            });
+            $('.totalTax').html(totalItemTaxPrice.toFixed(2));
 
-    // Update total tax price
-    var totalItemTaxPrice = 0;
-    $('.itemTaxPrice').each(function() {
-        totalItemTaxPrice += parseFloat($(this).val());
-    });
-    $('.totalTax').html(totalItemTaxPrice.toFixed(2));
+            // Update subtotal and total amount
+            var totalItemPrice = 0;
+            $('.quantity').each(function(index) {
+                totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(this).val());
+            });
+            $('.subTotal').html(totalItemPrice.toFixed(2));
 
-    // Update subtotal and total amount
-    var totalItemPrice = 0;
-    $('.quantity').each(function(index) {
-        totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(this).val());
-    });
-    $('.subTotal').html(totalItemPrice.toFixed(2));
+            // Calculate total discount amount
+            var totalDiscountAmount = 0;
+            $('.quantity').each(function(index) {
+                var discountRate = parseFloat($('.discount').eq(index).val()) || 0;
+                totalDiscountAmount += (parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(this)
+                    .val())) * (discountRate / 100);
+            });
 
-    // Update total discount
-    var totalItemDiscountPrice = 0;
-    $('.discount').each(function() {
-        totalItemDiscountPrice += parseFloat($(this).val()) || 0;
-    });
-    $('.totalDiscount').html(totalItemDiscountPrice.toFixed(2));
-    // Update Discount Amount input field
-    $('.discountAmt').val(totalItemDiscountPrice.toFixed(2));
+            // Update total discount
+            $('.totalDiscount').html(totalDiscountAmount.toFixed(2));
 
-    // Update total amount
-    var totalAmount = totalItemPrice + totalItemTaxPrice;
-    $('.totalAmount').html(totalAmount.toFixed(2));
-});
+            // Update Discount Amount input field
+            $('.discountAmt').val(totalDiscountAmount.toFixed(2));
 
+            // Update total amount
+            var totalAmount = totalItemPrice + totalItemTaxPrice;
+            $('.totalAmount').html(totalAmount.toFixed(2));
+        });
     </script>
 
     <script>
