@@ -107,19 +107,25 @@
                                         console.log("Populating unitPrice:", item.dftPrc);
                                         el.find('.unitPrice').val(item.dftPrc);
 
-                                        console.log("Populating pkgQuantity:", item.pkgUnitCd);
-                                        el.find('.pkgQuantity').val(item.pkgUnitCd);
-
-                                        console.log("Populating item_standard_name:", item
-                                            .itemStdNm);
-                                        el.find('.item_standard_name').val(item.itemStdNm);
 
                                         console.log("Populating tax:", item.taxTyCd);
                                         el.find('.tax').val(item.taxTyCd);
 
-                                        console.log("Populating country_of_origin:", item
-                                            .orgnNatCd);
-                                        el.find('.country_of_origin').val(item.orgnNatCd);
+                                        console.log("Populating itemClsCd:", item
+                                            .itemClsCd);
+                                        el.find('.itemClsCd').val(item.itemClsCd);
+
+                                        console.log("Populating itemNm:", item
+                                            .itemNm);
+                                        el.find('.itemNm').val(item.itemNm);
+
+                                        console.log("Populating Bcd:", item
+                                            .bcd);
+                                        el.find('.bcd').val(item.bcd);
+
+                                        console.log("Populating PkgUnitCd:", item
+                                            .pkgUnitCd);
+                                        el.find('.pkgUnitCd').val(item.pkgUnitCd);
 
                                         // Calculate tax based on taxTyCd
                                         var taxTyCd = item.taxTyCd;
@@ -142,7 +148,7 @@
                                         // Trigger change event for affected fields
                                         el.find(
                                                 '.itemTaxRate,.discount,.itemTaxPrice,.taxes,.amount'
-                                                )
+                                            )
                                             .trigger('change');
 
 
@@ -194,7 +200,7 @@
                 var quantity = parseFloat($(this).val());
                 var price = parseFloat($(el.find('.unitPrice')).val());
                 var discount = parseFloat($(el.find('.discount')).val()) ||
-                0; // Use default value if discount is not provided
+                    0; // Use default value if discount is not provided
                 var totalItemPrice = (quantity * price) - discount;
                 var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
                 var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
@@ -223,8 +229,8 @@
             });
 
             $(document).on('keyup change', '.unitPrice', function() {
-                var el = $(this).closest(
-                    '.row'); // Use closest() to find the closest ancestor with class 'row'
+                // var el = $(this).closest('.row'); 
+                var el = $(this).closest('[data-clone]');
                 var price = parseFloat($(this).val());
                 var quantity = parseFloat($(el.find('.quantity')).val());
                 var discount = parseFloat($(el.find('.discount')).val()) ||
@@ -239,69 +245,76 @@
                 var totalAmount = itemTaxPrice + totalItemPrice;
                 $(el.find('.amount')).html(totalAmount.toFixed(2));
 
-                // Update total tax price
-                var totalItemTaxPrice = 0;
-                $('.itemTaxPrice').each(function() {
-                    totalItemTaxPrice += parseFloat($(this).val());
-                });
-                $('.totalTax').html(totalItemTaxPrice.toFixed(2));
-
                 // Update subtotal and total amount
                 var totalItemPrice = 0;
-                $('.quantity').each(function(index) {
+                el.siblings().find('.quantity').each(function(index) {
                     totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(
                         this).val());
                 });
-                $('.subTotal').html(totalItemPrice.toFixed(2));
-                $('.totalAmount').html((totalItemPrice + totalItemTaxPrice).toFixed(2));
-
+                el.parent().find('.subTotal').html(totalItemPrice.toFixed(2));
+                var totalItemTaxPrice = 0;
+                el.siblings().find('.itemTaxPrice').each(function() {
+                    totalItemTaxPrice += parseFloat($(this).val());
+                });
+                var totalAmount = totalItemPrice + totalItemTaxPrice;
+                el.parent().find('.totalAmount').html(totalAmount.toFixed(2));
             });
 
             $(document).on('keyup change', '.discount', function() {
-                var el = $(this).closest('.row');
+                var el = $(this).closest('[data-clone]'); // Find the closest clone form
                 var discountRate = parseFloat($(this).val()) || 0;
 
-                var price = parseFloat($(el.find('.unitPrice')).val());
-                var quantity = parseFloat($(el.find('.quantity')).val());
+                var price = parseFloat(el.find('.unitPrice').val());
+                var quantity = parseFloat(el.find('.quantity').val());
 
                 var totalItemPrice = (price * quantity) * (1 - discountRate / 100);
-                var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
+                var itemTaxRate = parseFloat(el.find('.itemTaxRate').val());
                 var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
-                $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
+                el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
 
                 var totalAmount = itemTaxPrice + totalItemPrice;
-                $(el.find('.amount')).html(totalAmount.toFixed(2));
+                el.find('.amount').html(totalAmount.toFixed(2));
 
                 // Update total tax price
                 var totalItemTaxPrice = 0;
-                $('.itemTaxPrice').each(function() {
+                el.siblings().find('.itemTaxPrice').each(function() { // Find itemTaxPrice only in siblings
                     totalItemTaxPrice += parseFloat($(this).val());
                 });
-                $('.totalTax').html(totalItemTaxPrice.toFixed(2));
+                el.parent().find('.totalTax').html(totalItemTaxPrice.toFixed(2));
 
                 // Update subtotal and total amount
                 var totalItemPrice = 0;
-                $('.quantity').each(function(index) {
-                    totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(
-                        this).val());
+                el.siblings().find('.quantity').each(function(index) {
+                    totalItemPrice += parseFloat(el.siblings().find('.unitPrice').eq(index).val()) *
+                        parseFloat($(this).val());
                 });
-                $('.subTotal').html(totalItemPrice.toFixed(2));
+                el.parent().find('.subTotal').html(totalItemPrice.toFixed(2));
 
                 // Calculate total discount amount
                 var totalDiscountAmount = 0;
-                $('.quantity').each(function(index) {
-                    var discountRate = parseFloat($('.discount').eq(index).val()) || 0;
-                    totalDiscountAmount += (parseFloat($('.unitPrice').eq(index).val()) *
-                        parseFloat($(this)
-                            .val())) * (discountRate / 100);
+                el.closest('[data-clone]').find('.quantity').each(function(index) {
+                    var discountRate = parseFloat($(this).closest('[data-clone]').find('.discount')
+                        .eq(index).val()) || 0;
+                    totalDiscountAmount += (parseFloat($(this).closest('[data-clone]').find(
+                            '.unitPrice').eq(index).val()) *
+                        parseFloat($(this).val())) * (discountRate / 100);
                 });
-                // Update total discount
-                $('.totalDiscount').html(totalDiscountAmount.toFixed(2));
-                // Update Discount Amount input field
-                $('.discountAmt').val(totalDiscountAmount.toFixed(2));
+
+                // Update total discount and Discount Amount input field for the closest cloned form
+                el.parent().find('.totalDiscount').html(totalDiscountAmount.toFixed(2));
+                el.closest('[data-clone]').find('.discountAmt').val(totalDiscountAmount.toFixed(2));
+
                 // Update total amount
                 var totalAmount = totalItemPrice + totalItemTaxPrice;
-                $('.totalAmount').html(totalAmount.toFixed(2));
+                el.parent().find('.totalAmount').html(totalAmount.toFixed(2));
+            });
+
+            // Initialize Select2 for all select elements with the class 'select2'
+            $('.select2').select2({
+                templateResult: function(data) {
+                    var $option = $(data.element);
+                    return $option.data('text') || data.text;
+                }
             });
         });
     </script>
@@ -324,7 +337,7 @@
                     <div class="row">
                         <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('supplierName', __('Supplier Name'), ['class' => 'form-label']) }}
-                            {{ Form::number('supplierName', null, ['class' => 'form-control name-field', 'required' => 'required']) }}
+                            {{ Form::text('supplierName', null, ['class' => 'form-control name-field', 'required' => 'required']) }}
                         </div>
                         <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('supplierTin', __('Supplier Tin'), ['class' => 'form-label']) }}
@@ -332,11 +345,11 @@
                         </div>
                         <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('supplierBhfId', __('Supplier BhfId'), ['class' => 'form-label']) }}
-                            {{ Form::number('supplierBhfId', null, ['class' => 'form-control bhfid-field', 'required' => 'required']) }}
+                            {{ Form::text('supplierBhfId', null, ['class' => 'form-control bhfid-field', 'required' => 'required']) }}
                         </div>
                         <div class="form-group col-md-4" id="vender-box">
-                            {{ Form::label('supplierInvNo', __('Supplier Invoice No'), ['class' => 'form-label']) }}
-                            {{ Form::number('supplierInvNo', null, ['class' => 'form-control invno-field', 'required' => 'required']) }}
+                            {{ Form::label('supplierInvcNo', __('Supplier Invoice No'), ['class' => 'form-label']) }}
+                            {{ Form::text('supplierInvcNo', null, ['class' => 'form-control invno-field', 'required' => 'required']) }}
                         </div>
                         <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('purchTypeCode', __('Purchase Type Code'), ['class' => 'form-label']) }}
@@ -350,18 +363,9 @@
                             {{ Form::label('pmtTypeCode', __('Payment Type Code'), ['class' => 'form-label']) }}
                             {{ Form::select('pmtTypeCode', $paymentTypeCodes, null, ['class' => 'form-control select2 pmtTypeCode', 'required' => 'required']) }}
                         </div>
-                        <div class="form-group col-md-4" id="vender-box">
-                            {{ Form::label('category', __('Category'), ['class' => 'form-label']) }}
-                            {{ Form::select('category', $category, null, ['class' => 'form-control select2 category', 'required' => 'required']) }}
-                        </div>
                         <div class="form-group col-md-3">
                             {{ Form::label('purchDate', __('Purchase Date'), ['class' => 'form-label']) }}
                             {{ Form::date('purchDate', null, ['class' => 'form-control', 'required' => 'required']) }}
-                        </div>
-
-                        <div class="form-group col-md-3">
-                            {{ Form::label('purchase_number', __('Purchase Number'), ['class' => 'form-label']) }}
-                            <input type="text" class="form-control" value="{{ $purchase_number }}" readonly>
                         </div>
                         <div class="form-group col-md-3">
                             {{ Form::label('occurredDate', __('Occurred Date'), ['class' => 'form-label']) }}
@@ -417,20 +421,49 @@
                                     <td width="25%" class="form-group pt-1">
                                         {{ Form::label('itemCode', __('Item Code'), ['class' => 'form-label']) }}
                                         {{ Form::select('itemCode', $product_services_Codes, '', ['class' => 'form-control select2 itemCode', 'data-url' => route('productservice.getiteminformation'), 'required' => 'required']) }}
-
+                                    </td>
+                                     <td>
+                                        {{ Form::label('itemNm', __('ItemNm'), ['class' => 'form-label']) }}
+                                        {{ Form::text('itemNm', null, ['class' => 'form-control itemNm', 'required' => 'required']) }}
                                     </td>
                                     <td>
-                                        {{ Form::label('item_standard_name', __('Item Standard Name'), ['class' => 'form-label']) }}
-                                        {{ Form::text('item_standard_name', null, ['class' => 'form-control item_standard_name', 'required' => 'required']) }}
+                                        {{ Form::label('itemClsCd', __('ItemClsCd'), ['class' => 'form-label']) }}
+                                        {{ Form::text('itemClsCd', null, ['class' => 'form-control itemClsCd', 'required' => 'required']) }}
                                     </td>
+                                </tr>
+                                <tr>
+                                    <td width="25%" class="form-group pt-1">
+                                        {{ Form::label('bcd', __('Bcd'), ['class' => 'form-label']) }}
+                                        {{ Form::text('bcd', null, ['class' => 'form-control bcd', 'required' => 'required']) }}
+                                    </td>
+                                    <td>
+                                        {{ Form::label('pkgUnitCd', __('Pkg Unit Cd'), ['class' => 'form-label']) }}
+                                        {{ Form::text('pkgUnitCd', null, ['class' => 'form-control pkgUnitCd', 'required' => 'required']) }}
+                                    </td>
+                                    <td>
+                                        {{ Form::label('pkg', __('Package'), ['class' => 'form-label']) }}
+                                        {{ Form::text('pkg', null, ['class' => 'form-control pkg', 'required' => 'required', 'placeholder' => __('1,2,100')]) }}
+                                    </td>
+                                </tr>
+                                  <tr>
+                                 <td>
+                                        {{ Form::label('qtyUnitCd', __('Quantity'), ['class' => 'form-label']) }}
+                                        {{ Form::text('qtyUnitCd', null, ['class' => 'form-control qtyUnitCd', 'required' => 'required', 'placeholder' => __('U,T')]) }}
+                                    </td>
+                                </tr>
 
+                                <tr>
                                     <td>
                                         {{ Form::label('supplritemClsCode', __('Supplier Item Cls Code'), ['class' => 'form-label']) }}
-                                        {{ Form::text('supplieritemClsCode', null, ['class' => 'form-control', 'required' => 'required']) }}
+                                        {{ Form::text('supplrItemClsCode', null, ['class' => 'form-control', 'required' => 'required']) }}
                                     </td>
                                     <td>
                                         {{ Form::label('supplierItemCode', __('Supplier Item Code'), ['class' => 'form-label']) }}
                                         {{ Form::text('supplrItemCode', null, ['class' => 'form-control supplierItemCode', 'required' => 'required']) }}
+                                    </td>
+                                    <td>
+                                        {{ Form::label('supplrItemName', __('Supplier Item Name'), ['class' => 'form-label']) }}
+                                        {{ Form::text('supplrItemName', null, ['class' => 'form-control supplrItemName', 'required' => 'required']) }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -438,15 +471,14 @@
                                         {{ Form::label('quantity', __('Quantity'), ['class' => 'form-label']) }}
                                         {{ Form::number('quantity', null, ['class' => 'form-control quantity', 'required' => 'required', 'placeholder' => __('Quantity'), 'required' => 'required']) }}
                                     </td>
-
                                     <td>
                                         {{ Form::label('unitPrice', __('Unit Price'), ['class' => 'form-label']) }}
                                         {{ Form::number('unitPrice', null, ['class' => 'form-control unitPrice', 'required' => 'required', 'placeholder' => __('unitPrice'), 'required' => 'required']) }}
 
                                     </td>
                                     <td>
-                                        {{ Form::label('pkgQuantity', __('Pkg Quantity Code'), ['class' => 'form-label']) }}
-                                        {{ Form::text('pkgQuantity', null, ['class' => 'form-control pkgQuantity', 'required' => 'required']) }}
+                                        {{ Form::label('pkgQuantity', __('Pkg Quantity'), ['class' => 'form-label']) }}
+                                        {{ Form::number('pkgQuantity', null, ['class' => 'form-control pkgQuantity', 'required' => 'required']) }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -455,8 +487,8 @@
                                         {{ Form::number('discount', null, ['class' => 'form-control discount', 'required' => 'required']) }}
                                     </td>
                                     <td>
-                                        {{ Form::label('discount', __('Discount Amount'), ['class' => 'form-label']) }}
-                                        {{ Form::text('discount', null, ['class' => 'form-control discountAmt', 'required' => 'required']) }}
+                                        {{ Form::label('discountAmt', __('Discount Amount'), ['class' => 'form-label']) }}
+                                        {{ Form::text('discountAmt', null, ['class' => 'form-control discountAmt', 'required' => 'required']) }}
                                     </td>
                                     <td>
                                         {{ Form::label('itemExprDt', __('item Expire Date'), ['class' => 'form-label']) }}
@@ -472,16 +504,12 @@
                                             {{ Form::text('tax', '', ['class' => 'form-control tax']) }}
                                     </td>
                                     <td>
-                                        {{ Form::label('itemtaxprice', __('Item Tax Price'), ['class' => 'form-label']) }}
+                                        {{ Form::label('itemtaxprice', __('Taxable Amount'), ['class' => 'form-label']) }}
                                         {{ Form::text('itemTaxPrice', '', ['class' => 'form-control itemTaxPrice']) }}
                                     </td>
                                     <td>
                                         {{ Form::label('itemtaxrate', __('Item Tax Rate'), ['class' => 'form-label']) }}
                                         {{ Form::text('itemTaxRate', '', ['class' => 'form-control itemTaxRate']) }}
-                                    </td>
-                                    <td colspan="2">
-                                        {{ Form::label('Country_of_origin', __('Origin Nation Code'), ['class' => 'form-label']) }}
-                                        {{ Form::text('orgnNatCd', null, ['class' => 'form-control country_of_origin', 'rows' => '2', 'placeholder' => __('Country of Origin')]) }}
                                     </td>
                                     <td colspan="5"></td>
 
