@@ -1418,10 +1418,30 @@
                     <a class="dash-link" href="{{ route('stockinfo.index') }}">{{ __('Get Move List') }}</a>
                 </li>
                 <li class="dash-item {{ Request::route()->getName() == 'index' }}">
-                    <a class="dash-link" href="{{ route('stockinfo.stockadjustment') }}">{{ __('Stock Adjustment List') }}</a>
+                    <a class="dash-link" href="{{ route('stockadjustment.index') }}">{{ __('Stock Adjustment List') }}</a>
                 </li>
                 <li class="dash-item {{ Request::route()->getName() == 'create' }}">
                     <a class="dash-link" href="{{ route('stockinfo.create') }}">{{ __('Move Stock') }}</a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : '' }}">
+            <a href="#!" class="dash-link">
+                <span class="dash-micon">
+                    <i class="ti ti-layers-difference"></i>
+                </span>
+                <span class="dash-mtext">{{ __('Sales') }}</span>
+                <span class="dash-arrow">
+                    <i data-feather="chevron-right"></i>
+                </span>
+            </a>
+            <ul class="dash-submenu {{ Request::segment(1) == 'index' || Request::segment(1) == 'create' || Request::segment(1) == 'adjust' }}">
+                <li class="dash-item {{ Request::route()->getName() == 'index' }}">
+                    <a class="dash-link" href="{{ route('sales.index') }}">{{ __('Sales Report') }}</a>
+                </li>
+                <li class="dash-item {{ Request::route()->getName() == 'create' }}">
+                    <a class="dash-link" href="{{ route('sales.create') }}">{{ __('Send Sales Transaction') }}</a>
                 </li>
             </ul>
         </li>

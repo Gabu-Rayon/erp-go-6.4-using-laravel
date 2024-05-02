@@ -1206,4 +1206,22 @@ class PurchaseController extends Controller
         }
     }
 
+    public function getItem($itemCd)
+    {
+        try {
+            $itemInfo = ItemInformation::where('itemCd', $itemCd)->first();
+            return response()->json([
+                'message' => 'success',
+                'data' => $itemInfo
+            ]);
+        } catch (\Exception $e) {
+            \Log::info('Get Item Error');
+            \Log::info($e);
+            return response()->json([
+                'message' => 'error',
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
 }
