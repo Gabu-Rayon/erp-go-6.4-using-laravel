@@ -1,0 +1,1 @@
+<?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/stockinfo/create.blade.php ENDPATH**/ ?>

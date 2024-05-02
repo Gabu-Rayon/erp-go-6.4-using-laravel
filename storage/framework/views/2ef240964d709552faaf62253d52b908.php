@@ -1393,6 +1393,69 @@
         <?php endif; ?>
         <!--------------------- End POs System ----------------------------------->
 
+        <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : ''); ?>">
+            <a href="#!" class="dash-link">
+                <span class="dash-micon">
+                    <i class="ti ti-layers-difference"></i>
+                </span>
+                <span class="dash-mtext"><?php echo e(__('Import Items')); ?></span>
+                <span class="dash-arrow">
+                    <i data-feather="chevron-right"></i>
+                </span>
+            </a>
+            <ul class="dash-submenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create'); ?>">
+                <li class="dash-item <?php echo e(Request::route()->getName() == 'index'); ?>">
+                    <a class="dash-link" href="<?php echo e(route('importeditems.index')); ?>"><?php echo e(__('Get Import Items')); ?></a>
+                </li>
+                <li class="dash-item <?php echo e(Request::route()->getName() == 'create'); ?>">
+                <a class="dash-link" href="<?php echo e(route('importeditems.create')); ?>"><?php echo e(__('Send Import Item')); ?></a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : ''); ?>">
+            <a href="#!" class="dash-link">
+                <span class="dash-micon">
+                    <i class="ti ti-layers-difference"></i>
+                </span>
+                <span class="dash-mtext"><?php echo e(__('Stock Information')); ?></span>
+                <span class="dash-arrow">
+                    <i data-feather="chevron-right"></i>
+                </span>
+            </a>
+            <ul class="dash-submenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' || Request::segment(1) == 'adjust'); ?>">
+                <li class="dash-item <?php echo e(Request::route()->getName() == 'index'); ?>">
+                    <a class="dash-link" href="<?php echo e(route('stockinfo.index')); ?>"><?php echo e(__('Get Move List')); ?></a>
+                </li>
+                <li class="dash-item <?php echo e(Request::route()->getName() == 'index'); ?>">
+                    <a class="dash-link" href="<?php echo e(route('stockadjustment.index')); ?>"><?php echo e(__('Stock Adjustment List')); ?></a>
+                </li>
+                <li class="dash-item <?php echo e(Request::route()->getName() == 'create'); ?>">
+                    <a class="dash-link" href="<?php echo e(route('stockinfo.create')); ?>"><?php echo e(__('Move Stock')); ?></a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : ''); ?>">
+            <a href="#!" class="dash-link">
+                <span class="dash-micon">
+                    <i class="ti ti-layers-difference"></i>
+                </span>
+                <span class="dash-mtext"><?php echo e(__('Sales')); ?></span>
+                <span class="dash-arrow">
+                    <i data-feather="chevron-right"></i>
+                </span>
+            </a>
+            <ul class="dash-submenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' || Request::segment(1) == 'adjust'); ?>">
+                <li class="dash-item <?php echo e(Request::route()->getName() == 'index'); ?>">
+                    <a class="dash-link" href="<?php echo e(route('sales.index')); ?>"><?php echo e(__('Sales Report')); ?></a>
+                </li>
+                <li class="dash-item <?php echo e(Request::route()->getName() == 'create'); ?>">
+                    <a class="dash-link" href="<?php echo e(route('sales.create')); ?>"><?php echo e(__('Send Sales Transaction')); ?></a>
+                </li>
+            </ul>
+        </li>
+
         <?php if(\Auth::user()->type != 'super admin'): ?>
             <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'support' ? 'active' : ''); ?>">
                 <a href="<?php echo e(route('support.index')); ?>" class="dash-link">
@@ -1403,7 +1466,7 @@
             <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'api-initialization' ? 'active' : ''); ?>">
                 <a href="<?php echo e(route('apiinitialization.index')); ?>" class="dash-link">
                     <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
-                        class="dash-mtext"><?php echo e(__('Initialization')); ?></span>
+                        class="dash-mtext"><?php echo e(__('API Initialization')); ?></span>
                 </a>
             </li>
             <li
@@ -1612,9 +1675,9 @@
                 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage user')): ?>
                     <li
                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'api-initialization' ? 'active' : ''); ?>">
-                        <a href="<?php echo e(route('users.index')); ?>" class="dash-link">
+                        <a href="<?php echo e(route('apiinitialization.index')); ?>" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-settings"></i></span><span
-                                class="dash-mtext"><?php echo e(__('Initialization')); ?></span>
+                                class="dash-mtext"><?php echo e(__('API Initialization')); ?></span>
                         </a>
                     </li>
                 <?php endif; ?>

@@ -1843,5 +1843,4 @@ Route::get('/getpurchasesalesdetailsforsuppliers', [PurchaseController::class, '
 Route::get('/getsupplier/{id}', [PurchaseController::class, 'getSupplier']);
 Route::get('/getitem/{id}', [PurchaseController::class, 'getItem']);
 Route::get('stockinfoo/getstockmovelistfromapi', [StockMoveListController::class, 'getStockMoveListFromApi']);
-
 Route::any('/getItemInformationForPurchasing', [PurchaseController::class, 'getItemToPurchase'])->name('productservice.getiteminformation');

@@ -484,7 +484,15 @@
                                     <td>
                                         <?php echo e(Form::label('pkg', __('Package'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::text('item_standard_name', null, ['class' => 'form-control pkg', 'required' => 'required', 'placeholder' => __('1,2,100')])); ?>
+                                        <?php echo e(Form::text('pkg', null, ['class' => 'form-control pkg', 'required' => 'required', 'placeholder' => __('1,2,100')])); ?>
+
+                                    </td>
+                                </tr>
+                                  <tr>
+                                 <td>
+                                        <?php echo e(Form::label('qtyUnitCd', __('Quantity'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::text('qtyUnitCd', null, ['class' => 'form-control qtyUnitCd', 'required' => 'required', 'placeholder' => __('U,T')])); ?>
 
                                     </td>
                                 </tr>
