@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\StockAdjustmentList;
+use App\Models\ItemInformation;
+use App\Models\ReleaseType;
 use Illuminate\Http\Request;
 
 class StockAdjustmentListController extends Controller
@@ -12,7 +13,12 @@ class StockAdjustmentListController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            return view('stockadjustment.index');
+        } catch (\Exception $e) {
+            \Log::info($e);
+            return redirect()->to('stockinfo.index')->with('error', e.getMessage());
+        }
     }
 
     /**
@@ -20,7 +26,14 @@ class StockAdjustmentListController extends Controller
      */
     public function create()
     {
-        //
+        try {
+            $items = ItemInformation::all()->pluck('itemNm', 'itemCd');
+            $releaseTypes = ReleaseType::all()->pluck('type', 'id');
+            return view('stockadjustment.create', compact('items', 'releaseTypes'));
+        } catch (\Exception $e) {
+            \Log::info($e);
+            return redirect()->to('stockinfo.index')->with('error', e.getMessage());
+        }
     }
 
     /**
@@ -28,7 +41,14 @@ class StockAdjustmentListController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $data = $request->all();
+            \Log::info('STOCK ADJ');
+            \lOG::info(json_encode($data));
+            return  redirect()->back()->with('success', 'Stock Adjustment Added.');
+        } catch(\Exception $e) {
+            return  redirect()->back()->with('error', e->message());
+        }
     }
 
     /**

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StockMoveListController;
+use App\Http\Controllers\StockAdjustmentListController;
 use App\Http\Controllers\ImportedItemsController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PosController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\TaxController;
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\CodeController;
 use App\Http\Controllers\DealController;
+use App\Http\Controllers\SalesController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LoanController;
@@ -1805,6 +1807,35 @@ Route::group(
         Route::resource('iteminformation', ProductServiceController::class);
     }
 );
+
+Route::group(
+    [
+        'middleware' => [
+            'auth',
+            'XSS',
+            'revalidate',
+        ],
+    ],
+    function () {
+        Route::resource('stockadjustment', StockAdjustmentListController::class);
+    }
+);
+
+Route::group(
+    [
+        'middleware' => [
+            'auth',
+            'XSS',
+            'revalidate',
+        ],
+    ],
+    function () {
+        Route::resource('sales', SalesController::class);
+    }
+);
+
+Route::get('sales/saletransactions', [SalesController::class, 'sendSalesTransactions'])->name('sales.saletransactions');
+
 
 
 Route::get('/getPurchaseSalesItemsFromApi', [PurchaseController::class, 'getPurchaseSalesItemsFromApi']);
