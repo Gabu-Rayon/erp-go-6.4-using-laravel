@@ -22,71 +22,71 @@
                     <div class="row">
                         <div class="form-group col-md-4">
                             {{ Form::label('customerName', __('Customer Name (*)'),['class'=>'form-label']) }}
-                            {{ Form::text('customerName', '', array('class' => 'form-control','required'=>'required')) }}
+                            {{ Form::text('customerName', '', array('class' => 'form-control customerName','required'=>'required')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('customerTin', __('Customer TIN (*)'),['class'=>'form-label']) }}
-                            {{ Form::text('customerTin', '', array('class' => 'form-control','required'=>'required')) }}
+                            {{ Form::text('customerTin', '', array('class' => 'form-control customerTin','required'=>'required')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('customerNo', __('Customer Number'),['class'=>'form-label']) }}
-                            {{ Form::number('customerNo', '', array('class' => 'form-control')) }}
+                            {{ Form::number('customerNo', '', array('class' => 'form-control customerNo')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('customerMobileNo', __('Customer Mobile Number'),['class'=>'form-label']) }}
-                            {{ Form::text('customerMobileNo', '', array('class' => 'form-control')) }}
+                            {{ Form::text('customerMobileNo', '', array('class' => 'form-control customerMobileNo')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('salesType', __('Sales Type'),['class'=>'form-label']) }}
-                            {{ Form::text('salesType', '', array('class' => 'form-control')) }}
+                            {{ Form::text('salesType', '', array('class' => 'form-control salesType')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('paymentType', __('Payment Type'),['class'=>'form-label']) }}
-                            {{ Form::text('paymentType', '', array('class' => 'form-control')) }}
+                            {{ Form::text('paymentType', '', array('class' => 'form-control paymentType')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('traderInvoiceNo', __('Trader Invoice Number (*)'),['class'=>'form-label']) }}
-                            {{ Form::text('traderInvoiceNo', '', array('class' => 'form-control','required'=>'required')) }}
+                            {{ Form::text('traderInvoiceNo', '', array('class' => 'form-control traderInvoiceNo','required'=>'required')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('confirmDate', __('Confirm Date (*)'),['class'=>'form-label']) }}
-                            {{ Form::date('confirmDate', '', array('class' => 'form-control','required'=>'required')) }}
+                            {{ Form::date('confirmDate', '', array('class' => 'form-control confirmDate','required'=>'required')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('salesDate', __('Sales Date (*)'),['class'=>'form-label']) }}
-                            {{ Form::date('salesDate', '', array('class' => 'form-control','required'=>'required')) }}
+                            {{ Form::date('salesDate', '', array('class' => 'form-control salesDate','required'=>'required')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('stockReleseDate', __('Stock Release Date'),['class'=>'form-label']) }}
-                            {{ Form::date('stockReleseDate', '', array('class' => 'form-control')) }}
+                            {{ Form::date('stockReleseDate', '', array('class' => 'form-control stockReleseDate')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('receiptPublishDate', __('Receipt Publish Date (*)'),['class'=>'form-label']) }}
-                            {{ Form::date('receiptPublishDate', '', array('class' => 'form-control','required'=>'required')) }}
+                            {{ Form::date('receiptPublishDate', '', array('class' => 'form-control receiptPublishDate','required'=>'required')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('occurredDate', __('Occurred Date (*)'),['class'=>'form-label']) }}
-                            {{ Form::date('occurredDate', '', array('class' => 'form-control','required'=>'required')) }}
+                            {{ Form::date('occurredDate', '', array('class' => 'form-control occurredDate','required'=>'required')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('invoiceStatusCode', __('Invoice Status Code'),['class'=>'form-label']) }}
-                            {{ Form::text('invoiceStatusCode', '', array('class' => 'form-control')) }}
+                            {{ Form::text('invoiceStatusCode', '', array('class' => 'form-control invoiceStatusCode')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('isPurchaseAccept', __('Purchase Accepted'),['class'=>'form-label']) }}
-                            {{ Form::select('isPurchaseAccept', array('true' => 'True', 'false' => 'False'), null, array('class' => 'form-control')) }}
+                            {{ Form::select('isPurchaseAccept', array('true' => 'True', 'false' => 'False'), null, array('class' => 'isPurchaseAccept form-control')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('isStockIOUpdate', __('Stock IO Update'),['class'=>'form-label']) }}
-                            {{ Form::select('isStockIOUpdate', array('true' => 'True', 'false' => 'False'), null, array('class' => 'form-control')) }}
+                            {{ Form::select('isStockIOUpdate', array('true' => 'True', 'false' => 'False'), null, array('class' => 'isStockIOUpdate form-control')) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('mapping', __('Mapping'),['class'=>'form-label']) }}
-                            {{ Form::text('mapping', '', array('class' => 'form-control')) }}
+                            {{ Form::text('mapping', '', array('class' => 'form-control mapping')) }}
                         </div>
                         <div class="form-group col-md-12">
                             {{ Form::label('remark', __('Remark'),['class'=>'form-label']) }}
-                            {{ Form::textarea('remark', '', array('class' => 'form-control', 'rows' => '3')) }}
+                            {{ Form::textarea('remark', '', array('class' => 'form-control remark', 'rows' => '3')) }}
                         </div>
                     </div>
                 </div>
@@ -134,35 +134,35 @@
                             </div>
                             <div class="form-group col-md-4">
                                 {{ Form::label('isrcAplcbYn	', __('ISRCAPLCBYN	'),['class'=>'form-label']) }}
-                                {{ Form::select('isrcAplcbYn', array('true' => 'True', 'false' => 'False'), null, array('class' => 'form-control')) }}
+                                {{ Form::select('isrcAplcbYn', array('true' => 'True', 'false' => 'False'), null, array('class' => 'form-control isrcAplcbYn')) }}
                             </div>
                             <div class="form-group col-md-4">
                                 {{ Form::label('pkgUnitCode', __('Package Unit Code'),['class'=>'form-label']) }}
-                                {{ Form::number('pkgUnitCode', '', array('class' => 'form-control package-unit-code', 'readonly' => 'readonly')) }}
+                                {{ Form::text('pkgUnitCode', '', array('class' => 'form-control package-unit-code', 'readonly' => 'readonly')) }}
                             </div>
                             <div class="form-group col-md-4">
                                 {{ Form::label('pkgQuantity', __('Package Quantity (*)'),['class'=>'form-label']) }}
-                                {{ Form::number('pkgQuantity', '', array('class' => 'form-control', "required" => "required")) }}
+                                {{ Form::number('pkgQuantity', '', array('class' => 'form-control pkg-quantity', "required" => "required")) }}
                             </div>
                             <div class="form-group col-md-4">
                                 {{ Form::label('qtyUnitCd', __('Quantity Unit Code'),['class'=>'form-label']) }}
-                                {{ Form::text('qtyUnitCd', '', array('class' => 'form-control quantity-unit-code', 'readonly' => 'readonly')) }}
+                                {{ Form::text('qtyUnitCd', '', array('class' => 'form-control qty-unit-cd', 'readonly' => 'readonly')) }}
                             </div>
                             <div class="form-group col-md-4">
                                 {{ Form::label('qty', __('Quantity (*)'),['class'=>'form-label']) }}
-                                {{ Form::number('qty', '', array('class' => 'form-control', "required" => "required")) }}
+                                {{ Form::number('qty', '', array('class' => 'form-control quantity', "required" => "required")) }}
                             </div>
                             <div class="form-group col-md-4">
                                 {{ Form::label('discountRate', __('Discount Rate'),['class'=>'form-label']) }}
-                                {{ Form::text('discountRate', '', array('class' => 'form-control')) }}
+                                {{ Form::text('discountRate', '', array('class' => 'form-control discount-rate')) }}
                             </div>
                             <div class="form-group col-md-4">
                                 {{ Form::label('discountAmt', __('Discount Amount'),['class'=>'form-label']) }}
-                                {{ Form::text('discountAmt', '', array('class' => 'form-control')) }}
+                                {{ Form::text('discountAmt', '', array('class' => 'form-control discount-amt')) }}
                             </div>
                             <div class="form-group col-md-4">
                                 {{ Form::label('itemExprDate', __('Item Expiry Date'),['class'=>'form-label']) }}
-                                {{ Form::date('itemExprDate', '', array('class' => 'form-control')) }}
+                                {{ Form::date('itemExprDate', '', array('class' => 'form-control item-expr-date')) }}
                             </div>
                         </div>
                     </div>
@@ -182,78 +182,154 @@
 @push('script-page')
     <script>
         $(document).ready(function() {
-    $('.repeater.items').repeater({
-        initEmpty: false,
-        show: function() {
-            $(this).slideDown();
-            attachItemNameEventListener(this);
-        },
-        hide: function(deleteElement) {
-            if (confirm('Are you sure you want to delete this element?')) {
-                $(this).slideUp(deleteElement);
-            }
-        }
-    });
+            
+            let itemDataArray = [];
+            
+            $('.repeater.items').repeater({
+                initEmpty: false,
+                show: function() {
+                    $(this).slideDown();
+                    attachItemNameEventListener(this);
+                },
+                hide: function(deleteElement) {
+                    if (confirm('Are you sure you want to delete this element?')) {
+                        $(this).slideUp(deleteElement);
+                    }
+                }
+            });
+            
+            attachItemNameEventListener(document);
+            
+            function attachItemNameEventListener(container) {
+                const itemNames = container.querySelectorAll('.item-name');
+                itemNames.forEach(itemName => {
+                    itemName.addEventListener('change', async function (event) {
+                        const url = `http://localhost:8000/getitem/${event.target.value}`;
+                        const response = await fetch(url);
+                        const { data } = await response.json();
+                        const repeaterItem = itemName.closest('[data-repeater-item]');
+                        const itemCodeField = repeaterItem.querySelector('.item-code');
+                        const itemClassCodeField = repeaterItem.querySelector('.item-class-code');
+                        const itemTypeCodeField = repeaterItem.querySelector('.item-type-code');
+                        const OrgNatCodeField = repeaterItem.querySelector('.org-nat-code');
+                        const taxTypeCodeField = repeaterItem.querySelector('.tax-type-code');
+                        const unitPriceCodeField = repeaterItem.querySelector('.unit-price');
+                        const packageUnitCodeField = repeaterItem.querySelector('.package-unit-code');
+                        const quantityUnitCodeField = repeaterItem.querySelector('.qty-unit-cd');
+                        console.log(data);
+                        if (data
+                                && data.itemCd
+                                && data.itemClsCd
+                                && data.itemTyCd
+                                && data.orgnNatCd
+                                && data.taxTyCd
+                                && data.dftPrc
+                                && data.pkgUnitCd
+                                && data.qtyUnitCd
+                            ) {
+                                itemCodeField.value = data.itemCd;
+                                itemClassCodeField.value = data.itemClsCd;
+                                itemTypeCodeField.value = data.itemTyCd;
+                                OrgNatCodeField.value = data.orgnNatCd;
+                                taxTypeCodeField.value = data.taxTyCd;
+                                unitPriceCodeField.value = data.dftPrc;
+                                packageUnitCodeField.value = data.pkgUnitCd;
+                                quantityUnitCodeField.value = data.qtyUnitCd;
+                            } else {
+                                itemCodeField.value = '';
+                                itemClassCodeField.value = '';
+                                itemTypeCodeField.value = '';
+                                OrgNatCodeField.value = '';
+                                taxTypeCodeField.value = '';
+                                unitPriceCodeField.value = '';
+                                packageUnitCodeField.value = '';
+                                quantityUnitCodeField.value = '';
+                            }
+                        });
+                    });
+                }
+                const salesForm = document.querySelector('.sales-form');
+                salesForm.addEventListener('submit', async e => {
+                    e.preventDefault();
+                    itemDataArray = [];
+                    const repeatedItems = document.querySelectorAll('[data-repeater-item]');
+                    repeatedItems.forEach(repeaterItem => {
+                        const itemNameField = repeaterItem.querySelector('.item-name');
+                        const itemCodeField = repeaterItem.querySelector('.item-code');
+                        const itemClassCodeField = repeaterItem.querySelector('.item-class-code');
+                        const itemTypeCodeField = repeaterItem.querySelector('.item-type-code');
+                        const OrgNatCodeField = repeaterItem.querySelector('.org-nat-code');
+                        const taxTypeCodeField = repeaterItem.querySelector('.tax-type-code');
+                        const unitPriceCodeField = repeaterItem.querySelector('.unit-price');
+                        const packageUnitCodeField = repeaterItem.querySelector('.package-unit-code');
+                        const pkgQuantityField = repeaterItem.querySelector('.pkg-quantity');
+                        const qtyUnitCdField = repeaterItem.querySelector('.qty-unit-cd');
+                        const quantityField = repeaterItem.querySelector('.quantity');
+                        const discountRateField = repeaterItem.querySelector('.discount-rate');
+                        const discountAmtField = repeaterItem.querySelector('.discount-amt');
+                        const itemExprDateField = repeaterItem.querySelector('.item-expr-date');
+                        const isrcAplcbYnField = repeaterItem.querySelector('.isrcAplcbYn');
+                        
+                        const itemData = {
+                            itemCode: itemCodeField.value || '',
+                            itemClassCode: itemClassCodeField.value || '',
+                            itemTypeCode: itemTypeCodeField.value || '',
+                            itemName: itemNameField.value || '',
+                            orgnNatCd: OrgNatCodeField.value || '',
+                            taxTypeCode: taxTypeCodeField.value || '',
+                            unitPrice: parseFloat(unitPriceCodeField.value) || '',
+                            isrcAplcbYn: isrcAplcbYnField || '',
+                            pkgUnitCode: packageUnitCodeField.value || '',
+                            pkgQuantity: parseInt(pkgQuantityField.value) || '',
+                            qtyUnitCd: qtyUnitCdField.value || '',
+                            quantity: parseInt(quantityField.value) || '',
+                            discountRate: parseFloat(discountRateField.value) || '',
+                            discountAmt: parseFloat(discountAmtField.value) || '',
+                            itemExprDate: itemExprDateField.value || ''
+                        };
+                        
+                        itemDataArray.push(itemData);
+                    });
+                    
+                    const formDataObject = {};
+                    
+                    formDataObject.customerName = document.querySelector('.customerName').value;
+                    formDataObject.customerTin = document.querySelector('.customerTin').value;
+                    formDataObject.customerNo = document.querySelector('.customerNo').value;
+                    formDataObject.customerMobileNo = document.querySelector('.customerMobileNo').value;
+                    formDataObject.salesType = document.querySelector('.salesType').value;
+                    formDataObject.paymentType = document.querySelector('.paymentType').value;
+                    formDataObject.traderInvoiceNo = document.querySelector('.traderInvoiceNo').value;
+                    formDataObject.confirmDate = document.querySelector('.confirmDate').value;
+                    formDataObject.salesDate = document.querySelector('.salesDate').value;
+                    formDataObject.stockReleseDate = document.querySelector('.stockReleseDate').value;
+                    formDataObject.receiptPublishDate = document.querySelector('.receiptPublishDate').value;
+                    formDataObject.occurredDate = document.querySelector('.occurredDate').value;
+                    formDataObject.invoiceStatusCode = document.querySelector('.invoiceStatusCode').value;
+                    formDataObject.isPurchaseAccept = document.querySelector('.isPurchaseAccept').value;
+                    formDataObject.isStockIOUpdate = document.querySelector('.isStockIOUpdate').value;
+                    formDataObject.mapping = document.querySelector('.mapping').value;
+                    formDataObject.remark = document.querySelector('.remark').value;
+                    formDataObject.saleItemList = itemDataArray
 
-    // Attach event listener to initial item name field
-    attachItemNameEventListener(document);
-
-function attachItemNameEventListener(container) {
-    const itemNames = container.querySelectorAll('.item-name');
-    itemNames.forEach(itemName => {
-        itemName.addEventListener('change', async function (event) {
-            const url = `http://localhost:8000/getitem/${event.target.value}`;
-            const response = await fetch(url);
-            const { data } = await response.json();
-            const repeaterItem = itemName.closest('[data-repeater-item]');
-            const itemCodeField = repeaterItem.querySelector('.item-code');
-            const itemClassCodeField = repeaterItem.querySelector('.item-class-code');
-            const itemTypeCodeField = repeaterItem.querySelector('.item-type-code');
-            const OrgNatCodeField = repeaterItem.querySelector('.org-nat-code');
-            const taxTypeCodeField = repeaterItem.querySelector('.tax-type-code');
-            const unitPriceCodeField = repeaterItem.querySelector('.unit-price');
-            const packageUnitCodeField = repeaterItem.querySelector('.package-unit-code');
-            const quantityUnitCodeField = repeaterItem.querySelector('.quantity-unit-code');
-            console.log(data);
-            if (data
-                    && data.itemCd
-                    && data.itemClsCd
-                    && data.itemTyCd
-                    && data.orgnNatCd
-                    && data.taxTyCd
-                    && data.dftPrc
-                    && data.pkgUnitCd
-                    && data.qtyUnitCd
-                ) {
-                itemCodeField.value = data.itemCd;
-                itemClassCodeField.value = data.itemClsCd;
-                itemTypeCodeField.value = data.itemTyCd;
-                OrgNatCodeField.value = data.orgnNatCd;
-                taxTypeCodeField.value = data.taxTyCd;
-                unitPriceCodeField.value = data.dftPrc;
-                packageUnitCodeField.value = data.pkgUnitCd;
-                quantityUnitCodeField.value = data.qtyUnitCd
-            } else {
-                itemCodeField.value = '';
-                itemClassCodeField.value = '';
-                itemTypeCodeField.value = '';
-                OrgNatCodeField.value = '';
-                taxTypeCodeField.value = '';
-                unitPriceCodeField.value = '';
-                packageUnitCodeField.value = '';
-                quantityUnitCodeField.value = '';
-            }
-        });
-    });
-}
-});
-
-const salesForm = document.querySelector('.sales-form');
-salesForm.addEventListener('submit', e => {
-    e.preventDefault();
-    console.log('SUBMITTED');
-    console.log(e.target);
-});
-
+                    const url = 'http://localhost:8000/sales/store';
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    
+                    try {
+                        const response = await fetch('/sales', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken,
+                            },
+                            body: JSON.stringify(formDataObject)
+                        })
+                    } catch (e) {
+                        console.log(e);
+                    }
+                });
+            });
     </script>
+
+
 @endpush

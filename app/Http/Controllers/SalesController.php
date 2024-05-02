@@ -6,6 +6,7 @@ use App\Models\Sales;
 use App\Models\ItemInformation;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class SalesController extends Controller
 {
@@ -42,7 +43,31 @@ class SalesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            \Log::info('REQ DATA');
+            \Log::info($request->all());
+
+            $data = $request->all();
+            $url = 'https://etims.your-apps.biz/api/AddSale';
+
+            $response = Http::withHeaders([
+                'key' => '123456'
+                ])->post($url, $data);
+
+            \Log::info('SALES API RESPONSE');
+            \Log::info($response);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Sale Added Successfuly'
+            ]);
+        } catch (\Exception $e) {
+            \Log::info('ADD SALE ERROR');
+            \Log::info($e);
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     /**
