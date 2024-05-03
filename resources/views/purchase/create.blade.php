@@ -422,7 +422,7 @@
                                         {{ Form::label('itemCode', __('Item Code'), ['class' => 'form-label']) }}
                                         {{ Form::select('itemCode', $product_services_Codes, '', ['class' => 'form-control select2 itemCode', 'data-url' => route('productservice.getiteminformation'), 'required' => 'required']) }}
                                     </td>
-                                     <td>
+                                    <td>
                                         {{ Form::label('itemNm', __('ItemNm'), ['class' => 'form-label']) }}
                                         {{ Form::text('itemNm', null, ['class' => 'form-control itemNm', 'required' => 'required']) }}
                                     </td>
@@ -445,8 +445,8 @@
                                         {{ Form::text('pkg', null, ['class' => 'form-control pkg', 'required' => 'required', 'placeholder' => __('1,2,100')]) }}
                                     </td>
                                 </tr>
-                                  <tr>
-                                 <td>
+                                <tr>
+                                    <td>
                                         {{ Form::label('qtyUnitCd', __('Quantity'), ['class' => 'form-label']) }}
                                         {{ Form::text('qtyUnitCd', null, ['class' => 'form-control qtyUnitCd', 'required' => 'required', 'placeholder' => __('U,T')]) }}
                                     </td>

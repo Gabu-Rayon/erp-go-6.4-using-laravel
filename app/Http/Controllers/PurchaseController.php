@@ -44,8 +44,7 @@ class PurchaseController extends Controller
 
         $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
         $vender->prepend('Select Vendor', '');
-        $purchases = Purchase_Sales_Items::all();
-
+        $purchases = Purchase_Sales::all();
 
         return view('purchase.index', compact('purchases', 'vender'));
     }
@@ -119,6 +118,12 @@ class PurchaseController extends Controller
                 'mapping' => 'required',
 
                 'items.*.itemCode' => 'required',
+                'items.*.itemNm' => 'required',
+                'items.*.itemClsCode' => 'required',
+                'items.*.bcd' => 'required',
+                'items.*.pkgUnitCd' => 'required',
+                'items.*.pkg' => 'required',
+                'items.*.qtyUnitCd' => 'required',
                 'items.*.supplrItemClsCode' => 'required',
                 'items.*.supplrItemCode' => 'required',
                 'items.*.supplrItemName' => 'required',
@@ -128,6 +133,9 @@ class PurchaseController extends Controller
                 'items.*.discount' => 'required',
                 'items.*.discountAmt' => 'required',
                 'items.*.itemExprDt' => 'required',
+                'items.*.tax' => 'required',
+                'items.*.itemTaxPrice' => 'required',
+                'items.*.itemTaxRate' => 'required',
             ];
 
             // Validate request data
@@ -186,8 +194,78 @@ class PurchaseController extends Controller
             \Log::info('API Response  Body For Posting Purchase Data: ' . $response->body());
             \Log::info('API Response Status Code For Posting Purchase Data: ' . $response->status());
 
+
+
+
             // Check if the request was successful
             if ($response->successful()) {
+                // Save data to local database
+                Purchase_Sales::create([
+                    'spplrTin' => $request->input('supplierTin'),
+                    'spplrNm' => $request->input('supplierName'),
+                    'spplrBhfId' => $request->input('supplierBhfId'),
+                    'spplrInvcNo' => $request->input('supplierInvcNo'),
+                    'spplrSdcId' => $request->input('spplrSdcId'),
+                    'spplrMrcNo' => $request->input('spplrMrcNo') ?? null,//Can also be null
+                    'rcptTyCd' => $request->input('supplierName') ?? null,//Can also be null
+                    'pmtTyCd' => $request->input('pmtTypeCode') ?? null,
+                    'cfmDt' => $request->input('confirmDate') ?? null,
+                    'salesDt' => $request->input('purchDate') ?? null,
+                    'stockRlsDt' => $request->input('warehouseDate'),
+                    //For totItemCnt  are total item posted in the  Purchase_Sales_Items Model
+                    'totItemCnt' => count($request->input('items')),
+                    // 'totItemCnt' => count($itemsDataList),
+                    // 'totItemCnt' => Purchase_Sales_Items::count(),
+                    'taxblAmtA' => $request->input('taxblAmtA') ?? null,
+                    'taxblAmtB' => $request->input('taxblAmtB') ?? null,
+                    'taxblAmtC' => $request->input('taxblAmtB') ?? null,
+                    'taxblAmtD' => $request->input('taxblAmtD') ?? null,
+                    'taxblAmtE' => $request->input('taxblAmtE') ?? null,
+                    'taxRtA' => $request->input('taxRtA') ?? null,
+                    'taxRtB' => $request->input('taxRtB') ?? null,
+                    'taxRtC' => $request->input('taxRtC') ?? null,
+                    'taxRtD' => $request->input('taxRtD') ?? null,
+                    'taxRtE' => $request->input('taxRtE') ?? null,
+                    'taxAmtA' => $request->input('taxAmtA') ?? null,
+                    'taxAmtB' => $request->input('taxAmtB') ?? null,
+                    'taxAmtC' => $request->input('taxAmtC') ?? null,
+                    'taxAmtD' => $request->input('taxAmtD') ?? null,
+                    'taxAmtE' => $request->input('taxAmtE') ?? null,
+                    //totTaxblAmt will be the totals for all products totTaxblAmt's e
+                    'totTaxblAmt' => array_sum(array_column($itemsDataList, 'itemTaxPrice')),
+                    //    'totTaxblAmt' => $request->input('items')->sum('itemTaxPrice'),
+                    //totTaxAmt will be the totals for all products totTaxAmt's
+                    'totTaxAmt' => array_sum(array_column($itemsDataList, 'taxAmt')),
+                    //    'totTaxAmt' => $request->input('items')->sum('taxAmt'),
+                    //totAmt will be the totals for all products totAmt's
+                    'totAmt' => $request->input('items')->sum('quantity * unitPrice'),
+                    'remark' => $request->input('remark'),
+                ]);
+
+                // Loop through itemsDataList and save each item
+                foreach ($itemsDataList as $itemData) {
+                    Purchase_Sales_Items::create([
+                        'saleItemCode' => $request->input('supplierInvcNo'),
+                        'itemCd' => $itemData['itemCode'],
+                        'itemClsCd' => $itemData['itemClsCd'],
+                        'itemNm' => $itemData['itemNm'],
+                        'bcd' => $itemData['bcd'],
+                        'supplrItemClsCd' => $itemData['supplrItemClsCd'],
+                        'supplrIteNm' => $itemData['supplrItemNm'],
+                        'pkgUnitCd' => $itemData['pkgQuantity'],
+                        'pkg' => $itemData['pkg'],
+                        'qtyUnitCd' => $itemData['qtyUnitCd'],
+                        'qty' => $itemData['quantity'],
+                        'prc' => $itemData['unitPrice'],
+                        'splyAmt' => $itemData['quantity'] * $itemData['unitPrice'],
+                        'dcAmt' => $itemData['discountAmt'],
+                        'taxTyCd' => $itemData['tax'],
+                        'taxblAmt' => $itemData['itemTaxPrice'],
+                        'taxAmt' => $itemData['quantity'] * $itemData['unitPrice'] * $itemData['taxRate'],
+                        'totAmt' => $itemData['quantity'] * $itemData['unitPrice'],
+                        'itemExprDt' => $itemData['itemExprDt'],
+                    ]);
+                }
                 return redirect()->back()->with('success', 'Purchase Created Successfully');
             } else {
                 return redirect()->back()->with('error', 'Failed to create purchase. Please try again.');
@@ -282,7 +360,7 @@ class PurchaseController extends Controller
         }
     }
 
-    
+
     public function getSuppliersDetailsForPurchaseSalesFromApi()
     {
         try {
@@ -408,10 +486,10 @@ class PurchaseController extends Controller
         $countries = Details::where('cdCls', '05')->get();
         // Fetch countries data from the Details model where cdCls is 05
         $countries = Details::where('cdCls', '05')->get()->pluck('cdNm', 'cdVal');
-        $paymentTypeCodes = PaymentTypeCodes::get()->pluck('payment_type_code','payment_type_code');
-        $purchaseTypeCodes = PurchaseTypeCodes::get()->pluck('purchase_type_code','purchase_type_code');
-        $purchaseStatusCodes = PurchaseStatusCodes::get()->pluck('purchase_status_code','purchase_status_code');
-        $ReceiptTypesCodes = ReceiptTypeCodes::get()->pluck('receipt_type_code','receipt_type_code');
+        $paymentTypeCodes = PaymentTypeCodes::get()->pluck('payment_type_code', 'payment_type_code');
+        $purchaseTypeCodes = PurchaseTypeCodes::get()->pluck('purchase_type_code', 'purchase_type_code');
+        $purchaseStatusCodes = PurchaseStatusCodes::get()->pluck('purchase_status_code', 'purchase_status_code');
+        $ReceiptTypesCodes = ReceiptTypeCodes::get()->pluck('receipt_type_code', 'receipt_type_code');
 
         return view('purchase.create', compact('venders', 'product_services_Codes', 'paymentTypeCodes', 'purchaseTypeCodes', 'purchaseStatusCodes', 'ReceiptTypesCodes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
         // }
@@ -522,7 +600,7 @@ class PurchaseController extends Controller
             try {
                 \Log::info('ID');
                 \Log::info($id);
-                $purchase = Purchase_Sales_Items::find($id);
+                $purchase = Purchase_Sales::find($id);
                 \Log::info('PURCHASE');
                 \lOG::INFO($purchase);
                 return view('purchase.show', compact('purchase'));
@@ -534,6 +612,31 @@ class PurchaseController extends Controller
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
+
+    public function details($spplrInvcNo)
+    {
+        if (\Auth::user()->can('show purchase')) {
+            try {
+                $purchase = Purchase_Sales::where('spplrInvcNo', $spplrInvcNo)->first();
+                if ($purchase) {
+                    // Fetch related items
+                    $purchaseItems = Purchase_Sales_Items::where('saleItemCode', $spplrInvcNo)->get();
+                    // Fetch ItemInformation model
+                    $itemInformation = ItemInformation::get()->pluck('itemNm', 'itemCd');
+                    return view('purchase.details', compact('purchase', 'purchaseItems', 'itemInformation'));
+                } else {
+                    return view('errors.not_found'); // Create a custom error view
+                }
+            } catch (\Exception $e) {
+                \Log::error($e);
+                return redirect()->back()->with('error', __('Something went wrong.'));
+            }
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
+
+
 
     public function edit($id)
     {
@@ -1221,6 +1324,67 @@ class PurchaseController extends Controller
                 'message' => 'error',
                 'error' => $e->getMessage()
             ]);
+        }
+    }
+
+
+
+    public function mapPurchase(Request $request)
+    {
+        // Log received request data
+        \Log::info('Received request data From Mapping Purchases:', $request->all());
+
+        if (\Auth::user()->can('create purchase')) {
+            $rules = [
+                'supplierInvcNo' => 'required',
+                'purchaseTypeCode' => 'required',
+                'purchaseStatusCode' => 'required',
+                'itemCode.*' => 'required',
+                'supplierItemCode.*' => 'required',
+            ];
+
+            // Validate request data
+            $validator = \Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                $messages = $validator->getMessageBag();
+                return redirect()->route('purchase.index')->with('error', $messages->first());
+            }
+
+            // Construct itemPurchases array
+            $itemPurchases = [];
+            foreach ($request->input('itemCode') as $key => $itemCode) {
+                $itemPurchases[] = [
+                    'supplierItemCode' => $request->input('supplierItemCode')[$key],
+                    'itemCode' => $itemCode,
+                ];
+            }
+
+            $requestData = [
+                'supplierInvcNo' => $request->input('supplierInvcNo'),
+                'purchaseTypeCode' => $request->input('purchaseTypeCode'),
+                'purchaseStatusCode' => $request->input('purchaseStatusCode'),
+                'itemPurchases' => $itemPurchases,
+            ];
+
+            // Log request data
+            \Log::info('API Request Mapping Purchase Data Posted:', $requestData);
+
+            // Send request to API endpoint
+            $response = Http::post('https://etims.your-apps.biz/api/MapPurchase', $requestData);
+
+            // Log response data
+            \Log::info('API Response Status Code For Posting Mapping Purchase Data: ' . $response->status());
+            \Log::info('API Response Body For Posting Mapping Purchase Data: ' . $response->body());
+
+            // Check if the request was successful
+            if ($response->successful()) {
+                return redirect()->back()->with('success', 'Purchase Mapped Successfully');
+            } else {
+                return redirect()->back()->with('error', 'Failed to Map Purchase. Please try again.');
+            }
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
 

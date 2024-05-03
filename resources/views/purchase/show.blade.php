@@ -9,7 +9,7 @@
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
     <li class="breadcrumb-item"><a href="{{route('purchase.index')}}">{{__('Purchase')}}</a></li>
-    <li class="breadcrumb-item">{{$purchase->purchase_id}}</li>
+    <li class="breadcrumb-item">{{$purchase->spplrInvcNo}}</li>
 @endsection
 
 @section('content')

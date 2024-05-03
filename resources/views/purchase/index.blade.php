@@ -1,19 +1,18 @@
 @extends('layouts.admin')
 @section('page-title')
-    {{__('Manage Purchase')}}
+    {{ __('Manage Purchase') }}
 @endsection
 @section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
-    <li class="breadcrumb-item">{{__('Purchase')}}</li>
+    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+    <li class="breadcrumb-item">{{ __('Purchase') }}</li>
 @endsection
 @push('script-page')
     <script>
-
-        $('.copy_link').click(function (e) {
+        $('.copy_link').click(function(e) {
             e.preventDefault();
             var copyText = $(this).attr('href');
 
-            document.addEventListener('copy', function (e) {
+            document.addEventListener('copy', function(e) {
                 e.clipboardData.setData('text/plain', copyText);
                 e.preventDefault();
             }, true);
@@ -29,12 +28,13 @@
     <div class="float-end">
 
 
-{{--        <a href="{{ route('bill.export') }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{__('Export')}}">--}}
-{{--            <i class="ti ti-file-export"></i>--}}
-{{--        </a>--}}
+        {{--        <a href="{{ route('bill.export') }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{__('Export')}}"> --}}
+        {{--            <i class="ti ti-file-export"></i> --}}
+        {{--        </a> --}}
 
         @can('create purchase')
-            <a href="{{ route('purchase.create',0) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{__('Create')}}">
+            <a href="{{ route('purchase.create', 0) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
+                title="{{ __('Create') }}">
                 <i class="ti ti-plus"></i>
             </a>
         @endcan
@@ -43,8 +43,6 @@
 
 
 @section('content')
-
-
     <div class="row">
         <div class="col-md-12">
             <div class="card">
@@ -52,48 +50,95 @@
                     <div class="table-responsive">
                         <table class="table datatable">
                             <thead>
-                            <tr>
-                                <th> {{__('itemSeq')}}</th>
-                                <th> {{__('itemCd')}}</th>
-                                <th> {{__('itemClsCd')}}</th>
-                                <th> {{__('itemNm')}}</th>
-                                <th>{{__('pkgUnitCd')}}</th>
-                                <th>{{__('qtyUnitCd')}}</th>
-                                <th>{{__('totAmt')}}</th>
-                                @if(Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase'))
-                                    <th > {{__('Action')}}</th>
-                                @endif
-                            </tr>
+                                <tr>
+                                    <th> {{ __('SrNo') }}</th>
+                                    <th> {{ __('SpplrTin') }}</th>
+                                    <th> {{ __('SpplrNm') }}</th>
+                                    <th> {{ __('TotItemCnt') }}</th>
+                                    <th>{{ __('CfmDt') }}</th>
+                                    <th>{{ __('IsDBImport') }}</th>
+                                    @if (Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase'))
+                                        <th> {{ __('Action') }}</th>
+                                    @endif
+                                </tr>
                             </thead>
                             <tbody>
-                            @foreach ($purchases as $purchase)
-                                <tr>
-                                    <td>{{ $purchase->itemSeq }}</td>
-                                    <td>{{ $purchase->itemCd }}</td>
-                                    <td>{{ $purchase->itemClsCd }}</td>
-                                    <td>{{ $purchase->itemNm }}</td>
-                                    <td>{{ $purchase->pkgUnitCd }}</td>
-                                    <td>{{ $purchase->qtyUnitCd }}</td>
-                                    <td>{{ $purchase->totAmt }}</td>
-                                    <td class="d-flex" style="gap: 1rem;">
-                                        @can('show purchase')
-                                            <a href="{{ route('purchase.show', $purchase->id) }}" class="edit-icon btn btn-info btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="{{__('Show')}}">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                        @endcan
-                                        @can('edit purchase')
-                                            <a href="{{ route('purchase.edit',$purchase->id) }}" class="edit-icon btn btn-sm btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="{{__('Edit')}}">
-                                                <i class="fas fa-pencil-alt"></i>
-                                            </a>
-                                        @endcan
-                                        @can('delete purchase')
-                                            <a href="#" class="delete-icon btn btn-sm btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="{{__('Delete')}}" onclick="deleteData('{{ $purchase->id }}')">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        @endcan
-                                    </td>
-                                </tr>
-                            @endforeach
+                                @foreach ($purchases as $purchase)
+                                    <tr>
+                                        <td>{{ $purchase->id }}</td>
+                                        <td>{{ $purchase->spplrTin }}</td>
+                                        <td>{{ $purchase->spplrNm }}</td>
+                                        <td>{{ $purchase->totItemCnt }}</td>
+                                        <td>{{ $purchase->cfmDt }}</td>
+                                        <td>
+                                            @if ($purchase->isDBImport == 0)
+                                                <!-- Show Pending -->
+                                                <span
+                                                    class="purchase_status badge bg-secondary p-2 px-3 rounded">pending</span>
+                                            @else($purchase->status == 1)
+                                                <!-- Show Success -->
+                                                <span
+                                                    class="purchase_status badge bg-warning p-2 px-3 rounded">Success</span>
+                                            @endif
+                                        </td>
+                                        @if (Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase'))
+                                            <td class="Action">
+                                                <span>
+
+                                                    @can('show purchase')
+                                                        <div class="action-btn bg-info ms-2">
+                                                            <a href="{{ route('purchase.show', ['id' => $purchase->id]) }}"
+                                                                class="mx-3 btn btn-sm align-items-center"
+                                                                data-bs-toggle="tooltip" title="{{ __('Show') }}"
+                                                                data-original-title="{{ __('Detail') }}">
+                                                                <i class="ti ti-eye text-white"></i>
+                                                            </a>
+                                                        </div>
+                                                    @endcan
+                                                    @can('show purchase')
+                                                        <div class="action-btn bg-info ms-2">
+                                                            <a href="{{ route('purchase.details', ['spplrInvcNo' => $purchase->spplrInvcNo]) }}"
+                                                                class="mx-3 btn btn-sm align-items-center"
+                                                                data-bs-toggle="tooltip"
+                                                                title="{{ __('Map purchase Item to add to Purchase') }}"
+                                                                data-original-title="{{ __('Detail') }}">
+                                                                <i class="ti ti-list text-white"></i></a>
+                                                        </div>
+                                                    @endcan
+                                                    @can('edit purchase')
+                                                        <div class="action-btn bg-primary ms-2">
+                                                            <a href="{{ route('purchase.edit', \Crypt::encrypt($purchase->id)) }}"
+                                                                class="mx-3 btn btn-sm align-items-center"
+                                                                data-bs-toggle="tooltip" title="Edit"
+                                                                data-original-title="{{ __('Edit') }}">
+                                                                <i class="ti ti-pencil text-white"></i>
+                                                            </a>
+                                                        </div>
+                                                    @endcan
+                                                    @can('delete purchase')
+                                                        <div class="action-btn bg-danger ms-2">
+                                                            {!! Form::open([
+                                                                'method' => 'DELETE',
+                                                                'route' => ['purchase.destroy', $purchase->id],
+                                                                'class' => 'delete-form-btn',
+                                                                'id' => 'delete-form-' . $purchase->id,
+                                                            ]) !!}
+                                                            <a href="#"
+                                                                class="mx-3 btn btn-sm align-items-center bs-pass-para"
+                                                                data-bs-toggle="tooltip" title="{{ __('Delete') }}"
+                                                                data-original-title="{{ __('Delete') }}"
+                                                                data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
+                                                                data-confirm-yes="document.getElementById('delete-form-{{ $purchase->id }}').submit();">
+                                                                <i class="ti ti-trash text-white"></i>
+                                                            </a>
+                                                            {!! Form::close() !!}
+                                                        </div>
+                                                    @endcan
+                                                </span>
+                                            </td>
+                                        @endif
+                                    </tr>
+                                @endforeach
 
                             </tbody>
                         </table>
@@ -103,4 +148,3 @@
         </div>
     </div>
 @endsection
-
