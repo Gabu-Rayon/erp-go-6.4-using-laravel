@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sales;
+use App\Models\SalesItems;
 use App\Models\ItemInformation;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -15,7 +16,8 @@ class SalesController extends Controller
      */
     public function index()
     {
-        return view('sales.index');
+        $sales = Sales::all();
+        return view('sales.index', compact('sales'));
     }
 
     public function sendSalesTransactions()
@@ -56,6 +58,49 @@ class SalesController extends Controller
 
             \Log::info('SALES API RESPONSE');
             \Log::info($response);
+
+            Sales::create([
+                'customerName' => $data['customerName'],
+                'customerTin' => $data['customerTin'],
+                'customerNo' => $data['customerNo'],
+                'customerMobileNo' => $data['customerMobileNo'],
+                'salesType' => $data['salesType'],
+                'paymentType' => $data['paymentType'],
+                'traderInvoiceNo' => $data['traderInvoiceNo'],
+                'confirmDate' => $data['confirmDate'],
+                'salesDate' => $data['salesDate'],
+                'stockReleseDate' => $data['stockReleseDate'],
+                'receiptPublishDate' => $data['receiptPublishDate'],
+                'occurredDate' => $data['occurredDate'],
+                'invoiceStatusCode' => $data['invoiceStatusCode'],
+                'isPurchaseAccept' => $data['isPurchaseAccept'],
+                'isStockIOUpdate' => $data['isStockIOUpdate'],
+                'mapping' => $data['mapping'],
+                'remark' => $data['remark']
+            ]);
+
+            $saleItems = $data['saleItemList'];
+
+            foreach ($saleItems as $saleItem) {
+                SalesCreditNoteItems::create([
+                    'sales_credit_note_id' => $salesCreditNote->id,
+                    'itemCode' => $saleItem['itemCode'],
+                    'itemClassCode' => $saleItem['itemClassCode'],
+                    'itemTypeCode' => $saleItem['itemTypeCode'],
+                    'itemName' => $saleItem['itemName'],
+                    'orgnNatCd' => $saleItem['orgnNatCd'],
+                    'taxTypeCode' => $saleItem['taxTypeCode'],
+                    'unitPrice' => $saleItem['unitPrice'],
+                    'isrcAplcbYn' => $saleItem['isrcAplcbYn'],
+                    'pkgUnitCode' => $saleItem['pkgUnitCode'],
+                    'pkgQuantity' => $saleItem['pkgQuantity'],
+                    'qtyUnitCd' => $saleItem['qtyUnitCd'],
+                    'quantity' => $saleItem['quantity'],
+                    'discountRate' => $saleItem['discountRate'],
+                    'discountAmt' => $saleItem['discountAmt'],
+                    'itemExprDate' => $saleItem['itemExprDate'],
+                ]);
+            }
             return response()->json([
                 'status' => 'success',
                 'message' => 'Sale Added Successfuly'
@@ -73,17 +118,51 @@ class SalesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Sales $sales)
+    public function show(Sales $sale)
     {
-        //
+        $items = SalesItems::where('sales_id', 4)->get();
+        return view('sales.show', compact('sale', 'items'));
+    }
+
+    public function print(Sales $sale)
+    {
+        try {
+            return redirect()->back()->with('success', 'Successfully Printed');
+        } catch (\Exception $e) {
+            \Log::info('PRINTING ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function cancel(Sales $sale)
+    {
+        try {
+            return redirect()->back()->with('success', 'Successfully Cancelled');
+        } catch (\Exception $e) {
+            \Log::info('CANCELLING ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function creditNote(Sales $sale)
+    {
+        try {
+            return view('sales.creditnote');
+        } catch (\Exception $e) {
+            \Log::info('CANCELLING ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Sales $sales)
+    public function edit(Sales $sale)
     {
-        //
+        return view('sales.edit', compact('sale'));
     }
 
     /**

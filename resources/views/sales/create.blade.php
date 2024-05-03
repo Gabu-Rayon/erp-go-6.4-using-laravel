@@ -173,18 +173,20 @@
         <div class="modal-footer">
             <input type="button" value="{{ __('Cancel') }}" onclick="location.href = '{{ route('sales.index') }}';"
                 class="btn btn-light">
-            <input type="submit" value="{{ __('Create') }}" class="btn  btn-primary">
+            <button type="submit" class="btn  btn-primary thee-one-submit-button">{{ __('Create') }}</button>
         </div>
         {{ Form::close() }}
     </div>
 @endsection
 
 @push('script-page')
-    <script>
-        $(document).ready(function() {
-            
-            let itemDataArray = [];
-            
+<script>
+    $(document).ready(function() {
+        
+        let itemDataArray = [];
+        const salesForm = document.querySelector('.sales-form');
+        const loader = document.createElement('div');
+        
             $('.repeater.items').repeater({
                 initEmpty: false,
                 show: function() {
@@ -218,13 +220,13 @@
                         const quantityUnitCodeField = repeaterItem.querySelector('.qty-unit-cd');
                         console.log(data);
                         if (data
-                                && data.itemCd
-                                && data.itemClsCd
-                                && data.itemTyCd
-                                && data.orgnNatCd
-                                && data.taxTyCd
-                                && data.dftPrc
-                                && data.pkgUnitCd
+                        && data.itemCd
+                        && data.itemClsCd
+                        && data.itemTyCd
+                        && data.orgnNatCd
+                        && data.taxTyCd
+                        && data.dftPrc
+                        && data.pkgUnitCd
                                 && data.qtyUnitCd
                             ) {
                                 itemCodeField.value = data.itemCd;
@@ -248,9 +250,15 @@
                         });
                     });
                 }
-                const salesForm = document.querySelector('.sales-form');
                 salesForm.addEventListener('submit', async e => {
                     e.preventDefault();
+                    
+                    const loader = document.createElement('div');
+                    loader.classList.add('spinner-border', 'text-light', 'spinner-border-sm');
+                    loader.role = 'status';
+                    const submitButton = document.querySelector('.thee-one-submit-button');
+                    submitButton.appendChild(loader);
+                    console.log(submitButton);
                     itemDataArray = [];
                     const repeatedItems = document.querySelectorAll('[data-repeater-item]');
                     repeatedItems.forEach(repeaterItem => {
@@ -312,21 +320,83 @@
                     formDataObject.remark = document.querySelector('.remark').value;
                     formDataObject.saleItemList = itemDataArray
 
-                    const url = 'http://localhost:8000/sales/store';
+                    const url = 'http://localhost:8000/sales';
                     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                     
                     try {
-                        const response = await fetch('/sales', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': csrfToken,
-                            },
-                            body: JSON.stringify(formDataObject)
-                        })
-                    } catch (e) {
-                        console.log(e);
-                    }
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+        },
+        body: JSON.stringify(formDataObject)
+    });
+
+    // Correctly await the response data
+    const data = await response.json(); // Corrected line
+
+    console.log(data);
+
+    // Remove the loader
+    submitButton.removeChild(loader);
+
+    // Show success message
+    if (data.status === 'error') {
+        const popup = document.createElement('div');
+    popup.classList.add('alert', 'alert-danger');
+    popup.innerHTML = 'Error Adding Sale'; // Simplified for demonstration
+    popup.style.position = 'absolute';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.zIndex = '9999';
+    document.body.appendChild(popup);
+
+    // Reload the page after a delay
+    setTimeout(() => {
+        location.reload();
+    }, 3000);
+    } else {
+        const popup = document.createElement('div');
+    popup.classList.add('alert', 'alert-success');
+    popup.innerHTML = data.message || 'Sale Added Successfully'; // Assuming the message key is 'message'
+    popup.style.position = 'absolute';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.zIndex = '9999';
+    document.body.appendChild(popup);
+    }
+
+    // Redirect to sales page after a delay
+    setTimeout(() => {
+        window.location.href = '/sales';
+    }, 3000);
+} catch (e) {
+    console.log(e);
+
+    // Remove the loader
+    submitButton.removeChild(loader);
+
+    // Show error message
+    const popup = document.createElement('div');
+    popup.classList.add('alert', 'alert-danger');
+    popup.innerHTML = 'Error Adding Sale'; // Simplified for demonstration
+    popup.style.position = 'absolute';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.zIndex = '9999';
+    document.body.appendChild(popup);
+
+    // Reload the page after a delay
+    setTimeout(() => {
+        location.reload();
+    }, 3000);
+}
+
+
                 });
             });
     </script>

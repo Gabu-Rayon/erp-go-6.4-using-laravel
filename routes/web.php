@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StockMoveListController;
+use App\Http\Controllers\SalesCreditNoteController;
 use App\Http\Controllers\StockAdjustmentListController;
 use App\Http\Controllers\ImportedItemsController;
 use App\Http\Controllers\JobController;
@@ -1839,7 +1840,25 @@ Route::group(
     }
 );
 
+Route::group(
+    [
+        'middleware' => [
+            'auth',
+            'XSS',
+            'revalidate',
+        ],
+    ],
+    function () {
+        Route::resource('salescreditnote', SalesCreditNoteController::class);
+    }
+);
+
+Route::post('salescreditnote/{salescreditnote}', 'SalesCreditNoteController@update')->name('salescreditnote.update');
+
 Route::get('sales/saletransactions', [SalesController::class, 'sendSalesTransactions'])->name('sales.saletransactions');
+Route::get('sales/print', [SalesController::class, 'print'])->name('sales.print');
+Route::get('sales/cancel/{sale}', [SalesController::class, 'cancel'])->name('sales.cancel');
+Route::get('sales/creditnote', [SalesController::class, 'creditNote'])->name('sales.creditnote');
 
 
 

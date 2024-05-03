@@ -33,15 +33,46 @@
                         <thead>
                         <tr>
                             <th scope="col"><?php echo e(__('SrNo')); ?></th>
-                            <th scope="col"><?php echo e(__('Invoice No')); ?></th>
-                            <th scope="col"><?php echo e(__('Original Invoice No')); ?></th>
+                            <th scope="col"><?php echo e(__('Trader Invoice No')); ?></th>
                             <th scope="col"><?php echo e(__('Customer Tin')); ?></th>
-                            <th scope="col"><?php echo e(__('Receipt Type')); ?></th>
+                            <th scope="col"><?php echo e(__('Sales Type')); ?></th>
+                            <th scope="col"><?php echo e(__('Payments Type')); ?></th>
                             <th scope="col"><?php echo e(__('Status')); ?></th>
                             <th scope="col" ><?php echo e(__('Action')); ?></th>
                         </tr>
                         </thead>
                         <tbody class="list">
+                            <?php $__currentLoopData = $sales; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sale): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <tr>
+                                    <td><?php echo e($sale->id); ?></td>
+                                    <td><?php echo e($sale->traderInvoiceNo); ?></td>
+                                    <td><?php echo e($sale->customerTin); ?></td>
+                                    <td><?php echo e($sale->salesType); ?></td>
+                                    <td><?php echo e($sale->paymentType); ?></td>
+                                    <td><?php echo e($sale->status); ?></td>
+                                    <td>
+                                        <div class="action-btn bg-info">
+                                            <a href="<?php echo e(route('sales.show',$sale)); ?>" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="<?php echo e(__('Details')); ?>">
+                                                <i class="ti ti-eye text-white"></i>
+                                            </a>
+                                        </div>
+                                        <div class="action-btn bg-success">
+                                            <a href="<?php echo e(route('sales.print',$sale)); ?>" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="<?php echo e(__('Print')); ?>">
+                                                <i class="ti ti-printer text-white"></i>
+                                            </a>
+                                        </div>
+                                        <div class="action-btn bg-secondary">
+                                            <a href="<?php echo e(route('salescreditnote.edit',$sale)); ?>" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="<?php echo e(__('Credit Note')); ?>">
+                                                <i class="ti ti-book text-white"></i>
+                                            </a>
+                                        </div>
+                                        <div class="action-btn bg-warning">
+                                            <a href="<?php echo e(route('sales.edit',$sale)); ?>" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="<?php echo e(__('Edit')); ?>">
+                                                <i class="ti ti-pencil text-white"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>

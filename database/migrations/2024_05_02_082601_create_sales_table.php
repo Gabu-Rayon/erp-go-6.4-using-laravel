@@ -13,6 +13,23 @@ return new class extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
+            $table->string('customerName');
+            $table->string('customerTin')->nullable();
+            $table->string('customerNo')->nullable();
+            $table->string('customerMobileNo')->nullable();
+            $table->string('salesType')->nullable();
+            $table->string('paymentType')->nullable();
+            $table->string('traderInvoiceNo')->nullable();
+            $table->dateTime('confirmDate')->nullable();
+            $table->dateTime('salesDate')->nullable();
+            $table->dateTime('stockReleseDate')->nullable();
+            $table->dateTime('receiptPublishDate')->nullable();
+            $table->dateTime('occurredDate')->nullable();
+            $table->json('formDataObject')->nullable();
+            $table->boolean('isPurchaseAccept')->default(false);
+            $table->boolean('isStockIOUpdate')->default(false);
+            $table->string('mapping')->nullable();
+            $table->text('remark')->nullable();
             $table->timestamps();
         });
     }
