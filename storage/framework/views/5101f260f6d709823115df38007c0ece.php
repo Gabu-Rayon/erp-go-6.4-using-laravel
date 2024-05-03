@@ -392,7 +392,7 @@
                     formDataObject.mapping = document.querySelector('.mapping').value;
                     formDataObject.remark = document.querySelector('.remark').value;
                     formDataObject.orgInvoiceNo = document.querySelector('.orgInvoiceNo').value;
-                    formDataObject.saleItemList = itemDataArray
+                    formDataObject.creditNoteItemsList = itemDataArray
                     
                     const url = 'http://localhost:8000/salescreditnote';
                     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');

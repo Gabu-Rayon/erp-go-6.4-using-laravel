@@ -25,6 +25,7 @@ class Sales extends Model
         'isPurchaseAccept',
         'isStockIOUpdate',
         'mapping',
+        'status',
         'remark'
     ];
 }

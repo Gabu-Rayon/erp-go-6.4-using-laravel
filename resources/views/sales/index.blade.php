@@ -32,15 +32,46 @@
                         <thead>
                         <tr>
                             <th scope="col">{{__('SrNo')}}</th>
-                            <th scope="col">{{__('Invoice No')}}</th>
-                            <th scope="col">{{__('Original Invoice No')}}</th>
+                            <th scope="col">{{__('Trader Invoice No')}}</th>
                             <th scope="col">{{__('Customer Tin')}}</th>
-                            <th scope="col">{{__('Receipt Type')}}</th>
+                            <th scope="col">{{__('Sales Type')}}</th>
+                            <th scope="col">{{__('Payments Type')}}</th>
                             <th scope="col">{{__('Status')}}</th>
                             <th scope="col" >{{__('Action')}}</th>
                         </tr>
                         </thead>
                         <tbody class="list">
+                            @foreach ($sales as $sale)
+                                <tr>
+                                    <td>{{ $sale->id }}</td>
+                                    <td>{{ $sale->traderInvoiceNo }}</td>
+                                    <td>{{ $sale->customerTin }}</td>
+                                    <td>{{ $sale->salesType }}</td>
+                                    <td>{{ $sale->paymentType }}</td>
+                                    <td>{{ $sale->status }}</td>
+                                    <td>
+                                        <div class="action-btn bg-info">
+                                            <a href="{{ route('sales.show',$sale) }}" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="{{__('Details')}}">
+                                                <i class="ti ti-eye text-white"></i>
+                                            </a>
+                                        </div>
+                                        <div class="action-btn bg-success">
+                                            <a href="{{ route('sales.print',$sale) }}" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="{{__('Print')}}">
+                                                <i class="ti ti-printer text-white"></i>
+                                            </a>
+                                        </div>
+                                        <div class="action-btn bg-secondary">
+                                            <a href="{{ route('salescreditnote.edit',$sale) }}" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="{{__('Credit Note')}}">
+                                                <i class="ti ti-book text-white"></i>
+                                            </a>
+                                        </div>
+                                        <div class="action-btn bg-warning">
+                                            <a href="{{ route('sales.edit',$sale) }}" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="{{__('Edit')}}">
+                                                <i class="ti ti-pencil text-white"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

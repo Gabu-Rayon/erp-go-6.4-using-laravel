@@ -1453,9 +1453,6 @@
                 <li class="dash-item <?php echo e(Request::route()->getName() == 'create'); ?>">
                     <a class="dash-link" href="<?php echo e(route('sales.create')); ?>"><?php echo e(__('Send Sales Transaction')); ?></a>
                 </li>
-                <li class="dash-item <?php echo e(Request::route()->getName() == 'create'); ?>">
-                    <a class="dash-link" href="<?php echo e(route('salescreditnote.create')); ?>"><?php echo e(__('Add Sales Credit Note')); ?></a>
-                </li>
             </ul>
         </li>
 

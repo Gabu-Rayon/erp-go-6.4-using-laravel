@@ -1848,7 +1848,12 @@ Route::group(
     }
 );
 
+Route::post('salescreditnote/{salescreditnote}', 'SalesCreditNoteController@update')->name('salescreditnote.update');
+
 Route::get('sales/saletransactions', [SalesController::class, 'sendSalesTransactions'])->name('sales.saletransactions');
+Route::get('sales/print', [SalesController::class, 'print'])->name('sales.print');
+Route::get('sales/cancel/{sale}', [SalesController::class, 'cancel'])->name('sales.cancel');
+Route::get('sales/creditnote', [SalesController::class, 'creditNote'])->name('sales.creditnote');
 
 
 

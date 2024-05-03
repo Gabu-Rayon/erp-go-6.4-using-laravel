@@ -1443,9 +1443,6 @@
                 <li class="dash-item {{ Request::route()->getName() == 'create' }}">
                     <a class="dash-link" href="{{ route('sales.create') }}">{{ __('Send Sales Transaction') }}</a>
                 </li>
-                <li class="dash-item {{ Request::route()->getName() == 'create' }}">
-                    <a class="dash-link" href="{{ route('salescreditnote.create') }}">{{ __('Add Sales Credit Note') }}</a>
-                </li>
             </ul>
         </li>
 

@@ -48,7 +48,6 @@
                                             <a href="{{ route('stockinfo.show',$stockMove->id) }}" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="{{__('Details')}}"><i class="ti ti-eye text-white"></i></a>
                                         </div>
                                     </td>
-
                             @endforeach
                         </tbody>
                     </table>

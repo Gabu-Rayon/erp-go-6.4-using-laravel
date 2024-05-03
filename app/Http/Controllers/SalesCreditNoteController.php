@@ -3,6 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\SalesCreditNote;
+use App\Models\InvoiceStatusCode;
+use App\Models\PaymentTypeCodes;
+use App\Models\SalesTypeCode;
+use App\Models\CreditNoteReason;
+use App\Models\Sales;
+use App\Models\SalesCreditNoteItems;
+use App\Models\SalesItems;
 use App\Models\ItemInformation;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -22,14 +29,7 @@ class SalesCreditNoteController extends Controller
      */
     public function create()
     {
-        try {
-            $items = ItemInformation::all()->pluck('itemNm', 'itemCd');
-            return view('salescreditnote.create', compact('items'));
-        } catch (\Exception $e) {
-            \Log::info('CREATE VIEW ERROR');
-            \lOG::info($e);
-            redirect()->back()->with('error', 'Could Not Render Page');
-        }
+        
     }
 
     /**
@@ -51,7 +51,7 @@ class SalesCreditNoteController extends Controller
             \Log::info('SALES API RESPONSE');
             \Log::info($response);
 
-            SalesCreditNote::create([
+            $salesCreditNote = SalesCreditNote::create([
                 'orgInvoiceNo' => $data['orgInvoiceNo'],
                 'customerName' => $data['customerName'],
                 'customerTin' => $data['customerTin'],
@@ -71,6 +71,30 @@ class SalesCreditNoteController extends Controller
                 'mapping' => $data['mapping'],
                 'remark' => $data['remark']
             ]);
+
+            $saleCreditNoteItems = $data['creditNoteItemsList'];
+
+            foreach ($saleCreditNoteItems as $saleCreditNoteItem) {
+                SalesCreditNoteItems::create([
+                    'sales_credit_note_id' => $salesCreditNote->id,
+                    'itemCode' => $saleCreditNoteItem['itemCode'],
+                    'itemClassCode' => $saleCreditNoteItem['itemClassCode'],
+                    'itemTypeCode' => $saleCreditNoteItem['itemTypeCode'],
+                    'itemName' => $saleCreditNoteItem['itemName'],
+                    'orgnNatCd' => $saleCreditNoteItem['orgnNatCd'],
+                    'taxTypeCode' => $saleCreditNoteItem['taxTypeCode'],
+                    'unitPrice' => $saleCreditNoteItem['unitPrice'],
+                    'isrcAplcbYn' => $saleCreditNoteItem['isrcAplcbYn'],
+                    'pkgUnitCode' => $saleCreditNoteItem['pkgUnitCode'],
+                    'pkgQuantity' => $saleCreditNoteItem['pkgQuantity'],
+                    'qtyUnitCd' => $saleCreditNoteItem['qtyUnitCd'],
+                    'quantity' => $saleCreditNoteItem['quantity'],
+                    'discountRate' => $saleCreditNoteItem['discountRate'],
+                    'discountAmt' => $saleCreditNoteItem['discountAmt'],
+                    'itemExprDate' => $saleCreditNoteItem['itemExprDate'],
+                ]);
+            }
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Sale Added Successfuly'
@@ -96,9 +120,28 @@ class SalesCreditNoteController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(SalesCreditNote $salesCreditNote)
+    public function edit($id)
     {
-        //
+        try {
+            $items = SalesItems::where('sales_id', $id)->get();
+            $sale = Sales::find($id);
+            $creditNoteReasons = CreditNoteReason::all()->pluck('reason', 'reason');
+            $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'saleTypeCode');
+            $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'payment_type_code');
+            $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusCode', 'invoiceStatusCode');
+            return view('salescreditnote.edit', compact(
+                'items',
+                'sale',
+                'creditNoteReasons',
+                'salesTypeCodes',
+                'paymentTypeCodes',
+                'invoiceStatusCodes'
+            ));
+        } catch (\Exception $e) {
+            \Log::info('CREATE VIEW ERROR');
+            \lOG::info($e);
+            redirect()->back()->with('error', 'Could Not Render Page');
+        }
     }
 
     /**
