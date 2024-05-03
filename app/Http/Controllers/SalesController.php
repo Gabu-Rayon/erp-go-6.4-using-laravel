@@ -70,7 +70,7 @@ class SalesController extends Controller
                 'stockReleseDate' => $data['stockReleseDate'],
                 'receiptPublishDate' => $data['receiptPublishDate'],
                 'occurredDate' => $data['occurredDate'],
-                'formDataObject' => $data['formDataObject'],
+                'invoiceStatusCode' => $data['invoiceStatusCode'],
                 'isPurchaseAccept' => $data['isPurchaseAccept'],
                 'isStockIOUpdate' => $data['isStockIOUpdate'],
                 'mapping' => $data['mapping'],
