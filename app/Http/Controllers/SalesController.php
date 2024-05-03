@@ -56,6 +56,26 @@ class SalesController extends Controller
 
             \Log::info('SALES API RESPONSE');
             \Log::info($response);
+
+            Sales::create([
+                'customerName' => $data['customerName'],
+                'customerTin' => $data['customerTin'],
+                'customerNo' => $data['customerNo'],
+                'customerMobileNo' => $data['customerMobileNo'],
+                'salesType' => $data['salesType'],
+                'paymentType' => $data['paymentType'],
+                'traderInvoiceNo' => $data['traderInvoiceNo'],
+                'confirmDate' => $data['confirmDate'],
+                'salesDate' => $data['salesDate'],
+                'stockReleseDate' => $data['stockReleseDate'],
+                'receiptPublishDate' => $data['receiptPublishDate'],
+                'occurredDate' => $data['occurredDate'],
+                'formDataObject' => $data['formDataObject'],
+                'isPurchaseAccept' => $data['isPurchaseAccept'],
+                'isStockIOUpdate' => $data['isStockIOUpdate'],
+                'mapping' => $data['mapping'],
+                'remark' => $data['remark']
+            ]);
             return response()->json([
                 'status' => 'success',
                 'message' => 'Sale Added Successfuly'
