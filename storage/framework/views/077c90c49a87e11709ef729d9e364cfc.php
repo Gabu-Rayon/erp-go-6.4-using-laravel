@@ -455,7 +455,7 @@
                                         <?php echo e(Form::select('itemCode', $product_services_Codes, '', ['class' => 'form-control select2 itemCode', 'data-url' => route('productservice.getiteminformation'), 'required' => 'required'])); ?>
 
                                     </td>
-                                     <td>
+                                    <td>
                                         <?php echo e(Form::label('itemNm', __('ItemNm'), ['class' => 'form-label'])); ?>
 
                                         <?php echo e(Form::text('itemNm', null, ['class' => 'form-control itemNm', 'required' => 'required'])); ?>
@@ -488,8 +488,8 @@
 
                                     </td>
                                 </tr>
-                                  <tr>
-                                 <td>
+                                <tr>
+                                    <td>
                                         <?php echo e(Form::label('qtyUnitCd', __('Quantity'), ['class' => 'form-label'])); ?>
 
                                         <?php echo e(Form::text('qtyUnitCd', null, ['class' => 'form-control qtyUnitCd', 'required' => 'required', 'placeholder' => __('U,T')])); ?>

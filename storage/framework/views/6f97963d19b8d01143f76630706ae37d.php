@@ -1,0 +1,1 @@
+<?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/purchase/mapPurchase.blade.php ENDPATH**/ ?>

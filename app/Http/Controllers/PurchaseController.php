@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Bill;
 use App\Models\User;
 use App\Models\Vender;
@@ -170,10 +171,17 @@ class PurchaseController extends Controller
                 'purchTypeCode' => $request->input('purchTypeCode'),
                 'purchStatusCode' => $request->input('purchStatusCode'),
                 'pmtTypeCode' => $request->input('pmtTypeCode'),
+
                 'purchDate' => date('Ymd', strtotime($request->input('purchDate'))),
                 'occurredDate' => date('Ymd', strtotime($request->input('occurredDate'))),
                 'confirmDate' => date('YmdHis', strtotime($request->input('confirmDate'))),
                 'warehouseDate' => date('YmdHis', strtotime($request->input('warehouseDate'))),
+
+                // 'purchDate' => Carbon::createFromFormat('Y-m-d', $request->input('purchDate'))->format('Ymd');
+                // 'occurredDate' => Carbon::createFromFormat('Y-m-d', $request->input('occurredDate'))->format('Ymd');
+                // 'confirmDate' => Carbon::createFromFormat('Y-m-d H:i:s', $request->input('confirmDate'))->format('YmdHis');
+                // 'warehouseDate' => Carbon::createFromFormat('Y-m-d H:i:s', $request->input('warehouseDate'))->format('YmdHis');
+
                 'remark' => $request->input('remark'),
                 'mapping' => $request->input('mapping'),
                 'itemsDataList' => $itemsDataList,
@@ -1371,7 +1379,15 @@ class PurchaseController extends Controller
             \Log::info('API Request Mapping Purchase Data Posted:', $requestData);
 
             // Send request to API endpoint
-            $response = Http::post('https://etims.your-apps.biz/api/MapPurchase', $requestData);
+            // $response = Http::post('https://etims.your-apps.biz/api/MapPurchase', $requestData);
+
+            $response = Http::withHeaders([
+                'accept' => 'application/json',
+                'key' => '123456',
+                'Content-Type' => 'application/json',
+            ])->post('https://etims.your-apps.biz/api/MapPurchase', $requestData);
+
+
 
             // Log response data
             \Log::info('API Response Status Code For Posting Mapping Purchase Data: ' . $response->status());
@@ -1386,6 +1402,63 @@ class PurchaseController extends Controller
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+    }
+
+    public function searchByDate(Request $request)
+    {
+        try {
+            // Log received request data
+            \Log::info('Received request date From Searching Purchases By Date:', $request->all());
+
+            // Validate the request
+            $request->validate([
+                'searchByDate' => 'required|date',
+            ]);
+
+            // Get the entered date
+            $date = $request->input('searchByDate');
+
+            // Convert the date to YYYYMMDD format using Carbon
+            $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd');
+
+            // Log request data
+            \Log::info($formattedDate);
+
+            // Send a GET request to the API endpoint
+            $response = Http::withHeaders([
+                'accept' => '*/*',
+                'key' => '123456',
+            ])->get('https://etims.your-apps.biz/api/MapPurchase/SearchByDate', [
+                        'date' => $formattedDate,
+                    ]);
+
+            // Log response data
+            \Log::info('API Response Status Code For Searching Purchases By Date: ' . $response->status());
+            \Log::info('API Response Body For Searching Purchases By Date: ' . $response->body());
+
+            // Check if the request was successful
+            if ($response->successful()) {
+                // Get the data from the API response
+                $purchasesSearchedByDates = $response->json();
+
+                // Redirect back to the page with the API data
+                return redirect()->back()->with('purchasesSearchedByDates', $purchasesSearchedByDates);
+            } else {
+                // Handle the API request failure
+                return redirect()->back()->with(['error','Failed to fetch Any Searched Purchases By Date from the API']);
+            }
+        } catch (\Exception $e) {
+            // Log the exception
+            \Log::error($e);
+            \Log::error('An error occurred while searching Purchases By Date: ' . $e->getMessage());
+            // Handle the exception and provide feedback to the user
+            return back()->withErrors(['api_error' => $e->getMessage()]);
+        }
+    }
+
+
+    public function mappedPurchase(){
+         return view('purchase.mapPurchase');
     }
 
 }

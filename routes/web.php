@@ -1564,7 +1564,11 @@ Route::group(['middleware' => ['verified']], function () {
     );
      // purchase.mapPurchase
      Route::any('map-purchase', [PurchaseController::class, 'mapPurchase'])->name('purchase.mapPurchase');
-
+    //  purchase.SearchByDate
+     Route::any('/searchByDate', [PurchaseController::class, 'searchByDate'])->name('purchase.searchByDate');
+    // mapPurchase blade
+    Route::any('/mappedpurchase', [PurchaseController::class, 'mappedPurchase'])->name('purchase.mappedPurchases');
+     
     Route::get('pos-print-setting', [SystemController::class, 'posPrintIndex'])->name('pos.print.setting')->middleware(['auth', 'XSS']);
     Route::get('purchase/preview/{template}/{color}', [PurchaseController::class, 'previewPurchase'])->name('purchase.preview')->middleware(['auth', 'XSS']);
     Route::get('pos/preview/{template}/{color}', [PosController::class, 'previewPos'])->name('pos.preview')->middleware(['auth', 'XSS']);

@@ -25,15 +25,28 @@
 <?php $__env->stopPush(); ?>
 
 
+
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
-
-
-        
-        
-        
-
+        <!-- Add the form for date search -->
         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create purchase')): ?>
+            <div class="d-inline-block mb-4">
+                <!-- <?php echo e(Form::open(['url' => 'purchase.searchByDate', 'class' => 'w-100'])); ?> -->
+                <?php echo e(Form::open(['route' => 'purchase.searchByDate', 'method' => 'POST', 'class' => 'w-100'])); ?>
+
+                <?php echo csrf_field(); ?>
+                <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
+                <div class="form-group">
+                    <?php echo e(Form::label('SearchByDate', __('Search By Date'), ['class' => 'form-label'])); ?>
+
+                    <?php echo e(Form::date('searchByDate', null, ['class' => 'form-control', 'required' => 'required'])); ?>
+
+                </div>
+                <button type="submit" class="btn btn-primary"><?php echo e(__('Search')); ?></button>
+                <?php echo e(Form::close()); ?>
+
+
+            </div>
             <a href="<?php echo e(route('purchase.create', 0)); ?>" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
                 title="<?php echo e(__('Create')); ?>">
                 <i class="ti ti-plus"></i>
@@ -85,7 +98,6 @@
                                         <?php if(Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase')): ?>
                                             <td class="Action">
                                                 <span>
-
                                                     <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('show purchase')): ?>
                                                         <div class="action-btn bg-info ms-2">
                                                             <a href="<?php echo e(route('purchase.show', ['id' => $purchase->id])); ?>"

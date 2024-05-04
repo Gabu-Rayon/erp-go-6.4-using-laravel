@@ -24,15 +24,24 @@
 @endpush
 
 
+
 @section('action-btn')
     <div class="float-end">
-
-
-        {{--        <a href="{{ route('bill.export') }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{__('Export')}}"> --}}
-        {{--            <i class="ti ti-file-export"></i> --}}
-        {{--        </a> --}}
-
+        <!-- Add the form for date search -->
         @can('create purchase')
+            <div class="d-inline-block mb-4">
+                <!-- {{ Form::open(['url' => 'purchase.searchByDate', 'class' => 'w-100']) }} -->
+                {{ Form::open(['route' => 'purchase.searchByDate', 'method' => 'POST', 'class' => 'w-100']) }}
+                @csrf
+                <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    {{ Form::label('SearchByDate', __('Search By Date'), ['class' => 'form-label']) }}
+                    {{ Form::date('searchByDate', null, ['class' => 'form-control', 'required' => 'required']) }}
+                </div>
+                <button type="submit" class="btn btn-primary">{{ __('Search') }}</button>
+                {{ Form::close() }}
+
+            </div>
             <a href="{{ route('purchase.create', 0) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
                 title="{{ __('Create') }}">
                 <i class="ti ti-plus"></i>
@@ -84,7 +93,6 @@
                                         @if (Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase'))
                                             <td class="Action">
                                                 <span>
-
                                                     @can('show purchase')
                                                         <div class="action-btn bg-info ms-2">
                                                             <a href="{{ route('purchase.show', ['id' => $purchase->id]) }}"
