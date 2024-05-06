@@ -120,7 +120,7 @@ class PurchaseController extends Controller
 
                 'items.*.itemCode' => 'required',
                 'items.*.itemNm' => 'required',
-                'items.*.itemClsCode' => 'required',
+                'items.*.itemClsCd' => 'required',
                 'items.*.bcd' => 'required',
                 'items.*.pkgUnitCd' => 'required',
                 'items.*.pkg' => 'required',

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('hsCode');
             $table->string('itemClassificationCode');
             $table->string('itemCode');
+            $table->string('importItemStatusCode');
             // Foreign keys
             $table->foreign('srNo')->references('srNo')->on('imported_items')->onDelete('cascade');
             $table->foreign('taskCode')->references('taskCode')->on('imported_items')->onDelete('cascade');

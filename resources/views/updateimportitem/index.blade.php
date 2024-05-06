@@ -38,6 +38,7 @@
                             <th scope="col" >{{__('HS Code')}}</th>
                             <th scope="col" >{{__('Item Code')}}</th>
                             <th scope="col" >{{__('Item Classification Code')}}</th>
+                            <th scope="col" >{{__('Import Item Status')}}</th>
                         </tr>
                         </thead>
                         <tbody class="list">
@@ -50,6 +51,7 @@
                                     <td>{{ $updateImportedItem->hsCode }}</td>
                                     <td>{{ $updateImportedItem->itemClassificationCode }}</td>
                                     <td>{{ $updateImportedItem->itemCode }}</td>
+                                    <td>{{ $updateImportedItem->importItemStatusCode }}</td>
                             @endforeach
                         </tbody>
                     </table>

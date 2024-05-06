@@ -9,12 +9,11 @@
 <?php $__env->stopSection(); ?>
 <?php $__env->startPush('script-page'); ?>
     <script>
-
-        $('.copy_link').click(function (e) {
+        $('.copy_link').click(function(e) {
             e.preventDefault();
             var copyText = $(this).attr('href');
 
-            document.addEventListener('copy', function (e) {
+            document.addEventListener('copy', function(e) {
                 e.clipboardData.setData('text/plain', copyText);
                 e.preventDefault();
             }, true);
@@ -26,16 +25,30 @@
 <?php $__env->stopPush(); ?>
 
 
+
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
-
-
-
-
-
-
+        <!-- Add the form for date search -->
         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create purchase')): ?>
-            <a href="<?php echo e(route('purchase.create',0)); ?>" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="<?php echo e(__('Create')); ?>">
+            <div class="d-inline-block mb-4">
+                <!-- <?php echo e(Form::open(['url' => 'purchase.searchByDate', 'class' => 'w-100'])); ?> -->
+                <?php echo e(Form::open(['route' => 'purchase.searchByDate', 'method' => 'POST', 'class' => 'w-100'])); ?>
+
+                <?php echo csrf_field(); ?>
+                <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
+                <div class="form-group">
+                    <?php echo e(Form::label('SearchByDate', __('Search By Date'), ['class' => 'form-label'])); ?>
+
+                    <?php echo e(Form::date('searchByDate', null, ['class' => 'form-control', 'required' => 'required'])); ?>
+
+                </div>
+                <button type="submit" class="btn btn-primary"><?php echo e(__('Search')); ?></button>
+                <?php echo e(Form::close()); ?>
+
+
+            </div>
+            <a href="<?php echo e(route('purchase.create', 0)); ?>" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
+                title="<?php echo e(__('Create')); ?>">
                 <i class="ti ti-plus"></i>
             </a>
         <?php endif; ?>
@@ -44,8 +57,6 @@
 
 
 <?php $__env->startSection('content'); ?>
-
-
     <div class="row">
         <div class="col-md-12">
             <div class="card">
@@ -53,48 +64,96 @@
                     <div class="table-responsive">
                         <table class="table datatable">
                             <thead>
-                            <tr>
-                                <th> <?php echo e(__('itemSeq')); ?></th>
-                                <th> <?php echo e(__('itemCd')); ?></th>
-                                <th> <?php echo e(__('itemClsCd')); ?></th>
-                                <th> <?php echo e(__('itemNm')); ?></th>
-                                <th><?php echo e(__('pkgUnitCd')); ?></th>
-                                <th><?php echo e(__('qtyUnitCd')); ?></th>
-                                <th><?php echo e(__('totAmt')); ?></th>
-                                <?php if(Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase')): ?>
-                                    <th > <?php echo e(__('Action')); ?></th>
-                                <?php endif; ?>
-                            </tr>
+                                <tr>
+                                    <th> <?php echo e(__('SrNo')); ?></th>
+                                    <th> <?php echo e(__('SpplrTin')); ?></th>
+                                    <th> <?php echo e(__('SpplrNm')); ?></th>
+                                    <th> <?php echo e(__('TotItemCnt')); ?></th>
+                                    <th><?php echo e(__('CfmDt')); ?></th>
+                                    <th><?php echo e(__('IsDBImport')); ?></th>
+                                    <?php if(Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase')): ?>
+                                        <th> <?php echo e(__('Action')); ?></th>
+                                    <?php endif; ?>
+                                </tr>
                             </thead>
                             <tbody>
-                            <?php $__currentLoopData = $purchases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $purchase): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <tr>
-                                    <td><?php echo e($purchase->itemSeq); ?></td>
-                                    <td><?php echo e($purchase->itemCd); ?></td>
-                                    <td><?php echo e($purchase->itemClsCd); ?></td>
-                                    <td><?php echo e($purchase->itemNm); ?></td>
-                                    <td><?php echo e($purchase->pkgUnitCd); ?></td>
-                                    <td><?php echo e($purchase->qtyUnitCd); ?></td>
-                                    <td><?php echo e($purchase->totAmt); ?></td>
-                                    <td class="d-flex" style="gap: 1rem;">
-                                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('show purchase')): ?>
-                                            <a href="<?php echo e(route('purchase.show', $purchase->id)); ?>" class="edit-icon btn btn-info btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo e(__('Show')); ?>">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
+                                <?php $__currentLoopData = $purchases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $purchase): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <tr>
+                                        <td><?php echo e($purchase->id); ?></td>
+                                        <td><?php echo e($purchase->spplrTin); ?></td>
+                                        <td><?php echo e($purchase->spplrNm); ?></td>
+                                        <td><?php echo e($purchase->totItemCnt); ?></td>
+                                        <td><?php echo e($purchase->cfmDt); ?></td>
+                                        <td>
+                                            <?php if($purchase->isDBImport == 0): ?>
+                                                <!-- Show Pending -->
+                                                <span
+                                                    class="purchase_status badge bg-secondary p-2 px-3 rounded">pending</span>
+                                            <?php else: ?>
+                                                <!-- Show Success -->
+                                                <span
+                                                    class="purchase_status badge bg-warning p-2 px-3 rounded">Success</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <?php if(Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase')): ?>
+                                            <td class="Action">
+                                                <span>
+                                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('show purchase')): ?>
+                                                        <div class="action-btn bg-info ms-2">
+                                                            <a href="<?php echo e(route('purchase.show', ['id' => $purchase->id])); ?>"
+                                                                class="mx-3 btn btn-sm align-items-center"
+                                                                data-bs-toggle="tooltip" title="<?php echo e(__('Show')); ?>"
+                                                                data-original-title="<?php echo e(__('Detail')); ?>">
+                                                                <i class="ti ti-eye text-white"></i>
+                                                            </a>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('show purchase')): ?>
+                                                        <div class="action-btn bg-info ms-2">
+                                                            <a href="<?php echo e(route('purchase.details', ['spplrInvcNo' => $purchase->spplrInvcNo])); ?>"
+                                                                class="mx-3 btn btn-sm align-items-center"
+                                                                data-bs-toggle="tooltip"
+                                                                title="<?php echo e(__('Map purchase Item to add to Purchase')); ?>"
+                                                                data-original-title="<?php echo e(__('Detail')); ?>">
+                                                                <i class="ti ti-list text-white"></i></a>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit purchase')): ?>
+                                                        <div class="action-btn bg-primary ms-2">
+                                                            <a href="<?php echo e(route('purchase.edit', \Crypt::encrypt($purchase->id))); ?>"
+                                                                class="mx-3 btn btn-sm align-items-center"
+                                                                data-bs-toggle="tooltip" title="Edit"
+                                                                data-original-title="<?php echo e(__('Edit')); ?>">
+                                                                <i class="ti ti-pencil text-white"></i>
+                                                            </a>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete purchase')): ?>
+                                                        <div class="action-btn bg-danger ms-2">
+                                                            <?php echo Form::open([
+                                                                'method' => 'DELETE',
+                                                                'route' => ['purchase.destroy', $purchase->id],
+                                                                'class' => 'delete-form-btn',
+                                                                'id' => 'delete-form-' . $purchase->id,
+                                                            ]); ?>
+
+                                                            <a href="#"
+                                                                class="mx-3 btn btn-sm align-items-center bs-pass-para"
+                                                                data-bs-toggle="tooltip" title="<?php echo e(__('Delete')); ?>"
+                                                                data-original-title="<?php echo e(__('Delete')); ?>"
+                                                                data-confirm="<?php echo e(__('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?')); ?>"
+                                                                data-confirm-yes="document.getElementById('delete-form-<?php echo e($purchase->id); ?>').submit();">
+                                                                <i class="ti ti-trash text-white"></i>
+                                                            </a>
+                                                            <?php echo Form::close(); ?>
+
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </span>
+                                            </td>
                                         <?php endif; ?>
-                                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit purchase')): ?>
-                                            <a href="<?php echo e(route('purchase.edit',$purchase->id)); ?>" class="edit-icon btn btn-sm btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo e(__('Edit')); ?>">
-                                                <i class="fas fa-pencil-alt"></i>
-                                            </a>
-                                        <?php endif; ?>
-                                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete purchase')): ?>
-                                            <a href="#" class="delete-icon btn btn-sm btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo e(__('Delete')); ?>" onclick="deleteData('<?php echo e($purchase->id); ?>')">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </tr>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                             </tbody>
                         </table>
@@ -104,6 +163,5 @@
         </div>
     </div>
 <?php $__env->stopSection(); ?>
-
 
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/purchase/index.blade.php ENDPATH**/ ?>
