@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\StockMoveList;
 use Illuminate\Http\Request;
+use App\Models\StockMoveListItem;
+use Illuminate\Support\Facades\Http;
 
 class StockMoveListController extends Controller
 {
@@ -51,21 +53,54 @@ class StockMoveListController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $data = $request->all();
+            \Log::info('Inv No');
+            \Log::info($request->all());
+
+            $url = 'https://etims.your-apps.biz/api/StockUpdate/ByInvoiceNo?InvoiceNo=' . $data['invoiceNo'];
+
+            $response = Http::withHeaders([
+                'key' => '123456',
+                'accept' => '*/*',
+                'Content-Type' => 'application/json'
+            ])->post($url);
+
+            \Log::info('STOCK INV NO API RESPONSE');
+            \lOG::info($response);
+
+            return redirect()->to('stockinfo')->with('success', 'Updated Successfully');
+        } catch (\Exception $e) {
+            return redirect()->to('stockinfo')->with('error', $e->getMessage());
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(StockMoveList $stockMoveList)
+    public function show($id)
     {
-        return view('stockinfo.show', compact('stockMoveList'));
+        $stockMoveList = StockMoveList::find($id)->first();
+        \Log::info('STOCK MOVE LIST controller');
+        \Log::info($stockMoveList);
+        $items = StockMoveListItem::where('stockMoveListID', $stockMoveList->id)->get();
+        return view('stockinfo.show', compact('stockMoveList', 'items'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(StockMoveList $stockMoveList)
+    {
+        //
+    }
+
+    public function cancel(StockMoveList $stockMoveList)
+    {
+        //
+    }
+
+    public function stockMove(StockMoveList $stockMoveList)
     {
         //
     }

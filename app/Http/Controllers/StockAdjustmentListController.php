@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ItemInformation;
 use App\Models\ReleaseType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class StockAdjustmentListController extends Controller
 {
@@ -32,7 +33,7 @@ class StockAdjustmentListController extends Controller
             return view('stockadjustment.create', compact('items', 'releaseTypes'));
         } catch (\Exception $e) {
             \Log::info($e);
-            return redirect()->to('stockinfo.index')->with('error', e.getMessage());
+            return redirect()->to('stockinfo.index')->with('error', $e.getMessage());
         }
     }
 
@@ -45,9 +46,24 @@ class StockAdjustmentListController extends Controller
             $data = $request->all();
             \Log::info('STOCK ADJ');
             \lOG::info(json_encode($data));
-            return  redirect()->back()->with('success', 'Stock Adjustment Added.');
+
+            $url = 'https://etims.your-apps.biz/api/StockAdjustment';
+
+            $response = Http::withHeaders([
+                'key' => '123456',
+                'accept' => '*/*',
+                'Content-Type' => 'application/json'
+            ])->post($url, [
+                'storeReleaseTypeCode' => $request['storeReleaseTypeCode'],
+                'remark' => $request['remark'],
+                'stockItemList' => $request['items']
+            ]);
+
+            \Log::info('STOCK ADJ API RESPONSE');
+            \lOG::info($response);
+            return  redirect()->to('stockadjustment.index')->with('success', 'Stock Adjustment Added.');
         } catch(\Exception $e) {
-            return  redirect()->back()->with('error', e->message());
+            return  redirect()->back()->with('error', $e->getMessage());
         }
     }
 

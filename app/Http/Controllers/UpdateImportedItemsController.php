@@ -28,7 +28,7 @@ class UpdateImportedItemsController extends Controller
     {
         $importedItems = ImportedItems::all()->pluck('itemName', 'taskCode');
         $items = ItemInformation::all()->pluck('itemNm', 'itemCd');
-        $importItemStatusCode = ImportItemStatusCode::all()->pluck('code', 'code');
+        $importItemStatusCode = ImportItemStatusCode::all()->pluck('code', 'id');
         return view('updateimportitem.create', compact('importedItems', 'items', 'importItemStatusCode'));
     }
 
@@ -40,21 +40,7 @@ class UpdateImportedItemsController extends Controller
         try {
             \Log::info('IMPORTED ITEMS DATA');
             \Log::info($request->all());
-
-            $url = 'https://etims.your-apps.biz/api/MapImportedItem';
-
-            $response = Http::withHeaders([
-                'key' => '123456',
-                'accept' => '*/*',
-                'Content-Type' => 'application/json'
-            ])->post($url, [
-                'taskCode' => $request['importedItemName'],
-                'itemCode' => $request['item'],
-            ]);
-
-            \Log::info('IMPORTED ITEMS API RESPONSE');
-            \Log::info($response);
-
+            
             $importItem = ImportedItems::where('taskCode', $request['importedItemName'])->first();
             $givenItem = ItemInformation::where('itemCd', $request['item'])->first();
             $srNo = $importItem->srNo;
@@ -65,6 +51,28 @@ class UpdateImportedItemsController extends Controller
             $itemCd = $givenItem->itemCd;
             $itemClsCd = $givenItem->itemClsCd;
             $importItemStatusCode = $request['importItemStatusCode'];
+            $occurredDate = $importItem->occurredDate;
+            $remark = $request['remark'];
+            
+            $url = 'https://etims.your-apps.biz/api/MapImportedItem';
+
+            $response = Http::withHeaders([
+                'key' => '123456',
+                'accept' => '*/*',
+                'Content-Type' => 'application/json'
+            ])->post($url, [
+                'importItemStatusCode' => $request['importItemStatusCode'],
+                'declarationDate' => $declarationDate,
+                'occurredDate' => $occurredDate,
+                'remark' => $remark,
+                'importedItemLists' => [[
+                    'taskCode' => $request['importedItemName'],
+                    'itemCode' => $request['item'],
+                ]]
+            ]);
+
+            \Log::info('IMPORTED ITEMS API RESPONSE');
+            \Log::info($response);
 
             UpdateImportItems::create([
                 'srNo' => $srNo,

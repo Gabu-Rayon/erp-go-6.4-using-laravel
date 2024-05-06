@@ -1,16 +1,15 @@
-
-<?php $__env->startSection('page-title'); ?>
-    <?php echo e(__('Add Stock Adjustment')); ?>
-
-<?php $__env->stopSection(); ?>
-<?php $__env->startSection('breadcrumb'); ?>
-    <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
-    <li class="breadcrumb-item"><a href="<?php echo e(route('stockadjustment.index')); ?>"><?php echo e(__('Stock Adjustment')); ?></a></li>
-    <li class="breadcrumb-item"><?php echo e(__('Add Stock Adjustment')); ?></li>
-<?php $__env->stopSection(); ?>
-<?php $__env->startPush('script-page'); ?>
-    <script src="<?php echo e(asset('js/jquery-ui.min.js')); ?>"></script>
-    <script src="<?php echo e(asset('js/jquery.repeater.min.js')); ?>"></script>
+@extends('layouts.admin')
+@section('page-title')
+    {{ __('Move Stock') }}
+@endsection
+@section('breadcrumb')
+    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('stockinfo.index') }}">{{ __('Stock Move List') }}</a></li>
+    <li class="breadcrumb-item">{{ __('Move Stock') }}</li>
+@endsection
+@push('script-page')
+    <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
+    <script src="{{ asset('js/jquery.repeater.min.js') }}"></script>
     <script>
         var selector = "body";
         if ($(selector + " .repeater").length) {
@@ -326,28 +325,23 @@
             $(".discount").change();
         });
     </script>
-<?php $__env->stopPush(); ?>
+@endpush
 
-<?php $__env->startSection('content'); ?>
+@section('content')
     <div class="row">
-        <?php echo e(Form::open(['url' => 'stockadjustment', 'class' => 'w-100'])); ?>
-
+        {{ Form::open(['url' => 'stockmove', 'class' => 'w-100']) }}
         <div class="col-12">
-            <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
+            <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <div class="card">
                 <div class="card-body">
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <?php echo e(Form::label('storeReleaseTypeCode', __('Stored/ Release Type Code (*)'), ['class' => 'form-label'])); ?>
-
-                            <?php echo e(Form::select('storeReleaseTypeCode', $releaseTypes, null, ['class' => 'form-control'])); ?>
-
+                            {{ Form::label('branch', __('Branch (*)'), ['class' => 'form-label']) }}
+                            {{ Form::select('branch', $branches, null, ['class' => 'form-control']) }}
                         </div>
                         <div class="form-group col-md-4">
-                            <?php echo e(Form::label('remark', __('Remark'),['class'=>'form-label'])); ?>
-
-                            <?php echo e(Form::text('remark', '', array('class' => 'form-control', 'required' => 'required'))); ?>
-
+                            {{ Form::label('releaseType', __('Stored / Release Type (*)'),['class'=>'form-label']) }}
+                            {{ Form::select('releaseType', $releaseTypes, null, ['class' => 'form-control']) }}
                         </div>
                     </div>
                 </div>
@@ -355,7 +349,7 @@
         </div>
 
         <div class="col-12">
-            <h5 class=" d-inline-block mb-4"><?php echo e(__('Product & Services')); ?></h5>
+            <h5 class=" d-inline-block mb-4">{{ __('Product & Services') }}</h5>
             <div class="card repeater">
                 <div class="item-section py-2">
                     <div class="row justify-content-between align-items-center">
@@ -363,8 +357,7 @@
                             <div class="all-button-box me-2">
                                 <a href="#" data-repeater-create="" class="btn btn-primary" data-bs-toggle="modal"
                                     data-target="#add-bank">
-                                    <i class="ti ti-plus"></i> <?php echo e(__('Add item')); ?>
-
+                                    <i class="ti ti-plus"></i> {{ __('Add item') }}
                                 </a>
                             </div>
                         </div>
@@ -378,22 +371,16 @@
                             <tbody class="ui-sortable" data-repeater-item data-clone>
                                 <tr>
                                     <td class="form-group col-md-4">
-                                        <?php echo e(Form::label('itemCode', __('Item'), ['class' => 'form-label'])); ?>
-
-                                        <?php echo e(Form::select('itemCode', $items, null, ['class' => 'form-control'])); ?>
-
+                                        {{ Form::label('item', __('Item'), ['class' => 'form-label']) }}
+                                        {{ Form::select('item', $items, null, ['class' => 'form-control']) }}
                                     </td>
                                     <td class="form-group col-md-4">
-                                        <?php echo e(Form::label('packageQuantity', __('Package Quantity'),['class'=>'form-label'])); ?>
-
-                                        <?php echo e(Form::text('packageQuantity', '', array('class' => 'form-control', 'required' => 'required'))); ?>
-
+                                        {{ Form::label('quantity', __('Quantity'),['class'=>'form-label']) }}
+                                        {{ Form::text('quantity', '', array('class' => 'form-control', 'required' => 'required')) }}
                                     </td>
                                     <td class="form-group col-md-4">
-                                        <?php echo e(Form::label('quantity', __('Quantity'),['class'=>'form-label'])); ?>
-
-                                        <?php echo e(Form::text('quantity', '', array('class' => 'form-control', 'required' => 'required'))); ?>
-
+                                        {{ Form::label('quantityUnit', __('Quantity Unit'),['class'=>'form-label']) }}
+                                        {{ Form::text('quantityUnit', '', array('class' => 'form-control', 'required' => 'required')) }}
                                     </td>
                                     <td class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
                                 </tr>
@@ -404,9 +391,9 @@
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
                                     <td></td>
-                                    <td><strong><?php echo e(__('Amount')); ?> <br><small
-                                                class="text-danger font-weight-bold"><?php echo e(__('after  Tax & discount')); ?></small>
-                                            (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
+                                    <td><strong>{{ __('Amount') }} <br><small
+                                                class="text-danger font-weight-bold">{{ __('after  Tax & discount') }}</small>
+                                            ({{ \Auth::user()->currencySymbol() }})</strong></td>
                                     <td class="text-end amount">0.00</td>
                                     <td></td>
                                     <td></td>
@@ -416,7 +403,7 @@
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
                                     <td></td>
-                                    <td><strong><?php echo e(__('Sub Total')); ?> (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong>
+                                    <td><strong>{{ __('Sub Total') }} ({{ \Auth::user()->currencySymbol() }})</strong>
                                     </td>
                                     <td class="text-end subTotal">0.00</td>
                                     <td></td>
@@ -426,7 +413,7 @@
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
                                     <td></td>
-                                    <td><strong><?php echo e(__('Discount')); ?> (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
+                                    <td><strong>{{ __('Discount') }} ({{ \Auth::user()->currencySymbol() }})</strong></td>
                                     <td class="text-end totalDiscount">0.00</td>
                                     <td></td>
                                 </tr>
@@ -435,7 +422,7 @@
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
                                     <td></td>
-                                    <td><strong><?php echo e(__('Tax')); ?> (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
+                                    <td><strong>{{ __('Tax') }} ({{ \Auth::user()->currencySymbol() }})</strong></td>
                                     <td class="text-end totalTax">0.00</td>
                                     <td></td>
                                 </tr>
@@ -444,9 +431,8 @@
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
-                                    <td class="blue-text"><strong><?php echo e(__('Total Amount')); ?>
-
-                                            (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
+                                    <td class="blue-text"><strong>{{ __('Total Amount') }}
+                                            ({{ \Auth::user()->currencySymbol() }})</strong></td>
                                     <td class="blue-text text-end totalAmount">0.00</td>
                                     <td></td>
                                 </tr>
@@ -458,13 +444,10 @@
         </div>
 
         <div class="modal-footer">
-            <input type="button" value="<?php echo e(__('Cancel')); ?>" onclick="location.href = '<?php echo e(route('purchase.index')); ?>';"
+            <input type="button" value="{{ __('Cancel') }}" onclick="location.href = '{{ route('purchase.index') }}';"
                 class="btn btn-light">
-            <input type="submit" value="<?php echo e(__('Create')); ?>" class="btn  btn-primary">
+            <input type="submit" value="{{ __('Create') }}" class="btn  btn-primary">
         </div>
-        <?php echo e(Form::close()); ?>
-
+        {{ Form::close() }}
     </div>
-<?php $__env->stopSection(); ?>
-
-<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/stockadjustment/create.blade.php ENDPATH**/ ?>
+@endsection

@@ -2,22 +2,22 @@
 @push('script-page')
 @endpush
 @section('page-title')
-    {{__('Stock Move List')}}
+    {{__('Stock Adjustment List')}}
 @endsection
 @section('title')
     <div class="d-inline-block">
-        <h5 class="h4 d-inline-block font-weight-400 mb-0 ">{{__('Stock Move List')}}</h5>
+        <h5 class="h4 d-inline-block font-weight-400 mb-0 ">{{__('Stock Adjustment List')}}</h5>
     </div>
 @endsection
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
-    <li class="breadcrumb-item">{{__('Stock Move List')}}</li>
+    <li class="breadcrumb-item">{{__('Stock Adjustment List')}}</li>
 @endsection
 
 @section('action-btn')
     <div class="float-end">
-        <a href="#" data-url="{{ route('stockadjustment.create') }}" class="btn btn-sm btn-primary" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Add Stock Adjustment')}}">
-            Add Stock Adjustment
+        <a href="{{ route('stockadjustment.create', 0) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{ __('Add Stock Adjustment') }}">
+            <i class="ti ti-plus"></i>
         </a>
     </div>
 @endsection

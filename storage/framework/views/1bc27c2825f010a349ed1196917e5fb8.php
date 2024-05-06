@@ -15,6 +15,14 @@
     <li class="breadcrumb-item"><?php echo e(__('Stock Move List')); ?></li>
 <?php $__env->stopSection(); ?>
 
+<?php $__env->startSection('action-btn'); ?>
+    <div class="float-end">
+        <a href="#" data-url="<?php echo e(route('stockinfo.create')); ?>" class="btn btn-sm btn-primary" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Update Stock By Invoice Number')); ?>">
+            Update Stock By Invoice Number
+        </a>
+    </div>
+<?php $__env->stopSection(); ?>
+
 <?php $__env->startSection('content'); ?>
 <div class="row">
     <div class="col-md-12">
@@ -46,7 +54,7 @@
                                     <td><?php echo e($stockMove->status); ?></td>
                                     <td>
                                         <div class="action-btn bg-warning ms-2">
-                                            <a href="<?php echo e(route('stockinfo.show',$stockMove->id)); ?>" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="<?php echo e(__('Details')); ?>"><i class="ti ti-eye text-white"></i></a>
+                                            <a href="<?php echo e(route('stockinfo.show',$stockMove)); ?>" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="<?php echo e(__('Details')); ?>"><i class="ti ti-eye text-white"></i></a>
                                         </div>
                                     </td>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
