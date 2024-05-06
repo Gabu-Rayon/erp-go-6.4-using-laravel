@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mapped_purchase_item_lists', function (Blueprint $table) {
-             $table->id();
-            $table->integer('purchase_item_list_id')->nullable();
-            $table->foreignId('mapped_purchase_id')->nullable()->constrained('mapped_purchases');
+             $table->id();             
+             $table->integer('purchase_item_list_id')->nullable();
+            $table->foreignId('mapped_purchase_id')->nullable();
             $table->integer('itemSeq')->nullable();
             $table->string('itemCd')->nullable();
             $table->string('itemClsCd')->nullable();

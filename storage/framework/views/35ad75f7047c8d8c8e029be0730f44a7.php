@@ -79,7 +79,7 @@
                             <tbody>
                                 <?php $__currentLoopData = $mappedPurchases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $purchase): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
-                                        <td><?php echo e($purchase->id); ?></td>
+                                        <td><?php echo e($purchase->mappedPurchaseId); ?></td>
                                         <td><?php echo e($purchase->invcNo); ?></td>
                                         <td><?php echo e($purchase->orgInvcNo); ?></td>
                                         <td><?php echo e($purchase->supplrTin); ?></td>
@@ -113,4 +113,4 @@
     </div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/purchase/mapPurchase.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/purchase/mapPurchases.blade.php ENDPATH**/ ?>

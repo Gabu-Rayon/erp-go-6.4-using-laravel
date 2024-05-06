@@ -62,34 +62,43 @@
                                     <th> {{ __('ID') }}</th>
                                     <th> {{ __('InvcNo') }}</th>
                                     <th> {{ __('OrgInvcNo') }}</th>
-                                    <th> {{ __('Supplier Tin') }}</th>
-                                    <th>{{ __('supplier BhfId') }}</th>
-                                    <th>{{ __('Supplier Name') }}</th>
-                                     <th>{{ __('Supplier InvcNo') }}</th>
-                                      <th>{{ __('purchase Type Code') }}</th>
-                                       <th>{{ __('RceiptTyCd') }}</th>
-                                        <th>{{ __('Payment Type Code') }}</th>
-                                         <th>{{ __('Purchase Status Code') }}</th>
-                                          <th>{{ __('Confirm Date') }}</th>
+                                    <th> {{ __('SupplrTin') }}</th>
+                                    <th>{{ __('supplrBhfId') }}</th>
+                                    <th>{{ __('SupplrName') }}</th>
+                                     <th>{{ __('SupplrInvcNo') }}</th>
                                     @if (Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase'))
                                         <th> {{ __('Action') }}</th>
                                     @endif
                                 </tr>
                             </thead>
                             <tbody>
+                                @foreach ($mappedPurchases as $purchase)
                                     <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>
-                                        </td>
+                                        <td>{{ $purchase->mappedPurchaseId }}</td>
+                                        <td>{{ $purchase->invcNo }}</td>
+                                        <td>{{ $purchase->orgInvcNo }}</td>
+                                        <td>{{ $purchase->supplrTin }}</td>
+                                        <td>{{ $purchase->supplrBhfId }}</td>
+                                        <td>{{ $purchase->supplrName }}</td>
+                                        <td>{{ $purchase->supplrInvcNo }}</td>
                                         @if (Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase'))
                                             <td class="Action">
+                                                <span>
+                                                    @can('show purchase')
+                                                        <div class="action-btn bg-info ms-2">
+                                                            <a href="{{ route('mappedPurchases.details', ['mappedPurchaseId' => $purchase->mappedPurchaseId]) }}"
+                                                                class="mx-3 btn btn-sm align-items-center"
+                                                                data-bs-toggle="tooltip"
+                                                                title="{{ __('View Map purchase Item Details') }}"
+                                                                data-original-title="{{ __('View Map purchase Item Details') }}">
+                                                                <i class="ti ti-eye text-white"></i></a>
+                                                        </div>
+                                                    @endcan
+                                                </span>
                                             </td>
                                         @endif
                                     </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

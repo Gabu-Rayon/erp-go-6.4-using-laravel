@@ -1568,12 +1568,14 @@ Route::group(['middleware' => ['verified']], function () {
     //  purchase.SearchByDate
      Route::any('/searchByDate', [PurchaseController::class, 'searchByDate'])->name('purchase.searchByDate');
     // mapPurchase blade
-    Route::any('/mappedpurchase', [PurchaseController::class, 'mappedPurchase'])->name('purchase.mappedPurchases');
+    Route::any('/mappedpurchases', [PurchaseController::class, 'mappedPurchases'])->name('purchase.mappedPurchases');
     //  getMapPurchaseSearchByDate
     Route::any('/getMapPurchaseSearchByDate', [PurchaseController::class, 'getMapPurchaseSearchByDate'])->name('purchase.getMapPurchaseSearchByDate');
     //   getMapPurchaseSearchByDateItemLists
     Route::any('/getMapPurchaseSearchByDateItemLists', [PurchaseController::class, 'getMapPurchaseSearchByDateItemLists'])->name('purchase.getMapPurchaseSearchByDateItemLists');
-    
+    //mappedPurchases.details
+    Route::any('/mappedPurchasesDetails/{mappedPurchaseId}/details', [PurchaseController::class, 'MapPurchasesDetails'])->name('mappedPurchases.details');
+
     Route::get('pos-print-setting', [SystemController::class, 'posPrintIndex'])->name('pos.print.setting')->middleware(['auth', 'XSS']);
     Route::get('purchase/preview/{template}/{color}', [PurchaseController::class, 'previewPurchase'])->name('purchase.preview')->middleware(['auth', 'XSS']);
     Route::get('pos/preview/{template}/{color}', [PosController::class, 'previewPos'])->name('pos.preview')->middleware(['auth', 'XSS']);

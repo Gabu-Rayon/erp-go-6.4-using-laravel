@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MappedPurchaseItemList;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Bill;
@@ -34,7 +33,9 @@ use App\Models\Purchase_Sales_Items;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\ProductServiceCategory;
+use App\Models\MappedPurchaseItemList;
 use Illuminate\Support\Facades\Storage;
+
 
 class PurchaseController extends Controller
 {
@@ -1460,10 +1461,33 @@ class PurchaseController extends Controller
     }
 
 
-    public function mappedPurchase()
+    public function mappedPurchases()    
     {
-        return view('purchase.mapPurchase');
+        $mappedPurchases = mappedPurchases::all();
+        return view('purchase.mapPurchases',compact('mappedPurchases'));
     }
+    public function MapPurchasesDetails($mappedPurchaseId)
+    {
+        if (\Auth::user()->can('show purchase')) {
+            try {
+                $mappedpurchase = mappedPurchases::where('mappedPurchaseId', $mappedPurchaseId)->first();
+                if ($mappedpurchase) {
+                    // Fetch related purchase Lists items
+                    $mappedpurchaseItemsList = MappedPurchaseItemList::where('mapped_purchase_id', $mappedPurchaseId)->get();
+
+                    return view('purchase.mappedPurchasesDetails', compact('mappedpurchase', 'mappedpurchaseItemsList'));
+                } else {
+                    return view('errors.not_found');
+                }
+            } catch (\Exception $e) {
+                \Log::error($e);
+                return redirect()->back()->with('error', __('Something went wrong.'));
+            }
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
+
 
 
     public function getMapPurchaseSearchByDate()
@@ -1546,19 +1570,11 @@ class PurchaseController extends Controller
             ])->get($url);
             $data = $response->json();
             \Log::info('API Request Data: ' . json_encode($data));
-            
-            $purchaseclassList = $data['data']['mapPurchaseItemList'];
 
-
-            \Log::info('API Request Data: ' . json_encode($purchaseclassList));
-            \Log::info('API Response: ' . $purchaseclassList->body());
-            \Log::info('API Response Status Code: ' . $purchaseclassList->status());
-
-            if (isset($purchaseclassList)) {
-                foreach ($purchaseclassList as $itemClassList) {
-                    $itemLists = $itemClassList['mapPurchaseItemList'];
-                    if (isset($itemLists)) {
-                        foreach ($itemLists as $item) {
+            if (isset($data['data'])) {
+                foreach ($data['data'] as $purchaseclassList) {
+                    if (isset($purchaseclassList['mapPurchaseItemList'])) {
+                        foreach ($purchaseclassList['mapPurchaseItemList'] as $item) {
                             MappedPurchaseItemList::create([
                                 'purchase_item_list_id' => $item['id'],
                                 'mapped_purchase_id' => $purchaseclassList['id'],
@@ -1595,4 +1611,5 @@ class PurchaseController extends Controller
             ], 500);
         }
     }
+
 }

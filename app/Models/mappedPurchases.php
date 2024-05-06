@@ -50,4 +50,9 @@ class mappedPurchases extends Model
         'isStockIOUpdate',
         'isClientStockUpdate',
     ];
+
+    public function mappedPurchaseItemLists(){
+        
+        return $this->hasMany(MappedPurchaseItemList::class, 'mappedPurchaseId', 'mapped_purchase_id');
+    }
 }
