@@ -6,6 +6,7 @@ use App\Http\Controllers\SalesCreditNoteController;
 use App\Http\Controllers\StockAdjustmentListController;
 use App\Http\Controllers\ImportedItemsController;
 use App\Http\Controllers\UpdateImportedItemsController;
+use App\Http\Controllers\StockMoveController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\TaxController;
@@ -1878,6 +1879,19 @@ Route::group(
     }
 );
 
+Route::group(
+    [
+        'middleware' => [
+            'auth',
+            'XSS',
+            'revalidate',
+        ],
+    ],
+    function () {
+        Route::resource('stockmove', StockMoveController::class);
+    }
+);
+
 Route::post('salescreditnote/{salescreditnote}', 'SalesCreditNoteController@update')->name('salescreditnote.update');
 
 Route::get('sales/saletransactions', [SalesController::class, 'sendSalesTransactions'])->name('sales.saletransactions');
@@ -1892,4 +1906,6 @@ Route::get('/getpurchasesalesdetailsforsuppliers', [PurchaseController::class, '
 Route::get('/getsupplier/{id}', [PurchaseController::class, 'getSupplier']);
 Route::get('/getitem/{id}', [PurchaseController::class, 'getItem']);
 Route::get('stockinfoo/getstockmovelistfromapi', [StockMoveListController::class, 'getStockMoveListFromApi']);
+Route::get('stockinfo/cancel', [StockMoveListController::class, 'cancel'])->name('stockinfo.cancel');
+Route::get('stockinfo/stockmove', [StockMoveListController::class, 'stockmove'])->name('stockinfo.stockmove');
 Route::any('/getItemInformationForPurchasing', [PurchaseController::class, 'getItemToPurchase'])->name('productservice.getiteminformation');

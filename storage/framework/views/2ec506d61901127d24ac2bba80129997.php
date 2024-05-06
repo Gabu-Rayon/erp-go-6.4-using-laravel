@@ -39,6 +39,7 @@
                             <th scope="col" ><?php echo e(__('HS Code')); ?></th>
                             <th scope="col" ><?php echo e(__('Item Code')); ?></th>
                             <th scope="col" ><?php echo e(__('Item Classification Code')); ?></th>
+                            <th scope="col" ><?php echo e(__('Import Item Status')); ?></th>
                         </tr>
                         </thead>
                         <tbody class="list">
@@ -51,6 +52,7 @@
                                     <td><?php echo e($updateImportedItem->hsCode); ?></td>
                                     <td><?php echo e($updateImportedItem->itemClassificationCode); ?></td>
                                     <td><?php echo e($updateImportedItem->itemCode); ?></td>
+                                    <td><?php echo e($updateImportedItem->importItemStatusCode); ?></td>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>

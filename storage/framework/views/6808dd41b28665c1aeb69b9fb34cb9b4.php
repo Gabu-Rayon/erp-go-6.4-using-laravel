@@ -1,12 +1,12 @@
 
 <?php $__env->startSection('page-title'); ?>
-    <?php echo e(__('Add Stock Adjustment')); ?>
+    <?php echo e(__('Move Stock')); ?>
 
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('breadcrumb'); ?>
     <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
-    <li class="breadcrumb-item"><a href="<?php echo e(route('stockadjustment.index')); ?>"><?php echo e(__('Stock Adjustment')); ?></a></li>
-    <li class="breadcrumb-item"><?php echo e(__('Add Stock Adjustment')); ?></li>
+    <li class="breadcrumb-item"><a href="<?php echo e(route('stockinfo.index')); ?>"><?php echo e(__('Stock Move List')); ?></a></li>
+    <li class="breadcrumb-item"><?php echo e(__('Move Stock')); ?></li>
 <?php $__env->stopSection(); ?>
 <?php $__env->startPush('script-page'); ?>
     <script src="<?php echo e(asset('js/jquery-ui.min.js')); ?>"></script>
@@ -330,7 +330,7 @@
 
 <?php $__env->startSection('content'); ?>
     <div class="row">
-        <?php echo e(Form::open(['url' => 'stockadjustment', 'class' => 'w-100'])); ?>
+        <?php echo e(Form::open(['url' => 'stockmove', 'class' => 'w-100'])); ?>
 
         <div class="col-12">
             <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
@@ -338,15 +338,15 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <?php echo e(Form::label('storeReleaseTypeCode', __('Stored/ Release Type Code (*)'), ['class' => 'form-label'])); ?>
+                            <?php echo e(Form::label('branch', __('Branch (*)'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::select('storeReleaseTypeCode', $releaseTypes, null, ['class' => 'form-control'])); ?>
+                            <?php echo e(Form::select('branch', $branches, null, ['class' => 'form-control'])); ?>
 
                         </div>
                         <div class="form-group col-md-4">
-                            <?php echo e(Form::label('remark', __('Remark'),['class'=>'form-label'])); ?>
+                            <?php echo e(Form::label('releaseType', __('Stored / Release Type (*)'),['class'=>'form-label'])); ?>
 
-                            <?php echo e(Form::text('remark', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+                            <?php echo e(Form::select('releaseType', $releaseTypes, null, ['class' => 'form-control'])); ?>
 
                         </div>
                     </div>
@@ -378,21 +378,21 @@
                             <tbody class="ui-sortable" data-repeater-item data-clone>
                                 <tr>
                                     <td class="form-group col-md-4">
-                                        <?php echo e(Form::label('itemCode', __('Item'), ['class' => 'form-label'])); ?>
+                                        <?php echo e(Form::label('item', __('Item'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::select('itemCode', $items, null, ['class' => 'form-control'])); ?>
-
-                                    </td>
-                                    <td class="form-group col-md-4">
-                                        <?php echo e(Form::label('packageQuantity', __('Package Quantity'),['class'=>'form-label'])); ?>
-
-                                        <?php echo e(Form::text('packageQuantity', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+                                        <?php echo e(Form::select('item', $items, null, ['class' => 'form-control'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-4">
                                         <?php echo e(Form::label('quantity', __('Quantity'),['class'=>'form-label'])); ?>
 
                                         <?php echo e(Form::text('quantity', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+
+                                    </td>
+                                    <td class="form-group col-md-4">
+                                        <?php echo e(Form::label('quantityUnit', __('Quantity Unit'),['class'=>'form-label'])); ?>
+
+                                        <?php echo e(Form::text('quantityUnit', '', array('class' => 'form-control', 'required' => 'required'))); ?>
 
                                     </td>
                                     <td class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
@@ -467,4 +467,4 @@
     </div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/stockadjustment/create.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/stockmove/create.blade.php ENDPATH**/ ?>

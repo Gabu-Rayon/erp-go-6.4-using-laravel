@@ -1,4 +1,5 @@
 storage/logs/laravel.log
+storage\logs\laravel.log
 
 /.idea
 

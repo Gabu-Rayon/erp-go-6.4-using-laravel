@@ -2,23 +2,23 @@
 <?php $__env->startPush('script-page'); ?>
 <?php $__env->stopPush(); ?>
 <?php $__env->startSection('page-title'); ?>
-    <?php echo e(__('Stock Move List')); ?>
+    <?php echo e(__('Stock Adjustment List')); ?>
 
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('title'); ?>
     <div class="d-inline-block">
-        <h5 class="h4 d-inline-block font-weight-400 mb-0 "><?php echo e(__('Stock Move List')); ?></h5>
+        <h5 class="h4 d-inline-block font-weight-400 mb-0 "><?php echo e(__('Stock Adjustment List')); ?></h5>
     </div>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('breadcrumb'); ?>
     <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
-    <li class="breadcrumb-item"><?php echo e(__('Stock Move List')); ?></li>
+    <li class="breadcrumb-item"><?php echo e(__('Stock Adjustment List')); ?></li>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
-        <a href="#" data-url="<?php echo e(route('stockadjustment.create')); ?>" class="btn btn-sm btn-primary" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Add Stock Adjustment')); ?>">
-            Add Stock Adjustment
+        <a href="<?php echo e(route('stockadjustment.create', 0)); ?>" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="<?php echo e(__('Add Stock Adjustment')); ?>">
+            <i class="ti ti-plus"></i>
         </a>
     </div>
 <?php $__env->stopSection(); ?>

@@ -15,6 +15,7 @@ class UpdateImportItems extends Model
         'itemSeq',
         'hsCode',
         'itemClassificationCode',
-        'itemCode'
+        'itemCode',
+        'importItemStatusCode'
     ];
 }

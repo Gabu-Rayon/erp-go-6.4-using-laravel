@@ -40,19 +40,7 @@ class UpdateImportedItemsController extends Controller
         try {
             \Log::info('IMPORTED ITEMS DATA');
             \Log::info($request->all());
-
-            // $url = 'https://etims.your-apps.biz/api/MapImportedItem';
-
-            // $response = Http::withHeaders([
-            //     'key' => '123456'
-            // ])->post($url, [
-            //     'taskCode' => $request['importedItemName'],
-            //     'itemCode' => $request['item'],
-            // ]);
-
-            // \Log::info('IMPORTED ITEMS API RESPONSE');
-            // \Log::info($response);
-
+            
             $importItem = ImportedItems::where('taskCode', $request['importedItemName'])->first();
             $givenItem = ItemInformation::where('itemCd', $request['item'])->first();
             $srNo = $importItem->srNo;
@@ -62,6 +50,29 @@ class UpdateImportedItemsController extends Controller
             $hsCode = $importItem->hsCode;
             $itemCd = $givenItem->itemCd;
             $itemClsCd = $givenItem->itemClsCd;
+            $importItemStatusCode = $request['importItemStatusCode'];
+            $occurredDate = $importItem->occurredDate;
+            $remark = $request['remark'];
+            
+            $url = 'https://etims.your-apps.biz/api/MapImportedItem';
+
+            $response = Http::withHeaders([
+                'key' => '123456',
+                'accept' => '*/*',
+                'Content-Type' => 'application/json'
+            ])->post($url, [
+                'importItemStatusCode' => $request['importItemStatusCode'],
+                'declarationDate' => $declarationDate,
+                'occurredDate' => $occurredDate,
+                'remark' => $remark,
+                'importedItemLists' => [[
+                    'taskCode' => $request['importedItemName'],
+                    'itemCode' => $request['item'],
+                ]]
+            ]);
+
+            \Log::info('IMPORTED ITEMS API RESPONSE');
+            \Log::info($response);
 
             UpdateImportItems::create([
                 'srNo' => $srNo,
@@ -70,7 +81,8 @@ class UpdateImportedItemsController extends Controller
                 'itemSeq' => $itemSeq,
                 'hsCode' => $hsCode,
                 'itemClassificationCode' => $itemClsCd,
-                'itemCode' => $itemCd
+                'itemCode' => $itemCd,
+                'importItemStatusCode' => $importItemStatusCode
             ]);
 
             return redirect()->back()->with('success', 'Item Added Successfully');

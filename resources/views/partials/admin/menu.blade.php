@@ -1433,7 +1433,7 @@
                     <a class="dash-link" href="{{ route('stockadjustment.index') }}">{{ __('Stock Adjustment List') }}</a>
                 </li>
                 <li class="dash-item {{ Request::route()->getName() == 'create' }}">
-                    <a class="dash-link" href="{{ route('stockinfo.create') }}">{{ __('Move Stock') }}</a>
+                    <a class="dash-link" href="{{ route('stockmove.create') }}">{{ __('Move Stock') }}</a>
                 </li>
             </ul>
         </li>
