@@ -23,7 +23,7 @@ class CompositionListController extends Controller
     public function create()
     {
         try {
-            $iteminfo = ItemInformation::all()->pluck('itemCd', 'itemNm');
+            $iteminfo = ItemInformation::all()->pluck('itemNm','itemCd');
             $itemtypes = ItemType::all()->pluck('item_type_name', 'item_type_code');
             return view('compositionlist.create', compact('iteminfo', 'itemtypes'));
         } catch (\Exception $e) {

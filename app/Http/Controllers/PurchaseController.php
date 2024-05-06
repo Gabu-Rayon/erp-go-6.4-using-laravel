@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MappedPurchaseItemList;
+use Exception;
 use Carbon\Carbon;
 use App\Models\Bill;
 use App\Models\User;
@@ -18,6 +20,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Purchase_Sales;
 use App\Models\ItemInformation;
+use App\Models\mappedPurchases;
 use App\Models\PurchasePayment;
 use App\Models\PurchaseProduct;
 use App\Models\PaymentTypeCodes;
@@ -1445,7 +1448,7 @@ class PurchaseController extends Controller
                 return redirect()->back()->with('purchasesSearchedByDates', $purchasesSearchedByDates);
             } else {
                 // Handle the API request failure
-                return redirect()->back()->with(['error','Failed to fetch Any Searched Purchases By Date from the API']);
+                return redirect()->back()->with(['error', 'Failed to fetch Any Searched Purchases By Date from the API']);
             }
         } catch (\Exception $e) {
             // Log the exception
@@ -1457,8 +1460,139 @@ class PurchaseController extends Controller
     }
 
 
-    public function mappedPurchase(){
-         return view('purchase.mapPurchase');
+    public function mappedPurchase()
+    {
+        return view('purchase.mapPurchase');
     }
 
+
+    public function getMapPurchaseSearchByDate()
+    {
+        $url = 'https://etims.your-apps.biz/api/MapPurchase/SearchByDate?date=19990101';
+
+        try {
+            $response = Http::withHeaders([
+                'key' => '123456'
+            ])->get($url);
+            $data = $response->json();
+            $mappedPurchases = $data['data'];
+
+            \Log::info('API Request Data: ' . json_encode($response));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+
+            if (isset($mappedPurchases)) {
+                foreach ($mappedPurchases as $purchase) {
+                    mappedPurchases::create([
+                        'mappedPurchaseId' => $purchase['id'],
+                        'invcNo' => $purchase['invcNo'],
+                        'orgInvcNo' => $purchase['orgInvcNo'],
+                        'supplrTin' => $purchase['supplrTin'],
+                        'supplrBhfId' => $purchase['supplrBhfId'],
+                        'supplrName' => $purchase['supplrName'],
+                        'supplrInvcNo' => $purchase['supplrInvcNo'],
+                        'purchaseTypeCode' => $purchase['purchaseTypeCode'],
+                        'rceiptTyCd' => $purchase['rceiptTyCd'],
+                        'paymentTypeCode' => $purchase['paymentTypeCode'],
+                        'purchaseSttsCd' => $purchase['purchaseSttsCd'],
+                        'confirmDate' => $purchase['purchaseSttsCd'],
+                        'purchaseDate' => $purchase['purchaseDate'],
+                        'warehouseDt' => $purchase['warehouseDt'],
+                        'cnclReqDt' => $purchase['cnclReqDt'],
+                        'cnclDt' => $purchase['cnclDt'],
+                        'refundDate' => $purchase['refundDate'],
+                        'totItemCnt' => $purchase['totItemCnt'],
+                        'taxblAmtA' => $purchase['taxblAmtA'],
+                        'taxblAmtB' => $purchase['taxblAmtB'],
+                        'taxblAmtC' => $purchase['taxblAmtC'],
+                        'taxblAmtD' => $purchase['taxblAmtD'],
+                        'taxRtA' => $purchase['taxRtA'],
+                        'taxRtB' => $purchase['taxRtB'],
+                        'taxRtC' => $purchase['taxRtC'],
+                        'taxRtD' => $purchase['taxRtD'],
+                        'taxAmtA' => $purchase['taxAmtA'],
+                        'taxAmtB' => $purchase['taxAmtB'],
+                        'taxAmtC' => $purchase['taxAmtC'],
+                        'taxAmtD' => $purchase['taxAmtD'],
+                        'totTaxblAmt' => $purchase['totTaxblAmt'],
+                        'totTaxAmt' => $purchase['totTaxAmt'],
+                        'totAmt' => $purchase['totAmt'],
+                        'remark' => $purchase['remark'],
+                        'resultDt' => $purchase['resultDt'],
+                        'createdDate' => $purchase['createdDate'],
+                        'isUpload' => $purchase['isUpload'],
+                        'isStockIOUpdate' => $purchase['isStockIOUpdate'],
+                        'isClientStockUpdate' => $purchase['isClientStockUpdate'],
+                    ]);
+                }
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Error getting  Mapped Purchases',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
+    public function getMapPurchaseSearchByDateItemLists()
+    {
+        $url = 'https://etims.your-apps.biz/api/MapPurchase/SearchByDate?date=19990101';
+
+        try {
+            $response = Http::withHeaders([
+                'key' => '123456'
+            ])->get($url);
+            $data = $response->json();
+            \Log::info('API Request Data: ' . json_encode($data));
+            
+            $purchaseclassList = $data['data']['mapPurchaseItemList'];
+
+
+            \Log::info('API Request Data: ' . json_encode($purchaseclassList));
+            \Log::info('API Response: ' . $purchaseclassList->body());
+            \Log::info('API Response Status Code: ' . $purchaseclassList->status());
+
+            if (isset($purchaseclassList)) {
+                foreach ($purchaseclassList as $itemClassList) {
+                    $itemLists = $itemClassList['mapPurchaseItemList'];
+                    if (isset($itemLists)) {
+                        foreach ($itemLists as $item) {
+                            MappedPurchaseItemList::create([
+                                'purchase_item_list_id' => $item['id'],
+                                'mapped_purchase_id' => $purchaseclassList['id'],
+                                'itemSeq' => $item['itemSeq'],
+                                'itemCd' => $item['itemCd'],
+                                'itemClsCd' => $item['itemClsCd'],
+                                'itemNmme' => $item['itemNmme'],
+                                'bcd' => $item['bcd'],
+                                'supplrItemClsCd' => $item['supplrItemClsCd'],
+                                'supplrItemCd' => $item['supplrItemCd'],
+                                'supplrItemNm' => $item['supplrItemNm'],
+                                'pkgUnitCd' => $item['pkgUnitCd'],
+                                'pkg' => $item['pkg'],
+                                'qtyUnitCd' => $item['qtyUnitCd'],
+                                'qty' => $item['qty'],
+                                'unitprice' => $item['unitprice'],
+                                'supplyAmt' => $item['supplyAmt'],
+                                'discountRate' => $item['discountRate'],
+                                'discountAmt' => $item['discountAmt'],
+                                'taxblAmt' => $item['taxblAmt'],
+                                'taxTyCd' => $item['taxTyCd'],
+                                'taxAmt' => $item['taxAmt'],
+                                'totAmt' => $item['totAmt'],
+                                'itemExprDt' => $item['itemExprDt'],
+                            ]);
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error getting Map Purchase Search By Date Item Lists',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

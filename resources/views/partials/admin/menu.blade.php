@@ -1341,12 +1341,12 @@
                                 <a class="dash-link" href="{{ route('purchase.index') }}">{{ __('Purchase') }}</a>
                             </li>
                         @endcan
-                         <!--  @can('manage purchase')
+                         @can('manage purchase')
                             <li
                                 class="dash-item {{ Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : '' }}">
                                 <a class="dash-link" href="{{ route('purchase.mappedPurchases') }}">{{ __('Mapped Purchase') }}</a>
                             </li>
-                        @endcan -->
+                        @endcan
                           @can('manage purchase')
                             <li
                                 class="dash-item {{ Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : '' }}">

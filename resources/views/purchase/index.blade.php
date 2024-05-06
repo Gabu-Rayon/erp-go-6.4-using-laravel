@@ -29,21 +29,8 @@
     <div class="float-end">
         <!-- Add the form for date search -->
         @can('create purchase')
-            <div class="d-inline-block mb-4">
-                <!-- {{ Form::open(['url' => 'purchase.searchByDate', 'class' => 'w-100']) }} -->
-                {{ Form::open(['route' => 'purchase.searchByDate', 'method' => 'POST', 'class' => 'w-100']) }}
-                @csrf
-                <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
-                <div class="form-group">
-                    {{ Form::label('SearchByDate', __('Search By Date'), ['class' => 'form-label']) }}
-                    {{ Form::date('searchByDate', null, ['class' => 'form-control', 'required' => 'required']) }}
-                </div>
-                <button type="submit" class="btn btn-primary">{{ __('Search') }}</button>
-                {{ Form::close() }}
-
-            </div>
             <a href="{{ route('purchase.create', 0) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
-                title="{{ __('Create') }}">
+                title="{{ __('Add Purchase') }}">
                 <i class="ti ti-plus"></i>
             </a>
         @endcan
@@ -147,7 +134,6 @@
                                         @endif
                                     </tr>
                                 @endforeach
-
                             </tbody>
                         </table>
                     </div>
