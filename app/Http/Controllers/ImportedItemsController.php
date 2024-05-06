@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ImportedItems;
+use App\Models\UpdateImportItems;
 use Illuminate\Http\Request;
 
 class ImportedItemsController extends Controller
@@ -25,7 +26,13 @@ class ImportedItemsController extends Controller
      */
     public function create()
     {
-        return view('importeditems.create');
+        $updateImportedItems = UpdateImportItems::all();
+        return view('importeditems.create', compact('updateImportedItems'));
+    }
+
+    public function cancel(ImportedItems $importedItem)
+    {
+        return redirect()->to('importeditems.index')->with('success', 'Successfully Cancelled');
     }
 
     /**
