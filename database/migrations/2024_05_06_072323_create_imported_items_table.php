@@ -13,19 +13,19 @@ return new class extends Migration
     {
         Schema::create('imported_items', function (Blueprint $table) {
             $table->id();
+            $table->string('hsCode');
+            $table->string('declarationDate');
+            $table->string('itemSeq');
             $table->string('srNo');
             $table->string('taskCode');
             $table->string('itemName');
-            $table->string('hsCode');
             $table->string('pkgUnitCode');
             $table->string('netWeight');
             $table->string('invForCode');
-            $table->string('declarationDate');
             $table->string('orginNationCode');
             $table->string('qty');
             $table->string('supplierName');
             $table->string('nvcFcurExcrt');
-            $table->string('itemSeq');
             $table->string('exprtNatCode');
             $table->string('qtyUnitCode');
             $table->string('agentName');
@@ -34,6 +34,12 @@ return new class extends Migration
             $table->string('grossWeight');
             $table->string('invForCurrencyAmount');
             $table->string('status')->default('pending');
+            
+            $table->index('hsCode');
+            $table->index('declarationDate');
+            $table->index('itemSeq');
+            $table->index('srNo');
+            $table->index('taskCode');
             $table->timestamps();
         });
     }

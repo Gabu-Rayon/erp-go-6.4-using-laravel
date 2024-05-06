@@ -15,6 +15,14 @@
     <li class="breadcrumb-item"><?php echo e(__('Imported Items')); ?></li>
 <?php $__env->stopSection(); ?>
 
+<?php $__env->startSection('action-btn'); ?>
+    <div class="float-end">
+        <a href="#" data-url="<?php echo e(route('updateimporteditems.create')); ?>" class="btn btn-sm btn-primary" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Add Import Item')); ?>">
+            Add Import Item
+        </a>
+    </div>
+<?php $__env->stopSection(); ?>
+
 <?php $__env->startSection('content'); ?>
 <div class="row">
     <div class="col-md-12">
@@ -54,4 +62,4 @@
 <?php $__env->stopSection(); ?>
 
 
-<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/importeditems/create.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/updateimportitem/index.blade.php ENDPATH**/ ?>

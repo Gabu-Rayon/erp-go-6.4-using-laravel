@@ -12,90 +12,102 @@
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
     <li class="breadcrumb-item"><a href="{{ route('importeditems.index') }}">{{ __('Imported Items') }}</a></li>
-    <li class="breadcrumb-item">{{ ucwords($importedItem->srNo) }}</li>
+    <li class="breadcrumb-item">{{ ucwords($importedItem->taskCode) }}</li>
 @endsection
+
+@section('action-btn')
+    <div class="float-end m-2">
+        <a href="{{ route('importeditems.index') }}" class="btn btn-sm btn-info">
+            {{__('Back')}}
+        </a>
+    </div>
+    <div class="float-end m-2">
+        <a href="{{ route('importeditems.cancel', $importedItem->id) }}" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="{{__('Cancel Sale')}}">
+            {{__('Cancel')}}
+        </a>
+    </div>
+@endsection
+
 @section('content')
     <div class="row">
         <div class="col-md-12">
             {{ Form::open(['url' => 'importeditems', 'enctype' => 'multipart/form-data']) }}
                 <div class="row">
-                    <div class="form-group col-md-4">
-                        {{ Form::label('bsnsActv', __('Task Code'), ['class' => 'form-label']) }}
-                        {{ Form::text('bsnsActv', $importedItem->taskCode, ['class' => 'form-control ', 'required' => 'required', 'placeholder' => $importedItem->taskCode, 'readonly' => true]) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Item Sequence: ') }}</h6>
+                        <p>{{ $importedItem->itemSeq }}</h6>
                     </div>
-
-                    <div class="form-group col-md-4">
-                        {{ Form::label('bhfNm', __('Item Name'), ['class' => 'form-label']) }}
-                        {{ Form::text('bhfNm', $importedItem->itemName, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Task Code: ') }}</h6>
+                        <p>{{ $importedItem->taskCode }}</h6>
                     </div>
-
-                    <div class="form-group col-md-4">
-                        {{ Form::label('bhfOpenDt', __('HS Code'), ['class' => 'form-label']) }}
-                        {{ Form::text('bhfOpenDt', $importedItem->hsCode, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Item Name: ') }}</h6>
+                        <p>{{ $importedItem->itemName }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('prvncNm', __('Package Unit Code'), ['class' => 'form-label']) }}
-                        {{ Form::text('prvncNm', $importedItem->pkgUnitCode, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('HS Code: ') }}</h6>
+                        <p>{{ $importedItem->hsCode }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('dstrtNm', __('Net Weight'), ['class' => 'form-label']) }}
-                        {{ Form::text('dstrtNm', $importedItem->netWeight, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Package Unit Code: ') }}</h6>
+                        <p>{{ $importedItem->pkgUnitCode }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('scrtNm', __('Invoice Foreign Code'), ['class' => 'form-label']) }}
-                        {{ Form::text('sctrNm', $importedItem->invForCode, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Net Weight: ') }}</h6>
+                        <p>{{ $importedItem->netWeight }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('locDesc', __('Declaration Date'), ['class' => 'form-label']) }}
-                        {{ Form::text('locDesc', $importedItem->declarationDate, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Invoice Foreign Code: ') }}</h6>
+                        <p>{{ $importedItem->invForCode }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('hqYn', __('Origin Nation Code'), ['class' => 'form-label']) }}
-                        {{ Form::text('hqYn', $importedItem->orginNationCode, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Declaration Date: ') }}</h6>
+                        <p>{{ $importedItem->declarationDate }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('mgrNm', __('Quantity'), ['class' => 'form-label']) }}
-                        {{ Form::text('mgrNm', $importedItem->qty, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Origin Nation Code: ') }}</h6>
+                        <p>{{ $importedItem->orginNationCode }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('mgrTelNo', __('Supplier Name'), ['class' => 'form-label']) }}
-                        {{ Form::text('mgrTelNo', $importedItem->supplierName, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Quantity: ') }}</h6>
+                        <p>{{ $importedItem->qty }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('mgrEmail', __('nvcFcurExcrt'), ['class' => 'form-label']) }}
-                        {{ Form::text('mgrEmail', $importedItem->nvcFcurExcrt, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Supplier Name: ') }}</h6>
+                        <p>{{ $importedItem->supplierName }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('dvcId', __('Item Sequence'), ['class' => 'form-label']) }}
-                        {{ Form::text('dvcId', $importedItem->itemSeq, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('NVCFCUREXCRT: ') }}</h6>
+                        <p>{{ $importedItem->nvcFcurExcrt }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('sdcId', __('Export Nation Code'), ['class' => 'form-label']) }}
-                        {{ Form::text('sdcId', $importedItem->exprtNatCode, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Export Nation Code: ') }}</h6>
+                        <p>{{ $importedItem->exprtNatCode }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('devicesrlno', __('Quantity Code'), ['class' => 'form-label']) }}
-                        {{ Form::text('mrcNo', $importedItem->qtyUnitCode, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Quantity Unit Code: ') }}</h6>
+                        <p>{{ $importedItem->qtyUnitCode }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('devicesrlno', __('Agent Name'), ['class' => 'form-label']) }}
-                        {{ Form::text('cmcKey', $importedItem->agentName, ['class' => 'form-control ', 'required' => 'required']) }}
+                   <div class="col-md-3">
+                        <h6>{{ __('Agent Name: ') }}</h6>
+                        <p>{{ $importedItem->agentName }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('devicesrlno', __('Declaration Number'), ['class' => 'form-label']) }}
-                        {{ Form::text('cmcKey', $importedItem->declarationNo, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Declaration Number: ') }}</h6>
+                        <p>{{ $importedItem->declarationNo }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('devicesrlno', __('Package'), ['class' => 'form-label']) }}
-                        {{ Form::text('cmcKey', $importedItem->package, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Package: ') }}</h6>
+                        <p>{{ $importedItem->package }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('devicesrlno', __('Gross Weight'), ['class' => 'form-label']) }}
-                        {{ Form::text('cmcKey', $importedItem->grossWeight, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Gross Weight: ') }}</h6>
+                        <p>{{ $importedItem->grossWeight }}</h6>
                     </div>
-                    <div class="form-group col-md-4">
-                        {{ Form::label('devicesrlno', __('Invoice Foreign Currency Amount'), ['class' => 'form-label']) }}
-                        {{ Form::text('cmcKey', $importedItem->invForCurrencyAmount, ['class' => 'form-control ', 'required' => 'required']) }}
+                    <div class="col-md-3">
+                        <h6>{{ __('Invoice Foreign Currency Amount: ') }}</h6>
+                        <p>{{ $importedItem->invForCurrencyAmount }}</h6>
                     </div>
                 </div>
             </div>

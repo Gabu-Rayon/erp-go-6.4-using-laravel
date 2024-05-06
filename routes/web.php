@@ -5,6 +5,7 @@ use App\Http\Controllers\StockMoveListController;
 use App\Http\Controllers\SalesCreditNoteController;
 use App\Http\Controllers\StockAdjustmentListController;
 use App\Http\Controllers\ImportedItemsController;
+use App\Http\Controllers\UpdateImportedItemsController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\TaxController;
@@ -1807,6 +1808,20 @@ Route::group(
     }
 );
 
+Route::get('importeditems/cancel', [ImportedItemsController::class, 'cancel'])->name('importeditems.cancel');
+
+Route::group(
+    [
+        'middleware' => [
+            'auth',
+            'XSS',
+            'revalidate',
+        ],
+    ],
+    function () {
+        Route::resource('updateimporteditems', UpdateImportedItemsController::class);
+    }
+);
 
 
 Route::group(

@@ -26,23 +26,23 @@
                         <tr>
                             <th scope="col"><?php echo e(__('SrNo')); ?></th>
                             <th scope="col"><?php echo e(__('Task Code')); ?></th>
-                            <th scope="col"><?php echo e(__('Declaration Date')); ?></th>
-                            <th scope="col"><?php echo e(__('Item Sequence')); ?></th>
-                            <th scope="col" ><?php echo e(__('HS Code')); ?></th>
-                            <th scope="col" ><?php echo e(__('Item Code')); ?></th>
-                            <th scope="col" ><?php echo e(__('Item Classification Code')); ?></th>
+                            <th scope="col"><?php echo e(__('Item Name')); ?></th>
+                            <th scope="col"><?php echo e(__('Status')); ?></th>
+                            <th scope="col" ><?php echo e(__('Action')); ?></th>
                         </tr>
                         </thead>
                         <tbody class="list">
-                            <?php $__currentLoopData = $updateImportedItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $updateImportedItem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php $__currentLoopData = $importedItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $importedItem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
-                                    <td><?php echo e($updateImportedItem->srNo); ?></td>
-                                    <td><?php echo e($updateImportedItem->taskCode); ?></td>
-                                    <td><?php echo e($updateImportedItem->declarationDate); ?></td>
-                                    <td><?php echo e($updateImportedItem->itemSeq); ?></td>
-                                    <td><?php echo e($updateImportedItem->hsCode); ?></td>
-                                    <td><?php echo e($updateImportedItem->itemClassificationCode); ?></td>
-                                    <td><?php echo e($updateImportedItem->itemCode); ?></td>
+                                    <td><?php echo e($importedItem->srNo); ?></td>
+                                    <td><?php echo e($importedItem->taskCode); ?></td>
+                                    <td><?php echo e($importedItem->itemName); ?></td>
+                                    <td><?php echo e($importedItem->status); ?></td>
+                                    <td>
+                                        <div class="action-btn bg-warning ms-2">
+                                            <a href="<?php echo e(route('importeditems.show',$importedItem->id)); ?>" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="<?php echo e(__('Details')); ?>"><i class="ti ti-eye text-white"></i></a>
+                                        </div>
+                                    </td>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
@@ -54,4 +54,4 @@
 <?php $__env->stopSection(); ?>
 
 
-<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/importeditems/create.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/importeditems/index.blade.php ENDPATH**/ ?>

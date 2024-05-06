@@ -54,7 +54,7 @@ class ApiInitializationController extends Controller
             $devicesrlno = $request->devicesrlno;
 
             $response = Http::withHeaders([
-                'key' => 'value'
+                'key' => '123456'
             ])->post($url, [
                 'tin' => $taxpayeridno,
                 'bhfId' => $bhfId,
