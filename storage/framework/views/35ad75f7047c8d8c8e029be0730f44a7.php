@@ -213,7 +213,6 @@
     document.body.appendChild(popup);
     setTimeout(() => document.body.removeChild(popup), 3000);
   }
-
   function createPopup(type, message) {
     const popup = document.createElement('div');
     popup.classList.add('alert', type);
