@@ -1443,7 +1443,7 @@
                     <a class="dash-link" href="<?php echo e(route('stockadjustment.index')); ?>"><?php echo e(__('Stock Adjustment List')); ?></a>
                 </li>
                 <li class="dash-item <?php echo e(Request::route()->getName() == 'create'); ?>">
-                    <a class="dash-link" href="<?php echo e(route('stockinfo.create')); ?>"><?php echo e(__('Move Stock')); ?></a>
+                    <a class="dash-link" href="<?php echo e(route('stockmove.create')); ?>"><?php echo e(__('Move Stock')); ?></a>
                 </li>
             </ul>
         </li>
@@ -1784,5 +1784,4 @@
         </div>
     </div>
 </div>
-</nav>
-<?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/partials/admin/menu.blade.php ENDPATH**/ ?>
+</nav><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/partials/admin/menu.blade.php ENDPATH**/ ?>
