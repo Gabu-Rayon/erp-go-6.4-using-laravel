@@ -1340,7 +1340,6 @@ class PurchaseController extends Controller
     }
 
 
-
     public function mapPurchase(Request $request)
     {
         // Log received request data
@@ -1408,64 +1407,27 @@ class PurchaseController extends Controller
         }
     }
 
-    public function searchByDate(Request $request)
+
+    public function mappedPurchases()
     {
         try {
-            // Log received request data
-            \Log::info('Received request date From Searching Purchases By Date:', $request->all());
+            // Initially, set $filteredPurchases to null or an empty array
+            $filteredPurchases = [];
 
-            // Validate the request
-            $request->validate([
-                'searchByDate' => 'required|date',
-            ]);
+            // Retrieve all mapped purchases
+            $mappedPurchases = MappedPurchases::all();
 
-            // Get the entered date
-            $date = $request->input('searchByDate');
-
-            // Convert the date to YYYYMMDD format using Carbon
-            $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd');
-
-            // Log request data
-            \Log::info($formattedDate);
-
-            // Send a GET request to the API endpoint
-            $response = Http::withHeaders([
-                'accept' => '*/*',
-                'key' => '123456',
-            ])->get('https://etims.your-apps.biz/api/MapPurchase/SearchByDate', [
-                        'date' => $formattedDate,
-                    ]);
-
-            // Log response data
-            \Log::info('API Response Status Code For Searching Purchases By Date: ' . $response->status());
-            \Log::info('API Response Body For Searching Purchases By Date: ' . $response->body());
-
-            // Check if the request was successful
-            if ($response->successful()) {
-                // Get the data from the API response
-                $purchasesSearchedByDates = $response->json();
-
-                // Redirect back to the page with the API data
-                return redirect()->back()->with('purchasesSearchedByDates', $purchasesSearchedByDates);
-            } else {
-                // Handle the API request failure
-                return redirect()->back()->with(['error', 'Failed to fetch Any Searched Purchases By Date from the API']);
-            }
+            // Pass both $mappedPurchases and $filteredPurchases to the view
+            return view('purchase.mapPurchases', compact('mappedPurchases', 'filteredPurchases'));
         } catch (\Exception $e) {
-            // Log the exception
-            \Log::error($e);
-            \Log::error('An error occurred while searching Purchases By Date: ' . $e->getMessage());
-            // Handle the exception and provide feedback to the user
-            return back()->withErrors(['api_error' => $e->getMessage()]);
+            // Log the error for debugging purposes
+            \Log::error('Error retrieving mapped purchases: ' . $e->getMessage());
+            // Return an error view or redirect with an error message
+            return back()->withError('Failed to retrieve mapped purchases. Please try again later.');
         }
     }
 
 
-    public function mappedPurchases()    
-    {
-        $mappedPurchases = mappedPurchases::all();
-        return view('purchase.mapPurchases',compact('mappedPurchases'));
-    }
     public function MapPurchasesDetails($mappedPurchaseId)
     {
         if (\Auth::user()->can('show purchase')) {
@@ -1609,6 +1571,140 @@ class PurchaseController extends Controller
                 'message' => 'Error getting Map Purchase Search By Date Item Lists',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+
+    public function searchByDate(Request $request)
+    {
+        try {
+            // Log received request data
+            \Log::info('Received request date From Searching Purchases By Date:', $request->all());
+
+            // Validate the request
+            $request->validate([
+                'searchByDate' => 'required|date',
+            ]);
+
+            // Get the entered date
+            $date = $request->input('searchByDate');
+
+            // Convert the date to YYYYMMDD format using Carbon
+            $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd');
+
+            // Send a GET request to the API endpoint
+            $response = Http::withHeaders([
+                'accept' => '*/*',
+                'key' => '123456',
+            ])->get('https://etims.your-apps.biz/api/MapPurchase/SearchByDate', [
+                        'date' => $formattedDate,
+                    ]);
+
+            // Log response data
+            \Log::info('API Response Status Code For Searching Purchases By Date: ' . $response->status());
+            \Log::info('API Response Body For Searching Purchases By Date: ' . $response->body());
+
+            // Check if the request was successful
+            if ($response->successful()) {
+                // Get the data from the API response
+                $purchasesSearchedByDates = $response->json();
+
+                // Filter the data based on the entered date
+                $filteredPurchases = collect($purchasesSearchedByDates['data'])->filter(function ($purchase) use ($formattedDate) {
+                    return Carbon::createFromFormat('Ymd', $purchase['purchaseDate'])->format('Y-m-d') == $formattedDate;
+                });
+
+                // Check if the data exists in the local database
+                $localPurchases = MappedPurchases::where('purchaseDate', $formattedDate)->get();
+                if ($localPurchases->isEmpty()) {
+                    // Insert the data into the local database
+                    foreach ($filteredPurchases as $purchase) {
+                         MappedPurchases::create([
+                            'mappedPurchaseId' => $purchase['id'],
+                            'invcNo' => $purchase['invcNo'],
+                            'orgInvcNo' => $purchase['orgInvcNo'],
+                            'supplrTin' => $purchase['supplrTin'],
+                            'supplrBhfId' => $purchase['supplrBhfId'],
+                            'supplrName' => $purchase['supplrName'],
+                            'supplrInvcNo' => $purchase['supplrInvcNo'],
+                            'purchaseTypeCode' => $purchase['purchaseTypeCode'],
+                            'rceiptTyCd' => $purchase['rceiptTyCd'],
+                            'paymentTypeCode' => $purchase['paymentTypeCode'],
+                            'purchaseSttsCd' => $purchase['purchaseSttsCd'],
+                            'confirmDate' => $purchase['purchaseSttsCd'],
+                            'purchaseDate' => $purchase['purchaseDate'],
+                            'warehouseDt' => $purchase['warehouseDt'],
+                            'cnclReqDt' => $purchase['cnclReqDt'],
+                            'cnclDt' => $purchase['cnclDt'],
+                            'refundDate' => $purchase['refundDate'],
+                            'totItemCnt' => $purchase['totItemCnt'],
+                            'taxblAmtA' => $purchase['taxblAmtA'],
+                            'taxblAmtB' => $purchase['taxblAmtB'],
+                            'taxblAmtC' => $purchase['taxblAmtC'],
+                            'taxblAmtD' => $purchase['taxblAmtD'],
+                            'taxRtA' => $purchase['taxRtA'],
+                            'taxRtB' => $purchase['taxRtB'],
+                            'taxRtC' => $purchase['taxRtC'],
+                            'taxRtD' => $purchase['taxRtD'],
+                            'taxAmtA' => $purchase['taxAmtA'],
+                            'taxAmtB' => $purchase['taxAmtB'],
+                            'taxAmtC' => $purchase['taxAmtC'],
+                            'taxAmtD' => $purchase['taxAmtD'],
+                            'totTaxblAmt' => $purchase['totTaxblAmt'],
+                            'totTaxAmt' => $purchase['totTaxAmt'],
+                            'totAmt' => $purchase['totAmt'],
+                            'remark' => $purchase['remark'],
+                            'resultDt' => $purchase['resultDt'],
+                            'createdDate' => $purchase['createdDate'],
+                            'isUpload' => $purchase['isUpload'],
+                            'isStockIOUpdate' => $purchase['isStockIOUpdate'],
+                            'isClientStockUpdate' => $purchase['isClientStockUpdate'],
+                        ]);
+
+                        // Insert the item list data into the local database
+                        foreach ($purchase['mapPurchaseItemList'] as $itemList) {
+                            MappedPurchaseItemList::create([
+                                'purchase_item_list_id' => $itemList['id'],
+                                'mapped_purchase_id' => $purchase['id'],
+                                'itemSeq' => $itemList['itemSeq'],
+                                'itemCd' => $itemList['itemCd'],
+                                'itemClsCd' => $itemList['itemClsCd'],
+                                'itemNmme' => $itemList['itemNmme'],
+                                'bcd' => $itemList['bcd'],
+                                'supplrItemClsCd' => $itemList['supplrItemClsCd'],
+                                'supplrItemCd' => $itemList['supplrItemCd'],
+                                'supplrItemNm' => $itemList['supplrItemNm'],
+                                'pkgUnitCd' => $itemList['pkgUnitCd'],
+                                'pkg' => $itemList['pkg'],
+                                'qtyUnitCd' => $itemList['qtyUnitCd'],
+                                'qty' => $itemList['qty'],
+                                'unitprice' => $itemList['unitprice'],
+                                'supplyMmt' => $itemList['supplyAmt'],
+                                'discountRate' => $itemList['discountRate'],
+                                'discountAmt' => $itemList['discountAmt'],
+                                'taxblAmt' => $itemList['taxblAmt'],
+                                'taxTyCd' => $itemList['taxTyCd'],
+                                'taxAmt' => $itemList['taxAmt'],
+                                'totAmt' => $itemList['totAmt'],
+                                'itemExprDt' => $itemList['itemExprDt'],
+                            ]);
+                        }
+                    }
+                }
+
+                // Redirect back to the page with the filtered purchases
+                $filteredPurchases = MappedPurchases::where('purchaseDate', $date)->get();
+                return view('purchase.mapPurchases', compact('filteredPurchases'));
+            } else {
+                // Handle the API request failure
+                return redirect()->back()->with(['error', 'Failed to fetch Any Searched Purchases By Date from the API']);
+            }
+        } catch (\Exception $e) {
+            // Log the exception
+            \Log::error($e);
+            \Log::error('An error occurred while searching Purchases By Date: ' . $e->getMessage());
+            // Handle the exception and provide feedback to the user
+            return back()->withErrors(['api_error' => $e->getMessage()]);
         }
     }
 
