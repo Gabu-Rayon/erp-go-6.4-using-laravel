@@ -171,7 +171,7 @@
         showSuccessPopup(`{{ __('New mapPurchases added to database') }} <br> {{ __('New data count') }}: ${data.newData.length}`);
         setTimeout(location.reload, 3000);
       } else {
-        showInfoPopup('{{ __('Database is up to date') }}');
+        showInfoPopup('{{ __('Database is up to date. No new mapped purchase data added.') }}');
       }
     } catch (error) {
       showErrorPopup(error.message);

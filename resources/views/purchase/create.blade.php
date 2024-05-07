@@ -456,6 +456,8 @@
                                     <td>
                                         {{ Form::label('supplritemClsCode', __('Supplier Item Cls Code'), ['class' => 'form-label']) }}
                                         {{ Form::text('supplrItemClsCode', null, ['class' => 'form-control', 'required' => 'required']) }}
+                                         <small  class="text-dark">Supplier Item Cls Code length must be 8 characters
+                                         </small>
                                     </td>
                                     <td>
                                         {{ Form::label('supplierItemCode', __('Supplier Item Code'), ['class' => 'form-label']) }}

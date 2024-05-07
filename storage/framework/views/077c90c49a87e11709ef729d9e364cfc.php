@@ -503,6 +503,8 @@
 
                                         <?php echo e(Form::text('supplrItemClsCode', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
+                                         <small  class="text-dark">Supplier Item Cls Code length must be 8 characters
+                                         </small>
                                     </td>
                                     <td>
                                         <?php echo e(Form::label('supplierItemCode', __('Supplier Item Code'), ['class' => 'form-label'])); ?>
