@@ -49,7 +49,7 @@ class StockAdjustmentListController extends Controller
 
             $url = 'https://etims.your-apps.biz/api/StockAdjustment';
 
-            $response = Http::withHeaders([
+            $response = Http::withOptions(['verify' => false])->withHeaders([
                 'key' => '123456',
                 'accept' => '*/*',
                 'Content-Type' => 'application/json'
@@ -60,8 +60,10 @@ class StockAdjustmentListController extends Controller
             ]);
 
             \Log::info('STOCK ADJ API RESPONSE');
-            \lOG::info($response);
-            return  redirect()->to('stockadjustment.index')->with('success', 'Stock Adjustment Added.');
+            \lOG::info($response['data']);
+
+
+            return  redirect()->to('stockadjustment')->with('success', 'Stock Adjustment Added.');
         } catch(\Exception $e) {
             return  redirect()->back()->with('error', $e->getMessage());
         }

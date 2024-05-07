@@ -1784,5 +1784,4 @@
         </div>
     </div>
 </div>
-</nav>
-<?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/partials/admin/menu.blade.php ENDPATH**/ ?>
+</nav><?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/partials/admin/menu.blade.php ENDPATH**/ ?>

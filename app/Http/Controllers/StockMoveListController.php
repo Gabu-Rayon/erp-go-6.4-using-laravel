@@ -60,14 +60,22 @@ class StockMoveListController extends Controller
 
             $url = 'https://etims.your-apps.biz/api/StockUpdate/ByInvoiceNo?InvoiceNo=' . $data['invoiceNo'];
 
-            $response = Http::withHeaders([
+            $response = Http::withOptions(['verify' => false])->withHeaders([
                 'key' => '123456',
                 'accept' => '*/*',
                 'Content-Type' => 'application/json'
             ])->post($url);
 
             \Log::info('STOCK INV NO API RESPONSE');
-            \lOG::info($response);
+            \Log::info($response);
+
+            if ($response['errors']) {
+                if ($response['errors']['InvoiceNo']) {
+                    $err = $response['errors']['InvoiceNo'][0];
+                    \Log::info($err);
+                    return redirect()->to('stockinfo')->with('error', 'Invalid Invoice Number');
+                }
+            }
 
             return redirect()->to('stockinfo')->with('success', 'Updated Successfully');
         } catch (\Exception $e) {

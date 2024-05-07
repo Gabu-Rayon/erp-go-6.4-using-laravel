@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sales;
+use App\Models\SalesTypeCode;
+use App\Models\PaymentTypeCodes;
+use App\Models\InvoiceStatusCode;
+use App\Models\Customer;
 use App\Models\SalesItems;
 use App\Models\ItemInformation;
 use App\Http\Controllers\Controller;
@@ -32,7 +36,17 @@ class SalesController extends Controller
     {
         try {
             $items = ItemInformation::all()->pluck('itemNm', 'itemCd');
-            return view('sales.create', compact('items'));
+            $salesTypeCodes = SalesTypeCode::all()->pluck('value', 'code');
+            $paymentTypeCodes = PaymentTypeCodes::all()->pluck('value', 'code');
+            $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('value', 'code');
+            $customers = Customer::all()->pluck('name', 'name');
+            return view('sales.create', compact(
+                'items',
+                'salesTypeCodes',
+                'customers',
+                'paymentTypeCodes',
+                'invoiceStatusCodes'
+            ));
         } catch (\Exception $e) {
             \Log::info('Sales Create Render Error');
             \Log::info($e);
@@ -52,7 +66,7 @@ class SalesController extends Controller
             $data = $request->all();
             $url = 'https://etims.your-apps.biz/api/AddSale';
 
-            $response = Http::withHeaders([
+            $response = Http::withOptions(['verify' => false])->withHeaders([
                 'key' => '123456'
                 ])->post($url, $data);
 
