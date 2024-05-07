@@ -1,17 +1,18 @@
-@extends('layouts.admin')
 
-@section('page-title')
-    {{ __('Add Composition List') }}
-@endsection
 
-@section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-    <li class="breadcrumb-item"><a href="{{ route('compositionlist.index') }}">{{ __('Composition List') }}</a></li>
-    <li class="breadcrumb-item">{{ __('Add Composition List') }}</li>
-@endsection
-@push('script-page')
-    <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.repeater.min.js') }}"></script>
+<?php $__env->startSection('page-title'); ?>
+    <?php echo e(__('Add Composition List')); ?>
+
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('breadcrumb'); ?>
+    <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
+    <li class="breadcrumb-item"><a href="<?php echo e(route('compositionlist.index')); ?>"><?php echo e(__('Composition List')); ?></a></li>
+    <li class="breadcrumb-item"><?php echo e(__('Add Composition List')); ?></li>
+<?php $__env->stopSection(); ?>
+<?php $__env->startPush('script-page'); ?>
+    <script src="<?php echo e(asset('js/jquery-ui.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('js/jquery.repeater.min.js')); ?>"></script>
     <script>
         var selector = "body";
         if ($(selector + " .repeater").length) {
@@ -327,19 +328,22 @@
             $(".discount").change();
         });
     </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="row">
-        {{ Form::open(['url' => 'compositionlist', 'class' => 'w-100']) }}
+        <?php echo e(Form::open(['url' => 'compositionlist', 'class' => 'w-100'])); ?>
+
         <div class="col-12">
-            <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
+            <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
             <div class="card">
                 <div class="card-body">
                     <div class="row">
                         <div class="form-group col-md-12">
-                            {{ Form::label('mainItemCode', __('Main Item Code (*)'), ['class' => 'form-label']) }}
-                            {{ Form::select('mainItemCode', $mainItemCode, null, ['class' => 'form-control']) }}
+                            <?php echo e(Form::label('mainItemCode', __('Main Item Code (*)'), ['class' => 'form-label'])); ?>
+
+                            <?php echo e(Form::select('mainItemCode', $mainItemCode, null, ['class' => 'form-control'])); ?>
+
                         </div>
                     </div>
                 </div>
@@ -347,7 +351,7 @@
         </div>
 
         <div class="col-12">
-            <h5 class=" d-inline-block mb-4">{{ __('Product & Services') }}</h5>
+            <h5 class=" d-inline-block mb-4"><?php echo e(__('Product & Services')); ?></h5>
             <div class="card repeater">
                 <div class="item-section py-2">
                     <div class="row justify-content-between align-items-center">
@@ -355,7 +359,8 @@
                             <div class="all-button-box me-2">
                                 <a href="#" data-repeater-create="" class="btn btn-primary" data-bs-toggle="modal"
                                     data-target="#add-bank">
-                                    <i class="ti ti-plus"></i> {{ __('Add item') }}
+                                    <i class="ti ti-plus"></i> <?php echo e(__('Add item')); ?>
+
                                 </a>
                             </div>
                         </div>
@@ -369,12 +374,16 @@
                             <tbody class="ui-sortable" data-repeater-item data-clone>
                                 <tr>
                                     <td class="form-group col-md-4">
-                                        {{ Form::label('compoItemCode', __('Composition Item Code'), ['class' => 'form-label']) }}
-                                        {{ Form::select('compoItemCode', $compoItemCode, null, ['class' => 'form-control']) }}
+                                        <?php echo e(Form::label('compoItemCode', __('Composition Item Code'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::select('compoItemCode', $compoItemCode, null, ['class' => 'form-control'])); ?>
+
                                     </td>
                                     <td class="form-group col-md-4">
-                                        {{ Form::label('quantity', __('Quantity'),['class'=>'form-label']) }}
-                                        {{ Form::number('quantity', '', array('class' => 'form-control', 'required' => 'required')) }}
+                                        <?php echo e(Form::label('quantity', __('Quantity'),['class'=>'form-label'])); ?>
+
+                                        <?php echo e(Form::number('quantity', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+
                                     </td>
                                     <td class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
                                 </tr>
@@ -386,10 +395,13 @@
         </div>
 
         <div class="modal-footer">
-            <input type="button" value="{{ __('Cancel') }}" onclick="location.href = '{{ route('purchase.index') }}';"
+            <input type="button" value="<?php echo e(__('Cancel')); ?>" onclick="location.href = '<?php echo e(route('purchase.index')); ?>';"
                 class="btn btn-light">
-            <input type="submit" value="{{ __('Create') }}" class="btn  btn-primary">
+            <input type="submit" value="<?php echo e(__('Create')); ?>" class="btn  btn-primary">
         </div>
-        {{ Form::close() }}
+        <?php echo e(Form::close()); ?>
+
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/compositionlist/create.blade.php ENDPATH**/ ?>

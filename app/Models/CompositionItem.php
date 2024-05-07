@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class CompositionItem extends Model
 {
-    protected $fillable = ['compoItemCode', 'compoItemQty'];
-
-    public function mainItem()
-    {
-        return $this->belongsTo(MainItem::class);
-    }
+    protected $table = 'composition_items';
+    protected $fillable = [
+        'mainItemCode',
+        'compoItemCode',
+        'compoItemQty'
+    ];
 }
