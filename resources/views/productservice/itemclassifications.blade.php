@@ -29,7 +29,7 @@
                                     <th>{{ __('Name') }}</th>
                                     <th>{{ __('Level') }}</th>
                                     <th>{{ __('useYn') }}</th>
-                                    <th>{{ __('Action') }}</th>
+                                    <th>{{ __('Mapping') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -37,10 +37,10 @@
                                     <tr class="font-style">
                                         <td>{{$classification->id }}</td>
                                         <td>{{ $classification->itemClsCd }}</td>
-                                        <td>{{$classification->itemClsNm}}</td>
+                                        <td class="text-wrap">{{$classification->itemClsNm}}</td>
                                         <td>{{$classification->itemClsLvl }}</td>
-                                        <td>{{$classification->useYn}}</td>
-                                        <td></td>
+                                        <td>{{ $classification->useYn }}</td>
+                                        <td>{{$classification->mapping}}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

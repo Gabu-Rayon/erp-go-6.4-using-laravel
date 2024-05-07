@@ -16,7 +16,7 @@
 
 @section('action-btn')
     <div class="float-end">
-       <a href="#" data-size="lg" data-url="{{ route('compositionlist.create') }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Create')}}" data-title="{{__('Create Composition List Form Sample')}}" class="btn btn-sm btn-primary">
+       <a href="{{ route('compositionlist.create') }}" data-size="lg" data-bs-toggle="tooltip" title="{{__('Create')}}" data-title="{{__('Create Composition List Form Sample')}}" class="btn btn-sm btn-primary">
             <i class="ti ti-plus"></i>
         </a>
     </div>
@@ -37,11 +37,11 @@
                         </tr>
                         </thead>
                         <tbody class="list">
-                        @foreach ($compositionslist as $compositionlist)
+                        @foreach ($compositionslistitems as $compositionlistitem)
                             <tr>
-                                <td>{{ $compositionlist->mainItemCode }}</td>
-                  <td>{{ json_decode($compositionlist->compositionItems, true)[0]['compoItemCode'] }}</td>
-            <td>{{ json_decode($compositionlist->compositionItems, true)[0]['compoItemQty'] }}</td>
+                                <td>{{ $compositionlistitem->mainItemCode }}</td>
+                                <td>{{ $compositionlistitem->compoItemCode }}</td>
+                                <td>{{ $compositionlistitem->compoItemQty }}</td>
                             </tr>
                         @endforeach
                         </tbody>

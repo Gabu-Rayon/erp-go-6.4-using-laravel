@@ -30,7 +30,7 @@
                                     <th><?php echo e(__('Name')); ?></th>
                                     <th><?php echo e(__('Level')); ?></th>
                                     <th><?php echo e(__('useYn')); ?></th>
-                                    <th><?php echo e(__('Action')); ?></th>
+                                    <th><?php echo e(__('Mapping')); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -38,10 +38,10 @@
                                     <tr class="font-style">
                                         <td><?php echo e($classification->id); ?></td>
                                         <td><?php echo e($classification->itemClsCd); ?></td>
-                                        <td><?php echo e($classification->itemClsNm); ?></td>
+                                        <td class="text-wrap"><?php echo e($classification->itemClsNm); ?></td>
                                         <td><?php echo e($classification->itemClsLvl); ?></td>
                                         <td><?php echo e($classification->useYn); ?></td>
-                                        <td></td>
+                                        <td><?php echo e($classification->mapping); ?></td>
                                     </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>
