@@ -23,7 +23,9 @@ return new class extends Migration
             $table->string('pmtTyCd')->nullable();
             $table->dateTime('cfmDt')->nullable(); 
             $table->dateTime('salesDt')->nullable(); 
-            $table->dateTime('stockRlsDt')->nullable(); 
+            $table->dateTime('stockRlsDt')->nullable();
+            $table->string('warehouseDate')->nullable();
+            $table->string('warehouse')->nullable();            
             $table->string('totItemCnt')->nullable();
             $table->decimal('taxblAmtA', 10, 2)->nullable();
             $table->decimal('taxblAmtB', 10, 2)->nullable();

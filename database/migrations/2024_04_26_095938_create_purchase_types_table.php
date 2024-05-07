@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('purchase_types_code', function (Blueprint $table) {
             $table->id();
             $table->string('purchase_type_code');
+            $table->string('code');
             $table->timestamps();
         });
     }

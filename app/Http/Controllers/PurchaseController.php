@@ -154,6 +154,9 @@ class PurchaseController extends Controller
             // Construct itemsDataList array
             $itemsDataList = [];
             foreach ($request->input('items') as $item) {
+                $itemExprDt = str_replace('-', '', $item['itemExprDt']);
+                $itemExprDt = date('Ymd', strtotime($itemExprDt));
+
                 $itemsDataList[] = [
                     "itemCode" => $item['itemCode'],
                     "supplrItemClsCode" => $item['supplrItemClsCode'],
@@ -164,7 +167,7 @@ class PurchaseController extends Controller
                     "pkgQuantity" => $item['pkgQuantity'],
                     "discountRate" => $item['discount'],
                     "discountAmt" => $item['discountAmt'],
-                    "itemExprDt" => $item['itemExprDt'],
+                    "itemExprDt" => $itemExprDt,
                 ];
             }
             $requestData = [
@@ -223,7 +226,9 @@ class PurchaseController extends Controller
                     'pmtTyCd' => $request->input('pmtTypeCode') ?? null,
                     'cfmDt' => $request->input('confirmDate') ?? null,
                     'salesDt' => $request->input('purchDate') ?? null,
-                    'stockRlsDt' => $request->input('warehouseDate'),
+                    'stockRlsDt' => $request->input('warehouseDate') ?? null,
+                    'warehouseDate'  => $request->input('warehouseDate') ?? null,
+                    'warehouse' => $request->input('warehouse') ?? null,
                     //For totItemCnt  are total item posted in the  Purchase_Sales_Items Model
                     'totItemCnt' => count($request->input('items')),
                     // 'totItemCnt' => count($itemsDataList),
@@ -498,9 +503,9 @@ class PurchaseController extends Controller
         $countries = Details::where('cdCls', '05')->get();
         // Fetch countries data from the Details model where cdCls is 05
         $countries = Details::where('cdCls', '05')->get()->pluck('cdNm', 'cdVal');
-        $paymentTypeCodes = PaymentTypeCodes::get()->pluck('payment_type_code', 'payment_type_code');
-        $purchaseTypeCodes = PurchaseTypeCodes::get()->pluck('purchase_type_code', 'purchase_type_code');
-        $purchaseStatusCodes = PurchaseStatusCodes::get()->pluck('purchase_status_code', 'purchase_status_code');
+        $paymentTypeCodes = PaymentTypeCodes::get()->pluck('payment_type_code', 'code');
+        $purchaseTypeCodes = PurchaseTypeCodes::get()->pluck('purchase_type_code', 'code');
+        $purchaseStatusCodes = PurchaseStatusCodes::get()->pluck('purchase_status_code', 'code');
         $ReceiptTypesCodes = ReceiptTypeCodes::get()->pluck('receipt_type_code', 'receipt_type_code');
 
         return view('purchase.create', compact('venders', 'product_services_Codes', 'paymentTypeCodes', 'purchaseTypeCodes', 'purchaseStatusCodes', 'ReceiptTypesCodes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
