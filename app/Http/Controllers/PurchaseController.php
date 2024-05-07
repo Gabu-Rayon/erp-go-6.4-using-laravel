@@ -1343,69 +1343,88 @@ class PurchaseController extends Controller
 
     public function mapPurchase(Request $request)
     {
-        // Log received request data
-        \Log::info('Received request data From Mapping Purchases:', $request->all());
+       try {
+         // Log received request data
+         \Log::info('Received request data From Mapping Purchases:', $request->all());
 
-        if (\Auth::user()->can('create purchase')) {
-            $rules = [
-                'supplierInvcNo' => 'required',
-                'purchaseTypeCode' => 'required',
-                'purchaseStatusCode' => 'required',
-                'itemCode.*' => 'required',
-                'supplierItemCode.*' => 'required',
-            ];
-
-            // Validate request data
-            $validator = \Validator::make($request->all(), $rules);
-
-            if ($validator->fails()) {
-                $messages = $validator->getMessageBag();
-                return redirect()->route('purchase.index')->with('error', $messages->first());
-            }
-
-            // Construct itemPurchases array
-            $itemPurchases = [];
-            foreach ($request->input('itemCode') as $key => $itemCode) {
-                $itemPurchases[] = [
-                    'supplierItemCode' => $request->input('supplierItemCode')[$key],
-                    'itemCode' => $itemCode,
-                ];
-            }
-
-            $requestData = [
-                'supplierInvcNo' => $request->input('supplierInvcNo'),
-                'purchaseTypeCode' => $request->input('purchaseTypeCode'),
-                'purchaseStatusCode' => $request->input('purchaseStatusCode'),
-                'itemPurchases' => $itemPurchases,
-            ];
-
-            // Log request data
-            \Log::info('API Request Mapping Purchase Data Posted:', $requestData);
-
-            // Send request to API endpoint
-            // $response = Http::post('https://etims.your-apps.biz/api/MapPurchase', $requestData);
-
-            $response = Http::withHeaders([
-                'accept' => 'application/json',
-                'key' => '123456',
-                'Content-Type' => 'application/json',
-            ])->post('https://etims.your-apps.biz/api/MapPurchase', $requestData);
-
-
-
-            // Log response data
-            \Log::info('API Response Status Code For Posting Mapping Purchase Data: ' . $response->status());
-            \Log::info('API Response Body For Posting Mapping Purchase Data: ' . $response->body());
-
-            // Check if the request was successful
-            if ($response->successful()) {
-                return redirect()->back()->with('success', 'Purchase Mapped Successfully');
-            } else {
-                return redirect()->back()->with('error', 'Failed to Map Purchase. Please try again.');
-            }
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
-        }
+         if (\Auth::user()->can('create purchase')) {
+             $rules = [
+                 'supplierInvcNo' => 'required',
+                 'purchaseTypeCode' => 'required',
+                 'purchaseStatusCode' => 'required',
+                 'itemCode.*' => 'required',
+                 'supplierItemCode.*' => 'required',
+             ];
+ 
+             // Validate request data
+             $validator = \Validator::make($request->all(), $rules);
+ 
+             if ($validator->fails()) {
+                 $messages = $validator->getMessageBag();
+                 return redirect()->route('purchase.index')->with('error', $messages->first());
+             }
+ 
+             // Construct itemPurchases array
+             $itemPurchases = [];
+             foreach ($request->input('itemCode') as $key => $itemCode) {
+                 $itemPurchases[] = [
+                     'supplierItemCode' => $request->input('supplierItemCode')[$key],
+                     'itemCode' => $itemCode,
+                 ];
+             }
+ 
+             $requestData = [
+                 'supplierInvcNo' => $request->input('supplierInvcNo'),
+                 'purchaseTypeCode' => $request->input('purchaseTypeCode'),
+                 'purchaseStatusCode' => $request->input('purchaseStatusCode'),
+                 'itemPurchases' => $itemPurchases,
+             ];
+ 
+             // Log request data
+             \Log::info('API Request Mapping Purchase Data Posted:', $requestData);
+ 
+             // Send request to API endpoint
+             // $response = Http::post('https://etims.your-apps.biz/api/MapPurchase', $requestData);
+ 
+             $response = Http::withHeaders([
+                 'accept' => 'application/json',
+                 'key' => '123456',
+                 'Content-Type' => 'application/json',
+             ])->post('https://etims.your-apps.biz/api/MapPurchase', $requestData);
+ 
+ 
+ 
+             // Log response data
+             \Log::info('API Response Status Code For Posting Mapping Purchase Data: ' . $response->status());
+             \Log::info('API Response Body For Posting Mapping Purchase Data: ' . $response->body());
+ 
+             // Check if the request was successful
+             if ($response->successful()) {
+                 $endpoint = 'https://etims.your-apps.biz/api/MapPurchase/UpdateMapPurchaseStatus';
+ 
+                 $secondResponse = Http::withHeaders([
+                     'accept' => 'application/json',
+                     'key' => '123456',
+                     'Content-Type' => 'application/json',
+                 ])->post($endpoint, [
+                     'invoiceNo' => $request->input('supplierInvcNo'),
+                     'isUpdate' => true
+                 ]);
+ 
+                 \Log::info($secondResponse);
+ 
+                 return redirect()->back()->with('success', 'Purchase Mapped Successfully');
+             } else {
+                 return redirect()->back()->with('error', 'Failed to Map Purchase. Please try again.');
+             }
+         } else {
+             return redirect()->back()->with('error', __('Permission denied.'));
+         }
+       } catch (\Exception $e) {
+            \Log::info($e);
+            
+            return redirect()->back()->with('error', 'Something Went Wrong.');
+       }
     }
 
     public function searchByDate(Request $request)
