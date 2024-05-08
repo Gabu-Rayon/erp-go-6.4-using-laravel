@@ -63,125 +63,47 @@
         $(document).ready(function() {
             $(document).on('change', '.itemCode', function() {
                 var item_id = $(this).val();
-                var url = $(this).data('url');
+                var url = `http://localhost:8000/getitem/${item_id}`;
                 var el = $(this).closest('[data-clone]');
 
                 if (el.length) {
-                    console.log("Change event triggered for.itemCode[data-clone]");
-
-                    console.log("item_id:", item_id);
-                    console.log("url:", url);
-                    console.log("el:", el);
-
                     $.ajax({
                         url: url,
-                        type: 'POST',
+                        type: 'GET',
                         headers: {
                             'X-CSRF-TOKEN': jQuery('#token').val()
-                        },
-                        data: {
-                            'itemCode': item_id
                         },
                         cache: false,
                         success: function(data) {
                             try {
-                                console.log("Item information:", data.data);
 
                                 if (!data.data) {
-                                    console.log("Item information is empty.");
+                                    alert("Item information is empty.");
                                 } else {
-                                    console.log("Item information is not empty. Processing...");
-
                                     var item = data.data;
 
-                                    console.log("Item object:", item);
-
                                     if (Object.keys(item).length === 0) {
-                                        console.log("Item object is empty.");
+                                        alert("Item object is empty.");
                                     } else {
-                                        console.log(
-                                            "Item object is not empty. Populating fields..."
-                                        );
 
-                                        // Populate fields only for the current cloned form
-                                        console.log("Populating unitPrice:", item.dftPrc);
+                                        el.find('.itemClassCode').val(item.itemClsCd);
+
+                                        el.find('.itemTypeCode').val(item.itemTyCd);
+
+                                        el.find('.itemName').val(item.itemNm);
+
+                                        el.find('.orgnNatCd').val(item.orgnNatCd);
+
+                                        el.find('.taxTypeCode').val(item.taxTyCd);
+                                        
                                         el.find('.unitPrice').val(item.dftPrc);
 
+                                        el.find('.isrcAplcbYn').val(item.isrcAplcbYn);
 
-                                        console.log("Populating tax:", item.taxTyCd);
-                                        el.find('.tax').val(item.taxTyCd);
+                                        el.find('.pkgUnitCode').val(item.pkgUnitCd);
 
-                                        console.log("Populating itemClsCd:", item
-                                            .itemClsCd);
-                                        el.find('.itemClsCd').val(item.itemClsCd);
-
-                                        console.log("Populating itemNm:", item
-                                            .itemNm);
-                                        el.find('.itemNm').val(item.itemNm);
-
-                                        console.log("Populating Bcd:", item
-                                            .bcd);
-                                        el.find('.bcd').val(item.bcd);
-
-                                        console.log("Populating PkgUnitCd:", item
-                                            .pkgUnitCd);
-                                        el.find('.pkgUnitCd').val(item.pkgUnitCd);
-
-                                        // Calculate tax based on taxTyCd
-                                        var taxTyCd = item.taxTyCd;
-                                        var taxRate = 0;
-
-                                        if (taxTyCd === 'B') {
-                                            taxRate = 16; // VAT 16%
-                                        } else if (taxTyCd === 'E') {
-                                            taxRate = 8; // VAT 8%
-                                        }
-
-                                        // Calculate item tax price based on unit price and tax rate
-                                        var itemTaxPrice = parseFloat((taxRate / 100) * (item
-                                            .dftPrc * 1));
-                                        el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
-
-                                        // Update total tax rate and display
-                                        el.find('.itemTaxRate').val(taxRate.toFixed(2));
-
-                                        // Trigger change event for affected fields
-                                        el.find(
-                                                '.itemTaxRate,.discount,.itemTaxPrice,.taxes,.amount'
-                                            )
-                                            .trigger('change');
-
-
-                                        // Calculate item tax price based on unit price and tax rate
-                                        var itemTaxPrice = parseFloat((taxRate / 100) * (item
-                                            .dftPrc * 1));
-                                        el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
-
-                                        // Update total tax rate and display
-                                        el.find('.itemTaxRate').val(taxRate.toFixed(2));
-
-                                        // Trigger change event for affected fields
-                                        $('.itemTaxRate, .discount, .itemTaxPrice,.taxes,.amount')
-                                            .trigger(
-                                                'change');
-
-                                        // Calculate amount
-                                        var amount = parseFloat(item.dftPrc);
-                                        // Update total tax rate and display
-                                        el.find('.amount').val(taxRate.toFixed(2));
-
-                                        // Calculate subtotal
-                                        var subtotal = parseFloat(item.dftPrc);
-                                        // Update subtotal field
-                                        el.find('.subTotal').val(subtotal.toFixed(2));
-
-                                        // Calculate total amount
-                                        var totalAmount = subtotal + parseFloat(itemTaxPrice);
-                                        // Update total amount field
-                                        el.find('.totalAmount').val(totalAmount.toFixed(2));
-
-                                        // Update total tax field
-                                        el.find('.totalTax').val(itemTaxPrice.toFixed(2));
+                                        el.find('.qtyUnitCd').val(item.qtyUnitCd);
+                                     
                                     }
                                 }
                             } catch (error) {
@@ -194,126 +116,60 @@
                     });
                 }
             });
-            $(document).on('keyup change', '.quantity', function() {
-                // var el = $(this).closest('.row');
-                var el = $(this).closest('[data-clone]');
-                var quantity = parseFloat($(this).val());
-                var price = parseFloat($(el.find('.unitPrice')).val());
-                var discount = parseFloat($(el.find('.discount')).val()) ||
-                    0; // Use default value if discount is not provided
-                var totalItemPrice = (quantity * price) - discount;
-                var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
-                var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
-                $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
+            function calculateDiscountAmount(unitPrice, packageQuantity, quantity, discountRate) {
+        // Calculate the total price before discount
+        var totalPrice = unitPrice * quantity;
 
-                // Calculate total amount including tax
-                var totalAmount = itemTaxPrice + totalItemPrice;
-                $(el.find('.amount')).html(totalAmount.toFixed(2));
+        // Calculate the discounted price
+        var discountedPrice = totalPrice * (1 - discountRate);
 
-                // Update total tax price
-                var totalItemTaxPrice = 0;
-                el.siblings().find('.itemTaxPrice').each(function() {
-                    totalItemTaxPrice += parseFloat($(this).val());
-                });
-                el.parent().find('.totalTax').html(totalItemTaxPrice.toFixed(2));
+        // Calculate the discount amount
+        var discountAmount = totalPrice - discountedPrice;
 
-                // Update subtotal and total amount
-                var totalItemPrice = 0;
-                el.siblings().find('.quantity').each(function(index) {
-                    totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(
-                        this).val());
-                });
-                el.parent().find('.subTotal').html(totalItemPrice.toFixed(2));
-                var totalAmount = totalItemPrice + totalItemTaxPrice;
-                el.parent().find('.totalAmount').html(totalAmount.toFixed(2));
+        return discountAmount;
+    }
+
+    // Function to update discount amount field
+    function updateDiscountAmount(row) {
+        // Get values of required fields
+        var unitPrice = parseFloat(row.find('.unitPrice').val());
+        var packageQuantity = parseFloat(row.find('.pkgQuantity').val());
+        var quantity = parseFloat(row.find('.quantity').val());
+        var discountRate = parseFloat(row.find('.discountRate').val());
+
+        // Calculate discount amount
+        var discountAmt = calculateDiscountAmount(unitPrice, packageQuantity, quantity, discountRate) || 0;
+
+        // Update discount amount field
+        row.find('.discountAmt').val(discountAmt.toFixed(2));
+    }
+
+    // Event listener for change in unitPrice, pkgQuantity, quantity, and discountRate fields
+    $(document).on('keyup change', '.unitPrice, .pkgQuantity, .quantity, .discountRate', function() {
+        // Find the closest row containing the changed field
+        var row = $(this).closest('tr');
+
+        // Update discount amount for the row
+        updateDiscountAmount(row);
+    });
+
+    // Initial update of discount amount for existing rows
+            $('.repeater-item').each(function() {
+                updateDiscountAmount($(this));
             });
 
-            $(document).on('keyup change', '.unitPrice', function() {
-                // var el = $(this).closest('.row'); 
-                var el = $(this).closest('[data-clone]');
-                var price = parseFloat($(this).val());
-                var quantity = parseFloat($(el.find('.quantity')).val());
-                var discount = parseFloat($(el.find('.discount')).val()) ||
-                    0; // Use default value if discount is not provided
-                var totalItemPrice = (quantity * price) - discount;
+            $(document).on('keyup change', '.customerName', async function() {
+                var customer_id = $(this).val();
+                var url = `http://localhost:8000/getcustomer/${customer_id}`;
+                const response = await fetch(url);
+                const { data } = await response.json();
 
-                var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
-                var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
-                $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
+                console.log(data);
 
-                // Calculate total amount including tax
-                var totalAmount = itemTaxPrice + totalItemPrice;
-                $(el.find('.amount')).html(totalAmount.toFixed(2));
-
-                // Update subtotal and total amount
-                var totalItemPrice = 0;
-                el.siblings().find('.quantity').each(function(index) {
-                    totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(
-                        this).val());
-                });
-                el.parent().find('.subTotal').html(totalItemPrice.toFixed(2));
-                var totalItemTaxPrice = 0;
-                el.siblings().find('.itemTaxPrice').each(function() {
-                    totalItemTaxPrice += parseFloat($(this).val());
-                });
-                var totalAmount = totalItemPrice + totalItemTaxPrice;
-                el.parent().find('.totalAmount').html(totalAmount.toFixed(2));
-            });
-
-            $(document).on('keyup change', '.discount', function() {
-                var el = $(this).closest('[data-clone]'); // Find the closest clone form
-                var discountRate = parseFloat($(this).val()) || 0;
-
-                var price = parseFloat(el.find('.unitPrice').val());
-                var quantity = parseFloat(el.find('.quantity').val());
-
-                var totalItemPrice = (price * quantity) * (1 - discountRate / 100);
-                var itemTaxRate = parseFloat(el.find('.itemTaxRate').val());
-                var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
-                el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
-
-                var totalAmount = itemTaxPrice + totalItemPrice;
-                el.find('.amount').html(totalAmount.toFixed(2));
-
-                // Update total tax price
-                var totalItemTaxPrice = 0;
-                el.siblings().find('.itemTaxPrice').each(function() { // Find itemTaxPrice only in siblings
-                    totalItemTaxPrice += parseFloat($(this).val());
-                });
-                el.parent().find('.totalTax').html(totalItemTaxPrice.toFixed(2));
-
-                // Update subtotal and total amount
-                var totalItemPrice = 0;
-                el.siblings().find('.quantity').each(function(index) {
-                    totalItemPrice += parseFloat(el.siblings().find('.unitPrice').eq(index).val()) *
-                        parseFloat($(this).val());
-                });
-                el.parent().find('.subTotal').html(totalItemPrice.toFixed(2));
-
-                // Calculate total discount amount
-                var totalDiscountAmount = 0;
-                el.closest('[data-clone]').find('.quantity').each(function(index) {
-                    var discountRate = parseFloat($(this).closest('[data-clone]').find('.discount')
-                        .eq(index).val()) || 0;
-                    totalDiscountAmount += (parseFloat($(this).closest('[data-clone]').find(
-                            '.unitPrice').eq(index).val()) *
-                        parseFloat($(this).val())) * (discountRate / 100);
-                });
-
-                // Update total discount and Discount Amount input field for the closest cloned form
-                el.parent().find('.totalDiscount').html(totalDiscountAmount.toFixed(2));
-                el.closest('[data-clone]').find('.discountAmt').val(totalDiscountAmount.toFixed(2));
-
-                // Update total amount
-                var totalAmount = totalItemPrice + totalItemTaxPrice;
-                el.parent().find('.totalAmount').html(totalAmount.toFixed(2));
-            });
-
-            // Initialize Select2 for all select elements with the class 'select2'
-            $('.select2').select2({
-                templateResult: function(data) {
-                    var $option = $(data.element);
-                    return $option.data('text') || data.text;
+                if (data) {
+                    $('.customerTin').val(data.customerTin);
+                    $('.customerNo').val(data.customerNo);
+                    $('.customerMobileNo').val(data.contact);
                 }
             });
         });
@@ -335,63 +191,67 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             {{ Form::label('customerName', __('Customer Name (*)'), ['class' => 'form-label']) }}
-                            {{ Form::select('customerName', $customers, null, ['class' => 'form-control', 'required' => 'required']) }}
+                            {{ Form::select('customerName', $customers, null, ['class' => 'form-control customerName', 'required' => 'required']) }}
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             {{ Form::label('customerTin', __('Customer Tin (*)'),['class'=>'form-label']) }}
-                            {{ Form::text('customerTin', '', array('class' => 'form-control', 'required' => 'required')) }}
-                        </div>
-                        <div class="form-group col-md-4">
+                            {{ Form::text('customerTin', '', array('class' => 'form-control customerTin', 'required' => 'required', 'readonly' => true)) }}
+                        </div> 
+                        <div class="form-group col-md-3">
                             {{ Form::label('customerNo', __('Customer Number'),['class'=>'form-label']) }}
-                            {{ Form::text('customerNo', '', array('class' => 'form-control')) }}
+                            {{ Form::text('customerNo', '', array('class' => 'form-control customerNo', 'readonly' => true)) }}
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             {{ Form::label('customerMobileNo', __('Customer Mobile Number'),['class'=>'form-label']) }}
-                            {{ Form::text('customerMobileNo', '', array('class' => 'form-control')) }}
+                            {{ Form::text('customerMobileNo', '', array('class' => 'form-control customerMobileNo', 'readonly' => true)) }}
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             {{ Form::label('salesType', __('Sales Type'), ['class' => 'form-label']) }}
                             {{ Form::select('salesType', $salesTypeCodes, null, ['class' => 'form-control']) }}
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             {{ Form::label('paymentType', __('Payment Type'), ['class' => 'form-label']) }}
                             {{ Form::select('paymentType', $paymentTypeCodes, null, ['class' => 'form-control']) }}
                         </div>
-                        <div class="form-group col-md-4">
-                            {{ Form::label('confirmDate', __('Confirm Date (*)'),['class'=>'form-label']) }}
-                            {{ Form::date('confirmDate', '', array('class' => 'form-control', 'required' => 'required')) }}
+                        <div class="form-group col-md-3">
+                            {{ Form::label('traderInvoiceNo', __('Trader Invoive No (*)'), ['class' => 'form-label']) }}
+                            {{ Form::text('traderInvoiceNo', '', array('class' => 'form-control traderInvoiceNo', 'required' => true)) }}
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
+                            {{ Form::label('confirmDate', __('Confirm Date (*)'),['class'=>'form-label']) }}
+                            {{ Form::datetime('confirmDate', '', array('class' => 'form-control', 'required' => 'required')) }}
+                        </div>
+                        <div class="form-group col-md-3">
                             {{ Form::label('salesDate', __('Sales Date (*)'),['class'=>'form-label']) }}
                             {{ Form::date('salesDate', '', array('class' => 'form-control', 'required' => 'required')) }}
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             {{ Form::label('stockReleseDate', __('Stock Release Date'),['class'=>'form-label']) }}
-                            {{ Form::date('stockReleseDate', '', array('class' => 'form-control')) }}
+                            {{ Form::datetime('stockReleseDate', '', array('class' => 'form-control')) }}
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             {{ Form::label('receiptPublishDate', __('Receipt Publish Date (*)'),['class'=>'form-label']) }}
-                            {{ Form::date('receiptPublishDate', '', array('class' => 'form-control', 'required' => 'required')) }}
+                            {{ Form::datetime('receiptPublishDate', '', array('class' => 'form-control', 'required' => 'required')) }}
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             {{ Form::label('occurredDate', __('Occurred Date (*)'),['class'=>'form-label']) }}
                             {{ Form::date('occurredDate', '', array('class' => 'form-control', 'required' => 'required')) }}
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             {{ Form::label('invoiceStatusCode', __('Invoice Status'), ['class' => 'form-label']) }}
                             {{ Form::select('invoiceStatusCode', $invoiceStatusCodes, null, ['class' => 'form-control']) }}
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             {{ Form::label('isPurchaseAccept', __('Purchase Accepted?'), ['class' => 'form-label']) }}
                             {{ Form::select('isPurchaseAccept', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control']) }}
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             {{ Form::label('isStockIOUpdate', __('Stock IO Update?'), ['class' => 'form-label']) }}
                             {{ Form::select('isStockIOUpdate', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control']) }}
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             {{ Form::label('mapping', __('Mapping'),['class'=>'form-label']) }}
                             {{ Form::text('mapping', '', array('class' => 'form-control')) }}
                         </div>
@@ -425,18 +285,66 @@
                             <thead>
                             </thead>
                             <tbody class="ui-sortable" data-repeater-item data-clone>
-                                <tr>
+                                <tr class="row p-3">
                                     <td class="form-group col-md-4">
-                                        {{ Form::label('itemCode', __('Item'), ['class' => 'form-label']) }}
-                                        {{ Form::select('itemCode', $items, null, ['class' => 'form-control']) }}
+                                        {{ Form::label('itemCode', __('Item (*)'), ['class' => 'form-label']) }}
+                                        {{ Form::select('itemCode', $items, null, ['class' => 'form-control itemCode', 'required' => 'required']) }}
                                     </td>
                                     <td class="form-group col-md-4">
-                                        {{ Form::label('packageQuantity', __('Package Quantity'),['class'=>'form-label']) }}
-                                        {{ Form::text('packageQuantity', '', array('class' => 'form-control', 'required' => 'required')) }}
+                                        {{ Form::label('itemClassCode', __('Item Quantity'),['class'=>'form-label']) }}
+                                        {{ Form::text('itemClassCode', '', array('class' => 'form-control itemClassCode', 'readonly' => true)) }}
                                     </td>
                                     <td class="form-group col-md-4">
-                                        {{ Form::label('quantity', __('Quantity'),['class'=>'form-label']) }}
-                                        {{ Form::text('quantity', '', array('class' => 'form-control', 'required' => 'required')) }}
+                                        {{ Form::label('itemTypeCode', __('Item Type Code'),['class'=>'form-label']) }}
+                                        {{ Form::text('itemTypeCode', '', array('class' => 'form-control itemTypeCode', 'readonly' => true)) }}
+                                    </td>
+                                    <td class="form-group col-md-4">
+                                        {{ Form::label('itemName', __('Item Name'),['class'=>'form-label']) }}
+                                        {{ Form::text('itemName', '', array('class' => 'form-control itemName', 'readonly' => true)) }}
+                                    </td>
+                                    <td class="form-group col-md-4">
+                                        {{ Form::label('orgnNatCd', __('Origin Nation Code'),['class'=>'form-label']) }}
+                                        {{ Form::text('orgnNatCd', '', array('class' => 'form-control orgnNatCd', 'readonly' => true)) }}
+                                    </td>
+                                    <td class="form-group col-md-4">
+                                        {{ Form::label('taxTypeCode', __('Tax Type Code'),['class'=>'form-label']) }}
+                                        {{ Form::text('taxTypeCode', '', array('class' => 'form-control taxTypeCode', 'readonly' => true)) }}
+                                    </td>
+                                    <td class="form-group col-md-4">
+                                        {{ Form::label('unitPrice', __('Unit Price (*)'),['class'=>'form-label']) }}
+                                        {{ Form::number('unitPrice', '', array('class' => 'form-control unitPrice', 'required' => 'required')) }}
+                                    </td>
+                                    <td class="form-group col-md-4">
+                                        {{ Form::label('isrcAplcbYn', __('ISRCAPLCBYN?'),['class'=>'form-label']) }}
+                                        {{ Form::select('isrcAplcbYn', [true => 'Yes', false => 'No'], null, ['class' => 'form-control isrcAplcbYn']) }}
+                                    </td>
+                                    <td class="form-group col-md-4">
+                                        {{ Form::label('pkgUnitCode', __('Package Unit Code'),['class'=>'form-label']) }}
+                                        {{ Form::text('pkgUnitCode', '', array('class' => 'form-control pkgUnitCode', 'readonly' => true)) }}
+                                    </td>
+                                    <td class="form-group col-md-4">
+                                        {{ Form::label('pkgQuantity', __('Package Quantity (*)'),['class'=>'form-label']) }}
+                                        {{ Form::number('pkgQuantity', '', array('class' => 'form-control pkgQuantity', 'required' => 'required')) }}
+                                    </td>
+                                    <td class="form-group col-md-4">
+                                        {{ Form::label('qtyUnitCd', __('Quantity Unit Code'),['class'=>'form-label']) }}
+                                        {{ Form::text('qtyUnitCd', '', array('class' => 'form-control qtyUnitCd', 'readonly' => true)) }}
+                                    </td>
+                                    <td class="form-group col-md-4">
+                                        {{ Form::label('quantity', __('Quantity (*)'),['class'=>'form-label']) }}
+                                        {{ Form::number('quantity', '', array('class' => 'form-control quantity', 'required' => 'required')) }}
+                                    </td>
+                                    <td class="form-group col-md-4">
+                                        {{ Form::label('discountRate', __('Discount Rate'),['class'=>'form-label']) }}
+                                        {{ Form::number('discountRate', '', array('class' => 'form-control discountRate', 'required' => 'required')) }}
+                                    </td>
+                                    <td class="form-group col-md-4">
+                                        {{ Form::label('discountAmt', __('Discount Amount'),['class'=>'form-label']) }}
+                                        {{ Form::number('discountAmt', '', array('class' => 'form-control discountAmt', 'readonly' => true)) }}
+                                    </td>
+                                    <td class="form-group col-md-4">
+                                        {{ Form::label('itemExprDate', __('Item Expiry Date'),['class'=>'form-label']) }}
+                                        {{Form::date('itemExprDate',null,array('class'=>'form-control'))}}
                                     </td>
                                     <td class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
                                 </tr>

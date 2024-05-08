@@ -12,7 +12,7 @@ use App\Models\ItemInformation;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-
+use App\Models\SalesCreditNoteItems;
 class SalesController extends Controller
 {
     /**
@@ -36,10 +36,10 @@ class SalesController extends Controller
     {
         try {
             $items = ItemInformation::all()->pluck('itemNm', 'itemCd');
-            $salesTypeCodes = SalesTypeCode::all()->pluck('value', 'code');
-            $paymentTypeCodes = PaymentTypeCodes::all()->pluck('value', 'code');
-            $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('value', 'code');
-            $customers = Customer::all()->pluck('name', 'name');
+            $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeValue', 'saleTypeCode');
+            $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'code');
+            $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusValue', 'invoiceStatusCode');
+            $customers = Customer::all()->pluck('name', 'customer_id');
             return view('sales.create', compact(
                 'items',
                 'salesTypeCodes',
@@ -60,20 +60,70 @@ class SalesController extends Controller
     public function store(Request $request)
     {
         try {
-            \Log::info('REQ DATA');
+            \Log::info('SALE REQ DATA');
             \Log::info($request->all());
 
             $data = $request->all();
+
+            $data = $request->all();
+
+            $itemsDataList = [];
+            foreach ($data['items'] as $item) {
+                \Log::info('SALE ITEM DATA');
+                \Log::info($item);
+                $itemExprDt = str_replace('-', '', $item['itemExprDate']);
+                $itemExprDate = date('Ymd', strtotime($itemExprDt));
+
+                $itemsDataList[] = [
+                    "itemCode" => $item['itemCode'],
+                    "itemClassCode" => $item['itemClassCode'],
+                    "itemTypeCode" => $item['itemTypeCode'],
+                    "itemName" => $item['itemName'],
+                    "orgnNatCd" => $item['orgnNatCd'],
+                    "taxTypeCode" => $item['taxTypeCode'],
+                    "unitPrice" => $item['unitPrice'],
+                    "isrcAplcbYn" => $item['isrcAplcbYn'],
+                    "pkgUnitCode" => $item['pkgUnitCode'],
+                    "pkgQuantity" => $item['pkgQuantity'],
+                    "qtyUnitCd" => $item['qtyUnitCd'],
+                    "quantity" => $item['quantity'],
+                    "discountRate" => $item['discountRate'],
+                    "discountAmt" => $item['discountAmt'],
+                    "itemExprDate" => $itemExprDate,
+                ];
+            }
+
+
             $url = 'https://etims.your-apps.biz/api/AddSale';
 
             $response = Http::withOptions(['verify' => false])->withHeaders([
                 'key' => '123456'
-                ])->post($url, $data);
+                ])->post($url, [
+                        "customerNo" => $data['customerNo'],
+                        "customerTin" => $data['customerTin'],
+                        "customerName" => $data['customerName'],
+                        "customerMobileNo" => $data['customerMobileNo'],
+                        "salesType" => $data['salesType'],
+                        "paymentType" => $data['paymentType'],
+                        "traderInvoiceNo" => $data['traderInvoiceNo'],
+                        "confirmDate" => str_replace('-', '', $data['confirmDate']),
+                        "salesDate" => str_replace('-', '', $data['salesDate']),
+                        "stockReleseDate" => str_replace('-', '', $data['stockReleseDate']),
+                        "receiptPublishDate" => str_replace('-', '', $data['receiptPublishDate']),
+                        "occurredDate" => str_replace('-', '', $data['occurredDate']),
+                        "invoiceStatusCode" => $data['invoiceStatusCode'],
+                        "remark" => $data['remark'],
+                        "isPurchaseAccept" => $data['isPurchaseAccept'],
+                        "isStockIOUpdate" => $data['isStockIOUpdate'],
+                        "mapping" => $data['mapping'],
+                        "saleItemList" => $itemsDataList
+                ]);
 
             \Log::info('SALES API RESPONSE');
             \Log::info($response);
+            \Log::info('SALES API DATE STUFF');
 
-            Sales::create([
+            $sale = Sales::create([
                 'customerName' => $data['customerName'],
                 'customerTin' => $data['customerTin'],
                 'customerNo' => $data['customerNo'],
@@ -93,11 +143,11 @@ class SalesController extends Controller
                 'remark' => $data['remark']
             ]);
 
-            $saleItems = $data['saleItemList'];
+            $saleItems = $data['items'];
 
-            foreach ($saleItems as $saleItem) {
+            foreach ($itemsDataList as $saleItem) {
                 SalesCreditNoteItems::create([
-                    'sales_credit_note_id' => $salesCreditNote->id,
+                    'sales_credit_note_id' => $sale->id,
                     'itemCode' => $saleItem['itemCode'],
                     'itemClassCode' => $saleItem['itemClassCode'],
                     'itemTypeCode' => $saleItem['itemTypeCode'],
@@ -115,17 +165,11 @@ class SalesController extends Controller
                     'itemExprDate' => $saleItem['itemExprDate'],
                 ]);
             }
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Sale Added Successfuly'
-            ]);
+            return redirect()->back()->with('success', 'Added Sale Successfully');
         } catch (\Exception $e) {
             \Log::info('ADD SALE ERROR');
             \Log::info($e);
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ]);
+            return redirect()->back()->with('error', 'Something Went Wrong');
         }
     }
 

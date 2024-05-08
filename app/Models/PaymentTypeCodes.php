@@ -11,7 +11,7 @@ class PaymentTypeCodes extends Model
 
     protected $table = 'payment_types_code';
     protected $fillable = [
-        'code',
-        'value'
+        'payment_type_code',
+        'code'
     ];
 }

@@ -223,7 +223,7 @@ class CustomerController extends Controller
                 'isUsed' => true,
                 'remark' => $request->remark,
             ];
-            $response = Http::withHeaders([
+            $response = Http::withOptions(['verify' => false])->withHeaders([
                 'accept' => 'application/json',
                 'Content-Type' => 'application/json',
                 'key' => '123456', 
@@ -649,7 +649,23 @@ class CustomerController extends Controller
         }
     }
 
-
-
-
+    public function getCustomer($id)
+    {
+        try {
+            $customerInfo = Customer::where('customer_id', $id)->first();
+            \Log::info('CUSTOMER');
+            \Log::info($customerInfo);
+            return response()->json([
+                'message' => 'success',
+                'data' => $customerInfo
+            ]);
+        } catch (\Exception $e) {
+            \Log::info('Get Item Error');
+            \Log::info($e);
+            return response()->json([
+                'message' => 'error',
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
 }
