@@ -19,7 +19,7 @@
             <div class="item-section py-2">
                 <div class="row justify-content-between align-items-center">
                     <div class="col-md-12 d-flex align-items-center justify-content-between justify-content-md-end">
-                        <div class="all-button-box me-2"><input type="submit" value="{{ __('Import to Purchase') }}"
+                        <div class="all-button-box me-2"><input type="submit" value="{{ __('Map Purchase') }}"
                                 class="btn  btn-primary">
                             <input type="button" value="{{ __('Cancel') }}"
                                 onclick="location.href = '{{ route('purchase.index') }}';" class="btn btn-danger">

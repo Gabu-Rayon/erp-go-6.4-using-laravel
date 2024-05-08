@@ -49,9 +49,10 @@ class PurchaseController extends Controller
 
         $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
         $vender->prepend('Select Vendor', '');
+        $status = Purchase::$statues;
         $purchases = Purchase_Sales::all();
 
-        return view('purchase.index', compact('purchases', 'vender'));
+        return view('purchase.index', compact('purchases', 'vender', 'status'));
     }
 
 
@@ -227,7 +228,7 @@ class PurchaseController extends Controller
                     'cfmDt' => $request->input('confirmDate') ?? null,
                     'salesDt' => $request->input('purchDate') ?? null,
                     'stockRlsDt' => $request->input('warehouseDate') ?? null,
-                    'warehouseDate'  => $request->input('warehouseDate') ?? null,
+                    'warehouseDate' => $request->input('warehouseDate') ?? null,
                     'warehouse' => $request->input('warehouse') ?? null,
                     //For totItemCnt  are total item posted in the  Purchase_Sales_Items Model
                     'totItemCnt' => count($request->input('items')),
@@ -609,18 +610,26 @@ class PurchaseController extends Controller
     //     }
     // }
 
-
     public function show($id)
     {
-
         if (\Auth::user()->can('show purchase')) {
             try {
                 \Log::info('ID');
                 \Log::info($id);
+
                 $purchase = Purchase_Sales::find($id);
                 \Log::info('PURCHASE');
                 \lOG::INFO($purchase);
-                return view('purchase.show', compact('purchase'));
+
+                // Check the status of the purchase
+                $status = $purchase->status;
+                if ($status == 4) {
+                    // If status is 'Paid', redirect to purchase.view
+                    return view('purchase.view', compact('purchase'));
+                } else {
+                    // For other statuses, render the show view
+                    return view('purchase.show', compact('purchase'));
+                }
             } catch (\Exception $e) {
                 \Log::error($e);
                 return redirect()->back()->with('error', __('Purchase Not Found.'));
@@ -629,6 +638,7 @@ class PurchaseController extends Controller
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
+
 
     public function details($spplrInvcNo)
     {
@@ -1347,88 +1357,96 @@ class PurchaseController extends Controller
 
     public function mapPurchase(Request $request)
     {
-       try {
-         // Log received request data
-         \Log::info('Received request data From Mapping Purchases:', $request->all());
+        try {
+            // Log received request data
+            \Log::info('Received request data From Mapping Purchases:', $request->all());
 
-         if (\Auth::user()->can('create purchase')) {
-             $rules = [
-                 'supplierInvcNo' => 'required',
-                 'purchaseTypeCode' => 'required',
-                 'purchaseStatusCode' => 'required',
-                 'itemCode.*' => 'required',
-                 'supplierItemCode.*' => 'required',
-             ];
- 
-             // Validate request data
-             $validator = \Validator::make($request->all(), $rules);
- 
-             if ($validator->fails()) {
-                 $messages = $validator->getMessageBag();
-                 return redirect()->route('purchase.index')->with('error', $messages->first());
-             }
- 
-             // Construct itemPurchases array
-             $itemPurchases = [];
-             foreach ($request->input('itemCode') as $key => $itemCode) {
-                 $itemPurchases[] = [
-                     'supplierItemCode' => $request->input('supplierItemCode')[$key],
-                     'itemCode' => $itemCode,
-                 ];
-             }
- 
-             $requestData = [
-                 'supplierInvcNo' => $request->input('supplierInvcNo'),
-                 'purchaseTypeCode' => $request->input('purchaseTypeCode'),
-                 'purchaseStatusCode' => $request->input('purchaseStatusCode'),
-                 'itemPurchases' => $itemPurchases,
-             ];
- 
-             // Log request data
-             \Log::info('API Request Mapping Purchase Data Posted:', $requestData);
- 
-             // Send request to API endpoint
-             // $response = Http::post('https://etims.your-apps.biz/api/MapPurchase', $requestData);
- 
-             $response = Http::withHeaders([
-                 'accept' => 'application/json',
-                 'key' => '123456',
-                 'Content-Type' => 'application/json',
-             ])->post('https://etims.your-apps.biz/api/MapPurchase', $requestData);
- 
- 
- 
-             // Log response data
-             \Log::info('API Response Status Code For Posting Mapping Purchase Data: ' . $response->status());
-             \Log::info('API Response Body For Posting Mapping Purchase Data: ' . $response->body());
- 
-             // Check if the request was successful
-             if ($response->successful()) {
-                 $endpoint = 'https://etims.your-apps.biz/api/MapPurchase/UpdateMapPurchaseStatus';
- 
-                 $secondResponse = Http::withHeaders([
-                     'accept' => 'application/json',
-                     'key' => '123456',
-                     'Content-Type' => 'application/json',
-                 ])->post($endpoint, [
-                     'invoiceNo' => $request->input('supplierInvcNo'),
-                     'isUpdate' => true
-                 ]);
- 
-                 \Log::info($secondResponse);
- 
-                 return redirect()->back()->with('success', 'Purchase Mapped Successfully');
-             } else {
-                 return redirect()->back()->with('error', 'Failed to Map Purchase. Please try again.');
-             }
-         } else {
-             return redirect()->back()->with('error', __('Permission denied.'));
-         }
-       } catch (\Exception $e) {
+            if (\Auth::user()->can('create purchase')) {
+                $rules = [
+                    'supplierInvcNo' => 'required',
+                    'purchaseTypeCode' => 'required',
+                    'purchaseStatusCode' => 'required',
+                    'itemCode.*' => 'required',
+                    'supplierItemCode.*' => 'required',
+                ];
+
+                // Validate request data
+                $validator = \Validator::make($request->all(), $rules);
+
+                if ($validator->fails()) {
+                    $messages = $validator->getMessageBag();
+                    return redirect()->route('purchase.index')->with('error', $messages->first());
+                }
+
+                // Construct itemPurchases array
+                $itemPurchases = [];
+                foreach ($request->input('itemCode') as $key => $itemCode) {
+                    $itemPurchases[] = [
+                        'supplierItemCode' => $request->input('supplierItemCode')[$key],
+                        'itemCode' => $itemCode,
+                    ];
+                }
+
+                $requestData = [
+                    'supplierInvcNo' => $request->input('supplierInvcNo'),
+                    'purchaseTypeCode' => $request->input('purchaseTypeCode'),
+                    'purchaseStatusCode' => $request->input('purchaseStatusCode'),
+                    'itemPurchases' => $itemPurchases,
+                ];
+
+                // Log request data
+                \Log::info('API Request Mapping Purchase Data Posted:', $requestData);
+
+                // Send request to API endpoint
+                // $response = Http::post('https://etims.your-apps.biz/api/MapPurchase', $requestData);
+
+                $response = Http::withHeaders([
+                    'accept' => 'application/json',
+                    'key' => '123456',
+                    'Content-Type' => 'application/json',
+                ])->post('https://etims.your-apps.biz/api/MapPurchase', $requestData);
+
+
+
+                // Log response data
+                \Log::info('API Response Status Code For Posting Mapping Purchase Data: ' . $response->status());
+                \Log::info('API Response Body For Posting Mapping Purchase Data: ' . $response->body());
+
+                // Check if the request was successful
+                if ($response->successful()) {
+                    // Update Purchase_Sales model where supplierInvcNo matches
+                    // Purchase_Sales::where('supplierInvcNo', $request->input('supplierInvcNo'))
+                    //     ->update(['isDBImport' => 1]);
+
+
+                    Purchase_Sales::where('supplierInvcNo', $request->input('supplierInvcNo'))
+                        ->update(['isDBImport' => true]);
+
+                    $endpoint = 'https://etims.your-apps.biz/api/MapPurchase/UpdateMapPurchaseStatus';
+
+                    $secondResponse = Http::withHeaders([
+                        'accept' => 'application/json',
+                        'key' => '123456',
+                        'Content-Type' => 'application/json',
+                    ])->post($endpoint, [
+                                'invoiceNo' => $request->input('supplierInvcNo'),
+                                'isUpdate' => true
+                            ]);
+
+                    \Log::info($secondResponse);
+
+                    return redirect()->back()->with('success', 'Purchase Mapped Successfully');
+                } else {
+                    return redirect()->back()->with('error', 'Failed to Map Purchase. Please try again.');
+                }
+            } else {
+                return redirect()->back()->with('error', __('Permission denied.'));
+            }
+        } catch (\Exception $e) {
             \Log::info($e);
-            
+
             return redirect()->back()->with('error', 'Something Went Wrong.');
-       }
+        }
     }
 
 
@@ -1643,7 +1661,7 @@ class PurchaseController extends Controller
                 if ($localPurchases->isEmpty()) {
                     // Insert the data into the local database
                     foreach ($filteredPurchases as $purchase) {
-                         MappedPurchases::create([
+                        MappedPurchases::create([
                             'mappedPurchaseId' => $purchase['id'],
                             'invcNo' => $purchase['invcNo'],
                             'orgInvcNo' => $purchase['orgInvcNo'],

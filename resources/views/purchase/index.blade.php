@@ -49,10 +49,10 @@
                                 <tr>
                                     <th> {{ __('SrNo') }}</th>
                                     <th> {{ __('SpplrTin') }}</th>
-                                    <th> {{ __('SpplrNm') }}</th>
                                     <th> {{ __('TotItemCnt') }}</th>
                                     <th>{{ __('CfmDt') }}</th>
-                                    <th>{{ __('IsDBImport') }}</th>
+                                    <th>{{ __('Is Mapped') }}</th>
+                                    <th>{{__('Status')}}</th>                                    
                                     @if (Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase'))
                                         <th> {{ __('Action') }}</th>
                                     @endif
@@ -63,7 +63,6 @@
                                     <tr>
                                         <td>{{ $purchase->id }}</td>
                                         <td>{{ $purchase->spplrTin }}</td>
-                                        <td>{{ $purchase->spplrNm }}</td>
                                         <td>{{ $purchase->totItemCnt }}</td>
                                         <td>{{ $purchase->cfmDt }}</td>
                                         <td>
@@ -77,6 +76,19 @@
                                                     class="purchase_status badge bg-warning p-2 px-3 rounded">Success</span>
                                             @endif
                                         </td>
+                                        <td>
+                                        @if($purchase->status == 0)
+                                            <span class="purchase_status badge bg-secondary p-2 px-3 rounded">Draft</span>
+                                        @elseif($purchase->status == 1)
+                                            <span class="purchase_status badge bg-warning p-2 px-3 rounded">Sent</span>
+                                        @elseif($purchase->status == 2)
+                                            <span class="purchase_status badge bg-danger p-2 px-3 rounded">UnPaid</span>
+                                        @elseif($purchase->status == 3)
+                                            <span class="purchase_status badge bg-info p-2 px-3 rounded">Partialy Paid</span>
+                                        @elseif($purchase->status == 4)
+                                            <span class="purchase_status badge bg-primary p-2 px-3 rounded">Paid</span>
+                                        @endif
+                                    </td>
                                         @if (Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase'))
                                             <td class="Action">
                                                 <span>
@@ -95,7 +107,7 @@
                                                             <a href="{{ route('purchase.details', ['spplrInvcNo' => $purchase->spplrInvcNo]) }}"
                                                                 class="mx-3 btn btn-sm align-items-center"
                                                                 data-bs-toggle="tooltip"
-                                                                title="{{ __('Map purchase Item to add to Purchase') }}"
+                                                                title="{{ __('Map Purchase') }}"
                                                                 data-original-title="{{ __('Detail') }}">
                                                                 <i class="ti ti-list text-white"></i></a>
                                                         </div>
