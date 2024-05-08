@@ -10,5 +10,8 @@ class PaymentTypeCodes extends Model
     use HasFactory;
 
     protected $table = 'payment_types_code';
-    protected $fillable = ['payment_type_code'];
+    protected $fillable = [
+        'code',
+        'value'
+    ];
 }

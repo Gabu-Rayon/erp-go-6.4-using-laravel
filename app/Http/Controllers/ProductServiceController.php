@@ -85,7 +85,7 @@ class ProductServiceController extends Controller
 
                 $url = 'https://etims.your-apps.biz/api/AddItemsList';
 
-                $response = Http::withHeaders([
+                $response = Http::withOptions(['verify' => false])->withHeaders([
                     'key' => '123456'
                 ])->post($url, $data['items']);
 

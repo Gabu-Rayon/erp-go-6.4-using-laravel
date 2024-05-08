@@ -9,6 +9,7 @@ class InvoiceStatusCode extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'invoiceStatusCode'
+        'code',
+        'value'
     ];
 }

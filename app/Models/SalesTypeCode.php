@@ -9,6 +9,7 @@ class SalesTypeCode extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'saleTypeCode'
+        'code',
+        'value'
     ];
 }

@@ -45,7 +45,7 @@ class CompositionListController extends Controller
 
             $url = 'https://etims.your-apps.biz/api/AddCompositionItemList';
 
-            $response = Http::withHeaders([
+            $response = Http::withOptions(['verify' => false])->withHeaders([
                 'key' => '123456',
             ])->post($url, [
                 'mainItemCode' => $mainItemCode,
@@ -53,6 +53,10 @@ class CompositionListController extends Controller
             ]);
 
             \Log::info($response);
+
+            if ($response["statusCode"] == 500) {
+                return redirect()->back()->with('error', 'Server Error');
+            }
 
             CompositionList::create([
                 'mainItemCode' => $mainItemCode
