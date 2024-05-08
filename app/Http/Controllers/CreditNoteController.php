@@ -237,4 +237,6 @@ class CreditNoteController extends Controller
         echo json_encode($invoice->getDue());
     }
 
+
+
 }

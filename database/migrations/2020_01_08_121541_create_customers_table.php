@@ -17,10 +17,16 @@ class CreateCustomersTable extends Migration
             'customers', function (Blueprint $table){
             $table->bigIncrements('id');
             $table->integer('customer_id');
+            $table->string('customerNo');
+            $table->string('customerTin');
             $table->string('name')->nullable();
             $table->string('email')->nullable();
+            $table->string('address');
             $table->string('tax_number')->nullable();
             $table->string('contact')->nullable();
+            $table->string('faxNo')->nullable();
+            $table->boolean('isUsed')->nullable();
+            $table->string('remark')->nullable();
             $table->string('avatar', 100)->default('');
             $table->integer('created_by')->default(0);
             $table->integer('is_active')->default(1);

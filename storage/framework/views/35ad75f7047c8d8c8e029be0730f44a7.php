@@ -176,7 +176,7 @@
         showSuccessPopup(`<?php echo e(__('New mapPurchases added to database')); ?> <br> <?php echo e(__('New data count')); ?>: ${data.newData.length}`);
         setTimeout(location.reload, 3000);
       } else {
-        showInfoPopup('<?php echo e(__('Database is up to date')); ?>');
+        showInfoPopup('<?php echo e(__('Database is up to date. No new mapped purchase data added.')); ?>');
       }
     } catch (error) {
       showErrorPopup(error.message);

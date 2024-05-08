@@ -515,6 +515,8 @@ Route::group(['middleware' => ['verified']], function () {
 
     Route::get('/invoices/preview/{template}/{color}', [InvoiceController::class, 'previewInvoice'])->name('invoice.preview');
     Route::post('/invoices/template/setting', [InvoiceController::class, 'saveTemplateSettings'])->name('template.setting');
+    Route::get('getSalesByTraderInvoiceNo', [InvoiceController::class, 'getSalesByTraderInvoiceNo'])->name('invoice.no.getSalesByTraderInvoiceNo');
+
 
     Route::group(
         [
@@ -526,6 +528,7 @@ Route::group(['middleware' => ['verified']], function () {
         ], function () {
             Route::get('credit-note', [CreditNoteController::class, 'index'])->name('credit.note');
             Route::get('custom-credit-note', [CreditNoteController::class, 'customCreate'])->name('invoice.custom.credit.note');
+             Route::get('custom-credit-note', [CreditNoteController::class, 'customCreate'])->name('invoice.custom.credit.note');
             Route::post('custom-credit-note', [CreditNoteController::class, 'customStore'])->name('invoice.custom.credit.note');
             Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('invoice.get');
             Route::get('invoice/{id}/credit-note', [CreditNoteController::class, 'create'])->name('invoice.credit.note');
@@ -535,6 +538,7 @@ Route::group(['middleware' => ['verified']], function () {
             Route::delete('invoice/{id}/credit-note/delete/{cn_id}', [CreditNoteController::class, 'destroy'])->name('invoice.delete.credit.note');
         }
     );
+    
 
     Route::group(
         [

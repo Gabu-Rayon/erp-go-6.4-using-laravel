@@ -17,13 +17,19 @@ class Customer extends Authenticatable
 
     protected $fillable = [
         'customer_id',
+        'customerNo',
+        'customerTin',
         'name',
         'email',
-        'password',
+        'address',
+        'tax_number',
         'contact',
+        'faxNo',
+        'isUsed',
+        'remark',
         'avatar',
-        'is_active',
         'created_by',
+        'is_active',
         'email_verified_at',
         'billing_name',
         'billing_country',
@@ -39,7 +45,11 @@ class Customer extends Authenticatable
         'shipping_phone',
         'shipping_zip',
         'shipping_address',
+        'lang',
+        'balance',
+        'remember_token',
     ];
+
 
     protected $hidden = [
         'password',

@@ -55,6 +55,7 @@ class InvoiceController extends Controller
                 $query->where('status', '=', $request->status);
             }
             $invoices = $query->get();
+            // $invoices = $query->all();
 
             return view('invoice.index', compact('invoices', 'customer', 'status'));
         } else {
@@ -1256,6 +1257,128 @@ class InvoiceController extends Controller
         ob_end_clean();
 
         return $data;
+    }
+
+
+
+    public function getSalesByTraderInvoiceNo(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'getSalesByTraderInvoiceNo' => 'required|numeric',
+        ]);
+
+        // Get the input value
+        $traderInvoiceNo = $request->getSalesByTraderInvoiceNo;
+
+        // Check if the invoice exists in the local database
+        $invoice = Invoice::where('trderInvoiceNo', $traderInvoiceNo)->first();
+
+        if (!$invoice) {
+            // If the invoice does not exist in the local database, fetch it from the API
+            $response = Http::withHeaders([
+                'accept' => '*/*',
+                'key' => '123456' 
+            ])->get('https://etims.your-apps.biz/api/GetSalesByTraderInvoiceNo', [
+                        'traderInvoiceNo' => $traderInvoiceNo
+                    ]);
+
+            $data = $response->json();
+
+            // Check if the response is successful
+            if ($response->ok()) {
+                // Map the API response data to local database columns
+                $mappedData = [
+                    'invoice_id' => $data['id'],
+                    'customer_id' => null, 
+                    'issue_date' => $data['salesDate'],
+                    'due_date' => $data['salesDate'],
+                    'send_date' => null,
+                    'category_id' => null,
+                    'ref_number' => $data['invoiceNo'],
+                    'status' => $data['salesSttsCode'],
+                    'shipping_display' => null,
+                    'discount_apply' => null,
+                    'created_by' => $data['regrId'], 
+                    'trderInvoiceNo' => $data['trderInvoiceNo'],
+                    'invoiceNo' => $data['invoiceNo'],
+                    'orgInvoiceNo' => $data['orgInvoiceNo'],
+                    'customerTin' => $data['customerTin'],
+                    'customerName' => $data['customerName'],
+                    'receptTypeCode' => $data['receptTypeCode'],
+                    'paymentTypeCode' => $data['paymentTypeCode'],
+                    'salesSttsCode' => $data['salesSttsCode'],
+                    'confirmDate' => $data['confirmDate'],
+                    'salesDate' => $data['salesDate'],
+                    'stockReleaseDate' => $data['stockReleaseDate'],
+                    'cancelReqDate' => $data['cancelReqDate'],
+                    'cancelDate' => $data['cancelDate'],
+                    'refundDate' => $data['refundDate'],
+                    'refundReasonCd' => $data['refundReasonCd'],
+                    'totalItemCnt' => $data['totalItemCnt'],
+                    'taxableAmtA' => $data['taxableAmtA'],
+                    'taxableAmtB' => $data['taxableAmtB'],
+                    'taxableAmtC' => $data['taxableAmtC'],
+                    'taxableAmtD' => $data['taxableAmtB'],
+                    'taxRateA' => $data['taxRateA'],
+                    'taxRateB' => $data['taxRateB'],
+                    'taxRateC' => $data['taxRateC'],
+                    'taxRateD' => $data['taxRateD'],
+                    'taxAmtA' => $data['taxAmtA'],
+                    'taxAmtB' => $data['taxAmtB'],
+                    'taxAmtC' => $data['taxAmtC'],
+                    'taxAmtD' => $data['taxAmtD'],
+                    'totalTaxableAmt' => $data['totalTaxableAmt'],
+                    'totalTaxAmt' => $data['totalTaxAmt'],
+                    'totalAmt' => $data['totalAmt'],
+                    'prchrAcptcYn' => $data['prchrAcptcYn'],
+                    'remark' => $data['remark'],
+                    'regrNm' => $data['regrNm'],
+                    'regrId' => $data['regrId'],
+                    'modrNm' => $data['modrNm'],
+                    'modrId' => $data['modrId'],
+                    'receipt_CustomerTin' => $data['receipt_CustomerTin'],
+                    'receipt_CustomerMblNo' => $data['receipt_CustomerMblNo'],
+                    'receipt_RptNo' => $data['receipt_RptNo'],
+                    'receipt_RcptPbctDt' => $data['receipt_RcptPbctDt'],
+                    'receipt_TrdeNm' => $data['receipt_TrdeNm'],
+                    'receipt_Adrs' => $data['receipt_Adrs'],
+                    'receipt_TopMsg' => $data['receipt_TopMsg'],
+                    'receipt_BtmMsg'  => $data['receipt_BtmMsg'],
+                    'receipt_PrchrAcptcYn' => $data['receipt_PrchrAcptcYn'],
+                    'createdDate' => $data['createdDate'],
+                    'isKRASynchronized' => $data['isKRASynchronized'],
+                    'kraSynchronizedDate' => $data['kraSynchronizedDate'],
+                    'isStockIOUpdate' => $data['isStockIOUpdate'],
+                    'resultCd' => $data['resultCd'],
+                    'resultMsg' => $data['resultMsg'],
+                    'resultDt' => $data['resultDt'],
+                    'response_CurRcptNo' => $data['response_CurRcptNo'],
+                    'response_TotRcptNo' => $data['response_TotRcptNo'],
+                    'response_IntrlData' => $data['response_IntrlData'],
+                    'response_RcptSign' => $data['response_RcptSign'],
+                    'response_SdcDateTime' => $data['response_SdcDateTime'],
+                    'response_SdcId' => $data['response_SdcId'],
+                    'response_MrcNo' => $data['response_MrcNo'],
+                    'qrCodeURL' => $data['qrCodeURL'],
+                ];
+                // Save the mapped data to the local database
+                $invoice = Invoice::create($mappedData);
+
+                // Return success message along with newData property
+                return response()->json([
+                    'message' => 'New invoices added successfully.',
+                    'newData' => $invoice
+                ])->header('Refresh', '3;url=' . route('invoice.index'));
+
+            } else {
+               // Handle the error if the API request fails
+            return redirect()->back()->with('error', 'An error occurred while fetching the invoice data from the API');
+            }
+        } else {
+
+            return redirect()->back()->with('error', __('Invoice Already existing.'));
+        }
     }
 
 }
