@@ -316,7 +316,7 @@
                                     </td>
                                     <td class="form-group col-md-4">
                                         {{ Form::label('isrcAplcbYn', __('ISRCAPLCBYN?'),['class'=>'form-label']) }}
-                                        {{ Form::select('isrcAplcbYn', [true => 'Yes', false => 'No'], null, ['class' => 'form-control isrcAplcbYn']) }}
+                                        {{ Form::select('isrcAplcbYn', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control isrcAplcbYn']) }}
                                     </td>
                                     <td class="form-group col-md-4">
                                         {{ Form::label('pkgUnitCode', __('Package Unit Code'),['class'=>'form-label']) }}

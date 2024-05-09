@@ -65,8 +65,6 @@ class SalesController extends Controller
 
             $data = $request->all();
 
-            $data = $request->all();
-
             $itemsDataList = [];
             foreach ($data['items'] as $item) {
                 \Log::info('SALE ITEM DATA');
@@ -92,6 +90,9 @@ class SalesController extends Controller
                     "itemExprDate" => $itemExprDate,
                 ];
             }
+
+            \Log::info('ITEMS DATA LIST');
+            \Log::info($itemsDataList);
 
 
             $url = 'https://etims.your-apps.biz/api/AddSale';
@@ -123,6 +124,10 @@ class SalesController extends Controller
             \Log::info($response);
             \Log::info('SALES API DATE STUFF');
 
+            if ($response['statusCode'] == 400) {
+                return redirect()->back()->with('error', 'Trader invoice number already exists');
+            }
+
             $sale = Sales::create([
                 'customerName' => $data['customerName'],
                 'customerTin' => $data['customerTin'],
@@ -146,7 +151,7 @@ class SalesController extends Controller
             $saleItems = $data['items'];
 
             foreach ($itemsDataList as $saleItem) {
-                SalesCreditNoteItems::create([
+                SalesItems::create([
                     'sales_credit_note_id' => $sale->id,
                     'itemCode' => $saleItem['itemCode'],
                     'itemClassCode' => $saleItem['itemClassCode'],
@@ -165,7 +170,7 @@ class SalesController extends Controller
                     'itemExprDate' => $saleItem['itemExprDate'],
                 ]);
             }
-            return redirect()->back()->with('success', 'Added Sale Successfully');
+            return redirect()->to('sales')->with('success', 'Added Sale Successfully');
         } catch (\Exception $e) {
             \Log::info('ADD SALE ERROR');
             \Log::info($e);

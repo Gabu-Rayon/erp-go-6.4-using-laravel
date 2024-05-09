@@ -24,18 +24,6 @@
                 },
                 show: function () {
                     $(this).slideDown();
-                    var file_uploads = $(this).find('input.multi');
-                    if (file_uploads.length) {
-                        $(this).find('input.multi').MultiFile({
-                            max: 3,
-                            accept: 'png|jpg|jpeg',
-                            max_size: 2048
-                        });
-                    }
-                    if($('.select2').length) {
-                        $('.select2').select2();
-                    }
-
                 },
                 hide: function (deleteElement) {
                     if (confirm('Are you sure you want to delete this element?')) {
@@ -91,10 +79,10 @@
                         $('#customer_detail').removeClass('d-block');
                         $('#customer_detail').addClass('d-none');
                     }
-
                 },
 
             });
+
         });
 
         $(document).on('click', '#remove', function () {
@@ -359,6 +347,7 @@
         if (customerId > 0) {
             $('#customer').val(customerId).change();
         }
+        
 
     </script>
     <script>
@@ -376,80 +365,86 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                             <div class="form-group" id="customer-box">
                                 {{ Form::label('customer_id', __('Customer'),['class'=>'form-label']) }}
-                                {{ Form::select('customer_id', $customers,$customerId, array('class' => 'form-control select','id'=>'customer','data-url'=>route('invoice.customer'),'required'=>'required')) }}
-
+                                {{ Form::select('customer_id', $customers,'', array('class' => 'form-control customer_id select','id'=>'customer','data-url'=>route('invoice.customer'),'required'=>'required')) }}
                             </div>
-
                             <div id="customer_detail" class="d-none">
                             </div>
-                        </div>
-                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        {{ Form::label('issue_date', __('Issue Date'),['class'=>'form-label']) }}
-                                        <div class="form-icon-user">
-                                            {{Form::date('issue_date',null,array('class'=>'form-control','required'=>'required'))}}
-
-                                        </div>
-                                    </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('category_id', __('Item (*)'), ['class' => 'form-label']) }}
+                                    {{ Form::select('category_id', $category, null, ['class' => 'form-control', 'required' => 'required']) }}
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        {{ Form::label('due_date', __('Due Date'),['class'=>'form-label']) }}
-                                        <div class="form-icon-user">
-                                            {{Form::date('due_date',null,array('class'=>'form-control','required'=>'required'))}}
-
-                                        </div>
-                                    </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('salesType', __('Sales Type'), ['class' => 'form-label']) }}
+                                    {{ Form::select('salesType', $salesTypeCodes, null, ['class' => 'form-control']) }}
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        {{ Form::label('invoice_number', __('Invoice Number'),['class'=>'form-label']) }}
-                                        <div class="form-icon-user">
-                                            <input type="text" class="form-control" value="{{$invoice_number}}" readonly>
-                                        </div>
-                                    </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('paymentType', __('Payment Type'), ['class' => 'form-label']) }}
+                                    {{ Form::select('paymentType', $paymentTypeCodes, null, ['class' => 'form-control']) }}
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        {{ Form::label('category_id', __('Category'),['class'=>'form-label']) }}
-                                        {{ Form::select('category_id', $category,null, array('class' => 'form-control select','required'=>'required')) }}
-                                    </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('traderInvoiceNo', __('Trader Invoive No (*)'), ['class' => 'form-label']) }}
+                                    {{ Form::text('traderInvoiceNo', $invoice_number, array('class' => 'form-control', 'required' => true, 'readonly' => 'readonly')) }}
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        {{ Form::label('ref_number', __('Ref Number'),['class'=>'form-label']) }}
-                                        <div class="form-icon-user">
-                                            <span><i class="ti ti-joint"></i></span>
-                                            {{ Form::text('ref_number', '', array('class' => 'form-control')) }}
-                                        </div>
-                                    </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('confirmDate', __('Confirm Date (*)'),['class'=>'form-label']) }}
+                                    {{ Form::datetime('confirmDate', '', array('class' => 'form-control', 'required' => 'required')) }}
                                 </div>
-{{--                                <div class="col-md-6">--}}
-{{--                                    <div class="form-check custom-checkbox mt-4">--}}
-{{--                                        <input class="form-check-input" type="checkbox" name="discount_apply" id="discount_apply">--}}
-{{--                                        <label class="form-check-label " for="discount_apply">{{__('Discount Apply')}}</label>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                                <div class="col-md-6">--}}
-{{--                                    <div class="form-group">--}}
-{{--                                        {{Form::label('sku',__('SKU')) }}--}}
-{{--                                        {!!Form::text('sku', null,array('class' => 'form-control','required'=>'required')) !!}--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-                                @if(!$customFields->isEmpty())
-                                    <div class="col-md-6">
-                                        <div class="tab-pane fade show" id="tab-2" role="tabpanel">
-                                            @include('customFields.formBuilder')
-                                        </div>
-                                    </div>
-                                @endif
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('salesDate', __('Sales Date (*)'),['class'=>'form-label']) }}
+                                    {{ Form::date('salesDate', '', array('class' => 'form-control', 'required' => 'required')) }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('stockReleseDate', __('Stock Release Date'),['class'=>'form-label']) }}
+                                    {{ Form::datetime('stockReleseDate', '', array('class' => 'form-control')) }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('receiptPublishDate', __('Receipt Publish Date (*)'),['class'=>'form-label']) }}
+                                    {{ Form::datetime('receiptPublishDate', '', array('class' => 'form-control', 'required' => 'required')) }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('occurredDate', __('Occurred Date (*)'),['class'=>'form-label']) }}
+                                    {{ Form::date('occurredDate', '', array('class' => 'form-control', 'required' => 'required')) }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('invoiceStatusCode', __('Invoice Status'), ['class' => 'form-label']) }}
+                                    {{ Form::select('invoiceStatusCode', $invoiceStatusCodes, null, ['class' => 'form-control']) }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('isPurchaseAccept', __('Purchase Accepted?'), ['class' => 'form-label']) }}
+                                    {{ Form::select('isPurchaseAccept', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control']) }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('isStockIOUpdate', __('Stock IO Update?'), ['class' => 'form-label']) }}
+                                    {{ Form::select('isStockIOUpdate', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control']) }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('issue_date', __('Issue Date (*)'), ['class' => 'form-label']) }}
+                                    {{ Form::date('issue_date', '', array('class' => 'form-control', 'required' => 'required')) }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('send_date', __('Send Date (*)'), ['class' => 'form-label']) }}
+                                    {{ Form::date('send_date', '', array('class' => 'form-control', 'required' => 'required')) }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('due_date', __('Due Date (*)'), ['class' => 'form-label']) }}
+                                    {{ Form::date('due_date', '', array('class' => 'form-control', 'required' => 'required')) }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('mapping', __('Mapping'),['class'=>'form-label']) }}
+                                    {{ Form::text('mapping', '', array('class' => 'form-control')) }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ Form::label('ref_number', __('Reference Number'),['class'=>'form-label']) }}
+                                    {{ Form::text('ref_number', '', array('class' => 'form-control')) }}
+                                </div>
+                                <div class="form-group col-md-12">
+                                    {{ Form::label('remark', __('Remark'),['class'=>'form-label']) }}
+                                    {{ Form::textarea('remark', '', array('class' => 'form-control', 'rows' => '3')) }}
+                                </div>
                             </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -470,111 +465,43 @@
                 </div>
                 <div class="card-body table-border-style mt-2">
                     <div class="table-responsive">
-                        <table class="table  mb-0 table-custom-style" data-repeater-list="items" id="sortable-table">
-                            <thead>
-                            <tr>
-                                <th>{{__('Items')}}</th>
-                                <th>{{__('Quantity')}}</th>
-                                <th>{{__('Price')}} </th>
-                                <th>{{__('Discount')}}</th>
-                                <th>{{__('Tax')}} (%)</th>
-                                <th class="text-end">{{__('Amount')}} <br><small class="text-danger font-weight-bold">{{__('after tax & discount')}}</small></th>
-                                <th></th>
-                            </tr>
-                            </thead>
-
-                            <tbody class="ui-sortable" data-repeater-item>
-                            <tr>
-
-                                <td width="25%" class="form-group pt-0">
-                                    {{ Form::select('item', $product_services,'', array('class' => 'form-control select2 item','data-url'=>route('invoice.product'),'required'=>'required')) }}
-                                </td>
-                                <td>
-                                    <div class="form-group price-input input-group search-form">
-                                        {{ Form::text('quantity','', array('class' => 'form-control quantity','required'=>'required','placeholder'=>__('Qty'),'required'=>'required')) }}
-                                        <span class="unit input-group-text bg-transparent"></span>
-                                    </div>
-                                </td>
-
-
-                                <td>
-                                    <div class="form-group price-input input-group search-form">
-                                        {{ Form::text('price','', array('class' => 'form-control price','required'=>'required','placeholder'=>__('Price'),'required'=>'required')) }}
-                                        <span class="input-group-text bg-transparent">{{\Auth::user()->currencySymbol()}}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="form-group price-input input-group search-form">
-                                        {{ Form::text('discount','', array('class' => 'form-control discount','required'=>'required','placeholder'=>__('Discount'))) }}
-                                        <span class="input-group-text bg-transparent">{{\Auth::user()->currencySymbol()}}</span>
-                                    </div>
-                                </td>
-
-
-
-                                <td>
-                                    <div class="form-group">
-                                        <div class="input-group colorpickerinput">
-                                            <div class="taxes"></div>
-                                            {{ Form::hidden('tax','', array('class' => 'form-control tax text-dark')) }}
-                                            {{ Form::hidden('itemTaxPrice','', array('class' => 'form-control itemTaxPrice')) }}
-                                            {{ Form::hidden('itemTaxRate','', array('class' => 'form-control itemTaxRate')) }}
-                                        </div>
-                                    </div>
-                                </td>
-
-                                <td class="text-end amount">0.00</td>
-                                <td>
-                                    <a href="#" class="ti ti-trash text-white repeater-action-btn bg-danger ms-2 bs-pass-para" data-repeater-delete></a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <div class="form-group">
-                                        {{ Form::textarea('description', null, ['class'=>'form-control pro_description','rows'=>'2','placeholder'=>__('Description')]) }}
-                                    </div>
-                                </td>
-                                <td colspan="5"></td>
-                            </tr>
+                        <table class="table row  mb-0 table-custom-style" data-repeater-list="items" id="sortable-table">
+                            <tbody class="ui-sortable card m-3 col-md-12" data-repeater-item>
+                                    <tr class="card-body row">
+                                        <td class="form-group col-md-4">
+                                            {{ Form::label('itemCode', __('Item (*)'), ['class' => 'form-label']) }}
+                                            {{ Form::select('itemCode', $product_services, null, ['class' => 'form-control itemCode', 'required' => 'required']) }}
+                                        </td>
+                                        <td class="form-group col-md-4">
+                                            {{ Form::label('unitPrice', __('Unit Price'),['class'=>'form-label']) }}
+                                            {{ Form::number('unitPrice', '', array('class' => 'form-control', 'required' => true)) }}
+                                        </td>
+                                        <td class="form-group col-md-4">
+                                            {{ Form::label('pkgQuantity', __('Package Quantity'),['class'=>'form-label']) }}
+                                            {{ Form::number('pkgQuantity', '', array('class' => 'form-control', 'required' => true)) }}
+                                        </td>
+                                        <td class="form-group col-md-4">
+                                            {{ Form::label('quantity', __('Quantity'),['class'=>'form-label']) }}
+                                            {{ Form::number('quantity', '', array('class' => 'form-control', 'required' => true)) }}
+                                        </td>
+                                        <td class="form-group col-md-4">
+                                            {{ Form::label('discountRate', __('Discount Rate'),['class'=>'form-label']) }}
+                                            {{ Form::number('discountRate', '', array('class' => 'form-control')) }}
+                                        </td>
+                                        <td class="form-group col-md-4">
+                                            {{ Form::label('tax', __('Tax (*)'), ['class' => 'form-label']) }}
+                                            {{ Form::select('tax', $taxationtype, null, ['class' => 'form-control', 'required' => 'required']) }}
+                                        </td>
+                                        <td class="form-group col-md-12">
+                                            {{ Form::label('itemExprDate', __('Item Expiry Date'),['class'=>'form-label']) }}
+                                            {{Form::date('itemExprDate',null,array('class'=>'form-control'))}}
+                                        </td>
+                                        <td>
+                                            <a href="#" class="ti ti-trash text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></a>
+                                        </td>
+                                    </tr>
+                                </div>
                             </tbody>
-                            <tfoot>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td></td>
-                                <td><strong>{{__('Sub Total')}} ({{\Auth::user()->currencySymbol()}})</strong></td>
-                                <td class="text-end subTotal">0.00</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td></td>
-                                <td><strong>{{__('Discount')}} ({{\Auth::user()->currencySymbol()}})</strong></td>
-                                <td class="text-end totalDiscount">0.00</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td></td>
-                                <td><strong>{{__('Tax')}} ({{\Auth::user()->currencySymbol()}})</strong></td>
-                                <td class="text-end totalTax">0.00</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td class="blue-text"><strong>{{__('Total Amount')}} ({{\Auth::user()->currencySymbol()}})</strong></td>
-                                <td class="text-end totalAmount blue-text"></td>
-                                <td></td>
-                            </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>
