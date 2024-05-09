@@ -1347,12 +1347,6 @@
                                 <a class="dash-link" href="{{ route('purchase.mappedPurchases') }}">{{ __('Mapped Purchase') }}</a>
                             </li>
                         @endcan
-                          @can('manage purchase')
-                            <li
-                                class="dash-item {{ Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : '' }}">
-                                <a class="dash-link" href="{{ route('purchase.index') }}">{{ __('Update MapPurchase Status') }}</a>
-                            </li>
-                        @endcan
                         @can('manage quotation')
                         <li
                             class="dash-item {{ Request::route()->getName() == 'quotation.index' || Request::route()->getName() == 'quotations.create' || Request::route()->getName() == 'quotation.edit' || Request::route()->getName() == 'quotation.show' ? ' active' : '' }}">
