@@ -1727,8 +1727,6 @@ class PurchaseController extends Controller
             ], 500);
         }
     }
-
-
     public function searchByDate(Request $request)
     {
         try {
