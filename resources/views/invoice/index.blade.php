@@ -144,7 +144,8 @@
                                         <td>
                                             @if ($invoice->due_date < date('Y-m-d'))
                                                 <p class="text-danger mt-3">
-                                                    {{ \Auth::user()->dateFormat($invoice->due_date) }}</p>
+                                                    {{ \Auth::user()->dateFormat($invoice->due_date) }}
+                                                </p>
                                             @else
                                                 {{ \Auth::user()->dateFormat($invoice->due_date) }}
                                             @endif

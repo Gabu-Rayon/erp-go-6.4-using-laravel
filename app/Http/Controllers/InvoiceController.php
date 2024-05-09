@@ -3,20 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Plan;
+use App\Models\Details;
 use App\Models\User;
 use App\Models\Invoice;
 use App\Models\Utility;
 use App\Models\Customer;
 use App\Models\CreditNote;
+use App\Models\SalesTypeCode;
+use App\Models\InvoiceStatusCode;
+use App\Models\PaymentTypeCodes;
 use App\Models\BankAccount;
 use App\Models\CustomField;
 use App\Models\StockReport;
 use App\Models\Transaction;
+use App\Models\ItemInformation;
 use Illuminate\Http\Request;
 use App\Exports\InvoiceExport;
 use App\Models\InvoicePayment;
 use App\Models\InvoiceProduct;
 use App\Models\ProductService;
+use App\Models\ItemClassification;
 use App\Models\TransactionLines;
 use Illuminate\Support\Facades\DB;
 use App\Models\InvoiceBankTransfer;
@@ -33,12 +39,16 @@ class InvoiceController extends Controller
     {
     }
 
+    
+
     public function index(Request $request)
     {
         if (\Auth::user()->can('manage invoice')) {
             $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customer->prepend('Select Customer', '');
             $status = Invoice::$statues;
+            \Log::info('CREATOR ID');
+            \Log::info(\Auth::user()->creatorId());
             $query = Invoice::where('created_by', '=', \Auth::user()->creatorId());
 
             if (!empty($request->customer)) {
@@ -55,7 +65,6 @@ class InvoiceController extends Controller
                 $query->where('status', '=', $request->status);
             }
             $invoices = $query->get();
-            // $invoices = $query->all();
 
             return view('invoice.index', compact('invoices', 'customer', 'status'));
         } else {
@@ -70,12 +79,27 @@ class InvoiceController extends Controller
             $invoice_number = \Auth::user()->invoiceNumberFormat($this->invoiceNumber());
             $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customers->prepend('Select Customer', '');
-            $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'income')->get()->pluck('name', 'id');
+            $category = ItemClassification::all()->pluck('itemClsNm', 'itemClsCd');
             $category->prepend('Select Category', '');
-            $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $product_services = ItemInformation::all()->pluck('itemNm', 'itemCd');
             $product_services->prepend('--', '');
+            $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeValue', 'saleTypeCode');
+            $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'code');
+            $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusValue', 'invoiceStatusCode');
+            $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
 
-            return view('invoice.create', compact('customers', 'invoice_number', 'product_services', 'category', 'customFields', 'customerId'));
+            return view('invoice.create', compact(
+                'customers',
+                'invoice_number',
+                'product_services',
+                'category',
+                'customFields',
+                'customerId',
+                'salesTypeCodes',
+                'paymentTypeCodes',
+                'invoiceStatusCodes',
+                'taxationtype'
+            ));
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
@@ -209,64 +233,288 @@ class InvoiceController extends Controller
      ***************************************************************************/
     public function store(Request $request)
     {
-        if (\Auth::user()->can('create invoice')) {
-            $validator = \Validator::make(
-                $request->all(),
-                [
-                    'customer_id' => 'required',
-                    'issue_date' => 'required',
-                    'due_date' => 'required',
-                    'category_id' => 'required',
-                    'items' => 'required',
-                ]
-            );
-            if ($validator->fails()) {
-                $messages = $validator->getMessageBag();
-                return redirect()->back()->with('error', $messages->first());
+        try {
+            if (\Auth::user()->can('create invoice')) {
+                $validator = \Validator::make(
+                    $request->all(), [
+                        'customer_id' => 'required',
+                        'issue_date' => 'required',
+                        'due_date' => 'required',
+                        'category_id' => 'required',
+                        'traderInvoiceNo' => 'required|max:50|min:1',
+                        'items' => 'required'
+                        ]
+                    );
+                if ($validator->fails()) {
+                    $messages = $validator->getMessageBag();
+                    return redirect()->back()->with('error', $messages->first());
+                }
+
+
+                $data = $request->all();
+                $customer = Customer::find($data['customer_id']);
+                \Log::info('CUSTOMER');
+                \Log::info($customer);
+
+                $salesDt = str_replace('-', '', $data['salesDate']);
+                $salesDate = date('Ymd', strtotime($salesDt));
+
+                $occurredDt = str_replace('-', '', $data['occurredDate']);
+                $occurredDate = date('Ymd', strtotime($occurredDt));
+
+                $apiRequestData = [
+                    "customerNo" => $customer->customerNo,
+                    "customerTin" => $customer->customerTin,
+                    "customerName" => $customer->name,
+                    "customerMobileNo" => $customer->contact,
+                    "salesType" => $data['salesType'],
+                    "paymentType" => $data['paymentType'],
+                    "traderInvoiceNo" => $data['traderInvoiceNo'],
+                    "confirmDate" => $data['confirmDate'],
+                    "salesDate" => $salesDate,
+                    "stockReleseDate" => $data['stockReleseDate'],
+                    "receiptPublishDate" => $data['receiptPublishDate'],
+                    "occurredDate" => $occurredDate,
+                    "invoiceStatusCode" => $data['invoiceStatusCode'],
+                    "remark" => $data['remark'],
+                    "isPurchaseAccept" => $data['isPurchaseAccept'],
+                    "isStockIOUpdate" => $data['isStockIOUpdate'],
+                    "mapping" => $data['mapping'],
+                ];
+
+                $saleItemList = [];
+                $totalAmount = 0;
+
+                \Log::info('INV REQ DATA');
+                \Log::info($apiRequestData);
+
+                function calculateDiscountAmount($packageQuantity, $quantity, $unitPrice, $discountRate) {
+                    $totalItems = $packageQuantity * $quantity;
+                    $totalPriceBeforeDiscount = $totalItems * $unitPrice;
+                    $discountAmount = ($totalPriceBeforeDiscount * $discountRate) / 100;
+                    return $discountAmount;
+                }
+
+                function calculateTotalAmount($packageQuantity, $quantity, $unitPrice) {
+                    $totalItems = $packageQuantity * $quantity;
+                    $totalPriceBeforeDiscount = $totalItems * $unitPrice;
+                    return $totalPriceBeforeDiscount;
+                } 
+
+                foreach($data['items'] as $item) {
+                    $itemDetails = ItemInformation::where('itemCd', $item['itemCode'])->first();
+                    $itemExprDt = str_replace('-', '', $item['itemExprDate']);
+                    $itemExprDate = date('Ymd', strtotime($itemExprDt));
+                    $itemData = [
+                        "itemCode" => $itemDetails->itemCd,
+                        "itemClassCode" => $itemDetails->itemClsCd,
+                        "itemTypeCode" => $itemDetails->itemTyCd,
+                        "itemName" => $itemDetails->itemNm,
+                        "orgnNatCd" => $itemDetails->orgnNatCd,
+                        "taxTypeCode" => $itemDetails->taxTyCd,
+                        "unitPrice" => $item['unitPrice'],
+                        "isrcAplcbYn" => $itemDetails->isrcAplcbYn,
+                        "pkgUnitCode" => $itemDetails->pkgUnitCd,
+                        "pkgQuantity" => $item['pkgQuantity'],
+                        "tax" => $item['tax'],
+                        "qtyUnitCd" => $itemDetails->qtyUnitCd,
+                        "quantity" => $item['quantity'],
+                        "discountRate" => $item['discountRate'],
+                        "discountAmt" => calculateDiscountAmount(
+                            $item['pkgQuantity'],
+                            $item['quantity'],
+                            $item['unitPrice'],
+                            $item['discountRate'],
+                        ),
+                        "itemExprDate" => $itemExprDate
+                    ];
+
+                    array_push($saleItemList, $itemData);
+
+                    
+                }
+
+                $apiRequestData['saleItemList'] = $saleItemList;
+                \Log::info('INV REQ DATA');
+                \Log::info($apiRequestData);
+
+                // $url = 'https://etims.your-apps.biz/api/AddSale';
+
+                // $response = Http::withOptions(['verify' => false])->withHeaders([
+                //     'key' => '123456'
+                //     ])->post($url, $apiRequestData);
+
+                // \Log::info('SALES API RESPONSE');
+                // \Log::info($response);
+
+                // if ($response['statusCode'] == 400) {
+                //     return redirect()->back()->with('error', 'Trader invoice number already exists');
+                // }
+
+                \Log::info('INV DEYTA');
+                \Log::info($data);
+
+                foreach($saleItemList as $item){
+                    $totalAmount += calculateTotalAmount($item['pkgQuantity'], $item['quantity'],$item['unitPrice']);
+                }
+
+                $inv = Invoice::create([
+                    'invoice_id' => $this->invoiceNumber(),
+                    'customer_id' => $data['customer_id'],
+                    'issue_date' => $data['issue_date'],
+                    'due_date' => $data['due_date'],
+                    'send_date' => $data['send_date'],
+                    'category_id' => $data['category_id'],
+                    'ref_number' => $data['ref_number'],
+                    'status' => 0, // Assuming 'status' is nullable or has a default value
+                    'shipping_display' => null, // Assuming 'shipping_display' is nullable or has a default value
+                    'discount_apply' => null, // Assuming 'discount_apply' is nullable or has a default value
+                    'created_by' => \Auth::user()->creatorId(),
+                    'trderInvoiceNo' => $data['traderInvoiceNo'],
+                    'invoiceNo' => $data['traderInvoiceNo'],
+                    'orgInvoiceNo' => $data['traderInvoiceNo'],
+                    'customerTin' => $customer->customerTin,
+                    'customerName' => $customer->name,
+                    'receptTypeCode' => null, // Assuming 'receptTypeCode' is nullable or has a default value
+                    'paymentTypeCode' => null, // Assuming 'paymentTypeCode' is nullable or has a default value
+                    'salesSttsCode' => null, // Assuming 'salesSttsCode' is nullable or has a default value
+                    'confirmDate' => $data['confirmDate'],
+                    'salesDate' => $salesDate,
+                    'stockReleaseDate' => $data['stockReleseDate'],
+                    'cancelReqDate' => null, // Assuming 'cancelReqDate' is nullable or has a default value
+                    'cancelDate' => null, // Assuming 'cancelDate' is nullable or has a default value
+                    'refundDate' => null, // Assuming 'refundDate' is nullable or has a default value
+                    'refundReasonCd' => null, // Assuming 'refundReasonCd' is nullable or has a default value
+                    'totalItemCnt' => null, // Assuming 'totalItemCnt' is nullable or has a default value
+                    'taxableAmtA' => null, // Assuming 'taxableAmtA' is nullable or has a default value
+                    'taxableAmtB' => null, // Assuming 'taxableAmtB' is nullable or has a default value
+                    'taxableAmtC' => null, // Assuming 'taxableAmtC' is nullable or has a default value
+                    'taxableAmtD' => null, // Assuming 'taxableAmtD' is nullable or has a default value
+                    'taxRateA' => null, // Assuming 'taxRateA' is nullable or has a default value
+                    'taxRateB' => null, // Assuming 'taxRateB' is nullable or has a default value
+                    'taxRateC' => null, // Assuming 'taxRateC' is nullable or has a default value
+                    'taxRateD' => null, // Assuming 'taxRateD' is nullable or has a default value
+                    'taxAmtA' => null, // Assuming 'taxAmtA' is nullable or has a default value
+                    'taxAmtB' => null, // Assuming 'taxAmtB' is nullable or has a default value
+                    'taxAmtC' => null, // Assuming 'taxAmtC' is nullable or has a default value
+                    'taxAmtD' => null, // Assuming 'taxAmtD' is nullable or has a default value
+                    'totalTaxableAmt' => null, // Assuming 'totalTaxableAmt' is nullable or has a default value
+                    'totalTaxAmt' => null, // Assuming 'totalTaxAmt' is nullable or has a default value
+                    'totalAmt' => $totalAmount,
+                    'prchrAcptcYn' => null, // Assuming 'prchrAcptcYn' is nullable or has a default value
+                    'remark' => $data['remark'],
+                    'regrNm' => null, // Assuming 'regrNm' is nullable or has a default value
+                    'regrId' => null, // Assuming 'regrId' is nullable or has a default value
+                    'modrNm' => null, // Assuming 'modrNm' is nullable or has a default value
+                    'modrId' => null, // Assuming 'modrId' is nullable or has a default value
+                    'receipt_CustomerTin' => null, // Assuming 'receipt_CustomerTin' is nullable or has a default value
+                    'receipt_CustomerMblNo' => null, // Assuming 'receipt_CustomerMblNo' is nullable or has a default value
+                    'receipt_RptNo' => null, // Assuming 'receipt_RptNo' is nullable or has a default value
+                    'receipt_RcptPbctDt' => null, // Assuming 'receipt_RcptPbctDt' is nullable or has a default value
+                    'receipt_TrdeNm' => null, // Assuming 'receipt_TrdeNm' is nullable or has a default value
+                    'receipt_Adrs' => null, // Assuming 'receipt_Adrs' is nullable or has a default value
+                    'receipt_TopMsg' => null, // Assuming 'receipt_TopMsg' is nullable or has a default value
+                    'receipt_BtmMsg' => null, // Assuming 'receipt_BtmMsg' is nullable or has a default value
+                    'receipt_PrchrAcptcYn' => null, // Assuming 'receipt_PrchrAcptcYn' is nullable or has a default value
+                    'createdDate' => null, // Assuming 'createdDate' is nullable or has a default value
+                    'isKRASynchronized' => null, // Assuming 'isKRASynchronized' is nullable or has a default value
+                    'kraSynchronizedDate' => null, // Assuming 'kraSynchronizedDate' is nullable or has a default value
+                    'isStockIOUpdate' => $data['isStockIOUpdate'],
+                    'resultCd' => null, // Assuming 'resultCd' is nullable or has a default value
+                    'resultMsg' => null, // Assuming 'resultMsg' is nullable or has a default value
+                    'resultDt' => null, // Assuming 'resultDt' is nullable or has a default value
+                    'response_CurRcptNo' => null, // Assuming 'response_CurRcptNo' is nullable or has a default value
+                    'response_TotRcptNo' => null, // Assuming 'response_TotRcptNo' is nullable or has a default value
+                    'response_IntrlData' => null, // Assuming 'response_IntrlData' is nullable or has a default value
+                    'response_RcptSign' => null, // Assuming 'response_RcptSign' is nullable or has a default value
+                    'response_SdcDateTime' => null, // Assuming 'response_SdcDateTime' is nullable or has a default value
+                    'response_SdcId' => null, // Assuming 'response_SdcId' is nullable or has a default value
+                    'response_MrcNo' => null, // Assuming 'response_MrcNo' is nullable or has a default value
+                    'qrCodeURL' => null, // Assuming 'qrCodeURL' is nullable or has a default value
+                ]);
+                
+                foreach($saleItemList as $item){
+                    InvoiceProduct::create([
+                        'product_id' => $item['itemCode'],
+                        'invoice_id' => $inv['invoice_id'],
+                        'quantity' => $item['quantity'],
+                        'tax' => $item['tax'] || null,
+                        'discount' => $item['discountAmt'],
+                        'price' => calculateTotalAmount(
+                            $item['pkgQuantity'],
+                            $item['quantity'],
+                            $item['unitPrice'],
+                        ),
+                    ]);
+                }
+
+                return redirect()->to('invoice')->with('success', 'Sale Created Successfully');
             }
+        } catch (\Exception $e) {
+            \Log::info('ADD INV ERROR');
+            \Log::info($e);
 
-            $invoiceData = [
-                'customer_id' => $request->customer_id,
-                'issue_date' => $request->issue_date,
-                'due_date' => $request->due_date,
-                'category_id' => $request->category_id,
-                'items' => $request->items,
-                // Add other fields as needed
-
-                "customerTin" => $request->customer_tin,
-                "salesType" => $request->sales_types,
-                "paymentType" => $request->payment_type,
-                "invoiceStatusCode" => $request->invoice_status_code,
-                "remark" => $request->remark,
-                "isPurchaseAccept" => $request->is_purchase_accept,
-                "itemCode" => $request->item_code,
-                "unitPrice" => $request->unit_price,
-                "quantity" => $request->quantity,
-                "discountRate" => $request->discount_rate,
-                "discountAmt" => $request->discount_amount
-            ];
-
-            // Post data to the API endpoint
-            $response = Http::post('https://etims.your-apps.biz/api/SaveSales', $invoiceData);
-            // $response = Http::post('https://etims.your-apps.biz/api/AddSale', $invoiceData);           
-
-            // Check if the request was successful (status code 2xx)
-            if ($response->successful()) {
-                // API request was successful, handle response if needed
-                $apiResponse = $response->json(); // Convert response to JSON
-                // Handle API response here
-            } else {
-                // API request failed, handle error
-                $errorResponse = $response->json(); // Convert error response to JSON
-                // Handle error response here
-                return redirect()->back()->with('error', 'Failed to post data to API.');
-            }
-
-            // Rest of your logic...
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
+
+    // if (\Auth::user()->can('create invoice')) {
+    //     $validator = \Validator::make(
+    //         $request->all(),
+    //         [
+    //             'customer_id' => 'required',
+    //             'issue_date' => 'required',
+    //             'due_date' => 'required',
+    //             'category_id' => 'required',
+    //             'items' => 'required',
+    //         ]
+    //     );
+    //     if ($validator->fails()) {
+    //         $messages = $validator->getMessageBag();
+    //         return redirect()->back()->with('error', $messages->first());
+    //     }
+
+    //     $invoiceData = [
+    //         'customer_id' => $request->customer_id,
+    //         'issue_date' => $request->issue_date,
+    //         'due_date' => $request->due_date,
+    //         'category_id' => $request->category_id,
+    //         'items' => $request->items,
+    //         // Add other fields as needed
+
+    //         "customerTin" => $request->customer_tin,
+    //         "salesType" => $request->sales_types,
+    //         "paymentType" => $request->payment_type,
+    //         "invoiceStatusCode" => $request->invoice_status_code,
+    //         "remark" => $request->remark,
+    //         "isPurchaseAccept" => $request->is_purchase_accept,
+    //         "itemCode" => $request->item_code,
+    //         "unitPrice" => $request->unit_price,
+    //         "quantity" => $request->quantity,
+    //         "discountRate" => $request->discount_rate,
+    //         "discountAmt" => $request->discount_amount
+    //     ];
+
+    //     // Post data to the API endpoint
+    //     $response = Http::post('https://etims.your-apps.biz/api/SaveSales', $invoiceData);
+    //     // $response = Http::post('https://etims.your-apps.biz/api/AddSale', $invoiceData);           
+
+    //     // Check if the request was successful (status code 2xx)
+    //     if ($response->successful()) {
+    //         // API request was successful, handle response if needed
+    //         $apiResponse = $response->json(); // Convert response to JSON
+    //         // Handle API response here
+    //     } else {
+    //         // API request failed, handle error
+    //         $errorResponse = $response->json(); // Convert error response to JSON
+    //         // Handle error response here
+    //         return redirect()->back()->with('error', 'Failed to post data to API.');
+    //     }
+
+    //     // Rest of your logic...
+    // } else {
+    //     return redirect()->back()->with('error', __('Permission denied.'));
+    // }
 
     public function edit($ids)
     {
