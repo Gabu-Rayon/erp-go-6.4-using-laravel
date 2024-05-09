@@ -1549,10 +1549,9 @@ Route::group(['middleware' => ['verified']], function () {
             ],
         ], function () {
             Route::get('purchase/items', [PurchaseController::class, 'items'])->name('purchase.items');
-            Route::resource('purchase', PurchaseController::class);
-             
-             Route::get('purchase/{id}/show', [PurchaseController::class, 'show'])->name('purchase.show');
-             Route::get('purchase/{spplrInvcNo}/details', [PurchaseController::class, 'details'])->name('purchase.details');
+            Route::resource('purchase', PurchaseController::class);             
+            Route::get('purchase/{id}/show', [PurchaseController::class, 'show'])->name('purchase.show');
+            Route::get('purchase/{spplrInvcNo}/details', [PurchaseController::class, 'details'])->name('purchase.details');
             Route::get('purchase/{id}/payment', [PurchaseController::class, 'payment'])->name('purchase.payment');
             Route::post('purchase/{id}/payment', [PurchaseController::class, 'createPayment'])->name('purchase.payment');
             Route::post('purchase/{id}/payment/{pid}/destroy', [PurchaseController::class, 'paymentDestroy'])->name('purchase.payment.destroy');

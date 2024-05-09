@@ -118,8 +118,8 @@
                                     <div class="d-flex align-items-center justify-content-end">
                                         <div class="me-4">
                                             <small>
-                                                <strong>{{__('Issue Date')}} :</strong><br>
-                                                {{\Auth::user()->dateFormat($purchase->purchase_date)}}<br><br>
+                                                <strong>{{ __('Issue Date') }} :</strong><br>
+                                                {{ \Auth::user()->dateFormat($purchase->cfmDt) }}<br><br>
                                             </small>
                                         </div>
 
@@ -128,41 +128,39 @@
                             </div>
 
 
-                            <div class="row">
+                           <div class="row">
                                 <div class="col">
                                     <small class="font-style">
-                                        <strong>{{__('Billed To')}} :</strong><br>
-                                        @if(!empty($vendor->billing_name))
-                                            {{!empty($vendor->billing_name)?$vendor->billing_name:''}}<br>
-                                            {{!empty($vendor->billing_address)?$vendor->billing_address:''}}<br>
-                                            {{!empty($vendor->billing_city)?$vendor->billing_city:'' .', '}} <br>
-                                            {{!empty($vendor->billing_state)?$vendor->billing_state:'',', '}},
-                                            {{!empty($vendor->billing_zip)?$vendor->billing_zip:''}}<br>
-                                            {{!empty($vendor->billing_country)?$vendor->billing_country:''}}<br>
-                                            {{!empty($vendor->billing_phone)?$vendor->billing_phone:''}}<br>
-                                            @if($settings['vat_gst_number_switch'] == 'on')
-                                                <strong>{{__('Tax Number ')}} : </strong>{{!empty($vendor->tax_number)?$vendor->tax_number:'-'}}
-                                            @endif
-                                        @else
-                                            -
-                                        @endif
+                                        <strong>{{ __('Shipped To') }} :</strong><br>
+                                        <strong>Company </strong>:
+
+                                        <br>
                                     </small>
                                 </div>
 
-                                @if(App\Models\Utility::getValByName('shipping_display')=='on')
+                                @if (App\Models\Utility::getValByName('shipping_display') == 'on')
                                     <div class="col">
                                         <small>
-                                            <strong>{{__('Shipped To')}} :</strong><br>
-                                            @if(!empty($vendor->shipping_name))
-                                                {{!empty($vendor->shipping_name)?$vendor->shipping_name:''}}<br>
-                                                {{!empty($vendor->shipping_address)?$vendor->shipping_address:''}}<br>
-                                                {{!empty($vendor->shipping_city)?$vendor->shipping_city:'' .', '}}<br>
-                                                {{!empty($vendor->shipping_state)?$vendor->shipping_state:'',', '}},
-                                                {{!empty($vendor->shipping_zip)?$vendor->shipping_zip:''}}<br>
-                                                {{!empty($vendor->shipping_country)?$vendor->shipping_country:''}}<br>
-                                            @else
-                                            -
-                                            @endif
+                                            <strong>{{ __('Shipped From') }} :</strong>
+                                            <br>
+                                            <strong> SupplierTin </strong>:
+                                            {{ !empty($purchase->spplrTin) ? $purchase->spplrTin : '' }}
+                                            <br>
+                                            <strong> Supplier Name </strong>:
+                                            {{ !empty($purchase->spplrNm) ? $purchase->spplrNm : '' }}
+                                            <br>
+                                            <strong> SupplierBhfId </strong>:
+                                            {{ !empty($purchase->spplrBhfId) ? $purchase->spplrBhfId : '' }}
+                                            <br>
+                                            <strong> Supplier InvoiceNo </strong>:
+                                            {{ !empty($purchase->spplrInvcNo) ? $purchase->spplrInvcNo : '' }}
+                                            <br>
+                                            <strong> Supplier SdcId </strong>:
+                                            {{ !empty($purchase->spplrSdcId) ? $purchase->spplrSdcId : '' }}
+                                            <br>
+                                            <strong> Supplier MrcNo</strong>:
+                                            {{ !empty($purchase->spplrMrcNo) ? $purchase->spplrMrcNo : '' }}
+                                            <br>
                                         </small>
                                     </div>
                                 @endif
@@ -177,15 +175,22 @@
                             <div class="row mt-3">
                                 <div class="col">
                                     <small>
-                                        <strong>{{__('Status')}} :</strong><br>
-                                        @if($purchase->status == 1)
-                                            <span class="badge bg-warning p-2 px-3 rounded">{{ __(\App\Models\Purchase::$statues[$purchase->status]) }}</span>
+                                        <strong>{{ __('Status') }} :</strong><br>
+                                        @if ($purchase->status == 0)
+                                            <span
+                                                class="badge bg-secondary p-2 px-3 rounded">Draft</span>
+                                        @elseif($purchase->status == 1)
+                                            <span
+                                                class="badge bg-warning p-2 px-3 rounded">Sent</span>
                                         @elseif($purchase->status == 2)
-                                            <span class="badge bg-danger p-2 px-3 rounded">{{ __(\App\Models\Purchase::$statues[$purchase->status]) }}</span>
+                                            <span
+                                                class="badge bg-danger p-2 px-3 rounded">Unpaid</span>
                                         @elseif($purchase->status == 3)
-                                            <span class="badge bg-info p-2 px-3 rounded">{{ __(\App\Models\Purchase::$statues[$purchase->status]) }}</span>
+                                            <span
+                                                class="badge bg-info p-2 px-3 rounded">Partially Paid</span>
                                         @elseif($purchase->status == 4)
-                                            <span class="badge bg-success p-2 px-3 rounded">{{ __(\App\Models\Purchase::$statues[$purchase->status]) }}</span>
+                                            <span
+                                                class="badge bg-success p-2 px-3 rounded">Paid</span>
                                         @endif
                                     </small>
                                 </div>
@@ -193,57 +198,108 @@
 
                             </div>
 
-                            <div class="row mt-4">
+                                            <div class="row mt-4">
                                 <div class="col-md-12">
-                                    <div class="font-bold mb-2">{{__('Product Summary')}}</div>
-                                    <small class="mb-2">{{__('All items here cannot be deleted.')}}</small>
+                                    <div class="font-bold mb-2">{{ __('Products Summary') }}</div>
+                                    <small class="mb-2">{{ __('All items here cannot be deleted.') }}</small>
                                     <div class="table-responsive mt-3">
                                         <table class="table ">
                                             <tr>
                                                 <th class="text-dark" data-width="40">#</th>
-                                                <th class="text-dark">{{__('Product')}}</th>
-                                                <th class="text-dark">{{__('Quantity')}}</th>
-                                                <th class="text-dark">{{__('Rate')}}</th>
-                                                <th class="text-dark">{{__('Discount')}}</th>
-                                                <th class="text-dark">{{__('Tax')}}</th>
-                                                <th class="text-dark">{{__('Description')}}</th>
-                                                <th class="text-end text-dark" width="12%">{{__('Price')}}<br>
-                                                    <small class="text-danger font-weight-bold">{{__('after tax & discount')}}</small>
+                                                <th class="text-dark">{{ __('Product') }}</th>
+                                                <th class="text-dark">{{ __('Quantity') }}</th>
+                                                <th class="text-dark">{{ __('Rate') }}</th>
+                                                <th class="text-dark">{{ __('Discount') }}</th>
+                                                <th class="text-dark">{{ __('Tax') }}</th>
+                                                <th class="text-dark">{{ __('Supply Amount') }}</th>
+                                                <th class="text-end text-dark" width="12%">{{ __('Price') }}<br>
+                                                    <small
+                                                        class="text-danger font-weight-bold">{{ __('after tax & discount') }}</small>
                                                 </th>
                                                 <th></th>
                                             </tr>
+
+                                            @foreach ($purchaseItems as $item)
+                                                <tr>
+                                                    <td> {{ !empty($item->id) ? $item->id : '' }}</td>
+                                                    <td>{{ !empty($item->itemNm) ? $item->itemNm : '' }}</td>
+                                                    <td>{{ !empty($item->qty) ? $item->qty : '' }}</td>
+                                                    <td>Kes {{ !empty($item->prc) ? $item->prc : '' }}</td>
+                                                    <td>{{ !empty($item->dcAmt) ? $item->dcAmt : '' }}</td>
+                                                    <td>
+                                                        @php
+                                                            // Map taxTyCd to its corresponding description
+                                                            $taxDescription = '';
+                                                            switch ($item->taxTyCd) {
+                                                                case 'A':
+                                                                    $taxDescription = 'A-Exmpt';
+                                                                    break;
+                                                                case 'B':
+                                                                    $taxDescription = 'B-VAT 16%';
+                                                                    break;
+                                                                case 'C':
+                                                                    $taxDescription = 'C-Zero Rated';
+                                                                    break;
+                                                                case 'D':
+                                                                    $taxDescription = 'D-Non VAT';
+                                                                    break;
+                                                                case 'E':
+                                                                    $taxDescription = 'E-VAT 8%';
+                                                                    break;
+                                                                case 'F':
+                                                                    $taxDescription = 'F-Non Tax';
+                                                                    break;
+                                                                default:
+                                                                    $taxDescription = ''; // Handle unknown tax codes here
+                                                                    break;
+                                                            }
+                                                        @endphp
+                                                        {{ $taxDescription }}
+                                                    </td>
+                                                    <td>Kes {{ !empty($item->splyAmt) ? $item->splyAmt : '' }}</td>
+                                                    <td>Kes {{ !empty($item->totAmt) ? $item->totAmt : '' }}</td>
+                                                </tr>
+                                            @endforeach
                                             <tfoot>
-                                            <tr>
-                                                <td colspan="6"></td>
-                                                <td class="text-end"><b>{{__('Sub Total')}}</b></td>
-                                            </tr>
+                                                <tr>
+                                                    <td colspan="6"></td>
+                                                    <td class="text-end"><b>{{ __('Sub Total') }}</b></td>
+                                                    <td class="text-end">
+                                                     Kes {{ $purchaseItems->sum('prc') }} </td>
+                                                </tr>
 
                                                 <tr>
                                                     <td colspan="6"></td>
-                                                    <td class="text-end"><b>{{__('Discount')}}</b></td>
+                                                    <td class="text-end"><b>{{ __('Discount') }}</b></td>
+                                                    <td class="text-end">
+                                                            Kes {{ $purchaseItems->sum('dcAmt') }}
+                                                    </td>
                                                 </tr>
-
-                                            @if(!empty($taxesData))
-                                                @foreach($taxesData as $taxName => $taxPrice)
-                                                    <tr>
-                                                        <td colspan="6"></td>
-                                                        <td class="text-end"><b>{{$taxName}}</b></td>
-                                                        <td class="text-end">{{ \Auth::user()->priceFormat($taxPrice) }}</td>
-                                                    </tr>
-                                                @endforeach
-                                            @endif
-                                            <tr>
-                                                <td colspan="6"></td>
-                                                <td class="blue-text text-end"><b>{{__('Total')}}</b></td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="6"></td>
-                                                <td class="text-end"><b>{{__('Paid')}}</b></td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="6"></td>
-                                                <td class="text-end"><b>{{__('Due')}}</b></td>
-                                            </tr>
+                                                <tr>
+                                                    <td colspan="6"></td>
+                                                    <td class="text-end"><b>{{ __('Tax Amount') }}</b></td>
+                                                    <td class="text-end">
+                                                        Kes {{ $purchaseItems->sum('taxAmt') }} </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6"></td>
+                                                    <td class="blue-text text-end"><b>{{ __('Total') }}</b></td>
+                                                    <td class="blue-text text-end">
+                                                         Kes {{ $purchaseItems->sum('prc') }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6"></td>
+                                                    <td class="text-end"><b>{{ __('Paid') }}</b></td>
+                                                    <td class="text-end">
+                                                        {{ \Auth::user()->priceFormat($purchase->getTotal() - $purchase->getDue()) }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6"></td>
+                                                    <td class="text-end"><b>{{ __('Due') }}</b></td>
+                                                    <td class="text-end">
+                                                        {{ \Auth::user()->priceFormat($purchase->getDue()) }}</td>
+                                                </tr>
                                             </tfoot>
                                         </table>
                                     </div>
@@ -255,6 +311,7 @@
             </div>
         </div>
     </div>
+
 
     <div class="row">
         <div class="col-12">

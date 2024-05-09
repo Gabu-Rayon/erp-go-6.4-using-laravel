@@ -621,14 +621,35 @@ class PurchaseController extends Controller
                 \Log::info('PURCHASE');
                 \lOG::INFO($purchase);
 
-                // Check the status of the purchase
+                // Check the status of the purchase 
+                /***
+                 *  'Draft', is 0
+                 *  'Sent', is 1
+                 *  'Unpaid', is 2
+                 * 'Partialy Paid', is 3
+                 * 'Paid',  is 4 
+                 */
                 $status = $purchase->status;
                 if ($status == 4) {
+
+                    // Retrieve associated purchase sales items
+                    $purchaseItems = Purchase_Sales_Items::where('saleItemCode', $purchase->spplrInvcNo)->get();
+
+                    // Retrieve associated purchase payments
+                    $purchasePayments = PurchasePayment::where('purchase_id', $purchase->id)->get();
+
                     // If status is 'Paid', redirect to purchase.view
-                    return view('purchase.view', compact('purchase'));
+                    return view('purchase.view', compact('purchase', 'purchaseItems', 'purchasePayments'));
                 } else {
+
+                    // Retrieve associated purchase sales items
+                    $purchaseItems = Purchase_Sales_Items::where('saleItemCode', $purchase->spplrInvcNo)->get();
+
+                    // Retrieve associated purchase payments
+                    $purchasePayments = PurchasePayment::where('purchase_id', $purchase->id)->get();
+
                     // For other statuses, render the show view
-                    return view('purchase.show', compact('purchase'));
+                    return view('purchase.show', compact('purchase', 'purchaseItems', 'purchasePayments'));
                 }
             } catch (\Exception $e) {
                 \Log::error($e);
@@ -780,37 +801,65 @@ class PurchaseController extends Controller
     }
     public function sent($id)
     {
+
+
         if (\Auth::user()->can('send purchase')) {
-            $purchase = Purchase::where('id', $id)->first();
+            $purchase = Purchase_Sales::where('id', $id)->first();
+
+            if (!$purchase) {
+                // Handle the case where the purchase doesn't exist
+                return redirect()->back()->with('error', 'Purchase not found.');
+            }
+
+            // If the purchase exists, update its properties
             $purchase->send_date = date('Y-m-d');
             $purchase->status = 1;
             $purchase->save();
 
-            $vender = Vender::where('id', $purchase->vender_id)->first();
+            // Assign the value of spplrNm to $purchase->name
+            $purchase->name = $purchase->spplrNm;
 
-            $purchase->name = !empty($vender) ? $vender->name : '';
-            $purchase->purchase = \Auth::user()->purchaseNumberFormat($purchase->purchase_id);
+
+            // Retrieve the purchase number from purchase_payments table
+            $purchasePayment = PurchasePayment::where('purchase_id', $purchase->id)->first();
+            $purchaseId = $purchasePayment ? $purchasePayment->purchase_id : null;
+
+            // Format the purchase number
+            $purchase->purchase = \Auth::user()->purchaseNumberFormat($purchaseId);
+
+
 
             $purchaseId = Crypt::encrypt($purchase->id);
             $purchase->url = route('purchase.pdf', $purchaseId);
 
-            Utility::userBalance('vendor', $vender->id, $purchase->getTotal(), 'credit');
+            // Calculate the sum of totAmt
+            $totalAmount = Purchase_Sales::where('id', $id)->sum('totAmt');
 
+            // Retrieve the vendor ID and tin from the Purchase_Sales model
+            $vendorId = $purchase->spplrTin;
+
+            // Update Vendor Balance
+            Utility::userBalance('vendor', $vendorId, $totalAmount, 'credit');
+            
+            $vendorId = 1;
+            $vendorEmail = 'example@example.com'; 
+
+            // Create the array with hardcoded data
             $vendorArr = [
                 'vender_bill_name' => $purchase->name,
                 'vender_bill_number' => $purchase->purchase,
                 'vender_bill_url' => $purchase->url,
-
+                $vendorId => $vendorEmail, 
             ];
-            $resp = \App\Models\Utility::sendEmailTemplate('vender_bill_sent', [$vender->id => $vender->email], $vendorArr);
-
-            return redirect()->back()->with('success', __('Purchase successfully sent.') . (($resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
+            $resp = Utility::sendEmailTemplate('vender_bill_sent', [$vender->id => $vender->email], $vendorArr);
+            
+            return redirect()->back()->with('success', __('Purchase successfully sent.') . (($resp['is_success'] == false && !empty($resp['error'])) ? '<br>
+             <span class="text-danger">' . $resp['error'] . '</span>' : ''));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
 
     }
-
     public function resent($id)
     {
 
@@ -851,7 +900,66 @@ class PurchaseController extends Controller
             //        }
             //
             //        return redirect()->back()->with('success', __('Bill successfully sent.') . (($resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
-//
+             
+            /*******
+
+            if (\Auth::user()->can('send purchase')) {
+                $purchase = Purchase_Sales::where('id', $id)->first();
+
+                if (!$purchase) {
+                    // Handle the case where the purchase doesn't exist
+                    return redirect()->back()->with('error', 'Purchase not found.');
+                }
+
+                // If the purchase exists, update its properties
+                $purchase->send_date = date('Y-m-d');
+                $purchase->status = 1;
+                $purchase->save();
+
+                // Assign the value of spplrNm to $purchase->name
+                $purchase->name = $purchase->spplrNm;
+
+
+                // Retrieve the purchase number from purchase_payments table
+                $purchasePayment = PurchasePayment::where('purchase_id', $purchase->id)->first();
+                $purchaseId = $purchasePayment ? $purchasePayment->purchase_id : null;
+
+                // Format the purchase number
+                $purchase->purchase = \Auth::user()->purchaseNumberFormat($purchaseId);
+
+
+
+                $purchaseId = Crypt::encrypt($purchase->id);
+                $purchase->url = route('purchase.pdf', $purchaseId);
+
+                // Calculate the sum of totAmt
+                $totalAmount = Purchase_Sales::where('id', $id)->sum('totAmt');
+
+                // Retrieve the vendor ID and tin from the Purchase_Sales model
+                $vendorId = $purchase->spplrTin;
+
+                // Update Vendor Balance
+                Utility::userBalance('vendor', $vendorId, $totalAmount, 'credit');
+
+                $vendorId = 1;
+                $vendorEmail = 'example@example.com';
+
+                // Create the array with hardcoded data
+                $vendorArr = [
+                    'vender_bill_name' => $purchase->name,
+                    'vender_bill_number' => $purchase->purchase,
+                    'vender_bill_url' => $purchase->url,
+                    $vendorId => $vendorEmail,
+                ];
+                $resp = Utility::sendEmailTemplate('vender_bill_sent', [$vender->id => $vender->email], $vendorArr);
+
+                return redirect()->back()->with('success', __('Purchase successfully sent.') . (($resp['is_success'] == false && !empty($resp['error'])) ? '<br>
+             <span class="text-danger">' . $resp['error'] . '</span>' : ''));
+            } else {
+                return redirect()->back()->with('error', __('Permission denied.'));
+            }
+         *****/
+            
             return redirect()->back()->with('success', __('Bill successfully sent.'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
@@ -1119,7 +1227,9 @@ class PurchaseController extends Controller
         }
 
     }
+      
 
+    //Show the create Payment Form 
     public function payment($purchase_id)
     {
         if (\Auth::user()->can('create payment purchase')) {
@@ -1135,7 +1245,9 @@ class PurchaseController extends Controller
 
         }
     }
-
+      
+    //POST all the data fro mthe form to the database 
+    
     public function createPayment(Request $request, $purchase_id)
     {
         if (\Auth::user()->can('create payment purchase')) {

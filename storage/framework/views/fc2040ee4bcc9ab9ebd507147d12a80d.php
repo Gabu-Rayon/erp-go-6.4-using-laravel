@@ -220,13 +220,13 @@
                                     <td class="form-group col-md-3">
                                         <?php echo e(Form::label('isInrcApplicable', __('Is Inrc Applicable'),['class'=>'form-label'])); ?>
 
-                                        <?php echo e(Form::text('isInrcApplicable', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+                                        <?php echo e(Form::select('isInrcApplicable', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-3">
                                         <?php echo e(Form::label('isUsed', __('Is Used'),['class'=>'form-label'])); ?>
 
-                                        <?php echo e(Form::text('isUsed', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+                                        <?php echo e(Form::select('isUsed', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-3">

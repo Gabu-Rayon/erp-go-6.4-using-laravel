@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('rcptTyCd')->nullable();
             $table->string('pmtTyCd')->nullable();
             $table->dateTime('cfmDt')->nullable(); 
+            $table->dateTime('send_')->nullable(); 
             $table->dateTime('salesDt')->nullable(); 
             $table->dateTime('stockRlsDt')->nullable();
             $table->string('warehouseDate')->nullable();

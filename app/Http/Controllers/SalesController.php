@@ -32,6 +32,16 @@ class SalesController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+     function customerNumber()
+    {
+        $latest = Customer::where('created_by', '=', \Auth::user()->creatorId())->latest()->first();
+        if (!$latest) {
+            return 1;
+        }
+
+        return $latest->customer_id + 1;
+    }
+    
     public function create()
     {
         try {
@@ -127,6 +137,7 @@ class SalesController extends Controller
                 'customerName' => $data['customerName'],
                 'customerTin' => $data['customerTin'],
                 'customerNo' => $data['customerNo'],
+              'customer_id' => $this->customerNumber(),
                 'customerMobileNo' => $data['customerMobileNo'],
                 'salesType' => $data['salesType'],
                 'paymentType' => $data['paymentType'],
@@ -148,6 +159,7 @@ class SalesController extends Controller
             foreach ($itemsDataList as $saleItem) {
                 SalesCreditNoteItems::create([
                     'sales_credit_note_id' => $sale->id,
+                    'customer_id' => $this->customerNumber(),
                     'itemCode' => $saleItem['itemCode'],
                     'itemClassCode' => $saleItem['itemClassCode'],
                     'itemTypeCode' => $saleItem['itemTypeCode'],

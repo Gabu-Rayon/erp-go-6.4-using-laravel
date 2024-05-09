@@ -123,7 +123,7 @@
                                         <div class="me-4">
                                             <small>
                                                 <strong><?php echo e(__('Issue Date')); ?> :</strong><br>
-                                                <?php echo e(\Auth::user()->dateFormat($purchase->purchase_date)); ?><br><br>
+                                                <?php echo e(\Auth::user()->dateFormat($purchase->cfmDt)); ?><br><br>
                                             </small>
                                         </div>
 
@@ -132,42 +132,45 @@
                             </div>
 
 
-                            <div class="row">
+                           <div class="row">
                                 <div class="col">
                                     <small class="font-style">
-                                        <strong><?php echo e(__('Billed To')); ?> :</strong><br>
-                                        <?php if(!empty($vendor->billing_name)): ?>
-                                            <?php echo e(!empty($vendor->billing_name)?$vendor->billing_name:''); ?><br>
-                                            <?php echo e(!empty($vendor->billing_address)?$vendor->billing_address:''); ?><br>
-                                            <?php echo e(!empty($vendor->billing_city)?$vendor->billing_city:'' .', '); ?> <br>
-                                            <?php echo e(!empty($vendor->billing_state)?$vendor->billing_state:'',', '); ?>,
-                                            <?php echo e(!empty($vendor->billing_zip)?$vendor->billing_zip:''); ?><br>
-                                            <?php echo e(!empty($vendor->billing_country)?$vendor->billing_country:''); ?><br>
-                                            <?php echo e(!empty($vendor->billing_phone)?$vendor->billing_phone:''); ?><br>
-                                            <?php if($settings['vat_gst_number_switch'] == 'on'): ?>
-                                                <strong><?php echo e(__('Tax Number ')); ?> : </strong><?php echo e(!empty($vendor->tax_number)?$vendor->tax_number:'-'); ?>
+                                        <strong><?php echo e(__('Shipped To')); ?> :</strong><br>
+                                        <strong>Company </strong>:
 
-                                            <?php endif; ?>
-                                        <?php else: ?>
-                                            -
-                                        <?php endif; ?>
+                                        <br>
                                     </small>
                                 </div>
 
-                                <?php if(App\Models\Utility::getValByName('shipping_display')=='on'): ?>
+                                <?php if(App\Models\Utility::getValByName('shipping_display') == 'on'): ?>
                                     <div class="col">
                                         <small>
-                                            <strong><?php echo e(__('Shipped To')); ?> :</strong><br>
-                                            <?php if(!empty($vendor->shipping_name)): ?>
-                                                <?php echo e(!empty($vendor->shipping_name)?$vendor->shipping_name:''); ?><br>
-                                                <?php echo e(!empty($vendor->shipping_address)?$vendor->shipping_address:''); ?><br>
-                                                <?php echo e(!empty($vendor->shipping_city)?$vendor->shipping_city:'' .', '); ?><br>
-                                                <?php echo e(!empty($vendor->shipping_state)?$vendor->shipping_state:'',', '); ?>,
-                                                <?php echo e(!empty($vendor->shipping_zip)?$vendor->shipping_zip:''); ?><br>
-                                                <?php echo e(!empty($vendor->shipping_country)?$vendor->shipping_country:''); ?><br>
-                                            <?php else: ?>
-                                            -
-                                            <?php endif; ?>
+                                            <strong><?php echo e(__('Shipped From')); ?> :</strong>
+                                            <br>
+                                            <strong> SupplierTin </strong>:
+                                            <?php echo e(!empty($purchase->spplrTin) ? $purchase->spplrTin : ''); ?>
+
+                                            <br>
+                                            <strong> Supplier Name </strong>:
+                                            <?php echo e(!empty($purchase->spplrNm) ? $purchase->spplrNm : ''); ?>
+
+                                            <br>
+                                            <strong> SupplierBhfId </strong>:
+                                            <?php echo e(!empty($purchase->spplrBhfId) ? $purchase->spplrBhfId : ''); ?>
+
+                                            <br>
+                                            <strong> Supplier InvoiceNo </strong>:
+                                            <?php echo e(!empty($purchase->spplrInvcNo) ? $purchase->spplrInvcNo : ''); ?>
+
+                                            <br>
+                                            <strong> Supplier SdcId </strong>:
+                                            <?php echo e(!empty($purchase->spplrSdcId) ? $purchase->spplrSdcId : ''); ?>
+
+                                            <br>
+                                            <strong> Supplier MrcNo</strong>:
+                                            <?php echo e(!empty($purchase->spplrMrcNo) ? $purchase->spplrMrcNo : ''); ?>
+
+                                            <br>
                                         </small>
                                     </div>
                                 <?php endif; ?>
@@ -184,14 +187,21 @@
                                 <div class="col">
                                     <small>
                                         <strong><?php echo e(__('Status')); ?> :</strong><br>
-                                        <?php if($purchase->status == 1): ?>
-                                            <span class="badge bg-warning p-2 px-3 rounded"><?php echo e(__(\App\Models\Purchase::$statues[$purchase->status])); ?></span>
+                                        <?php if($purchase->status == 0): ?>
+                                            <span
+                                                class="badge bg-secondary p-2 px-3 rounded">Draft</span>
+                                        <?php elseif($purchase->status == 1): ?>
+                                            <span
+                                                class="badge bg-warning p-2 px-3 rounded">Sent</span>
                                         <?php elseif($purchase->status == 2): ?>
-                                            <span class="badge bg-danger p-2 px-3 rounded"><?php echo e(__(\App\Models\Purchase::$statues[$purchase->status])); ?></span>
+                                            <span
+                                                class="badge bg-danger p-2 px-3 rounded">Unpaid</span>
                                         <?php elseif($purchase->status == 3): ?>
-                                            <span class="badge bg-info p-2 px-3 rounded"><?php echo e(__(\App\Models\Purchase::$statues[$purchase->status])); ?></span>
+                                            <span
+                                                class="badge bg-info p-2 px-3 rounded">Partially Paid</span>
                                         <?php elseif($purchase->status == 4): ?>
-                                            <span class="badge bg-success p-2 px-3 rounded"><?php echo e(__(\App\Models\Purchase::$statues[$purchase->status])); ?></span>
+                                            <span
+                                                class="badge bg-success p-2 px-3 rounded">Paid</span>
                                         <?php endif; ?>
                                     </small>
                                 </div>
@@ -199,9 +209,9 @@
 
                             </div>
 
-                            <div class="row mt-4">
+                                            <div class="row mt-4">
                                 <div class="col-md-12">
-                                    <div class="font-bold mb-2"><?php echo e(__('Product Summary')); ?></div>
+                                    <div class="font-bold mb-2"><?php echo e(__('Products Summary')); ?></div>
                                     <small class="mb-2"><?php echo e(__('All items here cannot be deleted.')); ?></small>
                                     <div class="table-responsive mt-3">
                                         <table class="table ">
@@ -212,44 +222,98 @@
                                                 <th class="text-dark"><?php echo e(__('Rate')); ?></th>
                                                 <th class="text-dark"><?php echo e(__('Discount')); ?></th>
                                                 <th class="text-dark"><?php echo e(__('Tax')); ?></th>
-                                                <th class="text-dark"><?php echo e(__('Description')); ?></th>
+                                                <th class="text-dark"><?php echo e(__('Supply Amount')); ?></th>
                                                 <th class="text-end text-dark" width="12%"><?php echo e(__('Price')); ?><br>
-                                                    <small class="text-danger font-weight-bold"><?php echo e(__('after tax & discount')); ?></small>
+                                                    <small
+                                                        class="text-danger font-weight-bold"><?php echo e(__('after tax & discount')); ?></small>
                                                 </th>
                                                 <th></th>
                                             </tr>
+
+                                            <?php $__currentLoopData = $purchaseItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <tr>
+                                                    <td> <?php echo e(!empty($item->id) ? $item->id : ''); ?></td>
+                                                    <td><?php echo e(!empty($item->itemNm) ? $item->itemNm : ''); ?></td>
+                                                    <td><?php echo e(!empty($item->qty) ? $item->qty : ''); ?></td>
+                                                    <td>Kes <?php echo e(!empty($item->prc) ? $item->prc : ''); ?></td>
+                                                    <td><?php echo e(!empty($item->dcAmt) ? $item->dcAmt : ''); ?></td>
+                                                    <td>
+                                                        <?php
+                                                            // Map taxTyCd to its corresponding description
+                                                            $taxDescription = '';
+                                                            switch ($item->taxTyCd) {
+                                                                case 'A':
+                                                                    $taxDescription = 'A-Exmpt';
+                                                                    break;
+                                                                case 'B':
+                                                                    $taxDescription = 'B-VAT 16%';
+                                                                    break;
+                                                                case 'C':
+                                                                    $taxDescription = 'C-Zero Rated';
+                                                                    break;
+                                                                case 'D':
+                                                                    $taxDescription = 'D-Non VAT';
+                                                                    break;
+                                                                case 'E':
+                                                                    $taxDescription = 'E-VAT 8%';
+                                                                    break;
+                                                                case 'F':
+                                                                    $taxDescription = 'F-Non Tax';
+                                                                    break;
+                                                                default:
+                                                                    $taxDescription = ''; // Handle unknown tax codes here
+                                                                    break;
+                                                            }
+                                                        ?>
+                                                        <?php echo e($taxDescription); ?>
+
+                                                    </td>
+                                                    <td>Kes <?php echo e(!empty($item->splyAmt) ? $item->splyAmt : ''); ?></td>
+                                                    <td>Kes <?php echo e(!empty($item->totAmt) ? $item->totAmt : ''); ?></td>
+                                                </tr>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             <tfoot>
-                                            <tr>
-                                                <td colspan="6"></td>
-                                                <td class="text-end"><b><?php echo e(__('Sub Total')); ?></b></td>
-                                            </tr>
+                                                <tr>
+                                                    <td colspan="6"></td>
+                                                    <td class="text-end"><b><?php echo e(__('Sub Total')); ?></b></td>
+                                                    <td class="text-end">
+                                                     Kes <?php echo e($purchaseItems->sum('prc')); ?> </td>
+                                                </tr>
 
                                                 <tr>
                                                     <td colspan="6"></td>
                                                     <td class="text-end"><b><?php echo e(__('Discount')); ?></b></td>
-                                                </tr>
+                                                    <td class="text-end">
+                                                            Kes <?php echo e($purchaseItems->sum('dcAmt')); ?>
 
-                                            <?php if(!empty($taxesData)): ?>
-                                                <?php $__currentLoopData = $taxesData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $taxName => $taxPrice): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <tr>
-                                                        <td colspan="6"></td>
-                                                        <td class="text-end"><b><?php echo e($taxName); ?></b></td>
-                                                        <td class="text-end"><?php echo e(\Auth::user()->priceFormat($taxPrice)); ?></td>
-                                                    </tr>
-                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                            <?php endif; ?>
-                                            <tr>
-                                                <td colspan="6"></td>
-                                                <td class="blue-text text-end"><b><?php echo e(__('Total')); ?></b></td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="6"></td>
-                                                <td class="text-end"><b><?php echo e(__('Paid')); ?></b></td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="6"></td>
-                                                <td class="text-end"><b><?php echo e(__('Due')); ?></b></td>
-                                            </tr>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6"></td>
+                                                    <td class="text-end"><b><?php echo e(__('Tax Amount')); ?></b></td>
+                                                    <td class="text-end">
+                                                        Kes <?php echo e($purchaseItems->sum('taxAmt')); ?> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6"></td>
+                                                    <td class="blue-text text-end"><b><?php echo e(__('Total')); ?></b></td>
+                                                    <td class="blue-text text-end">
+                                                         Kes <?php echo e($purchaseItems->sum('prc')); ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6"></td>
+                                                    <td class="text-end"><b><?php echo e(__('Paid')); ?></b></td>
+                                                    <td class="text-end">
+                                                        <?php echo e(\Auth::user()->priceFormat($purchase->getTotal() - $purchase->getDue())); ?>
+
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6"></td>
+                                                    <td class="text-end"><b><?php echo e(__('Due')); ?></b></td>
+                                                    <td class="text-end">
+                                                        <?php echo e(\Auth::user()->priceFormat($purchase->getDue())); ?></td>
+                                                </tr>
                                             </tfoot>
                                         </table>
                                     </div>
@@ -261,6 +325,7 @@
             </div>
         </div>
     </div>
+
 
     <div class="row">
         <div class="col-12">
