@@ -12,48 +12,12 @@ use App\Models\ProductServiceCategory;
 
 class ProductServiceCategoryController extends Controller
 {
-    // public function index()
-    // {
-    //     if (\Auth::user()->can('manage constant category')) {
-    //         $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->get();
-
-    //         return view('productServiceCategory.index', compact('categories'));
-    //     } else {
-    //         return redirect()->back()->with('error', __('Permission denied.'));
-    //     }
-    // }
-
     public function index()
     {
         if (\Auth::user()->can('manage constant category')) {
-            try {
-                // $response = Http::withHeaders([
-                //     'accept' => 'application/json',
-                //     'Content-Type' => 'application/json',
-                //     'key' => '123456',
-                // ])->get('https://etims.your-apps.biz/ItemClassificationList', [
-                //         'date' => date('2024-04-09'),
-                //     ]);
+            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->get();
 
-                $response = Http::withOptions([
-                    'verify' => false
-                ])->withHeaders([
-                    'key' => '123456',
-                ])->get('https://etims.your-apps.biz/api/GetItemClassificationList?date=20210101120000');
-
-                        \Log::error($response);
-                if ($response->successful()) {
-                    $ItemClassificationLists = $response->json();
-                    return view('productServiceCategory.index', compact('ItemClassificationLists'));
-                } else {
-                    \Log::error('Failed to fetch Item Classification Lists from API');
-                    return redirect()->back()->with('error', 'Failed to fetch Item Classification Lists from API');
-                }
-            } catch (\Exception $e) {
-                // Log exception and handle exception
-                \Log::error('Exception occurred while fetching Item Classification Lists: ' . $e->getMessage());
-                return redirect()->back()->with('error', 'Failed to fetch Item Classification  Lists from the API');
-            }
+            return view('productServiceCategory.index', compact('categories'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }

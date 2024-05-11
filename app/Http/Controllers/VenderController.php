@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\VenderExport;
-use App\Imports\VenderImport;
+use Auth;
+use File;
+use App\Models\Plan;
+use App\Models\User;
+use App\Models\Vender;
+use App\Models\Utility;
 use App\Models\CustomField;
 use App\Models\Transaction;
-use App\Models\Utility;
-use App\Models\Vender;
-use Auth;
-use App\Models\User;
-use App\Models\Plan;
-use File;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
+use App\Exports\VenderExport;
+use App\Imports\VenderImport;
 use Illuminate\Validation\Rule;
-use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Crypt;
 
 
 class VenderController extends Controller
@@ -560,5 +561,52 @@ class VenderController extends Controller
         }
 
         return redirect()->back()->with($data['status'], $data['msg']);
+    }
+    public function getSuppliersDetailsFromApi()
+    {
+        try {
+            ini_set('max_execution_time', 300);
+            $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
+
+            $response = Http::withHeaders([
+                'key' => '123456'
+            ])->timeout(300)->get($url);
+
+            $data = $response->json()['data'];
+            $salesSuppliers = $data['data']['saleList'];
+
+            // Log API request and response details
+            \Log::info('API Request Data of Suppliers / Vender Details  of Sales and Purchases: ' . json_encode($data));
+            \Log::info('API Request Data of Suppliers / Vender Details  of Sales and Purchases: ' . json_encode($salesSuppliers));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+
+            // Divide the data into batches of 100 items each
+            $batches = array_chunk($salesSuppliers, 100);
+
+            foreach ($batches as $batch) {
+                foreach ($batch as $item) {
+                    // Process each batch
+                    Vender::create([
+                        'vender_id' => $this->venderNumber(),
+                        'name' => $item['spplrNm'],
+                        'tax_number' => $item['spplrTin'],                     
+                        'spplrTin' => $item['spplrTin'],
+                        'spplrNm' => $item['spplrNm'],
+                        'spplrBhfId' => $item['spplrBhfId'],
+                        'spplrInvcNo' => $item['spplrInvcNo'],
+                        'spplrSdcId' => $item['spplrSdcId'],
+                        'spplrMrcNo' => $item['spplrMrcNo'],
+                        'created_by' => \Auth::user()->creatorId(),                      
+                    ]);
+                }
+            }
+
+            return redirect()->route('vender.index')->with('success', __('Suppliers / Vender Details successfully created From Api.'));
+        } catch (\Exception $e) {
+            \Log::error('Error addingSuppliers / Vender Details  Details  from the API: ');
+            \Log::info($e);
+            return redirect()->route('vender.index')->with('error', __('Error adding Suppliers / Vender Details  Details  from the API.'));
+        }
     }
 }

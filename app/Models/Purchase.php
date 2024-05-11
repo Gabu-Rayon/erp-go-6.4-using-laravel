@@ -12,7 +12,6 @@ class Purchase extends Model
     use HasFactory;
 
     protected $fillable = [
-        'purchase_id',
         'vender_id',
         'warehouse_id',
         'purchase_date',
@@ -20,6 +19,37 @@ class Purchase extends Model
         'discount_apply',
         'category_id',
         'created_by',
+        'spplrTin',
+        'spplrNm',
+        'spplrBhfId',
+        'spplrInvcNo',
+        'spplrSdcId',
+        'spplrMrcNo',
+        'rcptTyCd',
+        'pmtTyCd',
+        'cfmDt',
+        'salesDt',
+        'stockRlsDt',
+        'totItemCnt',
+        'taxblAmtA',
+        'taxblAmtB',
+        'taxblAmtC',
+        'taxblAmtD',
+        'taxblAmtE',
+        'taxRtA',
+        'taxRtB',
+        'taxRtC',
+        'taxRtD',
+        'taxRtE',
+        'taxAmtA',
+        'taxAmtB',
+        'taxAmtC',
+        'taxAmtD',
+        'taxAmtE',
+        'totTaxblAmt',
+        'totTaxAmt',
+        'totAmt',
+        'remark',
     ];
     public static $statues = [
         'Draft',
@@ -54,8 +84,7 @@ class Purchase extends Model
     {
 
         $subTotal = 0;
-        foreach($this->items as $product)
-        {
+        foreach ($this->items as $product) {
 
             $subTotal += ($product->price * $product->quantity);
         }
@@ -65,7 +94,7 @@ class Purchase extends Model
     public function getTotal()
     {
 
-        return ($this->getSubTotal() -$this->getTotalDiscount()) + $this->getTotalTax();
+        return ($this->getSubTotal() - $this->getTotalDiscount()) + $this->getTotalTax();
     }
     // public function getTotalTax()
     // {
@@ -85,8 +114,7 @@ class Purchase extends Model
     {
         $taxData = Utility::getTaxData();
         $totalTax = 0;
-        foreach($this->items as $product)
-        {
+        foreach ($this->items as $product) {
             // $taxes = Utility::totalTaxRate($product->tax);
 
             $taxArr = explode(',', $product->tax);
@@ -101,12 +129,11 @@ class Purchase extends Model
 
         return $totalTax;
     }
-    
+
     public function getTotalDiscount()
     {
         $totalDiscount = 0;
-        foreach($this->items as $product)
-        {
+        foreach ($this->items as $product) {
             $totalDiscount += $product->discount;
         }
 
@@ -115,8 +142,7 @@ class Purchase extends Model
     public function getDue()
     {
         $due = 0;
-        foreach($this->payments as $payment)
-        {
+        foreach ($this->payments as $payment) {
             $due += $payment->amount;
         }
 
@@ -137,46 +163,49 @@ class Purchase extends Model
 
         if ($month == 'true') {
             $purchaseProducts = \DB::table('purchase_products')
-                ->select('purchase_products.id as purchase',
+                ->select(
+                    'purchase_products.id as purchase',
                     \DB::raw('SUM(purchase_products.quantity) as quantity'),
                     \DB::raw('SUM(discount) as total_discount'),
                     \DB::raw('tax as tax'),
-                    \DB::raw('SUM(price)  as price'))
+                    \DB::raw('SUM(price)  as price')
+                )
                 ->leftJoin('purchases', 'purchase_products.purchase_id', 'purchases.id')
                 ->where(\DB::raw('MONTH(purchases.created_at)'), '=', [date('m')])
-            ->where('purchases.created_by', \Auth::user()->creatorId())
+                ->where('purchases.created_by', \Auth::user()->creatorId())
                 ->groupBy('purchase')
                 ->get()
                 ->keyBy('purchase');
         } else {
             $purchaseProducts = \DB::table('purchase_products')
-                ->select('purchase_products.id as purchase',
+                ->select(
+                    'purchase_products.id as purchase',
                     \DB::raw('SUM(quantity) as quantity'),
                     \DB::raw('SUM(discount) as total_discount'),
                     \DB::raw('tax as tax'),
-                    \DB::raw('SUM(price)  as price'))
+                    \DB::raw('SUM(price)  as price')
+                )
                 ->leftJoin('purchases', 'purchase_products.purchase_id', 'purchases.id')
-            ->where('purchases.created_by', \Auth::user()->creatorId())
+                ->where('purchases.created_by', \Auth::user()->creatorId())
                 ->groupBy('purchase')
                 ->get()
                 ->keyBy('purchase');
         }
-        
-        $total = 0;
-        
 
-        foreach($purchaseProducts as $purchase)
-        {
+        $total = 0;
+
+
+        foreach ($purchaseProducts as $purchase) {
             $getTaxData = Utility::getTaxData();
             $totalTaxPrice = 0;
             if (!empty($purchase->tax)) {
                 foreach (explode(',', $purchase->tax) as $tax) {
-                    $taxPrice = \Utility::taxRate($getTaxData[$tax]['rate'], $purchase->price, $purchase->quantity , $purchase->total_discount);
+                    $taxPrice = \Utility::taxRate($getTaxData[$tax]['rate'], $purchase->price, $purchase->quantity, $purchase->total_discount);
                     $totalTaxPrice += $taxPrice;
                 }
             }
 
-            $total += ($purchase->price  * $purchase->quantity) + $totalTaxPrice - $purchase->total_discount;
+            $total += ($purchase->price * $purchase->quantity) + $totalTaxPrice - $purchase->total_discount;
 
         }
         return $total;
@@ -193,11 +222,12 @@ class Purchase extends Model
     public static function getPurchaseReportChart()
     {
         $purchases = Purchase::whereDate('created_at', '>', Carbon::now()->subDays(10))
-                            ->where('created_by', '=', Auth::user()->creatorId())
-                            ->orderBy('created_at')->get()->groupBy(
-                                function ($val) {
-                                    return Carbon::parse($val->created_at)->format('dm');
-                                });
+            ->where('created_by', '=', Auth::user()->creatorId())
+            ->orderBy('created_at')->get()->groupBy(
+                function ($val) {
+                    return Carbon::parse($val->created_at)->format('dm');
+                }
+            );
 
         $total = [];
         if (!empty($purchases) && count($purchases) > 0) {
@@ -214,16 +244,15 @@ class Purchase extends Model
         $y = date("Y");
 
         for ($i = 0; $i <= 9; $i++) {
-            $date                      = date('Y-m-d', mktime(0, 0, 0, $m, ($d - $i), $y));
+            $date = date('Y-m-d', mktime(0, 0, 0, $m, ($d - $i), $y));
             $purchasesArray['label'][] = $date;
-            $date                      = date('dm', strtotime($date));
-            $purchasesArray['value'][] = array_key_exists($date, $total) ? $total[$date] : 0;;
+            $date = date('dm', strtotime($date));
+            $purchasesArray['value'][] = array_key_exists($date, $total) ? $total[$date] : 0;
+            ;
         }
 
         return $purchasesArray;
     }
-
-
 
 
 }

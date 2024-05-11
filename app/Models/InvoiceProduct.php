@@ -13,11 +13,27 @@ class InvoiceProduct extends Model
         'tax',
         'discount',
         'price',
+        'customer_id',
+        'itemCode',
+        'itemClassCode',
+        'itemTypeCode',
+        'itemName',
+        'orgnNatCd',
+        'taxTypeCode',
+        'unitPrice',
+        'isrcAplcbYn',
+        'pkgUnitCode',
+        'pkgQuantity',
+        'qtyUnitCd',
+        'discountRate',
+        'discountAmt',
+        'itemExprDate',
     ];
 
-    public function product(){
+    public function product()
+    {
         return $this->hasOne('App\Models\ProductService', 'id', 'product_id');
-    }    
+    }
 
-  
+
 }

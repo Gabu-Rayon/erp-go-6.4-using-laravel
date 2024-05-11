@@ -91,19 +91,17 @@
                                         <?php endif; ?>
                                     </td>
                                         <?php if(Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase')): ?>
-                                            <td class="Action">
-                                                <span>
-                                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('show purchase')): ?>
-                                                        <div class="action-btn bg-info ms-2">
-                                                            <a href="<?php echo e(route('purchase.show', ['id' => $purchase->id])); ?>"
-                                                                class="mx-3 btn btn-sm align-items-center"
-                                                                data-bs-toggle="tooltip" title="<?php echo e(__('Show')); ?>"
-                                                                data-original-title="<?php echo e(__('Detail')); ?>">
+                                        <td class="Action">
+                                            <span>
+
+                                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('show purchase')): ?>
+                                                    <div class="action-btn bg-info ms-2">
+                                                            <a href="<?php echo e(route('purchase.show',\Crypt::encrypt($purchase->id))); ?>" class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip" title="<?php echo e(__('Show')); ?>" data-original-title="<?php echo e(__('Detail')); ?>">
                                                                 <i class="ti ti-eye text-white"></i>
                                                             </a>
                                                         </div>
-                                                    <?php endif; ?>
-                                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('show purchase')): ?>
+                                                <?php endif; ?>
+                                                 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('show purchase')): ?>
                                                         <div class="action-btn bg-info ms-2">
                                                             <a href="<?php echo e(route('purchase.details', ['spplrInvcNo' => $purchase->spplrInvcNo])); ?>"
                                                                 class="mx-3 btn btn-sm align-items-center"
@@ -113,40 +111,27 @@
                                                                 <i class="ti ti-list text-white"></i></a>
                                                         </div>
                                                     <?php endif; ?>
-                                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit purchase')): ?>
-                                                        <div class="action-btn bg-primary ms-2">
-                                                            <a href="<?php echo e(route('purchase.edit', \Crypt::encrypt($purchase->id))); ?>"
-                                                                class="mx-3 btn btn-sm align-items-center"
-                                                                data-bs-toggle="tooltip" title="Edit"
-                                                                data-original-title="<?php echo e(__('Edit')); ?>">
-                                                                <i class="ti ti-pencil text-white"></i>
-                                                            </a>
-                                                        </div>
-                                                    <?php endif; ?>
-                                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete purchase')): ?>
-                                                        <div class="action-btn bg-danger ms-2">
-                                                            <?php echo Form::open([
-                                                                'method' => 'DELETE',
-                                                                'route' => ['purchase.destroy', $purchase->id],
-                                                                'class' => 'delete-form-btn',
-                                                                'id' => 'delete-form-' . $purchase->id,
-                                                            ]); ?>
+                                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit purchase')): ?>
+                                                    <div class="action-btn bg-primary ms-2">
+                                                        <a href="<?php echo e(route('purchase.edit',\Crypt::encrypt($purchase->id))); ?>" class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip" title="Edit" data-original-title="<?php echo e(__('Edit')); ?>">
+                                                            <i class="ti ti-pencil text-white"></i>
+                                                        </a>
+                                                    </div>
+                                                <?php endif; ?>
+                                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete purchase')): ?>
+                                                    <div class="action-btn bg-danger ms-2">
+                                                        <?php echo Form::open(['method' => 'DELETE', 'route' => ['purchase.destroy', $purchase->id],'class'=>'delete-form-btn','id'=>'delete-form-'.$purchase->id]); ?>
 
-                                                            <a href="#"
-                                                                class="mx-3 btn btn-sm align-items-center bs-pass-para"
-                                                                data-bs-toggle="tooltip" title="<?php echo e(__('Delete')); ?>"
-                                                                data-original-title="<?php echo e(__('Delete')); ?>"
-                                                                data-confirm="<?php echo e(__('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?')); ?>"
-                                                                data-confirm-yes="document.getElementById('delete-form-<?php echo e($purchase->id); ?>').submit();">
-                                                                <i class="ti ti-trash text-white"></i>
-                                                            </a>
-                                                            <?php echo Form::close(); ?>
+                                                        <a href="#" class="mx-3 btn btn-sm align-items-center bs-pass-para" data-bs-toggle="tooltip" title="<?php echo e(__('Delete')); ?>" data-original-title="<?php echo e(__('Delete')); ?>" data-confirm="<?php echo e(__('Are You Sure?').'|'.__('This action can not be undone. Do you want to continue?')); ?>" data-confirm-yes="document.getElementById('delete-form-<?php echo e($purchase->id); ?>').submit();">
+                                                            <i class="ti ti-trash text-white"></i>
+                                                        </a>
+                                                        <?php echo Form::close(); ?>
 
-                                                        </div>
-                                                    <?php endif; ?>
-                                                </span>
-                                            </td>
-                                        <?php endif; ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </span>
+                                        </td>
+                                    <?php endif; ?>
                                     </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>

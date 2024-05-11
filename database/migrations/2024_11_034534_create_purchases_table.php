@@ -4,30 +4,41 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreatePurchasesTable extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('purchase_sales', function (Blueprint $table) {
+        Schema::create('purchases', function (Blueprint $table) {
             $table->id();
+            $table->integer('purchase_id')->nullable();
+            $table->foreignId('vender_id')->nullable();
+            $table->foreignId('warehouse_id')->nullable();
+            $table->date('purchase_date')->nullable();
+            $table->date('purchase_date')->nullable();
+            $table->string('purchase_number')->nullable();
+            $table->integer('status')->nullable();
+            $table->integer('shipping_display')->nullable();
+            $table->date('send_date')->nullable();
+            $table->integer('discount_apply')->nullable();
+            $table->integer('category_id')->nullable();
+            $table->integer('created_by')->nullable();
             $table->string('spplrTin')->nullable();
             $table->string('spplrNm')->nullable();
             $table->string('spplrBhfId')->nullable();
-            $table->bigInteger('spplrInvcNo')->nullable();
+            $table->string('spplrInvcNo')->nullable();
             $table->string('spplrSdcId')->nullable();
             $table->string('spplrMrcNo')->nullable();
             $table->string('rcptTyCd')->nullable();
             $table->string('pmtTyCd')->nullable();
-            $table->dateTime('cfmDt')->nullable(); 
-            $table->dateTime('send_')->nullable(); 
-            $table->dateTime('salesDt')->nullable(); 
-            $table->dateTime('stockRlsDt')->nullable();
-            $table->string('warehouseDate')->nullable();
-            $table->string('warehouse')->nullable();            
-            $table->string('totItemCnt')->nullable();
+            $table->date('cfmDt')->nullable();
+            $table->date('salesDt')->nullable();
+            $table->date('stockRlsDt')->nullable();
+            $table->integer('totItemCnt')->nullable();
             $table->decimal('taxblAmtA', 10, 2)->nullable();
             $table->decimal('taxblAmtB', 10, 2)->nullable();
             $table->decimal('taxblAmtC', 10, 2)->nullable();
@@ -45,18 +56,20 @@ return new class extends Migration
             $table->decimal('taxAmtE', 10, 2)->nullable();
             $table->decimal('totTaxblAmt', 10, 2)->nullable();
             $table->decimal('totTaxAmt', 10, 2)->nullable();
-            $table->decimal('totAmt', 10, 2)->nullable(); 
-            $table->string('remark')->nullable();
+            $table->decimal('totAmt', 10, 2)->nullable();
+            $table->boolean('isDbImport')->nullable();
+            $table->text('remark')->nullable();
             $table->timestamps();
         });
     }
 
-
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('purchase_sales');
+        Schema::dropIfExists('purchases');
     }
-};
+}

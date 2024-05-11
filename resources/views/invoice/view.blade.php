@@ -3,9 +3,9 @@
     {{ __('Invoice Detail') }}
 @endsection
 @section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-    <li class="breadcrumb-item"><a href="{{ route('invoice.index') }}">{{ __('Invoice') }}</a></li>
-    <li class="breadcrumb-item">{{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}</li>
+    <li class="breadcrumb-iteam"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+    <li class="breadcrumb-iteam"><a href="{{ route('invoice.index') }}">{{ __('Invoice') }}</a></li>
+    <li class="breadcrumb-iteam">{{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}</li>
 @endsection
 @php
     $settings = Utility::settings();
@@ -316,8 +316,8 @@
 
     @if (Gate::check('show invoice'))
         @if ($invoice->status != 0)
-            <div class="row justify-content-between align-items-center mb-3">
-                <div class="col-md-12 d-flex align-items-center justify-content-between justify-content-md-end">
+            <div class="row justify-content-between align-iteams-center mb-3">
+                <div class="col-md-12 d-flex align-iteams-center justify-content-between justify-content-md-end">
                     @if (!empty($invoicePayment))
                         <div class="all-button-box mx-2 mr-2">
                             <a href="#" class="btn btn-sm btn-primary"
@@ -366,7 +366,7 @@
                             </div>
                             <div class="row">
                                 <div class="col text-end">
-                                    <div class="d-flex align-items-center justify-content-end">
+                                    <div class="d-flex align-iteams-center justify-content-end">
                                         <div class="me-4">
                                             <small>
                                                 <strong>{{ __('Issue Date') }} :</strong><br>
@@ -473,7 +473,7 @@
                             <div class="row mt-4">
                                 <div class="col-md-12">
                                     <div class="font-weight-bold">{{ __('Product Summary') }}</div>
-                                    <small>{{ __('All items here cannot be deleted.') }}</small>
+                                    <small>{{ __('All iteams here cannot be deleted.') }}</small>
                                     <div class="table-responsive mt-2">
                                         <table class="table mb-0 table-striped">
                                             <tr>
@@ -497,112 +497,81 @@
                                                 $taxesData = [];
                                             @endphp
                                             @foreach ($iteams as $key => $iteam)
-                                                {{-- @if (!empty($iteam->tax))
+                                                <td> {{ !empty($iteam->id) ? $iteam->id : '' }}</td>
+                                                <td>{{ !empty($iteam->itemName) ? $iteam->itemName : '' }}</td>
+                                                <td>{{ !empty($iteam->quantity) ? $iteam->quantity : '' }}</td>
+                                                <td>Kes {{ !empty($iteam->unitPrice) ? $iteam->unitPrice : '' }}</td>
+                                                <td>{{ !empty($iteam->discountAmt) ? $iteam->discountAmt : '' }}</td>
+                                                <td>
                                                     @php
-                                                        $taxes = App\Models\Utility::tax($iteam->tax);
-                                                        $totalQuantity += $iteam->quantity;
-                                                        $totalRate += $iteam->price;
-                                                        $totalDiscount += $iteam->discount;
-                                                        foreach ($taxes as $taxe) {
-                                                            $taxDataPrice = App\Models\Utility::taxRate($taxe->rate, $iteam->price, $iteam->quantity, $iteam->discount);
-                                                            if (array_key_exists($taxe->name, $taxesData)) {
-                                                                $taxesData[$taxe->name] = $taxesData[$taxe->name] + $taxDataPrice;
-                                                            } else {
-                                                                $taxesData[$taxe->name] = $taxDataPrice;
-                                                            }
+                                                        // Map taxTypeCode to its corresponding description
+                                                        $taxDescription = '';
+                                                        switch ($iteam->taxTypeCode) {
+                                                            case 'A':
+                                                                $taxDescription = 'A-Exmpt';
+                                                                break;
+                                                            case 'B':
+                                                                $taxDescription = 'B-VAT 16%';
+                                                                break;
+                                                            case 'C':
+                                                                $taxDescription = 'C-Zero Rated';
+                                                                break;
+                                                            case 'D':
+                                                                $taxDescription = 'D-Non VAT';
+                                                                break;
+                                                            case 'E':
+                                                                $taxDescription = 'E-VAT 8%';
+                                                                break;
+                                                            case 'F':
+                                                                $taxDescription = 'F-Non Tax';
+                                                                break;
+                                                            default:
+                                                                $taxDescription = ''; // Handle unknown tax codes here
+                                                                break;
                                                         }
                                                     @endphp
-                                                @endif --}}
-                                                <tr>
-                                                    <td>{{ $key + 1 }}</td>
-                                                    @php
-                                                        $productName = $iteam->product;
-                                                        $totalRate += $iteam->price;
-                                                        $totalQuantity += $iteam->quantity;
-                                                        $totalDiscount += $iteam->discount;
-                                                    @endphp
-                                                    <td>{{ !empty($productName) ? $productName->name : '' }}</td>
-                                                    <td>{{ $iteam->quantity . ' (' . $productName->unit->name . ')' }}</td>
-                                                    <td>{{ \Auth::user()->priceFormat($iteam->price) }}</td>
-                                                    <td>{{ \Auth::user()->priceFormat($iteam->discount) }}</td>
-
-                                                    {{-- <td>
-                                                        @if (!empty($iteam->tax))
-                                                            <table>
-                                                                @php
-                                                                    $totalTaxRate = 0;
-                                                                @endphp
-                                                                @foreach ($taxes as $tax)
-                                                                    @php
-                                                                        $taxPrice=App\Models\Utility::taxRate($tax->rate,$iteam->price,$iteam->quantity,$iteam->discount) ;
-                                                                        $totalTaxPrice+=$taxPrice;
-                                                                    @endphp
-                                                                    <tr>
-                                                                        <td>{{$tax->name .' ('.$tax->rate .'%)'}}</td>
-                                                                        <td>{{\Auth::user()->priceFormat($taxPrice)}}</td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            </table>
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td> --}}
-
-                                                    <td>
-                                                        @if (!empty($iteam->tax))
-                                                            <table>
-                                                                @php
-                                                                    $itemTaxes = [];
-                                                                    $getTaxData = Utility::getTaxData();
-
-                                                                    if (!empty($iteam->tax)) {
-                                                                        foreach (explode(',', $iteam->tax) as $tax) {
-                                                                            $taxPrice = \Utility::taxRate($getTaxData[$tax]['rate'], $iteam->price, $iteam->quantity);
-                                                                            $totalTaxPrice += $taxPrice;
-                                                                            $itemTax['name'] = $getTaxData[$tax]['name'];
-                                                                            $itemTax['rate'] = $getTaxData[$tax]['rate'] . '%';
-                                                                            $itemTax['price'] = \Auth::user()->priceFormat($taxPrice);
-
-                                                                            $itemTaxes[] = $itemTax;
-                                                                            if (array_key_exists($getTaxData[$tax]['name'], $taxesData)) {
-                                                                                $taxesData[$getTaxData[$tax]['name']] = $taxesData[$getTaxData[$tax]['name']] + $taxPrice;
-                                                                            } else {
-                                                                                $taxesData[$getTaxData[$tax]['name']] = $taxPrice;
-                                                                            }
-                                                                        }
-                                                                        $iteam->itemTax = $itemTaxes;
-                                                                    } else {
-                                                                        $iteam->itemTax = [];
-                                                                    }
-                                                                @endphp
-                                                                @foreach ($iteam->itemTax as $tax)
-
-                                                                        <tr>
-                                                                            <td>{{$tax['name'] .' ('.$tax['rate'] .'%)'}}</td>
-                                                                            <td>{{ $tax['price']}}</td>
-                                                                        </tr>
-                                                                @endforeach
-                                                            </table>
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
-
-                                                    <td>{{ !empty($iteam->description) ? $iteam->description : '-' }}</td>
-                                                    <td class="text-end">
-                                                        {{ \Auth::user()->priceFormat($iteam->price * $iteam->quantity - $iteam->discount + $totalTaxPrice) }}
-                                                    </td>
+                                                    {{ $taxDescription }}
+                                                </td>
+                                                <td>{{ !empty($iteam->description) ? $iteam->description : '' }}</td>
+                                                <td>Kes {{ !empty($iteam->price) ? $iteam->price : '' }}</td>
                                                 </tr>
                                             @endforeach
                                             <tfoot>
                                                 <tr>
                                                     <td></td>
                                                     <td><b>{{ __('Total') }}</b></td>
-                                                    <td><b>{{ $totalQuantity }}</b></td>
-                                                    <td><b>{{ \Auth::user()->priceFormat($totalRate) }}</b></td>
-                                                    <td><b>{{ \Auth::user()->priceFormat($totalDiscount) }}</b></td>
-                                                    <td><b>{{ \Auth::user()->priceFormat($totalTaxPrice) }}</b></td>
-                                                    <td></td>
+                                                    <td><b>{{ $iteam->sum('quantity') }} </b></td>
+                                                    <td><b>{{ $iteam->sum('price') }} </b></td>
+                                                    <td><b>{{ $iteam->sum('discountAmt') }}</b></td>
+
+
+                                                    @php
+                                                        $totalTaxableAmount = 0;
+                                                    @endphp
+
+                                                    @foreach ($invoice->items as $item)
+                                                        @php
+                                                            // Get the tax rate based on the taxTypeCode
+                                                            switch ($item->taxTypeCode) {
+                                                                case 'B':
+                                                                    $taxRate = 16 / 100; // 16%
+                                                                    break;
+                                                                case 'E':
+                                                                    $taxRate = 8 / 100; // 8%
+                                                                    break;
+                                                                default:
+                                                                    $taxRate = 0; // No tax
+                                                            }
+
+                                                            // Calculate the taxable amount for the product
+                                                            $taxableAmount = $item->price * (1 + $taxRate);
+
+                                                            // Add the taxable amount to the total
+                                                            $totalTaxableAmount += $taxableAmount;
+                                                        @endphp
+                                                    @endforeach
+
+                                                    <td><b>{{ $totalTaxableAmount }}</b></td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="6"></td>
@@ -747,7 +716,7 @@
                                                         'id' => 'delete-form-' . $payment->id,
                                                     ]) !!}
 
-                                                    <a href="#" class="mx-3 btn btn-sm align-items-center bs-pass-para"
+                                                    <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para"
                                                         data-bs-toggle="tooltip" title="Delete"
                                                         data-original-title="{{ __('Delete') }}"
                                                         data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
@@ -795,7 +764,7 @@
                                                             data-url="{{ URL::to('invoice/' . $bankPayment->id . '/action') }}"
                                                             data-size="lg" data-ajax-popup="true"
                                                             data-title="{{ __('Payment Status') }}"
-                                                            class="mx-3 btn btn-sm align-items-center"
+                                                            class="mx-3 btn btn-sm align-iteams-center"
                                                             data-bs-toggle="tooltip" title="{{ __('Payment Status') }}"
                                                             data-original-title="{{ __('Payment Status') }}">
                                                             <i class="ti ti-caret-right text-white"></i>
@@ -809,7 +778,7 @@
                                                         'id' => 'delete-form-' . $bankPayment->id,
                                                     ]) !!}
 
-                                                    <a href="#" class="mx-3 btn btn-sm align-items-center bs-pass-para"
+                                                    <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para"
                                                         data-bs-toggle="tooltip" title="Delete"
                                                         data-original-title="{{ __('Delete') }}"
                                                         data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
@@ -865,7 +834,7 @@
                                                 <a data-url="{{ route('invoice.edit.credit.note', [$creditNote->invoice, $creditNote->id]) }}"
                                                     data-ajax-popup="true" title="{{ __('Edit') }}"
                                                     data-original-title="{{ __('Credit Note') }}" href="#"
-                                                    class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip"
+                                                    class="mx-3 btn btn-sm align-iteams-center" data-bs-toggle="tooltip"
                                                     data-original-title="{{ __('Edit') }}">
                                                     <i class="ti ti-pencil text-white"></i>
                                                 </a>
@@ -878,7 +847,7 @@
                                                     'route' => ['invoice.delete.credit.note', $creditNote->invoice, $creditNote->id],
                                                     'id' => 'delete-form-' . $creditNote->id,
                                                 ]) !!}
-                                                <a href="#" class="mx-3 btn btn-sm align-items-center bs-pass-para "
+                                                <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para "
                                                     data-bs-toggle="tooltip" title="Delete"
                                                     data-original-title="{{ __('Delete') }}"
                                                     data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"

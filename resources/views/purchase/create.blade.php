@@ -500,8 +500,6 @@
 
                                 <tr>
                                     <td>
-
-                                        <div class="form-group">
                                             {{ Form::label('tax', __('Tax'), ['class' => 'form-label']) }}
                                             {{ Form::text('tax', '', ['class' => 'form-control tax']) }}
                                     </td>

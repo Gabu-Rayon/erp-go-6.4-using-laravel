@@ -4,17 +4,27 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreatePurchaseProductsTable extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
     public function up()
     {
-        Schema::create('purchase_sales_items', function (Blueprint $table) {
+        Schema::create('purchase_products', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('saleItemCode');
-            $table->foreign('saleItemCode')->references('spplrInvcNo')->on('purchase_sales')->onDelete('cascade');
+            $table->integer('purchase_id');
+            $table->integer('product_id');
+            $table->integer('quantity');
+            $table->string('tax', '50')->nullable();
+            $table->float('discount')->default('0.00');
+            $table->decimal('price', 15, 2)->nullable()->default(0.0);
+            $table->text('description')->nullable();
+
+
+            $table->string('saleItemCode')->nullable();
             $table->string('itemSeq')->nullable();
             $table->string('itemCd')->nullable();
             $table->string('itemClsCd')->nullable();
@@ -35,17 +45,18 @@ return new class extends Migration
             $table->decimal('taxblAmt', 10, 2)->nullable();
             $table->decimal('taxAmt', 10, 2)->nullable();
             $table->decimal('totAmt', 10, 2)->nullable();
-            $table->string('itemExprDt')->nullable();
+            $table->date('itemExprDt')->nullable();
             $table->timestamps();
         });
     }
 
-
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('purchase__sales__items');
+        Schema::dropIfExists('purchase_products');
     }
-};
+}

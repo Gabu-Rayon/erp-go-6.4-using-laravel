@@ -50,7 +50,7 @@ class PurchaseController extends Controller
         $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
         $vender->prepend('Select Vendor', '');
         $status = Purchase::$statues;
-        $purchases = Purchase_Sales::all();
+        $purchases = Purchase::all();
 
         return view('purchase.index', compact('purchases', 'vender', 'status'));
     }
@@ -216,7 +216,7 @@ class PurchaseController extends Controller
             // Check if the request was successful
             if ($response->successful()) {
                 // Save data to local database
-                Purchase_Sales::create([
+                Purchase::create([
                     'spplrTin' => $request->input('supplierTin'),
                     'spplrNm' => $request->input('supplierName'),
                     'spplrBhfId' => $request->input('supplierBhfId'),
@@ -230,10 +230,10 @@ class PurchaseController extends Controller
                     'stockRlsDt' => $request->input('warehouseDate') ?? null,
                     'warehouseDate' => $request->input('warehouseDate') ?? null,
                     'warehouse' => $request->input('warehouse') ?? null,
-                    //For totItemCnt  are total item posted in the  Purchase_Sales_Items Model
+                    //For totItemCnt  are total item posted in the  PurchaseProduct Model
                     'totItemCnt' => count($request->input('items')),
                     // 'totItemCnt' => count($itemsDataList),
-                    // 'totItemCnt' => Purchase_Sales_Items::count(),
+                    // 'totItemCnt' => PurchaseProdcut::count(),
                     'taxblAmtA' => $request->input('taxblAmtA') ?? null,
                     'taxblAmtB' => $request->input('taxblAmtB') ?? null,
                     'taxblAmtC' => $request->input('taxblAmtB') ?? null,
@@ -262,7 +262,7 @@ class PurchaseController extends Controller
 
                 // Loop through itemsDataList and save each item
                 foreach ($itemsDataList as $itemData) {
-                    Purchase_Sales_Items::create([
+                    PurchaseProduct::create([
                         'saleItemCode' => $request->input('supplierInvcNo'),
                         'itemCd' => $itemData['itemCode'],
                         'itemClsCd' => $itemData['itemClsCd'],
@@ -324,6 +324,9 @@ class PurchaseController extends Controller
             \Log::info('API Response: ' . $response->body());
             \Log::info('API Response Status Code: ' . $response->status());
 
+            // Initialize purchase_id counter
+            $purchaseId = 1;
+
             // Divide the data into batches of 100 items each
             if (isset($purchaseSalesList)) {
                 foreach ($purchaseSalesList as $class) {
@@ -341,7 +344,40 @@ class PurchaseController extends Controller
                             foreach ($batch as $item) {
                                 \Log::info('Processing item with spplrInvcNo: ' . $saleItemCode . ' and item: ' . json_encode($item));
                                 if (!empty($saleItemCode)) {
-                                    Purchase_Sales_Items::create([
+
+                                    // Initialize the tax code variable
+                                    $taxCode = null;
+                                    // Map the tax type code to the tax code
+                                    switch ($item['taxTyCd']) {
+                                        case 'A':
+                                            $taxCode = 1;
+                                            break;
+                                        case 'B':
+                                            $taxCode = 2;
+                                            break;
+                                        case 'C':
+                                            $taxCode = 3;
+                                            break;
+                                        case 'D':
+                                            $taxCode = 4;
+                                            break;
+                                        case 'E':
+                                            $taxCode = 5;
+                                            break;
+                                        case 'F':
+                                            $taxCode = 6;
+                                            break;
+                                        default:
+                                            $taxCode = null;
+                                            break;
+                                    }
+
+                                    PurchaseProduct::create([
+                                        'purchase_id' => null,
+                                        'quantity' => $item['totAmt'],
+                                        'tax' => $taxCode,
+                                        'price' => $item['prc'],
+                                        'discount' => $item['prc'] * $item['dcRt'] / 100,
                                         'saleItemCode' => $saleItemCode,
                                         'itemSeq' => $item['itemSeq'],
                                         'itemCd' => $item['itemCd'],
@@ -398,13 +434,24 @@ class PurchaseController extends Controller
             \Log::info('API Response: ' . $response->body());
             \Log::info('API Response Status Code: ' . $response->status());
 
+
+            // Initialize purchase_id counter
+            $purchaseId = 1;
             // Divide the data into batches of 100 items each
             $batches = array_chunk($purchaseSalesSuppliers, 100);
 
             foreach ($batches as $batch) {
                 foreach ($batch as $item) {
                     // Process each batch
-                    Purchase_Sales::create([
+                    Purchase::create([
+                        'purchase_id' => null,
+                        'vender_id' => null,
+                        'warehouse_id' => null,
+                        'purchase_date' => null,
+                        'purchase_number' => null,
+                        'discount_apply' => null,
+                        'category_id' => null,
+                        'created_by' => \Auth::user()->creatorId(),
                         'spplrTin' => $item['spplrTin'],
                         'spplrNm' => $item['spplrNm'],
                         'spplrBhfId' => $item['spplrBhfId'],
@@ -610,65 +657,42 @@ class PurchaseController extends Controller
     //     }
     // }
 
-    public function show($id)
+    public function show($ids)
     {
+
         if (\Auth::user()->can('show purchase')) {
             try {
-                \Log::info('ID');
-                \Log::info($id);
-
-                $purchase = Purchase_Sales::find($id);
-                \Log::info('PURCHASE');
-                \lOG::INFO($purchase);
-
-                // Check the status of the purchase 
-                /***
-                 *  'Draft', is 0
-                 *  'Sent', is 1
-                 *  'Unpaid', is 2
-                 * 'Partialy Paid', is 3
-                 * 'Paid',  is 4 
-                 */
-                $status = $purchase->status;
-                if ($status == 4) {
-
-                    // Retrieve associated purchase sales items
-                    $purchaseItems = Purchase_Sales_Items::where('saleItemCode', $purchase->spplrInvcNo)->get();
-
-                    // Retrieve associated purchase payments
-                    $purchasePayments = PurchasePayment::where('purchase_id', $purchase->id)->get();
-
-                    // If status is 'Paid', redirect to purchase.view
-                    return view('purchase.view', compact('purchase', 'purchaseItems', 'purchasePayments'));
-                } else {
-
-                    // Retrieve associated purchase sales items
-                    $purchaseItems = Purchase_Sales_Items::where('saleItemCode', $purchase->spplrInvcNo)->get();
-
-                    // Retrieve associated purchase payments
-                    $purchasePayments = PurchasePayment::where('purchase_id', $purchase->id)->get();
-
-                    // For other statuses, render the show view
-                    return view('purchase.show', compact('purchase', 'purchaseItems', 'purchasePayments'));
-                }
-            } catch (\Exception $e) {
-                \Log::error($e);
+                $id = Crypt::decrypt($ids);
+            } catch (\Throwable $th) {
                 return redirect()->back()->with('error', __('Purchase Not Found.'));
+            }
+
+            $id = Crypt::decrypt($ids);
+            $purchase = Purchase::find($id);
+
+            if ($purchase->created_by == \Auth::user()->creatorId()) {
+
+                $purchasePayment = PurchasePayment::where('purchase_id', $purchase->id)->first();
+                $vendor = $purchase->vender;
+                $iteams = $purchase->items;
+
+                return view('purchase.view', compact('purchase', 'vendor', 'iteams', 'purchasePayment'));
+            } else {
+                return redirect()->back()->with('error', __('Permission denied.'));
             }
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
 
-
     public function details($spplrInvcNo)
     {
         if (\Auth::user()->can('show purchase')) {
             try {
-                $purchase = Purchase_Sales::where('spplrInvcNo', $spplrInvcNo)->first();
+                $purchase = Purchase::where('spplrInvcNo', $spplrInvcNo)->first();
                 if ($purchase) {
                     // Fetch related items
-                    $purchaseItems = Purchase_Sales_Items::where('saleItemCode', $spplrInvcNo)->get();
+                    $purchaseItems = PurchaseProduct::where('saleItemCode', $spplrInvcNo)->get();
                     // Fetch ItemInformation model
                     $itemInformation = ItemInformation::get()->pluck('itemNm', 'itemCd');
                     return view('purchase.details', compact('purchase', 'purchaseItems', 'itemInformation'));
@@ -691,7 +715,7 @@ class PurchaseController extends Controller
         if (\Auth::user()->can('edit purchase')) {
             \Log::info('EDIT ID');
             \Log::info($id);
-            $purchase = Purchase_Sales_Items::find($id);
+            $purchase = PurchaseProduct::find($id);
             $purchase_number = $id;
             \Log::info('EDIT ITEM');
             \Log::info($purchase);
@@ -708,7 +732,7 @@ class PurchaseController extends Controller
         }
     }
 
-    public function update(Request $request, Purchase_Sales_Items $purchase)
+    public function update(Request $request, PurchaseProduct $purchase)
     {
         try {
             if (\Auth::user()->can('edit purchase')) {
@@ -801,60 +825,31 @@ class PurchaseController extends Controller
     }
     public function sent($id)
     {
-
-
         if (\Auth::user()->can('send purchase')) {
-            $purchase = Purchase_Sales::where('id', $id)->first();
-
-            if (!$purchase) {
-                // Handle the case where the purchase doesn't exist
-                return redirect()->back()->with('error', 'Purchase not found.');
-            }
-
-            // If the purchase exists, update its properties
+            $purchase = Purchase::where('id', $id)->first();
             $purchase->send_date = date('Y-m-d');
             $purchase->status = 1;
             $purchase->save();
 
-            // Assign the value of spplrNm to $purchase->name
-            $purchase->name = $purchase->spplrNm;
+            $vender = Vender::where('id', $purchase->vender_id)->first();
 
-
-            // Retrieve the purchase number from purchase_payments table
-            $purchasePayment = PurchasePayment::where('purchase_id', $purchase->id)->first();
-            $purchaseId = $purchasePayment ? $purchasePayment->purchase_id : null;
-
-            // Format the purchase number
-            $purchase->purchase = \Auth::user()->purchaseNumberFormat($purchaseId);
-
-
+            $purchase->name = !empty($vender) ? $vender->name : '';
+            $purchase->purchase = \Auth::user()->purchaseNumberFormat($purchase->purchase_id);
 
             $purchaseId = Crypt::encrypt($purchase->id);
             $purchase->url = route('purchase.pdf', $purchaseId);
 
-            // Calculate the sum of totAmt
-            $totalAmount = Purchase_Sales::where('id', $id)->sum('totAmt');
+            Utility::userBalance('vendor', $vender->id, $purchase->getTotal(), 'credit');
 
-            // Retrieve the vendor ID and tin from the Purchase_Sales model
-            $vendorId = $purchase->spplrTin;
-
-            // Update Vendor Balance
-            Utility::userBalance('vendor', $vendorId, $totalAmount, 'credit');
-            
-            $vendorId = 1;
-            $vendorEmail = 'example@example.com'; 
-
-            // Create the array with hardcoded data
             $vendorArr = [
                 'vender_bill_name' => $purchase->name,
                 'vender_bill_number' => $purchase->purchase,
                 'vender_bill_url' => $purchase->url,
-                $vendorId => $vendorEmail, 
+
             ];
-            $resp = Utility::sendEmailTemplate('vender_bill_sent', [$vender->id => $vender->email], $vendorArr);
-            
-            return redirect()->back()->with('success', __('Purchase successfully sent.') . (($resp['is_success'] == false && !empty($resp['error'])) ? '<br>
-             <span class="text-danger">' . $resp['error'] . '</span>' : ''));
+            $resp = \App\Models\Utility::sendEmailTemplate('vender_bill_sent', [$vender->id => $vender->email], $vendorArr);
+
+            return redirect()->back()->with('success', __('Purchase successfully sent.') . (($resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -900,11 +895,11 @@ class PurchaseController extends Controller
             //        }
             //
             //        return redirect()->back()->with('success', __('Bill successfully sent.') . (($resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
-             
+
             /*******
 
             if (\Auth::user()->can('send purchase')) {
-                $purchase = Purchase_Sales::where('id', $id)->first();
+                $purchase = Purchase::where('id', $id)->first();
 
                 if (!$purchase) {
                     // Handle the case where the purchase doesn't exist
@@ -933,9 +928,9 @@ class PurchaseController extends Controller
                 $purchase->url = route('purchase.pdf', $purchaseId);
 
                 // Calculate the sum of totAmt
-                $totalAmount = Purchase_Sales::where('id', $id)->sum('totAmt');
+                $totalAmount = Purchase::where('id', $id)->sum('totAmt');
 
-                // Retrieve the vendor ID and tin from the Purchase_Sales model
+                // Retrieve the vendor ID and tin from the Purchase model
                 $vendorId = $purchase->spplrTin;
 
                 // Update Vendor Balance
@@ -959,7 +954,7 @@ class PurchaseController extends Controller
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
          *****/
-            
+
             return redirect()->back()->with('success', __('Bill successfully sent.'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
@@ -1227,7 +1222,7 @@ class PurchaseController extends Controller
         }
 
     }
-      
+
 
     //Show the create Payment Form 
     public function payment($purchase_id)
@@ -1245,9 +1240,9 @@ class PurchaseController extends Controller
 
         }
     }
-      
+
     //POST all the data fro mthe form to the database 
-    
+
     public function createPayment(Request $request, $purchase_id)
     {
         if (\Auth::user()->can('create payment purchase')) {
@@ -1526,12 +1521,12 @@ class PurchaseController extends Controller
 
                 // Check if the request was successful
                 if ($response->successful()) {
-                    // Update Purchase_Sales model where supplierInvcNo matches
-                    // Purchase_Sales::where('supplierInvcNo', $request->input('supplierInvcNo'))
+                    // Update Purchase model where supplierInvcNo matches
+                    // Purchase::where('supplierInvcNo', $request->input('supplierInvcNo'))
                     //     ->update(['isDBImport' => 1]);
 
 
-                    Purchase_Sales::where('supplierInvcNo', $request->input('supplierInvcNo'))
+                    Purchase::where('supplierInvcNo', $request->input('supplierInvcNo'))
                         ->update(['isDBImport' => true]);
 
                     $endpoint = 'https://etims.your-apps.biz/api/MapPurchase/UpdateMapPurchaseStatus';
@@ -1859,5 +1854,6 @@ class PurchaseController extends Controller
             return back()->withErrors(['api_error' => $e->getMessage()]);
         }
     }
+
 
 }

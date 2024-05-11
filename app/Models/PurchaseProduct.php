@@ -13,6 +13,28 @@ class PurchaseProduct extends Model
         'tax',
         'discount',
         'total',
+        'saleItemCode',
+        'itemSeq',
+        'itemCd',
+        'itemClsCd',
+        'itemNm',
+        'bcd',
+        'spplrItemClsCd',
+        'spplrItemCd',
+        'spplrItemNm',
+        'pkgUnitCd',
+        'pkg',
+        'qtyUnitCd',
+        'qty',
+        'prc',
+        'splyAmt',
+        'dcRt',
+        'dcAmt',
+        'taxTyCd',
+        'taxblAmt',
+        'taxAmt',
+        'totAmt',
+        'itemExprDt'
     ];
 
     public function product()

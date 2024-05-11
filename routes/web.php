@@ -453,6 +453,10 @@ Route::group(['middleware' => ['verified']], function () {
             Route::resource('vender', VenderController::class);
         }
     );
+    //  getSuppliersDetailsFromApi
+     Route::get('/getSuppliersDetailsFromApi', [VenderController::class, 'getSuppliersDetailsFromApi']);
+
+    
 
     Route::group(
         [
@@ -516,6 +520,9 @@ Route::group(['middleware' => ['verified']], function () {
     Route::get('/invoices/preview/{template}/{color}', [InvoiceController::class, 'previewInvoice'])->name('invoice.preview');
     Route::post('/invoices/template/setting', [InvoiceController::class, 'saveTemplateSettings'])->name('template.setting');
     Route::get('getSalesByTraderInvoiceNo', [InvoiceController::class, 'getSalesByTraderInvoiceNo'])->name('invoice.no.getSalesByTraderInvoiceNo');
+
+    //for autofilling the item information in the forms
+    Route::get('geInvoiceItemInformation', [InvoiceController::class, 'getItem'])->name('invoice.getiteminformation');
 
 
     Route::group(
@@ -1905,6 +1912,7 @@ Route::get('sales/creditnote', [SalesController::class, 'creditNote'])->name('sa
 
 
 Route::get('/getPurchaseSalesItemsFromApi', [PurchaseController::class, 'getPurchaseSalesItemsFromApi']);
+
 Route::get('/getpurchasesalesdetailsforsuppliers', [PurchaseController::class, 'getSuppliersDetailsForPurchaseSalesFromApi']);
 Route::get('/getsupplier/{id}', [PurchaseController::class, 'getSupplier']);
 Route::get('/getitem/{id}', [PurchaseController::class, 'getItem']);

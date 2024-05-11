@@ -152,7 +152,9 @@
                                         <td>
                                             <?php if($invoice->due_date < date('Y-m-d')): ?>
                                                 <p class="text-danger mt-3">
-                                                    <?php echo e(\Auth::user()->dateFormat($invoice->due_date)); ?></p>
+                                                    <?php echo e(\Auth::user()->dateFormat($invoice->due_date)); ?>
+
+                                                </p>
                                             <?php else: ?>
                                                 <?php echo e(\Auth::user()->dateFormat($invoice->due_date)); ?>
 

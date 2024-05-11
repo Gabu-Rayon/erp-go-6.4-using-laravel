@@ -23,6 +23,24 @@ return new class extends Migration {
         });
     }
 
+
+
+    // public function up(): void
+    // {
+    //     Schema::create('code', function (Blueprint $table) {
+    //         $table->id();
+    //         $table->string('cdCls');
+    //         $table->string('cdClsNm');
+    //         $table->string('cdClsDesc');
+    //         $table->string('useYn');
+    //         $table->string('userDfnNm1');
+    //         $table->string('userDfnNm2');
+    //         $table->string('userDfnNm3');
+    //         $table->index('cdCls');
+    //         $table->timestamps();
+    //     });
+    // }
+
     /**
      * Reverse the migrations.
      */

@@ -3,29 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\Plan;
-use App\Models\Details;
 use App\Models\User;
+use App\Models\Details;
 use App\Models\Invoice;
 use App\Models\Utility;
 use App\Models\Customer;
 use App\Models\CreditNote;
-use App\Models\SalesTypeCode;
-use App\Models\InvoiceStatusCode;
-use App\Models\PaymentTypeCodes;
 use App\Models\BankAccount;
 use App\Models\CustomField;
 use App\Models\StockReport;
 use App\Models\Transaction;
-use App\Models\ItemInformation;
 use Illuminate\Http\Request;
+use App\Models\SalesTypeCode;
 use App\Exports\InvoiceExport;
 use App\Models\InvoicePayment;
 use App\Models\InvoiceProduct;
 use App\Models\ProductService;
-use App\Models\ItemClassification;
+use App\Models\ItemInformation;
+use App\Models\PaymentTypeCodes;
 use App\Models\TransactionLines;
+use App\Models\InvoiceStatusCode;
+use App\Models\ItemClassification;
 use Illuminate\Support\Facades\DB;
 use App\Models\InvoiceBankTransfer;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
@@ -39,7 +40,7 @@ class InvoiceController extends Controller
     {
     }
 
-    
+
 
     public function index(Request $request)
     {
@@ -79,13 +80,13 @@ class InvoiceController extends Controller
             $invoice_number = \Auth::user()->invoiceNumberFormat($this->invoiceNumber());
             $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customers->prepend('Select Customer', '');
-            $category = ItemClassification::all()->pluck('itemClsNm', 'itemClsCd');
+            $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'income')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
             $product_services = ItemInformation::all()->pluck('itemNm', 'itemCd');
             $product_services->prepend('--', '');
-            $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeValue', 'saleTypeCode');
+            $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'saleTypeCode');
             $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'code');
-            $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusValue', 'invoiceStatusCode');
+            $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusCode', 'invoiceStatusCode');
             $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
 
             return view('invoice.create', compact(
@@ -99,7 +100,8 @@ class InvoiceController extends Controller
                 'paymentTypeCodes',
                 'invoiceStatusCodes',
                 'taxationtype'
-            ));
+            )
+            );
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
@@ -233,18 +235,22 @@ class InvoiceController extends Controller
      ***************************************************************************/
     public function store(Request $request)
     {
+
+        // Log the entire request data
+        Log::info('Form data received:', $request->all());
         try {
             if (\Auth::user()->can('create invoice')) {
                 $validator = \Validator::make(
-                    $request->all(), [
+                    $request->all(),
+                    [
                         'customer_id' => 'required',
                         'issue_date' => 'required',
                         'due_date' => 'required',
                         'category_id' => 'required',
                         'traderInvoiceNo' => 'required|max:50|min:1',
                         'items' => 'required'
-                        ]
-                    );
+                    ]
+                );
                 if ($validator->fails()) {
                     $messages = $validator->getMessageBag();
                     return redirect()->back()->with('error', $messages->first());
@@ -288,20 +294,22 @@ class InvoiceController extends Controller
                 \Log::info('INV REQ DATA');
                 \Log::info($apiRequestData);
 
-                function calculateDiscountAmount($packageQuantity, $quantity, $unitPrice, $discountRate) {
+                function calculateDiscountAmount($packageQuantity, $quantity, $unitPrice, $discountRate)
+                {
                     $totalItems = $packageQuantity * $quantity;
                     $totalPriceBeforeDiscount = $totalItems * $unitPrice;
                     $discountAmount = ($totalPriceBeforeDiscount * $discountRate) / 100;
                     return $discountAmount;
                 }
 
-                function calculateTotalAmount($packageQuantity, $quantity, $unitPrice) {
+                function calculateTotalAmount($packageQuantity, $quantity, $unitPrice)
+                {
                     $totalItems = $packageQuantity * $quantity;
                     $totalPriceBeforeDiscount = $totalItems * $unitPrice;
                     return $totalPriceBeforeDiscount;
-                } 
+                }
 
-                foreach($data['items'] as $item) {
+                foreach ($data['items'] as $item) {
                     $itemDetails = ItemInformation::where('itemCd', $item['itemCode'])->first();
                     $itemExprDt = str_replace('-', '', $item['itemExprDate']);
                     $itemExprDate = date('Ymd', strtotime($itemExprDt));
@@ -331,7 +339,7 @@ class InvoiceController extends Controller
 
                     array_push($saleItemList, $itemData);
 
-                    
+
                 }
 
                 $apiRequestData['saleItemList'] = $saleItemList;
@@ -354,8 +362,8 @@ class InvoiceController extends Controller
                 \Log::info('INV DEYTA');
                 \Log::info($data);
 
-                foreach($saleItemList as $item){
-                    $totalAmount += calculateTotalAmount($item['pkgQuantity'], $item['quantity'],$item['unitPrice']);
+                foreach ($saleItemList as $item) {
+                    $totalAmount += calculateTotalAmount($item['pkgQuantity'], $item['quantity'], $item['unitPrice']);
                 }
 
                 $inv = Invoice::create([
@@ -432,19 +440,39 @@ class InvoiceController extends Controller
                     'response_MrcNo' => null, // Assuming 'response_MrcNo' is nullable or has a default value
                     'qrCodeURL' => null, // Assuming 'qrCodeURL' is nullable or has a default value
                 ]);
-                
-                foreach($saleItemList as $item){
+
+                foreach ($saleItemList as $item) {
                     InvoiceProduct::create([
                         'product_id' => $item['itemCode'],
                         'invoice_id' => $inv['invoice_id'],
                         'quantity' => $item['quantity'],
-                        'tax' => $item['tax'] || null,
+                        'tax' => $itemDetails->taxTyCd,
                         'discount' => $item['discountAmt'],
                         'price' => calculateTotalAmount(
                             $item['pkgQuantity'],
                             $item['quantity'],
                             $item['unitPrice'],
                         ),
+                        'customer_id' => $data['customer_id'],
+                        "itemCode" => $itemDetails->itemCd,
+                        "itemClassCode" => $itemDetails->itemClsCd,
+                        "itemTypeCode" => $itemDetails->itemTyCd,
+                        "itemName" => $itemDetails->itemNm,
+                        "orgnNatCd" => $itemDetails->orgnNatCd,
+                        "taxTypeCode" => $itemDetails->taxTyCd,
+                        "unitPrice" => $item['unitPrice'],
+                        "isrcAplcbYn" => $itemDetails->isrcAplcbYn,
+                        "pkgUnitCode" => $itemDetails->pkgUnitCd,
+                        "pkgQuantity" => $item['pkgQuantity'],
+                        "qtyUnitCd" => $itemDetails->qtyUnitCd,
+                        "discountRate" => $item['discountRate'],
+                        "discountAmt" => calculateDiscountAmount(
+                            $item['pkgQuantity'],
+                            $item['quantity'],
+                            $item['unitPrice'],
+                            $item['discountRate'],
+                        ),
+                        "itemExprDate" => $itemExprDate
                     ]);
                 }
 
@@ -666,13 +694,15 @@ class InvoiceController extends Controller
                 return redirect()->back()->with('error', __('Invoice Not Found.'));
             }
             $id = Crypt::decrypt($ids);
-            $invoice = Invoice::with(['creditNote', 'payments.bankAccount', 'items.product.unit'])->find($id);
+            $invoice = Invoice::with(['creditNote', 'payments.bankAccount', 'items.product'])->find($id);
 
             if (!empty($invoice->created_by) == \Auth::user()->creatorId()) {
                 $invoicePayment = InvoicePayment::where('invoice_id', $invoice->id)->first();
 
                 $customer = $invoice->customer;
-                $iteams = $invoice->items;
+                // Retrieve associated sales products
+                 $iteams = InvoiceProduct::where('invoice_id', $invoice->invoice_id)->get();
+
                 $user = \Auth::user();
 
                 // start for storage limit note
@@ -817,15 +847,24 @@ class InvoiceController extends Controller
 
                 $invoice_products = InvoiceProduct::where('invoice_id', $invoice->id)->get();
                 foreach ($invoice_products as $invoice_product) {
-                    $product = ProductService::find($invoice_product->product_id);
+                    $product = ItemInformation::find($invoice_product->product_id);
                     $totalTaxPrice = 0;
-                    if ($invoice_product->tax != null) {
-                        $taxes = \App\Models\Utility::tax($invoice_product->tax);
-                        foreach ($taxes as $tax) {
-                            $taxPrice = \App\Models\Utility::taxRate($tax->rate, $invoice_product->price, $invoice_product->quantity, $invoice_product->discount);
-                            $totalTaxPrice += $taxPrice;
-                        }
+                    // Manually specify tax rates based on taxTypeCode
+                    switch ($invoice_product->taxTypeCode) {
+                        case 'B':
+                            $taxRate = 16 / 100; // 16%
+                            break;
+                        case 'E':
+                            $taxRate = 8 / 100; // 8%
+                            break;
+                        default:
+                            $taxRate = 0; // No tax
                     }
+
+                    // Calculate tax price based on the manually specified tax rate
+                    $taxPrice = \App\Models\Utility::taxRate($taxRate, $invoice_product->price, $invoice_product->quantity, $invoice_product->discount);
+                    // Add the tax price to the total tax price
+                    $totalTaxPrice += $taxPrice;
 
                     $itemAmount = ($invoice_product->price * $invoice_product->quantity) - ($invoice_product->discount) + $totalTaxPrice;
 
@@ -1526,7 +1565,7 @@ class InvoiceController extends Controller
             // If the invoice does not exist in the local database, fetch it from the API
             $response = Http::withHeaders([
                 'accept' => '*/*',
-                'key' => '123456' 
+                'key' => '123456'
             ])->get('https://etims.your-apps.biz/api/GetSalesByTraderInvoiceNo', [
                         'traderInvoiceNo' => $traderInvoiceNo
                     ]);
@@ -1538,7 +1577,7 @@ class InvoiceController extends Controller
                 // Map the API response data to local database columns
                 $mappedData = [
                     'invoice_id' => $data['id'],
-                    'customer_id' => null, 
+                    'customer_id' => null,
                     'issue_date' => $data['salesDate'],
                     'due_date' => $data['salesDate'],
                     'send_date' => null,
@@ -1547,7 +1586,7 @@ class InvoiceController extends Controller
                     'status' => $data['salesSttsCode'],
                     'shipping_display' => null,
                     'discount_apply' => null,
-                    'created_by' => $data['regrId'], 
+                    'created_by' => $data['regrId'],
                     'trderInvoiceNo' => $data['trderInvoiceNo'],
                     'invoiceNo' => $data['invoiceNo'],
                     'orgInvoiceNo' => $data['orgInvoiceNo'],
@@ -1592,7 +1631,7 @@ class InvoiceController extends Controller
                     'receipt_TrdeNm' => $data['receipt_TrdeNm'],
                     'receipt_Adrs' => $data['receipt_Adrs'],
                     'receipt_TopMsg' => $data['receipt_TopMsg'],
-                    'receipt_BtmMsg'  => $data['receipt_BtmMsg'],
+                    'receipt_BtmMsg' => $data['receipt_BtmMsg'],
                     'receipt_PrchrAcptcYn' => $data['receipt_PrchrAcptcYn'],
                     'createdDate' => $data['createdDate'],
                     'isKRASynchronized' => $data['isKRASynchronized'],
@@ -1620,13 +1659,31 @@ class InvoiceController extends Controller
                 ])->header('Refresh', '3;url=' . route('invoice.index'));
 
             } else {
-               // Handle the error if the API request fails
-            return redirect()->back()->with('error', 'An error occurred while fetching the invoice data from the API');
+                // Handle the error if the API request fails
+                return redirect()->back()->with('error', 'An error occurred while fetching the invoice data from the API');
             }
         } else {
 
             return redirect()->back()->with('error', __('Invoice Already existing.'));
         }
     }
+    public function getItem($itemCd)
+    {
+        try {
+            $itemInfo = ItemInformation::where('itemCd', $itemCd)->first();
+            return response()->json([
+                'message' => 'success',
+                'data' => $itemInfo
+            ]);
+        } catch (\Exception $e) {
+            \Log::info('Get Item Error');
+            \Log::info($e);
+            return response()->json([
+                'message' => 'error',
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
 
 }
