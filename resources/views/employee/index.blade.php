@@ -55,34 +55,32 @@
                                             <a href="#"  class="btn btn-outline-primary">{{ \Auth::user()->employeeIdFormat($employee->employee_id) }}</a>
                                         @endcan
                                     </td>
+                                    {{ Log::info('department') }}
+                                    {{ Log::info($departments) }}
                                     <td class="font-style">{{ $employee->name }}</td>
                                     <td>{{ $employee->email }}</td>
-                                    @if($employee->branch_id)
                                     <td>
                                         @foreach ($branches as $branch)
-                                            @if ($branch->bhfId == $department->branch_id)
+                                            @if ($branch->bhfId == $employee->branch_id)
                                                 {{ $branch->bhfNm }}
                                             @endif
                                         @endforeach
                                     </td>
-                                    @else
-                                        <td>-</td>
-                                    @endif
-                                    @if($employee->department_id)
-                                        <td class="font-style">{{$employee->department?$employee->department->name:''}}</td>
-                                    @else
-                                        <td>-</td>
-                                    @endif
-                                    @if($employee->designation_id)
-                                        <td class="font-style">{{!$employee->designation?$employee->designation->name:''}}</td>
-                                    @else
-                                        <td>-</td>
-                                    @endif
-                                    @if($employee->company_doj)
-                                        <td class="font-style">{{ \Auth::user()->dateFormat($employee->company_doj )}}</td>
-                                    @else
-                                        <td>-</td>
-                                    @endif
+                                    <td>
+                                        @foreach ($departments as $department)
+                                            @if ($department->id == $employee->department_id)
+                                                {{ $department->name }}
+                                            @endif
+                                        @endforeach
+                                    </td>
+                                    <td>
+                                        @foreach ($designations as $designation)
+                                            @if ($designation->id == $employee->designation_id)
+                                                {{ $designation->name }}
+                                            @endif
+                                        @endforeach
+                                    </td>
+                                    <td class="font-style">{{ \Auth::user()->dateFormat($employee->created_at )}}</td>
                                     <td>
                                         {{ (!empty($employee->user->last_login_at)) ? $employee->user->last_login_at : '-' }}
                                     </td>
