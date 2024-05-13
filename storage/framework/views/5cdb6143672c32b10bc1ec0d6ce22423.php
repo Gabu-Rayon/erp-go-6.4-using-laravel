@@ -56,35 +56,37 @@
                                             <a href="#"  class="btn btn-outline-primary"><?php echo e(\Auth::user()->employeeIdFormat($employee->employee_id)); ?></a>
                                         <?php endif; ?>
                                     </td>
+                                    <?php echo e(Log::info('department')); ?>
+
+                                    <?php echo e(Log::info($departments)); ?>
+
                                     <td class="font-style"><?php echo e($employee->name); ?></td>
                                     <td><?php echo e($employee->email); ?></td>
-                                    <?php if($employee->branch_id): ?>
                                     <td>
                                         <?php $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <?php if($branch->bhfId == $department->branch_id): ?>
+                                            <?php if($branch->bhfId == $employee->branch_id): ?>
                                                 <?php echo e($branch->bhfNm); ?>
 
                                             <?php endif; ?>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </td>
-                                    <?php else: ?>
-                                        <td>-</td>
-                                    <?php endif; ?>
-                                    <?php if($employee->department_id): ?>
-                                        <td class="font-style"><?php echo e($employee->department?$employee->department->name:''); ?></td>
-                                    <?php else: ?>
-                                        <td>-</td>
-                                    <?php endif; ?>
-                                    <?php if($employee->designation_id): ?>
-                                        <td class="font-style"><?php echo e(!$employee->designation?$employee->designation->name:''); ?></td>
-                                    <?php else: ?>
-                                        <td>-</td>
-                                    <?php endif; ?>
-                                    <?php if($employee->company_doj): ?>
-                                        <td class="font-style"><?php echo e(\Auth::user()->dateFormat($employee->company_doj )); ?></td>
-                                    <?php else: ?>
-                                        <td>-</td>
-                                    <?php endif; ?>
+                                    <td>
+                                        <?php $__currentLoopData = $departments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $department): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php if($department->id == $employee->department_id): ?>
+                                                <?php echo e($department->name); ?>
+
+                                            <?php endif; ?>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </td>
+                                    <td>
+                                        <?php $__currentLoopData = $designations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $designation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php if($designation->id == $employee->designation_id): ?>
+                                                <?php echo e($designation->name); ?>
+
+                                            <?php endif; ?>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </td>
+                                    <td class="font-style"><?php echo e(\Auth::user()->dateFormat($employee->created_at )); ?></td>
                                     <td>
                                         <?php echo e((!empty($employee->user->last_login_at)) ? $employee->user->last_login_at : '-'); ?>
 
