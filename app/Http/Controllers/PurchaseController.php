@@ -102,6 +102,10 @@ class PurchaseController extends Controller
   * Add Purchase to API END POINT 
   * 
   ********************************************/
+
+
+
+
     public function store(Request $request)
     {
         // Log received request data
@@ -109,6 +113,7 @@ class PurchaseController extends Controller
 
         if (\Auth::user()->can('create purchase')) {
             $rules = [
+                'supplier_id' => 'required',
                 'supplierTin' => 'required',
                 'supplierBhfId' => 'required',
                 'supplierName' => 'required',
@@ -120,12 +125,15 @@ class PurchaseController extends Controller
                 'occurredDate' => 'required',
                 'confirmDate' => 'required',
                 'warehouseDate' => 'required',
+                'category_id' => 'required',
+                'warehouse' => 'required',
                 'remark' => 'required',
                 'mapping' => 'required',
 
                 'items.*.itemCode' => 'required',
                 'items.*.itemNm' => 'required',
                 'items.*.itemClsCd' => 'required',
+                'items.*.itemId' => 'required',
                 'items.*.bcd' => 'required',
                 'items.*.pkgUnitCd' => 'required',
                 'items.*.pkg' => 'required',
@@ -210,13 +218,23 @@ class PurchaseController extends Controller
             \Log::info('API Response  Body For Posting Purchase Data: ' . $response->body());
             \Log::info('API Response Status Code For Posting Purchase Data: ' . $response->status());
 
+            // Save data to local database
+            try {
+                DB::beginTransaction();
 
-
-
-            // Check if the request was successful
-            if ($response->successful()) {
-                // Save data to local database
                 Purchase::create([
+                    'purchase_id' => $this->purchaseNumber(),
+                    'vender_id' => $request->input('supplier_id'),
+                    'warehouse_id' => $request->input('warehouse'),
+                    'purchase_date' => $request->input('purchDate'),
+                    'purchase_number ' => $this->purchaseNumber(),
+                    'status' => 0,
+                    'shipping_display' => null,
+                    'send_date' => null,
+                    'discount_apply' => null,
+                    'category_id' => $request->input('category_id'),
+                    'created_by' => \Auth::user()->creatorId(),
+
                     'spplrTin' => $request->input('supplierTin'),
                     'spplrNm' => $request->input('supplierName'),
                     'spplrBhfId' => $request->input('supplierBhfId'),
@@ -256,20 +274,76 @@ class PurchaseController extends Controller
                     'totTaxAmt' => array_sum(array_column($itemsDataList, 'taxAmt')),
                     //    'totTaxAmt' => $request->input('items')->sum('taxAmt'),
                     //totAmt will be the totals for all products totAmt's
-                    'totAmt' => $request->input('items')->sum('quantity * unitPrice'),
+                    'totAmt' => collect($request->input('items'))->sum(function ($item) {
+                        return $item['quantity'] * $item['unitPrice'];
+                    }),
                     'remark' => $request->input('remark'),
                 ]);
 
+                \Log::info('Contents of $itemsDataList:', $itemsDataList);
+
                 // Loop through itemsDataList and save each item
-                foreach ($itemsDataList as $itemData) {
-                    PurchaseProduct::create([
+                // foreach ($itemsDataList as $itemData) {
+
+                foreach ($itemsDataList as $index => $itemData) {
+                    \Log::info("Item data at index $index:", $itemData);
+
+                    // Check if the 'tax' key exists in $itemData
+                    if (array_key_exists('tax', $itemData)) {
+                        // Get the tax type code from the form input
+                        $taxTypeCode = $itemData['tax'];
+
+                        // Initialize the tax code variable
+                        $taxCode = null;
+
+                        // Map the tax type code to the tax code
+                        switch ($taxTypeCode) {
+                            case 'A':
+                                $taxCode = 1;
+                                break;
+                            case 'B':
+                                $taxCode = 2;
+                                break;
+                            case 'C':
+                                $taxCode = 3;
+                                break;
+                            case 'D':
+                                $taxCode = 4;
+                                break;
+                            case 'E':
+                                $taxCode = 5;
+                                break;
+                            case 'F':
+                                $taxCode = 6;
+                                break;
+                            default:
+                                $taxCode = null;
+                                break;
+                        }
+                    } else {
+                        // Handle the case where 'tax' key is missing
+                        // You can log an error or perform other error handling here
+                        \Log::error('Tax key is missing in item data: ' . json_encode($itemData));
+                        continue;
+                    }
+
+                    // Create PurchaseProduct instance with the mapped tax code
+                    $purchaseProduct = new PurchaseProduct([
+                        'purchase_id' => $this->purchaseNumber(),
+                        'product_id' => $itemData['itemId'],
+                        'quantity' => $itemData['quantity'],
+                        'tax' => $taxCode,
+                        'discount' => $itemData['discountAmt'],
+                        'price' => $itemData['unitPrice'],
+                        'description' => null,
                         'saleItemCode' => $request->input('supplierInvcNo'),
                         'itemCd' => $itemData['itemCode'],
                         'itemClsCd' => $itemData['itemClsCd'],
                         'itemNm' => $itemData['itemNm'],
                         'bcd' => $itemData['bcd'],
-                        'supplrItemClsCd' => $itemData['supplrItemClsCd'],
-                        'supplrIteNm' => $itemData['supplrItemNm'],
+                        'supplrItemClsCd' => $itemData['supplrItemClsCode'],
+                        'supplrItemCd' => $itemData['supplrItemCode'],
+                        'supplrIteNm' => $itemData['supplrItemName'],
                         'pkgUnitCd' => $itemData['pkgQuantity'],
                         'pkg' => $itemData['pkg'],
                         'qtyUnitCd' => $itemData['qtyUnitCd'],
@@ -279,13 +353,25 @@ class PurchaseController extends Controller
                         'dcAmt' => $itemData['discountAmt'],
                         'taxTyCd' => $itemData['tax'],
                         'taxblAmt' => $itemData['itemTaxPrice'],
-                        'taxAmt' => $itemData['quantity'] * $itemData['unitPrice'] * $itemData['taxRate'],
+                        'taxAmt' => $itemData['quantity'] * $itemData['unitPrice'] * $itemData['itemTaxRate'],
                         'totAmt' => $itemData['quantity'] * $itemData['unitPrice'],
                         'itemExprDt' => $itemData['itemExprDt'],
                     ]);
+
+                    // Save the PurchaseProduct instance to the database
+                    $purchaseProduct->save();
                 }
-                return redirect()->back()->with('success', 'Purchase Created Successfully');
-            } else {
+
+                return redirect()->route('purchase.index')->with('success', 'Purchase Created Successfully');
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                // Log the error
+                \Log::error('Error saving purchase data: ');
+                \Log::error($e);
+
+                // Handle the error and redirect back with an error message
                 return redirect()->back()->with('error', 'Failed to create purchase. Please try again.');
             }
         } else {
@@ -532,12 +618,12 @@ class PurchaseController extends Controller
         $category->prepend('Select Category', '');
 
         $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
-        $venders = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+        $venders = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'spplrNm');
         $venders->prepend('Select Vender', '');
         $suppliers = Vender::all()->pluck('name', 'id');
         $suppliers->prepend('Select Supplier', '');
 
-        $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'name');
+        $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
         $warehouse->prepend('Select Warehouse', '');
 
         // $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->where('type','!=', 'service')->get()->pluck('name', 'id');

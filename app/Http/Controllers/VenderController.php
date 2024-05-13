@@ -613,4 +613,27 @@ class VenderController extends Controller
             return redirect()->route('vender.index')->with('error', __('Error adding Suppliers / Vender Details  Details  from the API.'));
         }
     }
+
+
+
+    // get SupplierInformationto to auto fill listing form
+    public function getSupplierInformation(Request $request)
+    {
+        // Fetch Supplier  information based on the item code
+        $supplierName = $request->input('supplierName');
+
+        \Log::info('Supplier Name: ' . $supplierName);
+
+        $supplierInfo['data'] = Vender::where('spplrNm', $supplierName)->first();
+
+        if ($supplierInfo['data']) {
+            // Return Supplier information as JSON response
+            return response()->json($supplierInfo);
+        } else {
+            // If supplier information not found, return empty response
+             \Log::error('No data found for supplier: ' . $supplierName);
+            return response()->json([]);
+        }
+    }
+
 }

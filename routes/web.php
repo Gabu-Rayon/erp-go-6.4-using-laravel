@@ -455,7 +455,7 @@ Route::group(['middleware' => ['verified']], function () {
     );
     //  getSuppliersDetailsFromApi
      Route::get('/getSuppliersDetailsFromApi', [VenderController::class, 'getSuppliersDetailsFromApi']);
-
+    Route::any('/getSupplierInformation', [VenderController::class, 'getSupplierInformation'])->name('venders.getSupplierInformation');
     
 
     Route::group(
