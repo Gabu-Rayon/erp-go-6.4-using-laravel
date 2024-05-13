@@ -35,50 +35,25 @@
                                 <thead>
                                     <tr>
                                         <th>Tin</th>
-                                        <th>Branch ID</th>
                                         <th>Branch Name</th>
-                                        <th>Branch Status</th>
-                                        <th>Province</th>
-                                        <th>District</th>
-                                        <th>Sector</th>
                                         <th>Manager Name</th>
-                                        <th>Manager Tel. No.</th>
-                                        <th>Manager Email</th>
-                                        <th>HQ</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="font-style">
                                     <?php $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <tr>
                                             <td><?php echo e($branch['tin']); ?></td>
-                                            <td><?php echo e($branch['bhfId']); ?></td>
                                             <td><?php echo e($branch['bhfNm']); ?></td>
-                                            <td>
-                                                <?php if($branch['bhfSttsCd'] === '01'): ?>
-                                                  Active
-                                                <?php else: ?>
-                                                    Inactive
-                                                <?php endif; ?>
-                                            </td>
-                                            <td><?php echo e($branch['prvncNm']); ?></td>
-                                            <td><?php echo e($branch['dstrtNm']); ?></td>
-                                            <td><?php echo e($branch['sctrNm']); ?></td>
                                             <td><?php echo e($branch['mgrNm']); ?></td>
-                                            <td><?php echo e($branch['mgrTelNo']); ?></td>
-                                            <td><?php echo e($branch['mgrEmail']); ?></td>
-                                            <td><?php echo e($branch['hqYn'] === 'Y' ? 'Yes' : 'No'); ?></td>
                                             <td class="Action text-end">
                                                 <span>
                                                     <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit branch')): ?>
-                                                        <div class="action-btn bg-primary ms-2">
-
-                                                            <a href="#" class="mx-3 btn btn-sm align-items-center"
-                                                                data-url="<?php echo e(URL::to('branch/' . $branch['bhfId'] . '/edit')); ?>"
-                                                                data-ajax-popup="true" data-title="<?php echo e(__('Edit Branch')); ?>"
-                                                                data-bs-toggle="tooltip" title="<?php echo e(__('Edit')); ?>"
-                                                                data-original-title="<?php echo e(__('Edit')); ?>"><i
-                                                                    class="ti ti-pencil text-white"></i></a>
-                                                        </div>
+                                                        <div class="action-btn bg-info ms-2">
+                                                            <a href="#" class="mx-3 btn btn-sm  align-items-center" data-url="<?php echo e(route('branch.edit',$branch->id)); ?>" data-ajax-popup="true"  data-size="lg " data-bs-toggle="tooltip" title="<?php echo e(__('Edit')); ?>"  data-title="<?php echo e(__('Edit Branch')); ?>">
+                                                                <i class="ti ti-pencil text-white"></i>
+                                                            </a>
+                                                        </div> 
                                                     <?php endif; ?>
                                                     <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete branch')): ?>
                                                         <div class="action-btn bg-danger ms-2">

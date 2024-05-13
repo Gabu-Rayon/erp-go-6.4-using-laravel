@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use App\Models\Utility;
 use App\Models\warehouse;
-use App\Models\WarehouseProduct;
-use DB;
+use App\Models\BranchesList;
 use Illuminate\Http\Request;
+use App\Models\WarehouseProduct;
 
 class WarehouseController extends Controller
 {
@@ -32,7 +33,9 @@ class WarehouseController extends Controller
      */
     public function create()
     {
-        return view('warehouse.create');
+        $branches = BranchesList::all()->pluck('bhfNm', 'id');
+
+        return view('warehouse.create', compact('branches'));
 
     }
 
@@ -59,6 +62,7 @@ class WarehouseController extends Controller
             }
 
             $warehouse             = new warehouse();
+            $warehouse->branch_id = $request->branchId;
             $warehouse->name       = $request->name;
             $warehouse->address    = $request->address;
             $warehouse->city       = $request->city;

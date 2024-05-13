@@ -1,127 +1,83 @@
 <?php echo e(Form::open(array('url'=>'branch','method'=>'post'))); ?>
 
-<div class="modal-body">
+    <div class="modal-body">
+        <div class="row">
+            <div class="form-group col-6">
+                <?php echo e(Form::label('bhfNm',__('Branch Name'),['class'=>'form-label'])); ?>
 
-    <div class="row">
-        <div class="col-12">
-           <!--  <div class="form-group">
-                <?php echo e(Form::label('branch_user_id',__('Branch User Id'),['class'=>'form-label'])); ?>
+                <?php echo e(Form::text('bhfNm',null,array('class'=>'form-control','placeholder'=>__('Enter Branch Name')))); ?>
 
-                <?php echo e(Form::text('branch_user_id',null,array('class'=>'form-control','placeholder'=>__('345600')))); ?>
-
-                <?php $__errorArgs = ['branch_user_id'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                <span class="invalid-name" role="alert">
-                    <strong class="text-danger"><?php echo e($message); ?></strong>
-                </span>
-                <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-            </div> -->
-            <div class="form-group">
-                <?php echo e(Form::label('branch_user_name',__('Branch User Name'),['class'=>'form-label'])); ?>
-
-                <?php echo e(Form::text('name',null,array('class'=>'form-control','placeholder'=>__('Enter Branch User Name')))); ?>
-
-                <?php $__errorArgs = ['branch_user_name'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                <span class="invalid-name" role="alert">
-                    <strong class="text-danger"><?php echo e($message); ?></strong>
-                </span>
-                <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
             </div>
+            <div class="form-group col-6">
+                <?php echo e(Form::label('bhfId',__('Branch ID'),['class'=>'form-label'])); ?>
 
-            <div class="form-group">
-                <?php echo e(Form::label('password',__('Password'),['class'=>'form-label'])); ?>
+                <?php echo e(Form::text('bhfId',null,array('class'=>'form-control','placeholder'=>__('Enter Branch ID')))); ?>
 
-                <?php echo e(Form::password('password',array('class'=>'form-control','placeholder'=>__('Enter User Password'),'required'=>'required','minlength'=>"6"))); ?>
-
-                <?php $__errorArgs = ['password'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                <small class="invalid-password" role="alert">
-                    <strong class="text-danger"><?php echo e($message); ?></strong>
-                </small>
-                <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
             </div>
+            <div class="form-group col-6">
+                <?php echo e(Form::label('tin',__('Branch TIN'),['class'=>'form-label'])); ?>
 
-            <div class="form-group">
-                <?php echo e(Form::label('address',__('Address'),['class'=>'form-label'])); ?>
+                <?php echo e(Form::text('tin',null,array('class'=>'form-control','placeholder'=>__('Enter Branch TIN')))); ?>
 
-                <?php echo e(Form::text('address',null,array('class'=>'form-control','placeholder'=>__('MAIN ST 23')))); ?>
-
-                <?php $__errorArgs = ['address'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                <span class="invalid-name" role="alert">
-                    <strong class="text-danger"><?php echo e($message); ?></strong>
-                </span>
-                <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
             </div>
-            <div class="form-group">
-                <?php echo e(Form::label('contact_no',__('Contact No'),['class'=>'form-label'])); ?>
+            <div class="form-group col-6">
+                <?php echo e(Form::label('bhfSttsCd', __('Branch Status'), ['class' => 'form-label'])); ?>
 
-                <?php echo e(Form::text('contact',null,array('class'=>'form-control','placeholder'=>__('0720045000')))); ?>
+                <?php echo e(Form::select('bhfSttsCd', ['01' => 'Active', '00' => 'Inactive'], null, ['class' => 'form-control'])); ?>
 
-                <?php $__errorArgs = ['contact_no'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                <span class="invalid-name" role="alert">
-                    <strong class="text-danger"><?php echo e($message); ?></strong>
-                </span>
-                <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
             </div>
-            <div class="form-group">
-                <?php echo e(Form::label('remark',__('Remarks'),['class'=>'form-label'])); ?>
+            <div class="form-group col-6">
+                <?php echo e(Form::label('prvncNm', __('Province Name'), ['class' => 'form-label'])); ?>
 
-                <?php echo e(Form::text('remark',null,array('class'=>'form-control','placeholder'=>__('Enter Remarks')))); ?>
+                <?php echo e(Form::text('prvncNm', '', ['class' => 'form-control'])); ?>
 
-                <?php $__errorArgs = ['contact_no'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                <span class="invalid-name" role="alert">
-                    <strong class="text-danger"><?php echo e($message); ?></strong>
-                </span>
-                <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
             </div>
-        </div>  
+            <div class="form-group col-6">
+                <?php echo e(Form::label('dstrtNm', __('District Name'), ['class' => 'form-label'])); ?>
+
+                <?php echo e(Form::text('dstrtNm', '', ['class' => 'form-control'])); ?>
+
+            </div>
+            <div class="form-group col-6">
+                <?php echo e(Form::label('sctrNm', __('SCTR Name'), ['class' => 'form-label'])); ?>
+
+                <?php echo e(Form::text('sctrNm', '', ['class' => 'form-control'])); ?>
+
+            </div>
+            <div class="form-group col-6">
+                <?php echo e(Form::label('locDesc', __('LOC DESC'), ['class' => 'form-label'])); ?>
+
+                <?php echo e(Form::text('locDesc', '', ['class' => 'form-control'])); ?>
+
+            </div>
+            <div class="form-group col-6">
+                <?php echo e(Form::label('mgrNm', __('Manager Name'), ['class' => 'form-label'])); ?>
+
+                <?php echo e(Form::text('mgrNm', '', ['class' => 'form-control'])); ?>
+
+            </div>
+            <div class="form-group col-6">
+                <?php echo e(Form::label('mgrTelNo', __('Manager Contact'), ['class' => 'form-label'])); ?>
+
+                <?php echo e(Form::text('mgrTelNo', '', ['class' => 'form-control'])); ?>
+
+            </div>
+            <div class="form-group col-6">
+                <?php echo e(Form::label('mgrEmail', __('Manager Email'), ['class' => 'form-label'])); ?>
+
+                <?php echo e(Form::text('mgrEmail', '', ['class' => 'form-control'])); ?>
+
+            </div>
+            <div class="form-group col-6">
+                <?php echo e(Form::label('hqYn', __('HeadQuarter?'), ['class' => 'form-label'])); ?>
+
+                <?php echo e(Form::select('hqYn', ['Y' => 'Yes', 'N' => 'No'], null, ['class' => 'form-control'])); ?>
+
+            </div>
+        </div>
     </div>
-</div>
-<div class="modal-footer">
-    <input type="button" value="<?php echo e(__('Cancel')); ?>" class="btn btn-light" data-bs-dismiss="modal">
-    <input type="submit" value="<?php echo e(__('Create')); ?>" class="btn  btn-primary">
-</div>
-    <?php echo e(Form::close()); ?>
-
-
-<?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/branch/create.blade.php ENDPATH**/ ?>
+    <div class="modal-footer">
+        <input type="button" value="<?php echo e(__('Cancel')); ?>" class="btn btn-light" data-bs-dismiss="modal">
+        <input type="submit" value="<?php echo e(__('Create')); ?>" class="btn  btn-primary">
+    </div>
+<?php echo e(Form::close()); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/branch/create.blade.php ENDPATH**/ ?>

@@ -39,41 +39,7 @@
 
                             <!--------------------- Start Products System ----------------------------------->
 
-        <?php if(Gate::check('manage product & service') || Gate::check('manage product & service')): ?>
-            <li class="dash-item dash-hasmenu">
-                <a href="#!" class="dash-link ">
-                    <span class="dash-micon"><i class="ti ti-template"></i></span><span
-                        class="dash-mtext"><?php echo e(__('Basic Data')); ?></span><span class="dash-arrow">
-                        <i data-feather="chevron-right"></i></span>
-                </a>
-                <ul class="dash-submenu">
-                    <?php if(Gate::check('manage product & service')): ?>
-                        <li class="dash-item <?php echo e(Request::segment(1) == 'basicdata' ? 'active' : ''); ?>">
-                            <a href="<?php echo e(route('noticelist.index')); ?>"
-                                class="dash-link"><?php echo e(__('Notices List')); ?>
-
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                    <?php if(Gate::check('manage product & service')): ?>
-                        <li class="dash-item <?php echo e(Request::segment(1) == 'branchlist' ? 'active' : ''); ?>">
-                            <a href="<?php echo e(route('brancheslist.index')); ?>"
-                                class="dash-link"><?php echo e(__('Branch List')); ?>
-
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                    <?php if(Gate::check('manage product & service')): ?>
-                        <li class="dash-item <?php echo e(Request::segment(1) == 'customerbypin' ? 'active' : ''); ?>">
-                            <a href="#"
-                                class="dash-link"><?php echo e(__('Get Customer By Pin')); ?>
-
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                </ul>
-            </li>
-        <?php endif; ?>
+        
         <!--------------------- End Products System ----------------------------------->
 
 
@@ -377,6 +343,49 @@
                     </li>
                 <?php endif; ?>
                 <!--------------------- End Dashboard ----------------------------------->
+
+                <?php if(Gate::check('manage product & service') || Gate::check('manage product & service')): ?>
+            <li class="dash-item dash-hasmenu">
+                <a href="#!" class="dash-link ">
+                    <span class="dash-micon">
+                        <i class="ti ti-template"></i>
+                    </span>
+                    <span class="dash-mtext">
+                        <?php echo e(__('Basic Data')); ?>
+
+                    </span>
+                    <span class="dash-arrow">
+                        <i data-feather="chevron-right"></i>
+                    </span>
+                </a>
+                <ul class="dash-submenu">
+                    <?php if(Gate::check('manage product & service')): ?>
+                        <li class="dash-item <?php echo e(Request::segment(1) == 'basicdata' ? 'active' : ''); ?>">
+                            <a href="<?php echo e(route('noticelist.index')); ?>"
+                                class="dash-link"><?php echo e(__('Notices List')); ?>
+
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                    <?php if(Gate::check('manage product & service')): ?>
+                        <li class="dash-item <?php echo e(Request::segment(1) == 'branchlist' ? 'active' : ''); ?>">
+                            <a href="<?php echo e(route('brancheslist.index')); ?>"
+                                class="dash-link"><?php echo e(__('Branch List')); ?>
+
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                    <?php if(Gate::check('manage product & service')): ?>
+                        <li class="dash-item <?php echo e(Request::segment(1) == 'customerbypin' ? 'active' : ''); ?>">
+                            <a href="#"
+                                class="dash-link"><?php echo e(__('Get Customer By Pin')); ?>
+
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
+            </li>
+        <?php endif; ?>
 
 
                 <!--------------------- Start HRM ----------------------------------->
@@ -1399,6 +1408,7 @@
         <?php endif; ?>
         <!--------------------- End POs System ----------------------------------->
 
+        <?php if(\Auth::user()->type == 'company'): ?>
         <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : ''); ?>">
             <a href="#!" class="dash-link">
                 <span class="dash-micon">
@@ -1418,7 +1428,10 @@
                 </li>
             </ul>
         </li>
+        <?php endif; ?>
 
+
+        <?php if(\Auth::user()->type == 'company' || \Auth::user()->type == 'Employee'): ?>
         <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : ''); ?>">
             <a href="#!" class="dash-link">
                 <span class="dash-micon">
@@ -1441,38 +1454,13 @@
                 </li>
             </ul>
         </li>
-
-        <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : ''); ?>">
-            <a href="#!" class="dash-link">
-                <span class="dash-micon">
-                    <i class="ti ti-layers-difference"></i>
-                </span>
-                <span class="dash-mtext"><?php echo e(__('Sales')); ?></span>
-                <span class="dash-arrow">
-                    <i data-feather="chevron-right"></i>
-                </span>
-            </a>
-            <ul class="dash-submenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' || Request::segment(1) == 'adjust'); ?>">
-                <li class="dash-item <?php echo e(Request::route()->getName() == 'index'); ?>">
-                    <a class="dash-link" href="<?php echo e(route('sales.index')); ?>"><?php echo e(__('Sales Report')); ?></a>
-                </li>
-                <li class="dash-item <?php echo e(Request::route()->getName() == 'create'); ?>">
-                    <a class="dash-link" href="<?php echo e(route('sales.create')); ?>"><?php echo e(__('Send Sales Transaction')); ?></a>
-                </li>
-            </ul>
-        </li>
+        <?php endif; ?>
 
         <?php if(\Auth::user()->type != 'super admin'): ?>
             <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'support' ? 'active' : ''); ?>">
                 <a href="<?php echo e(route('support.index')); ?>" class="dash-link">
                     <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
                         class="dash-mtext"><?php echo e(__('Support System')); ?></span>
-                </a>
-            </li>
-            <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'api-initialization' ? 'active' : ''); ?>">
-                <a href="<?php echo e(route('apiinitialization.index')); ?>" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
-                        class="dash-mtext"><?php echo e(__('API Initialization')); ?></span>
                 </a>
             </li>
             <li
@@ -1498,6 +1486,23 @@
                 </a>
             </li>
         <?php endif; ?>
+
+
+        <?php if(\Auth::user()->type == 'company'): ?>
+        <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'api-initialization' ? 'active' : ''); ?>">
+            <a href="<?php echo e(route('apiinitialization.index')); ?>" class="dash-link">
+                <span class="dash-micon">
+                    <i class="ti ti-headphones"></i>
+                </span>
+                <span class="dash-mtext">
+                    <?php echo e(__('API Initialization')); ?>
+
+                </span>
+            </a>
+        </li>
+        <?php endif; ?>
+
+
         <?php if(\Auth::user()->type == 'company'): ?>
             <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'compositionlist' ? 'active' : ''); ?>">
                 <a href="<?php echo e(route('compositionlist.index')); ?>" class="dash-link">
@@ -1674,16 +1679,6 @@
                         <a href="<?php echo e(route('users.index')); ?>" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-users"></i></span><span
                                 class="dash-mtext"><?php echo e(__('Companies')); ?></span>
-                        </a>
-                    </li>
-                <?php endif; ?>
-                 
-                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage user')): ?>
-                    <li
-                       class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'api-initialization' ? 'active' : ''); ?>">
-                        <a href="<?php echo e(route('apiinitialization.index')); ?>" class="dash-link">
-                            <span class="dash-micon"><i class="ti ti-settings"></i></span><span
-                                class="dash-mtext"><?php echo e(__('API Initialization')); ?></span>
                         </a>
                     </li>
                 <?php endif; ?>

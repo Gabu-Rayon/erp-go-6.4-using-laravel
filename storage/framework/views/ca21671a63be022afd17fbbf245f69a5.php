@@ -27,6 +27,12 @@
             <?php echo e(Form::textarea('address',null,array('class'=>'form-control','rows'=>3 ,'required'=>'required'))); ?>
 
         </div>
+        <div class="form-group col-md-12">
+              <?php echo e(Form::label('branchId', __('Branch Id'), ['class' => 'form-label'])); ?>
+
+                            <?php echo e(Form::select('branchId', $branches, null, ['class' => 'form-control select2 branchId','rows'=>3 , 'required' => 'required'])); ?>
+
+        </div>
         <div class="form-group col-md-6">
             <?php echo e(Form::label('city',__('City'),array('class'=>'form-label'))); ?>
 

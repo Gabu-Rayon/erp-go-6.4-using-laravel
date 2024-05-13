@@ -1,6 +1,9 @@
 <div class="card sticky-top" style="top:30px">
     <div class="list-group list-group-flush" id="useradd-sidenav">
-        <a href="<?php echo e(route('branch.index')); ?>" class="list-group-item list-group-item-action border-0 <?php echo e((request()->is('branch*') ? 'active' : '')); ?>"><?php echo e(__('Branch')); ?> <div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
+        <a href="<?php echo e(route('branch.index')); ?>" class="list-group-item list-group-item-action border-0 <?php echo e((request()->is('branch*') && !request()->is('branchuser*') ? 'active' : '')); ?>"><?php echo e(__('Branch')); ?> <div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
+
+
+        <a href="<?php echo e(route('branchuser.index')); ?>" class="list-group-item list-group-item-action border-0 <?php echo e((request()->is('branchuser*') ? 'active' : '')); ?>"><?php echo e(__('Branch User')); ?><div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
 
         <a href="<?php echo e(route('department.index')); ?>" class="list-group-item list-group-item-action border-0 <?php echo e((request()->is('department*') ? 'active' : '')); ?>"><?php echo e(__('Department')); ?><div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
 

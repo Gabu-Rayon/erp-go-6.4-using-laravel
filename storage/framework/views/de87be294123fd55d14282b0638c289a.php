@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('page-title'); ?>
     <?php echo e(__('Manage Department')); ?>
 
@@ -39,34 +41,42 @@
                             </thead>
                             <tbody class="font-style">
                             <?php $__currentLoopData = $departments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $department): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <tr>
-                                    <td><?php echo e(!empty($department->branch)?$department->branch->name:''); ?></td>
-                                    <td><?php echo e($department->name); ?></td>
+    <tr>
+        <td>
+            <?php $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php if($branch->bhfId == $department->branch_id): ?>
+                    <?php echo e($branch->bhfNm); ?>
 
-                                    <td class="Action">
-                                        <span>
-                                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit department')): ?>
-                                            <div class="action-btn bg-primary ms-2">
+                <?php endif; ?>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </td>
+        <td><?php echo e($department->name); ?></td>
 
-                                                <a href="#" data-url="<?php echo e(URL::to('department/'.$department->id.'/edit')); ?>"  data-ajax-popup="true" data-title="<?php echo e(__('Edit Department')); ?>" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="<?php echo e(__('Edit')); ?>" data-original-title="<?php echo e(__('Edit')); ?>">
-                                                    <i class="ti ti-pencil text-white"></i></a>
-                                            </div>
-                                                <?php endif; ?>
-                                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete department')): ?>
-                                                    <div class="action-btn bg-danger ms-2">
-                                                        <?php echo Form::open(['method' => 'DELETE', 'route' => ['department.destroy', $department->id],'id'=>'delete-form-'.$department->id]); ?>
+        <td class="Action">
+            <span>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit department')): ?>
+                    <div class="action-btn bg-info ms-2">
+                        <a href="#" class="mx-3 btn btn-sm  align-items-center" data-url="<?php echo e(route('department.edit',$department->id)); ?>" data-ajax-popup="true"  data-size="lg" data-bs-toggle="tooltip" title="<?php echo e(__('Edit')); ?>"  data-title="<?php echo e(__('Edit Department')); ?>">
+                            <i class="ti ti-pencil text-white"></i>
+                        </a>
+                    </div> 
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete department')): ?>
+                    <div class="action-btn bg-danger ms-2">
+                        <?php echo Form::open(['method' => 'DELETE', 'route' => ['department.destroy', $department->id],'id'=>'delete-form-'.$department->id]); ?>
 
+                        <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="<?php echo e(__('Delete')); ?>" data-original-title="<?php echo e(__('Delete')); ?>" data-confirm="<?php echo e(__('Are You Sure?').'|'.__('This action can not be undone. Do you want to continue?')); ?>" data-confirm-yes="document.getElementById('delete-form-<?php echo e($department->id); ?>').submit();">
+                            <i class="ti ti-trash text-white"></i>
+                        </a>
+                        <?php echo Form::close(); ?>
 
+                    </div>
+                <?php endif; ?>
+            </span>
+        </td>
+    </tr>
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                                                <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="<?php echo e(__('Delete')); ?>" data-original-title="<?php echo e(__('Delete')); ?>" data-confirm="<?php echo e(__('Are You Sure?').'|'.__('This action can not be undone. Do you want to continue?')); ?>" data-confirm-yes="document.getElementById('delete-form-<?php echo e($department->id); ?>').submit();"><i class="ti ti-trash text-white"></i></a>
-                                                <?php echo Form::close(); ?>
-
-                                                    </div>
-                                            <?php endif; ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>
                         </table>
                     </div>

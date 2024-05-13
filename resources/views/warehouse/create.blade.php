@@ -22,6 +22,10 @@
             {{Form::label('address',__('Address'),array('class'=>'form-label')) }}
             {{Form::textarea('address',null,array('class'=>'form-control','rows'=>3 ,'required'=>'required'))}}
         </div>
+        <div class="form-group col-md-12">
+              {{ Form::label('branchId', __('Branch Id'), ['class' => 'form-label']) }}
+                            {{ Form::select('branchId', $branches, null, ['class' => 'form-control select2 branchId','rows'=>3 , 'required' => 'required']) }}
+        </div>
         <div class="form-group col-md-6">
             {{Form::label('city',__('City'),array('class'=>'form-label')) }}
             {{Form::text('city',null,array('class'=>'form-control'))}}

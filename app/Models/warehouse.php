@@ -13,6 +13,7 @@ class warehouse extends Model
 
     protected $fillable = [
         'name',
+        'branch_id',
         'address',
         'city',
         'city_zip',

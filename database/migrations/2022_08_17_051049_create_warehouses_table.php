@@ -15,6 +15,7 @@ class CreateWarehousesTable extends Migration
     {
         Schema::create('warehouses', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('branch_id');
             $table->string('name');
             $table->text('address');
             $table->string('city');
