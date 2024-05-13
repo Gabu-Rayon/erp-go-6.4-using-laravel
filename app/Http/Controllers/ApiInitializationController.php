@@ -15,9 +15,12 @@ class ApiInitializationController extends Controller
     {
             Log::info(\Auth::user()->type);
             try {
-                $apiinitializations = ApiInitialization::all();
-                
-                return view('apiinitialization.index', compact('apiinitializations'));
+                if (\Auth::user()->type == 'company') {
+                    $apiinitializations = ApiInitialization::all();
+                    return view('apiinitialization.index', compact('apiinitializations'));
+                } else {
+                    return redirect()->back()->with('error', 'Permission Denied');
+                }
             } catch (\Exception $e) {
                 Log::error($e->getMessage());
             }

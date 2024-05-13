@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Branch;
+use App\Models\BranchesList;
 use App\Models\Department;
 use Illuminate\Http\Request;
 
@@ -13,8 +13,9 @@ class DepartmentController extends Controller
         if(\Auth::user()->can('manage department'))
         {
             $departments = Department::where('created_by', '=', \Auth::user()->creatorId())->get();
-
-            return view('department.index', compact('departments'));
+            $branches = BranchesList::all();
+            \Log::info($departments);
+            return view('department.index', compact('departments', 'branches'));
         }
         else
         {
@@ -24,15 +25,20 @@ class DepartmentController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create department'))
-        {
-            $branch = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+        try {
+            if(\Auth::user()->can('create department'))
+            {
+                $branch = BranchesList::all()->pluck('bhfNm', 'bhfId');
 
-            return view('department.create', compact('branch'));
-        }
-        else
-        {
-            return response()->json(['error' => __('Permission denied.')], 401);
+                return view('department.create', compact('branch'));
+            }
+            else
+            {
+                return redirect()->back()->with('error', 'Permission Denied');
+            }
+        } catch (\Exception $e) {
+            \Log::info('RENDER CREATE DEPARTMENT ERROR');
+            \Log::info($e);
         }
     }
 
@@ -43,9 +49,9 @@ class DepartmentController extends Controller
 
             $validator = \Validator::make(
                 $request->all(), [
-                                   'branch_id' => 'required',
-                                   'name' => 'required|max:20',
-                               ]
+                    'branch_id' => 'required',
+                    'name' => 'required|max:20',
+                    ]
             );
             if($validator->fails())
             {
@@ -79,7 +85,7 @@ class DepartmentController extends Controller
         {
             if($department->created_by == \Auth::user()->creatorId())
             {
-                $branch = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+                $branch = BranchesList::all()->pluck('bhfNm', 'bhfId');
 
                 return view('department.edit', compact('department', 'branch'));
             }

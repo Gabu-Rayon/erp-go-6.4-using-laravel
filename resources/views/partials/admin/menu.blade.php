@@ -39,38 +39,7 @@
 
                             <!--------------------- Start Products System ----------------------------------->
 
-        @if (Gate::check('manage product & service') || Gate::check('manage product & service'))
-            <li class="dash-item dash-hasmenu">
-                <a href="#!" class="dash-link ">
-                    <span class="dash-micon"><i class="ti ti-template"></i></span><span
-                        class="dash-mtext">{{ __('Basic Data') }}</span><span class="dash-arrow">
-                        <i data-feather="chevron-right"></i></span>
-                </a>
-                <ul class="dash-submenu">
-                    @if (Gate::check('manage product & service'))
-                        <li class="dash-item {{ Request::segment(1) == 'basicdata' ? 'active' : '' }}">
-                            <a href="{{ route('noticelist.index') }}"
-                                class="dash-link">{{ __('Notices List') }}
-                            </a>
-                        </li>
-                    @endif
-                    @if (Gate::check('manage product & service'))
-                        <li class="dash-item {{ Request::segment(1) == 'branchlist' ? 'active' : '' }}">
-                            <a href="{{ route('brancheslist.index') }}"
-                                class="dash-link">{{ __('Branch List') }}
-                            </a>
-                        </li>
-                    @endif
-                    @if (Gate::check('manage product & service'))
-                        <li class="dash-item {{ Request::segment(1) == 'customerbypin' ? 'active' : '' }}">
-                            <a href="#"
-                                class="dash-link">{{ __('Get Customer By Pin') }}
-                            </a>
-                        </li>
-                    @endif
-                </ul>
-            </li>
-        @endif
+        
         <!--------------------- End Products System ----------------------------------->
 
 
@@ -374,6 +343,45 @@
                     </li>
                 @endif
                 <!--------------------- End Dashboard ----------------------------------->
+
+                @if (Gate::check('manage product & service') || Gate::check('manage product & service'))
+            <li class="dash-item dash-hasmenu">
+                <a href="#!" class="dash-link ">
+                    <span class="dash-micon">
+                        <i class="ti ti-template"></i>
+                    </span>
+                    <span class="dash-mtext">
+                        {{ __('Basic Data') }}
+                    </span>
+                    <span class="dash-arrow">
+                        <i data-feather="chevron-right"></i>
+                    </span>
+                </a>
+                <ul class="dash-submenu">
+                    @if (Gate::check('manage product & service'))
+                        <li class="dash-item {{ Request::segment(1) == 'basicdata' ? 'active' : '' }}">
+                            <a href="{{ route('noticelist.index') }}"
+                                class="dash-link">{{ __('Notices List') }}
+                            </a>
+                        </li>
+                    @endif
+                    @if (Gate::check('manage product & service'))
+                        <li class="dash-item {{ Request::segment(1) == 'branchlist' ? 'active' : '' }}">
+                            <a href="{{ route('brancheslist.index') }}"
+                                class="dash-link">{{ __('Branch List') }}
+                            </a>
+                        </li>
+                    @endif
+                    @if (Gate::check('manage product & service'))
+                        <li class="dash-item {{ Request::segment(1) == 'customerbypin' ? 'active' : '' }}">
+                            <a href="#"
+                                class="dash-link">{{ __('Get Customer By Pin') }}
+                            </a>
+                        </li>
+                    @endif
+                </ul>
+            </li>
+        @endif
 
 
                 <!--------------------- Start HRM ----------------------------------->
@@ -1389,6 +1397,7 @@
         @endif
         <!--------------------- End POs System ----------------------------------->
 
+        @if (\Auth::user()->type == 'company')
         <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : '' }}">
             <a href="#!" class="dash-link">
                 <span class="dash-micon">
@@ -1408,7 +1417,10 @@
                 </li>
             </ul>
         </li>
+        @endif
 
+
+        @if (\Auth::user()->type == 'company' || \Auth::user()->type == 'Employee')
         <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : '' }}">
             <a href="#!" class="dash-link">
                 <span class="dash-micon">
@@ -1431,38 +1443,13 @@
                 </li>
             </ul>
         </li>
-
-        <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : '' }}">
-            <a href="#!" class="dash-link">
-                <span class="dash-micon">
-                    <i class="ti ti-layers-difference"></i>
-                </span>
-                <span class="dash-mtext">{{ __('Sales') }}</span>
-                <span class="dash-arrow">
-                    <i data-feather="chevron-right"></i>
-                </span>
-            </a>
-            <ul class="dash-submenu {{ Request::segment(1) == 'index' || Request::segment(1) == 'create' || Request::segment(1) == 'adjust' }}">
-                <li class="dash-item {{ Request::route()->getName() == 'index' }}">
-                    <a class="dash-link" href="{{ route('sales.index') }}">{{ __('Sales Report') }}</a>
-                </li>
-                <li class="dash-item {{ Request::route()->getName() == 'create' }}">
-                    <a class="dash-link" href="{{ route('sales.create') }}">{{ __('Send Sales Transaction') }}</a>
-                </li>
-            </ul>
-        </li>
+        @endif
 
         @if (\Auth::user()->type != 'super admin')
             <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'support' ? 'active' : '' }}">
                 <a href="{{ route('support.index') }}" class="dash-link">
                     <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
                         class="dash-mtext">{{ __('Support System') }}</span>
-                </a>
-            </li>
-            <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'api-initialization' ? 'active' : '' }}">
-                <a href="{{ route('apiinitialization.index') }}" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
-                        class="dash-mtext">{{ __('API Initialization') }}</span>
                 </a>
             </li>
             <li
@@ -1488,6 +1475,22 @@
                 </a>
             </li>
         @endif
+
+
+        @if (\Auth::user()->type == 'company')
+        <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'api-initialization' ? 'active' : '' }}">
+            <a href="{{ route('apiinitialization.index') }}" class="dash-link">
+                <span class="dash-micon">
+                    <i class="ti ti-headphones"></i>
+                </span>
+                <span class="dash-mtext">
+                    {{ __('API Initialization') }}
+                </span>
+            </a>
+        </li>
+        @endif
+
+
         @if (\Auth::user()->type == 'company')
             <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'compositionlist' ? 'active' : '' }}">
                 <a href="{{ route('compositionlist.index') }}" class="dash-link">
@@ -1664,16 +1667,6 @@
                         <a href="{{ route('users.index') }}" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-users"></i></span><span
                                 class="dash-mtext">{{ __('Companies') }}</span>
-                        </a>
-                    </li>
-                @endcan
-                 
-                @can('manage user')
-                    <li
-                       class="dash-item dash-hasmenu {{ Request::segment(1) == 'api-initialization' ? 'active' : '' }}">
-                        <a href="{{ route('apiinitialization.index') }}" class="dash-link">
-                            <span class="dash-micon"><i class="ti ti-settings"></i></span><span
-                                class="dash-mtext">{{ __('API Initialization') }}</span>
                         </a>
                     </li>
                 @endcan

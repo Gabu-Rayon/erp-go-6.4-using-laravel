@@ -1688,5 +1688,14 @@ class InvoiceController extends Controller
         }
     }
 
+    public function addCreditNote() {
+        try {
+            return view('invoice.credit.note');
+        } catch (\Exception $e) {
+            \Log::info('CREDIT NOTE VIEW ERROR');
+            \Log::info($e);
+            return redirect()->back()->with('error', 'Something Went Wrong');
+        }
+    }
 
 }

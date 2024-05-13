@@ -58,7 +58,13 @@
                                     <td class="font-style">{{ $employee->name }}</td>
                                     <td>{{ $employee->email }}</td>
                                     @if($employee->branch_id)
-                                        <td class="font-style">{{$employee->branch  ? $employee->branch->name:''}}</td>
+                                    <td>
+                                        @foreach ($branches as $branch)
+                                            @if ($branch->bhfId == $department->branch_id)
+                                                {{ $branch->bhfNm }}
+                                            @endif
+                                        @endforeach
+                                    </td>
                                     @else
                                         <td>-</td>
                                     @endif

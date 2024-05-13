@@ -42,13 +42,15 @@ class EmployeeController extends Controller
             if(Auth::user()->type == 'Employee')
             {
                 $employees = Employee::where('user_id', '=', Auth::user()->id)->with(['designation','branch','department'])->get();
+                $branches = BranchesList::all();
             }
             else
             {
                 $employees = Employee::where('created_by', \Auth::user()->creatorId())->with(['designation','branch','department'])->get();
+                $branches = BranchesList::all();
             }
 
-            return view('employee.index', compact('employees'));
+            return view('employee.index', compact('employees', 'branches'));
         }
         else
         {

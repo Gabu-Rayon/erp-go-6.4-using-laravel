@@ -23,7 +23,6 @@
                                     <th><?php echo e(__('Branch Name')); ?></th>
                                     <th><?php echo e(__('Manager')); ?></th>
                                     <th><?php echo e(__('Prvnc Name')); ?></th>
-                                    <th><?php echo e(__('Default')); ?></th>
                                     <th><?php echo e(__('Sctr Name')); ?></th>
                                     <th><?php echo e(__('Action')); ?></th>
                                 </tr>
@@ -36,11 +35,9 @@
                                         <td><?php echo e($branch->bhfNm); ?></td>
                                         <td><?php echo e($branch->bhfSttsCd); ?></td>
                                         <td><?php echo e($branch->prvncNm); ?></td>
-                                        <td><?php echo e($branch->hqYn); ?></td>
                                         <td><?php echo e($branch->sctrNm); ?></td>
                                     </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
                             </tbody>
                         </table>
                     </div>

@@ -1,70 +1,58 @@
 {{Form::open(array('url'=>'branch','method'=>'post'))}}
-<div class="modal-body">
-
-    <div class="row">
-        <div class="col-12">
-           <!--  <div class="form-group">
-                {{Form::label('branch_user_id',__('Branch User Id'),['class'=>'form-label'])}}
-                {{Form::text('branch_user_id',null,array('class'=>'form-control','placeholder'=>__('345600')))}}
-                @error('branch_user_id')
-                <span class="invalid-name" role="alert">
-                    <strong class="text-danger">{{ $message }}</strong>
-                </span>
-                @enderror
-            </div> -->
-            <div class="form-group">
-                {{Form::label('branch_user_name',__('Branch User Name'),['class'=>'form-label'])}}
-                {{Form::text('name',null,array('class'=>'form-control','placeholder'=>__('Enter Branch User Name')))}}
-                @error('branch_user_name')
-                <span class="invalid-name" role="alert">
-                    <strong class="text-danger">{{ $message }}</strong>
-                </span>
-                @enderror
+    <div class="modal-body">
+        <div class="row">
+            <div class="form-group col-6">
+                {{Form::label('bhfNm',__('Branch Name'),['class'=>'form-label'])}}
+                {{Form::text('bhfNm',null,array('class'=>'form-control','placeholder'=>__('Enter Branch Name')))}}
             </div>
-
-            <div class="form-group">
-                {{Form::label('password',__('Password'),['class'=>'form-label'])}}
-                {{Form::password('password',array('class'=>'form-control','placeholder'=>__('Enter User Password'),'required'=>'required','minlength'=>"6"))}}
-                @error('password')
-                <small class="invalid-password" role="alert">
-                    <strong class="text-danger">{{ $message }}</strong>
-                </small>
-                @enderror
+            <div class="form-group col-6">
+                {{Form::label('bhfId',__('Branch ID'),['class'=>'form-label'])}}
+                {{Form::text('bhfId',null,array('class'=>'form-control','placeholder'=>__('Enter Branch ID')))}}
             </div>
-
-            <div class="form-group">
-                {{Form::label('address',__('Address'),['class'=>'form-label'])}}
-                {{Form::text('address',null,array('class'=>'form-control','placeholder'=>__('MAIN ST 23')))}}
-                @error('address')
-                <span class="invalid-name" role="alert">
-                    <strong class="text-danger">{{ $message }}</strong>
-                </span>
-                @enderror
+            <div class="form-group col-6">
+                {{Form::label('tin',__('Branch TIN'),['class'=>'form-label'])}}
+                {{Form::text('tin',null,array('class'=>'form-control','placeholder'=>__('Enter Branch TIN')))}}
             </div>
-            <div class="form-group">
-                {{Form::label('contact_no',__('Contact No'),['class'=>'form-label'])}}
-                {{Form::text('contact',null,array('class'=>'form-control','placeholder'=>__('0720045000')))}}
-                @error('contact_no')
-                <span class="invalid-name" role="alert">
-                    <strong class="text-danger">{{ $message }}</strong>
-                </span>
-                @enderror
+            <div class="form-group col-6">
+                {{ Form::label('bhfSttsCd', __('Branch Status'), ['class' => 'form-label']) }}
+                {{ Form::select('bhfSttsCd', ['01' => 'Active', '00' => 'Inactive'], null, ['class' => 'form-control']) }}
             </div>
-            <div class="form-group">
-                {{Form::label('remark',__('Remarks'),['class'=>'form-label'])}}
-                {{Form::text('remark',null,array('class'=>'form-control','placeholder'=>__('Enter Remarks')))}}
-                @error('contact_no')
-                <span class="invalid-name" role="alert">
-                    <strong class="text-danger">{{ $message }}</strong>
-                </span>
-                @enderror
+            <div class="form-group col-6">
+                {{ Form::label('prvncNm', __('Province Name'), ['class' => 'form-label']) }}
+                {{ Form::text('prvncNm', '', ['class' => 'form-control']) }}
             </div>
-        </div>  
+            <div class="form-group col-6">
+                {{ Form::label('dstrtNm', __('District Name'), ['class' => 'form-label']) }}
+                {{ Form::text('dstrtNm', '', ['class' => 'form-control']) }}
+            </div>
+            <div class="form-group col-6">
+                {{ Form::label('sctrNm', __('SCTR Name'), ['class' => 'form-label']) }}
+                {{ Form::text('sctrNm', '', ['class' => 'form-control']) }}
+            </div>
+            <div class="form-group col-6">
+                {{ Form::label('locDesc', __('LOC DESC'), ['class' => 'form-label']) }}
+                {{ Form::text('locDesc', '', ['class' => 'form-control']) }}
+            </div>
+            <div class="form-group col-6">
+                {{ Form::label('mgrNm', __('Manager Name'), ['class' => 'form-label']) }}
+                {{ Form::text('mgrNm', '', ['class' => 'form-control']) }}
+            </div>
+            <div class="form-group col-6">
+                {{ Form::label('mgrTelNo', __('Manager Contact'), ['class' => 'form-label']) }}
+                {{ Form::text('mgrTelNo', '', ['class' => 'form-control']) }}
+            </div>
+            <div class="form-group col-6">
+                {{ Form::label('mgrEmail', __('Manager Email'), ['class' => 'form-label']) }}
+                {{ Form::text('mgrEmail', '', ['class' => 'form-control']) }}
+            </div>
+            <div class="form-group col-6">
+                {{ Form::label('hqYn', __('HeadQuarter?'), ['class' => 'form-label']) }}
+                {{ Form::select('hqYn', ['Y' => 'Yes', 'N' => 'No'], null, ['class' => 'form-control']) }}
+            </div>
+        </div>
     </div>
-</div>
-<div class="modal-footer">
-    <input type="button" value="{{__('Cancel')}}" class="btn btn-light" data-bs-dismiss="modal">
-    <input type="submit" value="{{__('Create')}}" class="btn  btn-primary">
-</div>
-    {{Form::close()}}
-
+    <div class="modal-footer">
+        <input type="button" value="{{__('Cancel')}}" class="btn btn-light" data-bs-dismiss="modal">
+        <input type="submit" value="{{__('Create')}}" class="btn  btn-primary">
+    </div>
+{{Form::close()}}

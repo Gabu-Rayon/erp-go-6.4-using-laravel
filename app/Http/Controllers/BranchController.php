@@ -14,51 +14,19 @@ class BranchController extends Controller
 {
     public function index()
     {
-        if (\Auth::user()->can('manage branch')) {
-            $branches = BranchesList::all();
-
-            return view('branch.index', compact('branches'));
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
+        try {
+            if (\Auth::user()->can('manage branch')) {
+                $branches = BranchesList::all();
+                return view('branch.index', compact('branches'));
+            } else {
+                return redirect()->back()->with('error', __('Permission denied.'));
+            }
+        } catch (\Exception $e) {
+            \Log::info('Render Branches List Error');
+            \Log::info($e);
+            return redirect()->back()->with('error', 'An Error Occurred');
         }
     }
-
-    // public function index()
-    // {
-    //     if (\Auth::user()->can('manage branch')) {
-    //         try {
-    //             // $response = Http::withHeaders([
-    //             //     'accept' => '/',
-    //             //     'key' => '123456',
-    //             // ])->get('https://etims.your-apps.biz/api/GetBranchList', [
-    //             //         'date' => date('20220409120000'),
-    //             //     ]);
-
-    //             $response = Http::withHeaders([
-    //                  'accept' => '/',
-    //                 'key' => '123456',
-    //             ])->timeout(300)->get('https://etims.your-apps.biz/api/GetBranchList', [
-    //                         'date' => date('20220409120000'),
-    //                     ]);
-
-
-    //             if ($response->successful()) {
-    //                 $branches = $response->json();
-    //                 return view('branch.index', compact('branches'));
-    //             } else {
-    //                 // Log error and handle error response
-    //                 \Log::error('Failed to fetch branches from API: ' . $response->status() . ' ' . $response->body());
-    //                 return redirect()->back()->with('error', 'Failed to fetch branches from API.');
-    //             }
-    //         } catch (\Exception $e) {
-    //             // Log exception and handle exception
-    //             \Log::error('Exception occurred while fetching branches: ' . $e->getMessage());
-    //             return redirect()->back()->with('error', 'Failed to fetch branches from API.');
-    //         }
-    //     } else {
-    //         return redirect()->back()->with('error', __('Permission denied.'));
-    //     }
-    // }
 
     public function create()
     {
@@ -103,133 +71,91 @@ class BranchController extends Controller
 
     public function store(Request $request)
     {
-
-        if (\Auth::user()->can('create branch')) {
-
-            $validator = \Validator::make(
-                $request->all(),
-                [
-                    'name' => 'required|max:120',
-                    // 'email' => 'required|email|unique:users',
-                    'address' => 'required',
-                    'contact' => 'required',
-                    'remark' => 'required',
-                    'password' => 'required|min:6',
-                ]
-            );
-            if ($validator->fails()) {
-                $messages = $validator->getMessageBag();
-
-                return redirect()->back()->with('error', $messages->first());
+        try {
+            if (\Auth::user()->can('edit branch')) {
+                    $data = $request->all();
+                    BranchesList::create([
+                        'bhfNm' => $data["bhfNm"],
+                        'bhfId' => $data["bhfId"],
+                        'tin' => $data["tin"],
+                        'bhfSttsCd' => $data["bhfSttsCd"],
+                        'prvncNm' => $data["prvncNm"],
+                        'dstrtNm' => 'dstrtNm',
+                        'sctrNm' => $data["sctrNm"],
+                        'locDesc' => $data["locDesc"],
+                        'mgrNm' => $data["mgrNm"],
+                        'mgrTelNo' => $data["mgrTelNo"],
+                        'mgrEmail' => $data["mgrEmail"],
+                        'hqYn' => $data["hqYn"],
+                    ]);
+                    \Log::info($data);
+                    return redirect()->back()->with('success', 'Branch Created Successfully');
+                } 
+                else {
+                    return redirect()->back()->with('error', __('Permission denied.'));
+                }
+            } catch (\Exception $e) {
+                \Log::info($data);
+                return redirect()->back()->with('error', $e->getMessage());
             }
-            // $uuid = Str::uuid()->toString();
-            // $branchUserId = substr($uuid, 0, 20);
-
-            $branchUserId = mt_rand(100000, 999999);
-            $authenticationCode = mt_rand(1000, 9999);
-
-            //array containing the data to be sent to the API
-            $requestData = [
-                'branchUserId' => $branchUserId,
-                'branchUserName' => $request->name,
-                'password' => Hash::make($request->password),
-                'address' => $request->address,
-                'contactNo' => $request->contact,
-                'authenticationCode' => $authenticationCode,
-                'remark' => $request->remark,
-
-                //we set is true
-                'isUsed' => true,
-            ];
-
-            // Make API call
-            // $response = Http::withHeaders([
-            //     'accept' => 'application/json',
-            //     'Content-Type' => 'application/json',
-            //     'key' => '123456',
-            // ])->post('https://etims.your-apps.biz/api/AddBranchUser', $requestData);
-
-            $response = Http::withHeaders([
-                'accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'key' => '123456',
-            ])->timeout(600)->post('https://etims.your-apps.biz/api/AddBranchUser', $requestData);
-
-            // Log the API response
-            \Log::info('API Request Data: ' . json_encode($requestData));
-            \Log::info('API Response: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
-
-
-            // Check if API call was successful
-            if ($response->successful()) {
-                return redirect()->route('branch.index')->with('success', __('Branch User successfully created.'));
-            } else {
-                // If API call failed, return with error message
-                return redirect()->back()->with('error', __('Failed to create Branch User.'));
-            }
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
-        }
     }
     public function show(Branch $branch)
     {
         return redirect()->route('branch.index');
     }
 
-    public function edit(Branch $branch)
+    public function edit(BranchesList $branch)
     {
-        if (\Auth::user()->can('edit branch')) {
-            if ($branch->created_by == \Auth::user()->creatorId()) {
-
+        try {
+            if (\Auth::user()->can('edit branch')) {
+                \Log::info('Render Edit Branch Success');
+                \Log::info($branch);
                 return view('branch.edit', compact('branch'));
             } else {
-                return response()->json(['error' => __('Permission denied.')], 401);
+                return redirect()->back()->with('error', 'Permission denied.');
             }
-        } else {
-            return response()->json(['error' => __('Permission denied.')], 401);
+        } catch (\Exception $e) {
+            \Log::info('Render Edit Branch Error');
+            \Log::info($e);
+            return redirect()->back()->with('error', 'An Error Occurred');
         }
     }
 
-    public function update(Request $request, Branch $branch)
-    {
+    public function update(Request $request, BranchesList $branch)
+{
+    try {
         if (\Auth::user()->can('edit branch')) {
-            if ($branch->created_by == \Auth::user()->creatorId()) {
-                $validator = \Validator::make(
-                    $request->all(),
-                    [
-                        'name' => 'required',
-                    ]
-                );
-                if ($validator->fails()) {
-                    $messages = $validator->getMessageBag();
+                $validator = \Validator::make($request->all(), [
+                    'bhfNm' => 'required',
+                    'tin' => 'required',
+                ]);
 
-                    return redirect()->back()->with('error', $messages->first());
+                if ($validator->fails()) {
+                    return redirect()->back()->with('error', $validator->errors()->first());
                 }
 
-                $branch->name = $request->name;
-                $branch->save();
+                $branch->update($request->all());
 
                 return redirect()->route('branch.index')->with('success', __('Branch successfully updated.'));
-            } else {
-                return redirect()->back()->with('error', __('Permission denied.'));
-            }
-        } else {
+            } 
+         else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+    } catch (\Exception $e) {
+        \Log::error('Update Branch Error: ');
+        \Log::info($e);
+        return redirect()->back()->with('error', 'An Error Occurred');
     }
+}
 
-    public function destroy(Branch $branch)
+    public function destroy(BranchesList $branch)
     {
         if (\Auth::user()->can('delete branch')) {
-            if ($branch->created_by == \Auth::user()->creatorId()) {
                 $branch->delete();
 
                 return redirect()->route('branch.index')->with('success', __('Branch successfully deleted.'));
-            } else {
-                return redirect()->back()->with('error', __('Permission denied.'));
             }
-        } else {
+        else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
