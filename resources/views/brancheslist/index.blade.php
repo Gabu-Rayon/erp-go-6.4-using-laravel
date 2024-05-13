@@ -22,7 +22,6 @@
                                     <th>{{ __('Branch Name') }}</th>
                                     <th>{{ __('Manager') }}</th>
                                     <th>{{ __('Prvnc Name') }}</th>
-                                    <th>{{ __('Default') }}</th>
                                     <th>{{ __('Sctr Name') }}</th>
                                     <th>{{ __('Action') }}</th>
                                 </tr>
@@ -35,11 +34,9 @@
                                         <td>{{ $branch->bhfNm }}</td>
                                         <td>{{ $branch->bhfSttsCd }}</td>
                                         <td>{{ $branch->prvncNm }}</td>
-                                        <td>{{ $branch->hqYn }}</td>
                                         <td>{{ $branch->sctrNm }}</td>
                                     </tr>
                                 @endforeach
-
                             </tbody>
                         </table>
                     </div>

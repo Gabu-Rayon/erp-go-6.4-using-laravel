@@ -568,11 +568,15 @@ class VenderController extends Controller
             ini_set('max_execution_time', 300);
             $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
 
-            $response = Http::withHeaders([
+            $response = Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
                 'key' => '123456'
             ])->timeout(300)->get($url);
 
             $data = $response->json()['data'];
+            \Log::info('VENDER ERROR');
+            \Log::info($data);
             $salesSuppliers = $data['data']['saleList'];
 
             // Log API request and response details

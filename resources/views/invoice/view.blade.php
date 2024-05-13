@@ -321,7 +321,7 @@
                     @if (!empty($invoicePayment))
                         <div class="all-button-box mx-2 mr-2">
                             <a href="#" class="btn btn-sm btn-primary"
-                                data-url="{{ route('invoice.credit.note', $invoice->id) }}" data-ajax-popup="true"
+                                data-url="{{ route('creditNote.create', $invoice->id) }}" data-ajax-popup="true"
                                 data-title="{{ __('Add Credit Note') }}">
                                 {{ __('Add Credit Note') }}
                             </a>

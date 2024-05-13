@@ -34,50 +34,25 @@
                                 <thead>
                                     <tr>
                                         <th>Tin</th>
-                                        <th>Branch ID</th>
                                         <th>Branch Name</th>
-                                        <th>Branch Status</th>
-                                        <th>Province</th>
-                                        <th>District</th>
-                                        <th>Sector</th>
                                         <th>Manager Name</th>
-                                        <th>Manager Tel. No.</th>
-                                        <th>Manager Email</th>
-                                        <th>HQ</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="font-style">
                                     @foreach ($branches as $branch)
                                         <tr>
                                             <td>{{ $branch['tin'] }}</td>
-                                            <td>{{ $branch['bhfId'] }}</td>
                                             <td>{{ $branch['bhfNm'] }}</td>
-                                            <td>
-                                                @if ($branch['bhfSttsCd'] === '01')
-                                                  Active
-                                                @else
-                                                    Inactive
-                                                @endif
-                                            </td>
-                                            <td>{{ $branch['prvncNm'] }}</td>
-                                            <td>{{ $branch['dstrtNm'] }}</td>
-                                            <td>{{ $branch['sctrNm'] }}</td>
                                             <td>{{ $branch['mgrNm'] }}</td>
-                                            <td>{{ $branch['mgrTelNo'] }}</td>
-                                            <td>{{ $branch['mgrEmail'] }}</td>
-                                            <td>{{ $branch['hqYn'] === 'Y' ? 'Yes' : 'No' }}</td>
                                             <td class="Action text-end">
                                                 <span>
                                                     @can('edit branch')
-                                                        <div class="action-btn bg-primary ms-2">
-
-                                                            <a href="#" class="mx-3 btn btn-sm align-items-center"
-                                                                data-url="{{ URL::to('branch/' . $branch['bhfId'] . '/edit') }}"
-                                                                data-ajax-popup="true" data-title="{{ __('Edit Branch') }}"
-                                                                data-bs-toggle="tooltip" title="{{ __('Edit') }}"
-                                                                data-original-title="{{ __('Edit') }}"><i
-                                                                    class="ti ti-pencil text-white"></i></a>
-                                                        </div>
+                                                        <div class="action-btn bg-info ms-2">
+                                                            <a href="#" class="mx-3 btn btn-sm  align-items-center" data-url="{{ route('branch.edit',$branch->id) }}" data-ajax-popup="true"  data-size="lg " data-bs-toggle="tooltip" title="{{__('Edit')}}"  data-title="{{__('Edit Branch')}}">
+                                                                <i class="ti ti-pencil text-white"></i>
+                                                            </a>
+                                                        </div> 
                                                     @endcan
                                                     @can('delete branch')
                                                         <div class="action-btn bg-danger ms-2">
