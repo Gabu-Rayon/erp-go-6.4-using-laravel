@@ -127,6 +127,10 @@
                                             .pkgUnitCd);
                                         el.find('.pkgUnitCd').val(item.pkgUnitCd);
 
+                                        console.log("Populating item Id:", item
+                                            .id);
+                                        el.find('.id').val(item.id);
+
                                         // Calculate tax based on taxTyCd
                                         var taxTyCd = item.taxTyCd;
                                         var taxRate = 0;
@@ -317,6 +321,76 @@
                 }
             });
         });
+
+        $(document).ready(function() {
+    $(document).on('change', '.supplierName', function() {
+        var supplier_Info = $(this).val();
+        var url = $(this).data('url');
+        var el = $(this).closest('[data-autofill]');
+
+        if (el.length) {
+            console.log("Change event triggered for .supplierName[data-autofill]");
+
+            console.log("supplier_Info:", supplier_Info);
+            console.log("url:", url);
+            console.log("el:", el);
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': jQuery('#token').val()
+                },
+                data: {
+                    'supplierName': supplier_Info
+                },
+                cache: false,
+                success: function(data) {
+                    try {
+                        console.log("supplier information:", data);
+
+                        if (!data || Object.keys(data).length === 0) {
+                            console.log("Supplier information is empty.");
+                        } else {
+                            console.log(
+                                "Supplier information is not empty. Processing...");
+
+                            var supplier = data.data;
+
+                            console.log("Supplier object:", supplier);
+
+                            console.log("Populating supplierName:", supplier
+                                .spplrNm);
+                            el.find('.supplierName').val(supplier.spplrNm);
+
+                            console.log("Populating supplierTin:", supplier
+                                .spplrTin);
+                            el.find('.supplierTin').val(supplier.spplrTin);
+
+                            console.log("Populating supplierBhfId:", supplier
+                                .spplrBhfId);
+                            el.find('.supplierBhfId').val(supplier.spplrBhfId);
+
+                            console.log("Populating SupplierInvoiceNo:", supplier
+                                .spplrInvcNo);
+                            el.find('.supplierInvcNo').val(supplier
+                                .spplrInvcNo);
+
+                            console.log("Populating supplier Id:", supplier.id);
+                            el.find('.id').val(supplier.id);
+                        }
+                    } catch (error) {
+                        console.error("Error processing Supplier Information:", error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error retrieving Supplier Information:", error);
+                }
+            });
+        }
+    });
+});
+
     </script>
 
     <script>
@@ -333,23 +407,24 @@
         <div class="col-12">
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <div class="card">
-                <div class="card-body">
+                <div class="card-body" data-autofill>
                     <div class="row">
                         <div class="form-group col-md-4" id="vender-box">
-                            {{ Form::label('supplierName', __('Supplier Name'), ['class' => 'form-label']) }}
-                            {{ Form::text('supplierName', null, ['class' => 'form-control name-field', 'required' => 'required']) }}
+                            {{ Form::label('SupplierName', __('supplierName'), ['class' => 'form-label']) }}
+                            {{ Form::select('supplierName', $venders, '', ['class' => 'form-control select2 supplierName', 'data-url' => route('venders.getSupplierInformation'), 'required' => 'required']) }}
                         </div>
+                            {{ Form::hidden('supplier_id', null, ['class' => 'form-control id', 'required' => 'required']) }}
                         <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('supplierTin', __('Supplier Tin'), ['class' => 'form-label']) }}
-                            {{ Form::text('supplierTin', null, ['class' => 'form-control tin-field', 'required' => 'required']) }}
+                            {{ Form::text('supplierTin', null, ['class' => 'form-control supplierTin', 'required' => 'required']) }}
                         </div>
                         <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('supplierBhfId', __('Supplier BhfId'), ['class' => 'form-label']) }}
-                            {{ Form::text('supplierBhfId', null, ['class' => 'form-control bhfid-field', 'required' => 'required']) }}
+                            {{ Form::text('supplierBhfId', null, ['class' => 'form-control supplierBhfId', 'required' => 'required']) }}
                         </div>
                         <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('supplierInvcNo', __('Supplier Invoice No'), ['class' => 'form-label']) }}
-                            {{ Form::text('supplierInvcNo', null, ['class' => 'form-control invno-field', 'required' => 'required']) }}
+                            {{ Form::text('supplierInvcNo', null, ['class' => 'form-control supplierInvcNo', 'required' => 'required']) }}
                         </div>
                         <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('purchTypeCode', __('Purchase Type Code'), ['class' => 'form-label']) }}
@@ -363,19 +438,23 @@
                             {{ Form::label('pmtTypeCode', __('Payment Type Code'), ['class' => 'form-label']) }}
                             {{ Form::select('pmtTypeCode', $paymentTypeCodes, null, ['class' => 'form-control select2 pmtTypeCode', 'required' => 'required']) }}
                         </div>
-                        <div class="form-group col-md-3">
+                        <div  class="form-group col-md-4" id="vender-box">
                             {{ Form::label('purchDate', __('Purchase Date'), ['class' => 'form-label']) }}
                             {{ Form::date('purchDate', null, ['class' => 'form-control', 'required' => 'required']) }}
                         </div>
-                        <div class="form-group col-md-3">
+                        <div  class="form-group col-md-4" id="vender-box">
                             {{ Form::label('occurredDate', __('Occurred Date'), ['class' => 'form-label']) }}
                             {{ Form::date('occurredDate', null, ['class' => 'form-control', 'required' => 'required']) }}
                         </div>
-                        <div class="form-group col-md-3">
+                        <div  class="form-group col-md-4" id="vender-box">
                             {{ Form::label('confirmDate', __('Confirm Date'), ['class' => 'form-label']) }}
                             {{ Form::date('confirmDate', null, ['class' => 'form-control', 'required' => 'required']) }}
                         </div>
-                        <div class="form-group col-md-3">
+                        <div class="form-group col-md-4" id="vender-box">
+                                    {{ Form::label('category_id', __('Item (*)'), ['class' => 'form-label']) }}
+                                    {{ Form::select('category_id', $category, null, ['class' => 'form-control', 'required' => 'required']) }}
+                                </div>
+                        <div  class="form-group col-md-4" id="vender-box">
                             {{ Form::label('warehouseDate', __('Warehouse Date'), ['class' => 'form-label']) }}
                             {{ Form::date('warehouseDate', null, ['class' => 'form-control', 'required' => 'required']) }}
                         </div>
@@ -383,7 +462,7 @@
                             {{ Form::label('warehouse', __('Ware House'), ['class' => 'form-label']) }}
                             {{ Form::select('warehouse', $warehouse, null, ['class' => 'form-control select2 warehouse', 'required' => 'required']) }}
                         </div>
-                        <div class="form-group col-md-6" id="vender-box">
+                        <div  class="form-group col-md-4" id="vender-box">
                             {{ Form::label('mapping', __('Mapping'), ['class' => 'form-label']) }}
                             {{ Form::text('mapping', null, ['class' => 'form-control invno-field']) }}
                         </div>
@@ -430,6 +509,7 @@
                                         {{ Form::label('itemClsCd', __('ItemClsCd'), ['class' => 'form-label']) }}
                                         {{ Form::text('itemClsCd', null, ['class' => 'form-control itemClsCd', 'required' => 'required']) }}
                                     </td>
+                                        {{ Form::hidden('itemId', null, ['class' => 'form-control id', 'required' => 'required']) }}
                                 </tr>
                                 <tr>
                                     <td width="25%" class="form-group pt-1">
@@ -456,8 +536,8 @@
                                     <td>
                                         {{ Form::label('supplritemClsCode', __('Supplier Item Cls Code'), ['class' => 'form-label']) }}
                                         {{ Form::text('supplrItemClsCode', null, ['class' => 'form-control', 'required' => 'required']) }}
-                                         <small  class="text-dark">Supplier Item Cls Code length must be 8 characters
-                                         </small>
+                                        <small class="text-dark">Supplier Item Cls Code length must be 8 characters
+                                        </small>
                                     </td>
                                     <td>
                                         {{ Form::label('supplierItemCode', __('Supplier Item Code'), ['class' => 'form-label']) }}
@@ -500,8 +580,8 @@
 
                                 <tr>
                                     <td>
-                                            {{ Form::label('tax', __('Tax'), ['class' => 'form-label']) }}
-                                            {{ Form::text('tax', '', ['class' => 'form-control tax']) }}
+                                        {{ Form::label('tax', __('Tax'), ['class' => 'form-label']) }}
+                                        {{ Form::text('tax', '', ['class' => 'form-control tax']) }}
                                     </td>
                                     <td>
                                         {{ Form::label('itemtaxprice', __('Taxable Amount'), ['class' => 'form-label']) }}
@@ -587,3 +667,13 @@
         {{ Form::close() }}
     </div>
 @endsection
+
+
+
+
+
+
+
+
+
+

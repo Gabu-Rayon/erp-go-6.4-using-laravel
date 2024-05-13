@@ -368,7 +368,7 @@
                                     <td class="form-group col-md-4">
                                         <?php echo e(Form::label('isrcAplcbYn', __('ISRCAPLCBYN?'),['class'=>'form-label'])); ?>
 
-                                        <?php echo e(Form::select('isrcAplcbYn', [true => 'Yes', false => 'No'], null, ['class' => 'form-control isrcAplcbYn'])); ?>
+                                        <?php echo e(Form::select('isrcAplcbYn', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control isrcAplcbYn'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-4">

@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Auth;
 
 class Purchase extends Model
 {
-    use HasFactory;
-
+    
+     protected $table = 'purchases';
     protected $fillable = [
+        'purchase_id',
         'vender_id',
         'warehouse_id',
         'purchase_date',
@@ -49,6 +50,7 @@ class Purchase extends Model
         'totTaxblAmt',
         'totTaxAmt',
         'totAmt',
+        'isDbImport',
         'remark',
     ];
     public static $statues = [

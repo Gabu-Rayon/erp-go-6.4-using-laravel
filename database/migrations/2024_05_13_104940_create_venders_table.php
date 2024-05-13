@@ -18,7 +18,15 @@ class CreateVendersTable extends Migration
             $table->integer('vender_id');
             $table->string('name')->nullable();
             $table->string('email')->nullable();
-            $table->string('tax_number')->nullable();
+            $table->string('tax_number')->nullable();;
+
+            $table->string('spplrTin')->nullable();
+            $table->string('spplrNm')->nullable();
+            $table->string('spplrBhfId')->nullable();
+            $table->string('spplrInvcNo')->nullable();
+            $table->string('spplrSdcId')->nullable();
+            $table->string('spplrMrcNo')->nullable();
+            
             $table->string('password')->nullable();
             $table->string('contact')->nullable();
             $table->string('avatar', 100)->default('');
