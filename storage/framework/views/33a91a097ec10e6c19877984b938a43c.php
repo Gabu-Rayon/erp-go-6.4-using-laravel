@@ -31,6 +31,7 @@
                             <tr>
                                 <th><?php echo e(__('Name')); ?></th>
                                 <th><?php echo e(__('Address')); ?></th>
+                                <th><?php echo e(__('Branch')); ?></th>
                                 <th><?php echo e(__('City')); ?></th>
                                 <th><?php echo e(__('Zip Code')); ?></th>
                                 <th><?php echo e(__('Action')); ?></th>
@@ -41,6 +42,7 @@
                                 <tr class="font-style">
                                     <td><?php echo e($warehouse->name); ?></td>
                                     <td><?php echo e($warehouse->address); ?></td>
+                                    <td><?php echo e($branches[$warehouse->branch_id]); ?></td>
                                     <td><?php echo e($warehouse->city); ?></td>
                                     <td><?php echo e($warehouse->city_zip); ?></td>
 

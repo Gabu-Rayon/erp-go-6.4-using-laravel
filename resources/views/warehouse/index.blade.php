@@ -30,6 +30,7 @@
                             <tr>
                                 <th>{{__('Name')}}</th>
                                 <th>{{__('Address')}}</th>
+                                <th>{{__('Branch')}}</th>
                                 <th>{{__('City')}}</th>
                                 <th>{{__('Zip Code')}}</th>
                                 <th>{{__('Action')}}</th>
@@ -40,6 +41,7 @@
                                 <tr class="font-style">
                                     <td>{{ $warehouse->name}}</td>
                                     <td>{{ $warehouse->address }}</td>
+                                    <td>{{ $branches[$warehouse->branch_id] }}</td>
                                     <td>{{ $warehouse->city }}</td>
                                     <td>{{ $warehouse->city_zip }}</td>
 

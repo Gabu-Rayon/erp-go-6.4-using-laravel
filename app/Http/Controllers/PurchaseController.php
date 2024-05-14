@@ -102,283 +102,6 @@ class PurchaseController extends Controller
   * Add Purchase to API END POINT 
   * 
   ********************************************/
-
-
-
-
-    public function store(Request $request)
-    {
-        // Log received request data
-        \Log::info('Received request data From Purchase Form:', $request->all());
-
-        if (\Auth::user()->can('create purchase')) {
-            $rules = [
-                'supplier_id' => 'required',
-                'supplierTin' => 'required',
-                'supplierBhfId' => 'required',
-                'supplierName' => 'required',
-                'supplierInvcNo' => 'required',
-                'purchTypeCode' => 'required',
-                'purchStatusCode' => 'required',
-                'pmtTypeCode' => 'required',
-                'purchDate' => 'required',
-                'occurredDate' => 'required',
-                'confirmDate' => 'required',
-                'warehouseDate' => 'required',
-                'category_id' => 'required',
-                'warehouse' => 'required',
-                'remark' => 'required',
-                'mapping' => 'required',
-
-                'items.*.itemCode' => 'required',
-                'items.*.itemNm' => 'required',
-                'items.*.itemClsCd' => 'required',
-                'items.*.itemId' => 'required',
-                'items.*.bcd' => 'required',
-                'items.*.pkgUnitCd' => 'required',
-                'items.*.pkg' => 'required',
-                'items.*.qtyUnitCd' => 'required',
-                'items.*.supplrItemClsCode' => 'required',
-                'items.*.supplrItemCode' => 'required',
-                'items.*.supplrItemName' => 'required',
-                'items.*.quantity' => 'required',
-                'items.*.unitPrice' => 'required',
-                'items.*.pkgQuantity' => 'required',
-                'items.*.discount' => 'required',
-                'items.*.discountAmt' => 'required',
-                'items.*.itemExprDt' => 'required',
-                'items.*.tax' => 'required',
-                'items.*.itemTaxPrice' => 'required',
-                'items.*.itemTaxRate' => 'required',
-            ];
-
-            // Validate request data
-            $validator = \Validator::make($request->all(), $rules);
-
-            if ($validator->fails()) {
-                $messages = $validator->getMessageBag();
-                return redirect()->route('purchase.index')->with('error', $messages->first());
-            }
-
-            // Construct itemsDataList array
-            $itemsDataList = [];
-            foreach ($request->input('items') as $item) {
-                $itemExprDt = str_replace('-', '', $item['itemExprDt']);
-                $itemExprDt = date('Ymd', strtotime($itemExprDt));
-
-                $itemsDataList[] = [
-                    "itemCode" => $item['itemCode'],
-                    "supplrItemClsCode" => $item['supplrItemClsCode'],
-                    "supplrItemCode" => $item['supplrItemCode'],
-                    "supplrItemName" => $item['supplrItemName'],
-                    "quantity" => $item['quantity'],
-                    "unitPrice" => $item['unitPrice'],
-                    "pkgQuantity" => $item['pkgQuantity'],
-                    "discountRate" => $item['discount'],
-                    "discountAmt" => $item['discountAmt'],
-                    "itemExprDt" => $itemExprDt,
-                ];
-            }
-            $requestData = [
-                'supplierTin' => $request->input('supplierTin'),
-                'supplierBhfId' => $request->input('supplierBhfId'),
-                'supplierName' => $request->input('supplierName'),
-                'supplierInvcNo' => $request->input('supplierInvcNo'),
-                'purchTypeCode' => $request->input('purchTypeCode'),
-                'purchStatusCode' => $request->input('purchStatusCode'),
-                'pmtTypeCode' => $request->input('pmtTypeCode'),
-
-                'purchDate' => date('Ymd', strtotime($request->input('purchDate'))),
-                'occurredDate' => date('Ymd', strtotime($request->input('occurredDate'))),
-                'confirmDate' => date('YmdHis', strtotime($request->input('confirmDate'))),
-                'warehouseDate' => date('YmdHis', strtotime($request->input('warehouseDate'))),
-
-                // 'purchDate' => Carbon::createFromFormat('Y-m-d', $request->input('purchDate'))->format('Ymd');
-                // 'occurredDate' => Carbon::createFromFormat('Y-m-d', $request->input('occurredDate'))->format('Ymd');
-                // 'confirmDate' => Carbon::createFromFormat('Y-m-d H:i:s', $request->input('confirmDate'))->format('YmdHis');
-                // 'warehouseDate' => Carbon::createFromFormat('Y-m-d H:i:s', $request->input('warehouseDate'))->format('YmdHis');
-
-                'remark' => $request->input('remark'),
-                'mapping' => $request->input('mapping'),
-                'itemsDataList' => $itemsDataList,
-            ];
-            // Log request data
-            \Log::info('API Request Purchase  Data Posted :', $requestData);
-
-            // Send request to API endpoint
-            $response = Http::withHeaders([
-                'accept' => 'application/json',
-                'key' => '123456',
-                'Content-Type' => 'application/json',
-            ])->post('https://etims.your-apps.biz/api/AddPurchase', $requestData);
-
-            // Log response data
-            \Log::info('API Response Status  Code For Posting Purchase Data: ' . $response->status());
-            \Log::info('API Request   Purchase  Data Posted: ' . json_encode($requestData));
-            \Log::info('API Response  Body For Posting Purchase Data: ' . $response->body());
-            \Log::info('API Response Status Code For Posting Purchase Data: ' . $response->status());
-
-            // Save data to local database
-            try {
-                DB::beginTransaction();
-
-                Purchase::create([
-                    'purchase_id' => $this->purchaseNumber(),
-                    'vender_id' => $request->input('supplier_id'),
-                    'warehouse_id' => $request->input('warehouse'),
-                    'purchase_date' => $request->input('purchDate'),
-                    'purchase_number ' => $this->purchaseNumber(),
-                    'status' => 0,
-                    'shipping_display' => null,
-                    'send_date' => null,
-                    'discount_apply' => null,
-                    'category_id' => $request->input('category_id'),
-                    'created_by' => \Auth::user()->creatorId(),
-
-                    'spplrTin' => $request->input('supplierTin'),
-                    'spplrNm' => $request->input('supplierName'),
-                    'spplrBhfId' => $request->input('supplierBhfId'),
-                    'spplrInvcNo' => $request->input('supplierInvcNo'),
-                    'spplrSdcId' => $request->input('spplrSdcId'),
-                    'spplrMrcNo' => $request->input('spplrMrcNo') ?? null,//Can also be null
-                    'rcptTyCd' => $request->input('supplierName') ?? null,//Can also be null
-                    'pmtTyCd' => $request->input('pmtTypeCode') ?? null,
-                    'cfmDt' => $request->input('confirmDate') ?? null,
-                    'salesDt' => $request->input('purchDate') ?? null,
-                    'stockRlsDt' => $request->input('warehouseDate') ?? null,
-                    'warehouseDate' => $request->input('warehouseDate') ?? null,
-                    'warehouse' => $request->input('warehouse') ?? null,
-                    //For totItemCnt  are total item posted in the  PurchaseProduct Model
-                    'totItemCnt' => count($request->input('items')),
-                    // 'totItemCnt' => count($itemsDataList),
-                    // 'totItemCnt' => PurchaseProdcut::count(),
-                    'taxblAmtA' => $request->input('taxblAmtA') ?? null,
-                    'taxblAmtB' => $request->input('taxblAmtB') ?? null,
-                    'taxblAmtC' => $request->input('taxblAmtB') ?? null,
-                    'taxblAmtD' => $request->input('taxblAmtD') ?? null,
-                    'taxblAmtE' => $request->input('taxblAmtE') ?? null,
-                    'taxRtA' => $request->input('taxRtA') ?? null,
-                    'taxRtB' => $request->input('taxRtB') ?? null,
-                    'taxRtC' => $request->input('taxRtC') ?? null,
-                    'taxRtD' => $request->input('taxRtD') ?? null,
-                    'taxRtE' => $request->input('taxRtE') ?? null,
-                    'taxAmtA' => $request->input('taxAmtA') ?? null,
-                    'taxAmtB' => $request->input('taxAmtB') ?? null,
-                    'taxAmtC' => $request->input('taxAmtC') ?? null,
-                    'taxAmtD' => $request->input('taxAmtD') ?? null,
-                    'taxAmtE' => $request->input('taxAmtE') ?? null,
-                    //totTaxblAmt will be the totals for all products totTaxblAmt's e
-                    'totTaxblAmt' => array_sum(array_column($itemsDataList, 'itemTaxPrice')),
-                    //    'totTaxblAmt' => $request->input('items')->sum('itemTaxPrice'),
-                    //totTaxAmt will be the totals for all products totTaxAmt's
-                    'totTaxAmt' => array_sum(array_column($itemsDataList, 'taxAmt')),
-                    //    'totTaxAmt' => $request->input('items')->sum('taxAmt'),
-                    //totAmt will be the totals for all products totAmt's
-                    'totAmt' => collect($request->input('items'))->sum(function ($item) {
-                        return $item['quantity'] * $item['unitPrice'];
-                    }),
-                    'remark' => $request->input('remark'),
-                ]);
-
-                \Log::info('Contents of $itemsDataList:', $itemsDataList);
-
-                // Loop through itemsDataList and save each item
-                // foreach ($itemsDataList as $itemData) {
-
-                foreach ($itemsDataList as $index => $itemData) {
-                    \Log::info("Item data at index $index:", $itemData);
-
-                    // Check if the 'tax' key exists in $itemData
-                    if (array_key_exists('tax', $itemData)) {
-                        // Get the tax type code from the form input
-                        $taxTypeCode = $itemData['tax'];
-
-                        // Initialize the tax code variable
-                        $taxCode = null;
-
-                        // Map the tax type code to the tax code
-                        switch ($taxTypeCode) {
-                            case 'A':
-                                $taxCode = 1;
-                                break;
-                            case 'B':
-                                $taxCode = 2;
-                                break;
-                            case 'C':
-                                $taxCode = 3;
-                                break;
-                            case 'D':
-                                $taxCode = 4;
-                                break;
-                            case 'E':
-                                $taxCode = 5;
-                                break;
-                            case 'F':
-                                $taxCode = 6;
-                                break;
-                            default:
-                                $taxCode = null;
-                                break;
-                        }
-                    } else {
-                        // Handle the case where 'tax' key is missing
-                        // You can log an error or perform other error handling here
-                        \Log::error('Tax key is missing in item data: ' . json_encode($itemData));
-                        continue;
-                    }
-
-                    // Create PurchaseProduct instance with the mapped tax code
-                    $purchaseProduct = new PurchaseProduct([
-                        'purchase_id' => $this->purchaseNumber(),
-                        'product_id' => $itemData['itemId'],
-                        'quantity' => $itemData['quantity'],
-                        'tax' => $taxCode,
-                        'discount' => $itemData['discountAmt'],
-                        'price' => $itemData['unitPrice'],
-                        'description' => null,
-                        'saleItemCode' => $request->input('supplierInvcNo'),
-                        'itemCd' => $itemData['itemCode'],
-                        'itemClsCd' => $itemData['itemClsCd'],
-                        'itemNm' => $itemData['itemNm'],
-                        'bcd' => $itemData['bcd'],
-                        'supplrItemClsCd' => $itemData['supplrItemClsCode'],
-                        'supplrItemCd' => $itemData['supplrItemCode'],
-                        'supplrIteNm' => $itemData['supplrItemName'],
-                        'pkgUnitCd' => $itemData['pkgQuantity'],
-                        'pkg' => $itemData['pkg'],
-                        'qtyUnitCd' => $itemData['qtyUnitCd'],
-                        'qty' => $itemData['quantity'],
-                        'prc' => $itemData['unitPrice'],
-                        'splyAmt' => $itemData['quantity'] * $itemData['unitPrice'],
-                        'dcAmt' => $itemData['discountAmt'],
-                        'taxTyCd' => $itemData['tax'],
-                        'taxblAmt' => $itemData['itemTaxPrice'],
-                        'taxAmt' => $itemData['quantity'] * $itemData['unitPrice'] * $itemData['itemTaxRate'],
-                        'totAmt' => $itemData['quantity'] * $itemData['unitPrice'],
-                        'itemExprDt' => $itemData['itemExprDt'],
-                    ]);
-
-                    // Save the PurchaseProduct instance to the database
-                    $purchaseProduct->save();
-                }
-
-                return redirect()->route('purchase.index')->with('success', 'Purchase Created Successfully');
-
-                DB::commit();
-            } catch (\Exception $e) {
-                DB::rollBack();
-                // Log the error
-                \Log::error('Error saving purchase data: ');
-                \Log::error($e);
-
-                // Handle the error and redirect back with an error message
-                return redirect()->back()->with('error', 'Failed to create purchase. Please try again.');
-            }
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
-        }
-    }
-
     public function getPurchaseSalesItemsFromApi()
     {
 
@@ -486,6 +209,7 @@ class PurchaseController extends Controller
                                         'totAmt' => $item['totAmt'],
                                         'itemExprDt' => $item['itemExprDt']
                                     ]);
+
                                 }
                             }
                         }
@@ -742,6 +466,314 @@ class PurchaseController extends Controller
     //         return redirect()->back()->with('error', __('Permission denied.'));
     //     }
     // }
+
+
+    public function store(Request $request)
+    {
+        // Log received request data
+        \Log::info('Received request data From Purchase Form:', $request->all());
+
+        if (\Auth::user()->can('create purchase')) {
+            $rules = [
+                'supplier_id' => 'required',
+                'supplierTin' => 'required',
+                'supplierBhfId' => 'required',
+                'supplierName' => 'required',
+                'supplierInvcNo' => 'required',
+                'purchTypeCode' => 'required',
+                'purchStatusCode' => 'required',
+                'pmtTypeCode' => 'required',
+                'purchDate' => 'required',
+                'occurredDate' => 'required',
+                'confirmDate' => 'required',
+                'warehouseDate' => 'required',
+                'category_id' => 'required',
+                'warehouse' => 'required',
+                'remark' => 'required',
+                'mapping' => 'required',
+
+                'items.*.itemCode' => 'required',
+                'items.*.itemNm' => 'required',
+                'items.*.itemClsCd' => 'required',
+                'items.*.itemId' => 'required',
+                'items.*.bcd' => 'required',
+                'items.*.pkgUnitCd' => 'required',
+                'items.*.pkg' => 'required',
+                'items.*.qtyUnitCd' => 'required',
+                'items.*.supplrItemClsCode' => 'required',
+                'items.*.supplrItemCode' => 'required',
+                'items.*.supplrItemName' => 'required',
+                'items.*.quantity' => 'required',
+                'items.*.unitPrice' => 'required',
+                'items.*.pkgQuantity' => 'required',
+                'items.*.discount' => 'required',
+                'items.*.discountAmt' => 'required',
+                'items.*.itemExprDt' => 'required',
+                'items.*.tax' => 'required',
+                'items.*.itemTaxPrice' => 'required',
+                'items.*.itemTaxRate' => 'required',
+            ];
+
+            // Validate request data
+            $validator = \Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                $messages = $validator->getMessageBag();
+                return redirect()->route('purchase.index')->with('error', $messages->first());
+            }
+
+            // Construct itemsDataList array
+            $itemsDataList = [];
+            foreach ($request->input('items') as $item) {
+                $itemExprDt = str_replace('-', '', $item['itemExprDt']);
+                $itemExprDt = date('Ymd', strtotime($itemExprDt));
+
+                $itemsDataList[] = [
+                    "itemCode" => $item['itemCode'],
+                    "supplrItemClsCode" => $item['supplrItemClsCode'],
+                    "supplrItemCode" => $item['supplrItemCode'],
+                    "supplrItemName" => $item['supplrItemName'],
+                    "quantity" => $item['quantity'],
+                    "unitPrice" => $item['unitPrice'],
+                    "pkgQuantity" => $item['pkgQuantity'],
+                    "discountRate" => $item['discount'],
+                    "discountAmt" => $item['discountAmt'],
+                    "itemExprDt" => $itemExprDt,
+                ];
+            }
+
+            $purchaseProductsDataList = [];
+
+            foreach ($request->input('items') as $item) {
+                $itemExprDt = str_replace('-', '', $item['itemExprDt']);
+                $itemExprDt = date('Ymd', strtotime($itemExprDt));
+
+                $purchaseProductsDataList[] = [
+                    "itemCode" => $item['itemCode'],
+                    "itemNm" => $item['itemNm'],
+                    "itemClsCd" => $item['itemClsCd'],
+                    "itemId" => $item['itemId'],
+                    "bcd" => $item['bcd'],
+                    "pkgUnitCd" => $item['pkgUnitCd'],
+                    "pkg" => $item['pkg'],
+                    "supplrItemClsCode" => $item['supplrItemClsCode'],
+                    "supplrItemCode" => $item['supplrItemCode'],
+                    "supplrItemName" => $item['supplrItemName'],
+                    "quantity" => $item['quantity'],
+                    "unitPrice" => $item['unitPrice'],
+                    'qtyUnitCd' => $item['qtyUnitCd'],
+                    "pkgQuantity" => $item['pkgQuantity'],
+                    "discountRate" => $item['discount'],
+                    "discountAmt" => $item['discountAmt'],
+                    "itemExprDt" => $itemExprDt,
+                    "tax" => $item['tax'],
+                    "itemTaxPrice" => $item['itemTaxPrice'],
+                    "itemTaxRate" => $item['itemTaxRate'],
+                ];
+            }
+
+            $requestData = [
+                'supplierTin' => $request->input('supplierTin'),
+                'supplierBhfId' => $request->input('supplierBhfId'),
+                'supplierName' => $request->input('supplierName'),
+                'supplierInvcNo' => $request->input('supplierInvcNo'),
+                'purchTypeCode' => $request->input('purchTypeCode'),
+                'purchStatusCode' => $request->input('purchStatusCode'),
+                'pmtTypeCode' => $request->input('pmtTypeCode'),
+
+                'purchDate' => date('Ymd', strtotime($request->input('purchDate'))),
+                'occurredDate' => date('Ymd', strtotime($request->input('occurredDate'))),
+                'confirmDate' => date('YmdHis', strtotime($request->input('confirmDate'))),
+                'warehouseDate' => date('YmdHis', strtotime($request->input('warehouseDate'))),
+
+                // 'purchDate' => Carbon::createFromFormat('Y-m-d', $request->input('purchDate'))->format('Ymd');
+                // 'occurredDate' => Carbon::createFromFormat('Y-m-d', $request->input('occurredDate'))->format('Ymd');
+                // 'confirmDate' => Carbon::createFromFormat('Y-m-d H:i:s', $request->input('confirmDate'))->format('YmdHis');
+                // 'warehouseDate' => Carbon::createFromFormat('Y-m-d H:i:s', $request->input('warehouseDate'))->format('YmdHis');
+
+                'remark' => $request->input('remark'),
+                'mapping' => $request->input('mapping'),
+                'itemsDataList' => $itemsDataList,
+            ];
+            // Log request data
+            \Log::info('API Request Purchase  Data Posted :', $requestData);
+
+            // Send request to API endpoint
+            // $response = Http::withHeaders([
+            //     'accept' => 'application/json',
+            //     'key' => '123456',
+            //     'Content-Type' => 'application/json',
+            // ])->post('https://etims.your-apps.biz/api/AddPurchase', $requestData);
+
+            // Log response data
+            // \Log::info('API Response Status  Code For Posting Purchase Data: ' . $response->status());
+            // \Log::info('API Request   Purchase  Data Posted: ' . json_encode($requestData));
+            // \Log::info('API Response  Body For Posting Purchase Data: ' . $response->body());
+            // \Log::info('API Response Status Code For Posting Purchase Data: ' . $response->status());
+
+            // Save data to local database
+            try {
+                DB::beginTransaction();
+
+                $purchase = new Purchase([
+                    'purchase_id' => $this->purchaseNumber(),
+                    'vender_id' => $request->input('supplier_id'),
+                    'warehouse_id' => $request->input('warehouse'),
+                    'purchase_date' => $request->input('purchDate'),
+                    'purchase_number ' => $this->purchaseNumber(),
+                    'status' => 0,
+                    'shipping_display' => null,
+                    'send_date' => null,
+                    'discount_apply' => null,
+                    'category_id' => $request->input('category_id'),
+                    'created_by' => \Auth::user()->creatorId(),
+
+                    'spplrTin' => $request->input('supplierTin'),
+                    'spplrNm' => $request->input('supplierName'),
+                    'spplrBhfId' => $request->input('supplierBhfId'),
+                    'spplrInvcNo' => $request->input('supplierInvcNo'),
+                    'spplrSdcId' => $request->input('spplrSdcId'),
+                    'spplrMrcNo' => $request->input('spplrMrcNo') ?? null,//Can also be null
+                    'rcptTyCd' => $request->input('supplierName') ?? null,//Can also be null
+                    'pmtTyCd' => $request->input('pmtTypeCode') ?? null,
+                    'cfmDt' => $request->input('confirmDate') ?? null,
+                    'salesDt' => $request->input('purchDate') ?? null,
+                    'stockRlsDt' => $request->input('warehouseDate') ?? null,
+                    'warehouseDate' => $request->input('warehouseDate') ?? null,
+                    'warehouse' => $request->input('warehouse') ?? null,
+                    //For totItemCnt  are total item posted in the  PurchaseProduct Model
+                    'totItemCnt' => count($request->input('items')),
+                    // 'totItemCnt' => count($itemsDataList),
+                    // 'totItemCnt' => PurchaseProdcut::count(),
+                    'taxblAmtA' => $request->input('taxblAmtA') ?? null,
+                    'taxblAmtB' => $request->input('taxblAmtB') ?? null,
+                    'taxblAmtC' => $request->input('taxblAmtB') ?? null,
+                    'taxblAmtD' => $request->input('taxblAmtD') ?? null,
+                    'taxblAmtE' => $request->input('taxblAmtE') ?? null,
+                    'taxRtA' => $request->input('taxRtA') ?? null,
+                    'taxRtB' => $request->input('taxRtB') ?? null,
+                    'taxRtC' => $request->input('taxRtC') ?? null,
+                    'taxRtD' => $request->input('taxRtD') ?? null,
+                    'taxRtE' => $request->input('taxRtE') ?? null,
+                    'taxAmtA' => $request->input('taxAmtA') ?? null,
+                    'taxAmtB' => $request->input('taxAmtB') ?? null,
+                    'taxAmtC' => $request->input('taxAmtC') ?? null,
+                    'taxAmtD' => $request->input('taxAmtD') ?? null,
+                    'taxAmtE' => $request->input('taxAmtE') ?? null,
+                    //totTaxblAmt will be the totals for all products totTaxblAmt's e
+                    'totTaxblAmt' => array_sum(array_column($itemsDataList, 'itemTaxPrice')),
+                    //    'totTaxblAmt' => $request->input('items')->sum('itemTaxPrice'),
+                    //totTaxAmt will be the totals for all products totTaxAmt's
+                    'totTaxAmt' => array_sum(array_column($itemsDataList, 'taxAmt')),
+                    //    'totTaxAmt' => $request->input('items')->sum('taxAmt'),
+                    //totAmt will be the totals for all products totAmt's
+                    'totAmt' => collect($request->input('items'))->sum(function ($item) {
+                        return $item['quantity'] * $item['unitPrice'];
+                    }),
+                    'remark' => $request->input('remark'),
+                ]);
+
+                \Log::info('Contents of $itemsDataList:', $itemsDataList);
+
+                // Loop through itemsDataList and save each item
+                // foreach ($itemsDataList as $itemData) {
+
+                foreach ($purchaseProductsDataList as $index => $itemData) {
+                    \Log::info("Purchase Products data at index $index:", $itemData);
+
+                    // Check if the 'tax' key exists in $itemData
+                    if (array_key_exists('tax', $itemData)) {
+                        // Get the tax type code from the form input
+                        $taxTypeCode = $itemData['tax'];
+
+                        // Initialize the tax code variable
+                        $taxCode = null;
+
+                        // Map the tax type code to the tax code
+                        switch ($taxTypeCode) {
+                            case 'A':
+                                $taxCode = 1;
+                                break;
+                            case 'B':
+                                $taxCode = 2;
+                                break;
+                            case 'C':
+                                $taxCode = 3;
+                                break;
+                            case 'D':
+                                $taxCode = 4;
+                                break;
+                            case 'E':
+                                $taxCode = 5;
+                                break;
+                            case 'F':
+                                $taxCode = 6;
+                                break;
+                            default:
+                                $taxCode = null;
+                                break;
+                        }
+                    } else {
+                        // Handle the case where 'tax' key is missing
+                        // You can log an error or perform other error handling here
+                        \Log::error('Tax key is missing in item data: ' . json_encode($itemData));
+                        continue;
+                    }
+
+                    // Create PurchaseProduct instance with the mapped tax code
+                    $purchaseProduct = new PurchaseProduct([
+                        'purchase_id' => $this->purchaseNumber(),
+                        'product_id' => $itemData['itemId'],
+                        'quantity' => $itemData['quantity'],
+                        'tax' => $taxCode,
+                        'discount' => $itemData['discountAmt'],
+                        'price' => $itemData['unitPrice'],
+                        'description' => null,
+                        'saleItemCode' => $request->input('supplierInvcNo'),
+                        'itemSeq' => null,
+                        'itemCd' => $itemData['itemCode'],
+                        'itemClsCd' => $itemData['itemClsCd'],
+                        'itemNm' => $itemData['itemNm'],
+                        'bcd' => $itemData['bcd'],
+                        'supplrItemClsCd' => $itemData['supplrItemClsCode'],
+                        'supplrItemCd' => $itemData['supplrItemCode'],
+                        'supplrIteNm' => $itemData['supplrItemName'],
+                        'pkgUnitCd' => $itemData['pkgQuantity'],
+                        'pkg' => $itemData['pkg'],
+                        'qtyUnitCd' => $itemData['qtyUnitCd'],
+                        'qty' => $itemData['quantity'],
+                        'prc' => $itemData['unitPrice'],
+                        'splyAmt' => $itemData['quantity'] * $itemData['unitPrice'],
+                        'dcAmt' => $itemData['discountAmt'],
+                        'taxTyCd' => $itemData['tax'],
+                        'taxblAmt' => $itemData['itemTaxPrice'],
+                        'taxAmt' => $itemData['quantity'] * $itemData['unitPrice'] * $itemData['itemTaxRate'],
+                        'totAmt' => $itemData['quantity'] * $itemData['unitPrice'],
+                        'itemExprDt' => $itemData['itemExprDt'],
+                    ]);
+
+                    // Save the PurchaseProduct instance to the database
+                    $purchaseProduct->save();
+                    \Log::info($purchaseProduct);
+                }
+
+                return redirect()->route('purchase.index')->with('success', 'Purchase Created Successfully');
+
+                DB::commit();
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                // Log the error
+                \Log::error('Error saving purchase data: ');
+                \Log::error($e);
+
+                // Handle the error and redirect back with an error message
+                return redirect()->back()->with('error', 'Failed to create purchase. Please try again.');
+            }
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
 
     public function show($ids)
     {
