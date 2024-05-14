@@ -1,15 +1,19 @@
-{{ Form::model($appraisal, ['route' => ['appraisal.update', $appraisal->id], 'method' => 'PUT']) }}
+<?php echo e(Form::model($appraisal, ['route' => ['appraisal.update', $appraisal->id], 'method' => 'PUT'])); ?>
+
 <div class="modal-body">
     <div class="row">
         <div class="col-md-12">
             <div class="form-group">
-                {{ Form::label('branch', __('Branch*'), ['class' => 'col-form-label']) }}
-                {{Form::select('branch',$brances,null,array('class'=>'form-control select','required'=>'required'))}}
+                <?php echo e(Form::label('branch', __('Branch*'), ['class' => 'col-form-label'])); ?>
+
+                <?php echo e(Form::select('branch',$brances,null,array('class'=>'form-control select','required'=>'required'))); ?>
+
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                {{ Form::label('employees', __('Employee*'), ['class' => 'col-form-label']) }}
+                <?php echo e(Form::label('employees', __('Employee*'), ['class' => 'col-form-label'])); ?>
+
                 <div class="employee_div">
                     <select name="employee" id="employee" class="form-control " required>
 
@@ -20,14 +24,18 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                {{ Form::label('appraisal_date', __('Select Month*'), ['class' => 'col-form-label']) }}
-                {{ Form::text('appraisal_date', null, ['class' => 'form-control d_filter' ,'required' => 'required']) }}
+                <?php echo e(Form::label('appraisal_date', __('Select Month*'), ['class' => 'col-form-label'])); ?>
+
+                <?php echo e(Form::text('appraisal_date', null, ['class' => 'form-control d_filter' ,'required' => 'required'])); ?>
+
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
-                {{ Form::label('remark', __('Remarks'), ['class' => 'col-form-label']) }}
-                {{ Form::textarea('remark', null, ['class' => 'form-control', 'rows' => '3']) }}
+                <?php echo e(Form::label('remark', __('Remarks'), ['class' => 'col-form-label'])); ?>
+
+                <?php echo e(Form::textarea('remark', null, ['class' => 'form-control', 'rows' => '3'])); ?>
+
             </div>
         </div>
     </div>
@@ -39,9 +47,10 @@
 
     <div class="modal-footer">
         <input type="button" value="Cancel" class="btn btn-light" data-bs-dismiss="modal">
-        <input type="submit" value="{{ __('Update') }}" class="btn btn-primary">
+        <input type="submit" value="<?php echo e(__('Update')); ?>" class="btn btn-primary">
     </div>
-    {{ Form::close() }}
+    <?php echo e(Form::close()); ?>
+
 
 
 
@@ -51,11 +60,11 @@
 
             var emp_id = $('#employee').val();
             $.ajax({
-                url: "{{ route('empByStar') }}",
+                url: "<?php echo e(route('empByStar')); ?>",
                 type: "post",
                 data:{
                     "employee": emp_id,
-                    "_token": "{{ csrf_token() }}",
+                    "_token": "<?php echo e(csrf_token()); ?>",
                 },
 
                 cache: false,
@@ -68,19 +77,19 @@
     </script>
 
     <script>
-        var branch_ids = '{{ $appraisal->branch}}';
-        var employee_id = '{{ $appraisal->employee}}';
-        var appraisal_id = '{{ $appraisal->id}}';
+        var branch_ids = '<?php echo e($appraisal->branch); ?>';
+        var employee_id = '<?php echo e($appraisal->employee); ?>';
+        var appraisal_id = '<?php echo e($appraisal->id); ?>';
 
 
 
         $( document ).ready(function() {
             $.ajax({
-                url: "{{ route('getemployee') }}",
+                url: "<?php echo e(route('getemployee')); ?>",
                 type: "post",
                 data:{
                     "branch_id": branch_ids,
-                    "_token": "{{ csrf_token() }}",
+                    "_token": "<?php echo e(csrf_token()); ?>",
                 },
 
                 cache: false,
@@ -88,7 +97,7 @@
 
                     $('#employee').html('<option value="">Select Employee</option>');
                     $.each(data.employee, function (key, value) {
-                        if(value.id == {{ $appraisal->employee }}){
+                        if(value.id == <?php echo e($appraisal->employee); ?>){
                             $("#employee").append('<option  selected value="' + value.id + '">' + value.name + '</option>');
                         }else{
                             $("#employee").append('<option value="' + value.id + '">' + value.name + '</option>');
@@ -98,13 +107,13 @@
             })
 
             $.ajax({
-                url: "{{ route('empByStar1') }}",
+                url: "<?php echo e(route('empByStar1')); ?>",
                 type: "post",
                 data:{
                     "employee": employee_id,
                     "appraisal": appraisal_id,
 
-                    "_token": "{{ csrf_token() }}",
+                    "_token": "<?php echo e(csrf_token()); ?>",
                 },
 
                 cache: false,
@@ -120,11 +129,11 @@
             var branch_id = this.value;
 
             $.ajax({
-                url: "{{ route('getemployee') }}",
+                url: "<?php echo e(route('getemployee')); ?>",
                 type: "post",
                 data:{
                     "branch_id": branch_id,
-                    "_token": "{{ csrf_token() }}",
+                    "_token": "<?php echo e(csrf_token()); ?>",
                 },
 
                 cache: false,
@@ -141,3 +150,4 @@
 
 
     </script>
+<?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/appraisal/edit.blade.php ENDPATH**/ ?>

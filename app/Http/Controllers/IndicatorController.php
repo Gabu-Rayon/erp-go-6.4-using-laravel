@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Branch;
+use App\Models\BranchesList;
 use App\Models\Competencies;
 use App\Models\Department;
+use App\Models\Designation;
 use App\Models\Employee;
 use App\Models\Indicator;
 use App\Models\PerformanceType;
@@ -37,11 +38,18 @@ class IndicatorController extends Controller
 
     public function create()
     {
-        $brances     = Branch::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-        $performance     = PerformanceType::where('created_by', '=', \Auth::user()->creatorId())->get();
-        $departments = Department::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-        $departments->prepend('Select Department', '');
-        return view('indicator.create', compact( 'brances', 'departments','performance'));
+        try {
+            $brances     = BranchesList::all()->pluck('bhfNm', 'bhfId');
+            $performance     = PerformanceType::where('created_by', '=', \Auth::user()->creatorId())->get();
+            $departments = Department::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $departments->prepend('Select Department', '');
+            $designations    = Designation::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $designations->prepend('Select Designation', '');
+            return view('indicator.create', compact( 'brances', 'departments','performance', 'designations'));
+        } catch (\Exception) {
+            \Log::info('INDICATOR ERROR');
+            \Log::info($e);
+        }
     }
 
 
@@ -107,13 +115,15 @@ class IndicatorController extends Controller
         {
 
             $performance     = PerformanceType::where('created_by', '=', \Auth::user()->creatorId())->get();
-            $brances        = Branch::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $brances        = BranchesList::all()->pluck('bhfNm', 'bhfId');
             $departments    = Department::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $departments->prepend('Select Department', '');
+            $designations    = Designation::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $designations->prepend('Select Designation', '');
 
             $ratings = json_decode($indicator->rating,true);
 
-            return view('indicator.edit', compact( 'brances', 'departments','performance','indicator','ratings'));
+            return view('indicator.edit', compact( 'brances', 'departments','performance','indicator','ratings', 'designations'));
         }
         else
         {

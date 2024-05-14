@@ -4,7 +4,7 @@
         <div class="col-md-12">
             <div class="info text-sm">
                 <strong>{{ __('Branch') }} : </strong>
-                <span>{{ !empty($appraisal->branches) ? $appraisal->branches->name : '' }}</span>
+                <span>{{ !empty($appraisal->branches) ? $appraisal->branches->bhfNm : '' }}</span>
             </div>
         </div>
         <div class="col-md-6 mt-3">

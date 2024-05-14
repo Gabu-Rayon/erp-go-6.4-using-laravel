@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appraisal;
-use App\Models\Branch;
+use App\Models\BranchesList;
 use App\Models\Competencies;
 use App\Models\Employee;
 use App\Models\Indicator;
@@ -42,16 +42,24 @@ class AppraisalController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create appraisal'))
-        {
+        try {
+            if(\Auth::user()->can('create appraisal'))
+            {
 
-            $performance     = PerformanceType::where('created_by', '=', \Auth::user()->creatorId())->get();
-            $brances = Branch::where('created_by', '=', \Auth::user()->creatorId())->get();
-            return view('appraisal.create', compact( 'brances', 'performance'));
-        }
-        else
-        {
-            return redirect()->back()->with('error', __('Permission denied.'));
+                $performance = PerformanceType::where('created_by', '=', \Auth::user()->creatorId())->get();
+                $brances = BranchesList::all()->pluck('bhfNm', 'bhfId');
+                $employees = Employee::all()->pluck('name', 'id');
+                return view('appraisal.create', compact( 'brances', 'performance', 'employees'));
+            }
+            else
+            {
+                return redirect()->back()->with('error', __('Permission denied.'));
+            }
+        } catch (\Exception $e) {
+            \Log::info('RENDER CREATE APPRAISAL ERROR');
+            \Log::info($e);
+
+            redirect()->back()->with('error', $e->getMessage());
         }
     }
 
@@ -62,9 +70,9 @@ class AppraisalController extends Controller
         {
             $validator = \Validator::make(
                 $request->all(), [
-                                   'branch' => 'required',
-                                   'employee' => 'required',
-                               ]
+                    'branch' => 'required',
+                    'employee' => 'required',
+                    ]
             );
             if($validator->fails())
             {
@@ -104,19 +112,24 @@ class AppraisalController extends Controller
 
     public function edit(Appraisal $appraisal)
     {
-        if(\Auth::user()->can('edit appraisal'))
-        {
+        try {
+            if(\Auth::user()->can('edit appraisal'))
+            {
 
-            $performance_types     = PerformanceType::where('created_by', '=', \Auth::user()->creatorId())->get();
-            $brances = Branch::where('created_by', '=', \Auth::user()->creatorId())->get();
-            $ratings = json_decode($appraisal->rating,true);
+                $performance_types     = PerformanceType::where('created_by', '=', \Auth::user()->creatorId())->get();
+                $brances = BranchesList::all()->pluck('bhfNm', 'id');
+                $ratings = json_decode($appraisal->rating,true);
 
 
-            return view('appraisal.edit', compact( 'brances', 'appraisal', 'performance_types','ratings'));
-        }
-        else
-        {
-            return redirect()->back()->with('error', __('Permission denied.'));
+                return view('appraisal.edit', compact( 'brances', 'appraisal', 'performance_types','ratings'));
+            }
+            else
+            {
+                return redirect()->back()->with('error', __('Permission denied.'));
+            }
+        } catch (\Exception $e) {
+            \Log::info('RENDER EDIT APPRAISAL ERROR');
+            \Log::info($e);
         }
     }
 
