@@ -755,6 +755,10 @@ class PurchaseController extends Controller
                     // Save the PurchaseProduct instance to the database
                     $purchaseProduct->save();
                     \Log::info($purchaseProduct);
+
+                    // Update warehouse stock
+                    Utility::addWarehouseStock($itemData['product_id'], $itemData['quantity'], $request->input('warehouse'));
+
                 }
 
                 return redirect()->route('purchase.index')->with('success', 'Purchase Created Successfully');
