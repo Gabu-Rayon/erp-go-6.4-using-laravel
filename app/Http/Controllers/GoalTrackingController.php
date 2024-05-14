@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Branch;
+use App\Models\BranchesList;
 use App\Models\Employee;
 use App\Models\GoalTracking;
 use App\Models\GoalType;
@@ -40,7 +40,7 @@ class GoalTrackingController extends Controller
         if(\Auth::user()->can('create goal tracking'))
         {
 
-            $brances = Branch::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $brances = BranchesList::all()->pluck('bhfNm', 'id');
             $brances->prepend('Select Branch', '');
             $goalTypes = GoalType::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $goalTypes->prepend('Select Goal Type', '');
@@ -108,7 +108,7 @@ class GoalTrackingController extends Controller
         if(\Auth::user()->can('edit goal tracking'))
         {
             $goalTracking = GoalTracking::find($id);
-            $brances      = Branch::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $brances      = BranchesList::all()->pluck('name', 'id');
             $brances->prepend('Select Branch', '');
             $goalTypes = GoalType::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $goalTypes->prepend('Select Goal Type', '');

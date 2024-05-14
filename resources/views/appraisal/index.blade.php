@@ -112,7 +112,7 @@
                                     }
                                 @endphp
                                 <tr>
-                                    <td>{{ !empty($appraisal->branches)?$appraisal->branches->name:'' }}</td>
+                                    <td>{{ !empty($appraisal->branches)?$appraisal->branches->bhfNm:'' }}</td>
                                     <td>{{ !empty($appraisal->employees)?!empty($appraisal->employees->department)?$appraisal->employees->department->name:'':'' }}</td>
                                     <td>{{ !empty($appraisal->employees)?!empty($appraisal->employees->designation)?$appraisal->employees->designation->name:'':'' }}</td>
                                     <td>{{!empty($appraisal->employees)?$appraisal->employees->name:'' }}</td>
@@ -158,10 +158,9 @@
                                                 </div>
                                             @endcan
                                             @can('edit appraisal')
-                                                <div class="action-btn bg-primary ms-2">
-                                                    <a href="#" data-url="{{ route('appraisal.edit',$appraisal->id) }}" data-size="lg" data-ajax-popup="true" data-title="{{__('Edit Appraisal')}}" data-bs-toggle="tooltip" title="{{__('Edit')}}" data-original-title="{{__('Edit')}}" class="mx-3 btn btn-sm align-items-center">
-                                                        <i class="ti ti-pencil text-white"></i>
-                                                    </a>
+                                                <div class="action-btn bg-warning ms-2">
+                                                    <a href="#" data-url="{{ route('appraisal.edit',$appraisal->id) }}" data-size="lg" data-ajax-popup="true" data-title="{{__('Edit Appraisal')}}" data-bs-toggle="tooltip" title="{{__('Edit')}}" data-original-title="{{__('Edit Appraisal')}}" class="mx-3 btn btn-sm align-items-center">
+                                                        <i class="ti ti-pencil text-white"></i></a>
                                                 </div>
                                             @endcan
                                             @can('delete appraisal')

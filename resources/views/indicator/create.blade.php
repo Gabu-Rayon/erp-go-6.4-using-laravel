@@ -16,8 +16,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 {{Form::label('designation',__('Designation'),['class'=>'form-label'])}}
-                <select class="select form-control select2-multiple" id="designation_id" name="designation" data-toggle="select2" data-placeholder="{{ __('Select Designation ...') }}" required>
-                </select>
+                {{Form::select('designation',$designations,null,array('class'=>'form-control select','required'=>'required'))}}
             </div>
         </div>
 

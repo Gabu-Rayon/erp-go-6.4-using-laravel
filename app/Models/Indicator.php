@@ -37,7 +37,7 @@ class Indicator extends Model
 
     public function branches()
     {
-        return $this->hasOne('App\Models\Branch', 'id', 'branch');
+        return $this->hasOne('App\Models\BranchesList', 'id', 'branch');
     }
 
     public function departments()

@@ -3,7 +3,7 @@
         <div class="col-md-12 ">
             <div class="info text-sm">
                 <strong>{{__('Branch')}} : </strong>
-                <span>{{ !empty($indicator->branches)?$indicator->branches->name:''}}</span>
+                <span>{{ !empty($indicator->branches)?$indicator->branches->bhfNm:''}}</span>
             </div>
         </div>
         <div class="col-md-6 mt-2">

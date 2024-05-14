@@ -20,7 +20,7 @@ class AttendanceEmployeeController extends Controller
 
         if (\Auth::user()->can('manage attendance')) {
 
-            $branch = BranchesList::all();
+            $branch = BranchesList::all()->pluck('bhfNm', 'bhfId');
             $branch->prepend('Select Branch', '');
 
             $department = Department::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -481,7 +481,7 @@ class AttendanceEmployeeController extends Controller
     {
         if (\Auth::user()->can('create attendance')) {
 
-            $branch = BranchesList::all();
+            $branch = BranchesList::all()->pluck('bhfNm', 'bhfId');
             $branch->prepend('Select Branch', '');
 
             $department = Department::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');

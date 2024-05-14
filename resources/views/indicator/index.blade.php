@@ -103,7 +103,7 @@
                                     }
                                 @endphp
                                 <tr>
-                                    <td>{{ !empty($indicator->branches)?$indicator->branches->name:'' }}</td>
+                                    <td>{{ !empty($indicator->branches)?$indicator->branches->bhfNm:'' }}</td>
                                     <td>{{ !empty($indicator->departments)?$indicator->departments->name:'' }}</td>
                                     <td>{{ !empty($indicator->designations)?$indicator->designations->name:'' }}</td>
                                     <td>
