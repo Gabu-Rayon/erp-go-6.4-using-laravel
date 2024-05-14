@@ -17,13 +17,11 @@ class WarehouseController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    
     {
+        $warehouses = Warehouse::where('created_by', \Auth::user()->creatorId())->get();
+        $branches = BranchesList::pluck('bhfNm', 'id');
 
-        $warehouses = warehouse::where('created_by', '=', \Auth::user()->creatorId())->get();
-
-        return view('warehouse.index',compact('warehouses'));
-
+        return view('warehouse.index', compact('warehouses', 'branches'));
     }
 
     /**

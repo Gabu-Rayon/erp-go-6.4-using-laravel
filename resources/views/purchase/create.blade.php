@@ -413,7 +413,10 @@
                             {{ Form::label('SupplierName', __('supplierName'), ['class' => 'form-label']) }}
                             {{ Form::select('supplierName', $venders, '', ['class' => 'form-control select2 supplierName', 'data-url' => route('venders.getSupplierInformation'), 'required' => 'required']) }}
                         </div>
-                            {{ Form::hidden('supplier_id', null, ['class' => 'form-control id', 'required' => 'required']) }}
+                            <div class="form-group col-md-4" id="vender-box">
+                            {{ Form::label('supplier_id', __('supplier Id'), ['class' => 'form-label']) }}
+                            {{ Form::text('supplier_id', null, ['class' => 'form-control id', 'required' => 'required']) }}
+                        </div>
                         <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('supplierTin', __('Supplier Tin'), ['class' => 'form-label']) }}
                             {{ Form::text('supplierTin', null, ['class' => 'form-control supplierTin', 'required' => 'required']) }}
@@ -509,7 +512,10 @@
                                         {{ Form::label('itemClsCd', __('ItemClsCd'), ['class' => 'form-label']) }}
                                         {{ Form::text('itemClsCd', null, ['class' => 'form-control itemClsCd', 'required' => 'required']) }}
                                     </td>
-                                        {{ Form::hidden('itemId', null, ['class' => 'form-control id', 'required' => 'required']) }}
+                                    <td>
+                                      {{ Form::label('itemId', __('Item Id'), ['class' => 'form-label']) }}
+                                        {{ Form::text('itemId', null, ['class' => 'form-control id', 'required' => 'required']) }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td width="25%" class="form-group pt-1">

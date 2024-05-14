@@ -417,8 +417,12 @@
                             <?php echo e(Form::select('supplierName', $venders, '', ['class' => 'form-control select2 supplierName', 'data-url' => route('venders.getSupplierInformation'), 'required' => 'required'])); ?>
 
                         </div>
-                            <?php echo e(Form::hidden('supplier_id', null, ['class' => 'form-control id', 'required' => 'required'])); ?>
+                            <div class="form-group col-md-4" id="vender-box">
+                            <?php echo e(Form::label('supplier_id', __('supplier Id'), ['class' => 'form-label'])); ?>
 
+                            <?php echo e(Form::text('supplier_id', null, ['class' => 'form-control id', 'required' => 'required'])); ?>
+
+                        </div>
                         <div class="form-group col-md-4" id="vender-box">
                             <?php echo e(Form::label('supplierTin', __('Supplier Tin'), ['class' => 'form-label'])); ?>
 
@@ -549,8 +553,12 @@
                                         <?php echo e(Form::text('itemClsCd', null, ['class' => 'form-control itemClsCd', 'required' => 'required'])); ?>
 
                                     </td>
-                                        <?php echo e(Form::hidden('itemId', null, ['class' => 'form-control id', 'required' => 'required'])); ?>
+                                    <td>
+                                      <?php echo e(Form::label('itemId', __('Item Id'), ['class' => 'form-label'])); ?>
 
+                                        <?php echo e(Form::text('itemId', null, ['class' => 'form-control id', 'required' => 'required'])); ?>
+
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td width="25%" class="form-group pt-1">
