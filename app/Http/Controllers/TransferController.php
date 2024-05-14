@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Branch;
+use App\Models\BranchesList;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Transfer;
@@ -42,7 +42,7 @@ class TransferController extends Controller
         if(\Auth::user()->can('create transfer'))
         {
             $departments = Department::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $branches    = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $branches    = BranchesList::all()->pluck('bhfNm', 'id');
             $employees   = Employee::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
             return view('transfer.create', compact('employees', 'departments', 'branches'));
@@ -86,7 +86,7 @@ class TransferController extends Controller
             if($setings['transfer_sent'] == 1)
             {
                 $employee             = Employee::find($transfer->employee_id);
-                $branch               = Branch::find($transfer->branch_id);
+                $branch               = BranchesList::find($transfer->branch_id);
                 $department           = Department::find($transfer->department_id);
                 $transfer->name       = $employee->name;
                 $transfer->email      = $employee->email;
@@ -126,7 +126,7 @@ class TransferController extends Controller
         if(\Auth::user()->can('edit transfer'))
         {
             $departments = Department::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $branches    = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $branches    = BranchesList::all()->pluck('bhfNm', 'id');
             $employees   = Employee::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             if($transfer->created_by == \Auth::user()->creatorId())
             {

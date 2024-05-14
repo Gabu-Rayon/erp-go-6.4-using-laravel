@@ -17,14 +17,7 @@
         <div class="col-md-4">
             <div class="form-group">
                 {{ Form::label('branch_id', __('Branch'), ['class' => 'col-form-label']) }}
-                <select class="form-control select" name="branch_id" id="branch_id"
-                        placeholder="{{ __('Select Branch') }}">
-                    <option value="">{{ __('Select Branch') }}</option>
-                    <option value="0">{{ __('All Branch') }}</option>
-                    @foreach ($branch as $branch)
-                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                    @endforeach
-                </select>
+                {{ Form::select('branch_id', $branch,null, array('class' => 'form-control','required'=>'required')) }}
             </div>
         </div>
 
@@ -32,9 +25,7 @@
             <div class="form-group">
                 {{ Form::label('department_id', __('Department'), ['class' => 'col-form-label']) }}
                 <div class="department_div">
-                    <select class="form-control department_id" name="department_id[]" placeholder="Select Designation" >
-                        <option value="">{{ __('Select Designation') }}</option>
-                    </select>
+                {{ Form::select('department_id', $departments,null, array('class' => 'form-control','required'=>'required')) }}
                 </div>
             </div>
         </div>
@@ -42,9 +33,7 @@
             <div class="form-group">
                 {{ Form::label('employee_id', __('Employee'), ['class' => 'col-form-label']) }}
                 <div class="employee_div">
-                    <select class="form-control employee_id" name="employee_id[]" placeholder="Select Employee">
-                        <option value="">{{ __('Select Employee') }}</option>
-                    </select>
+                {{ Form::select('employee_id', $employees,null, array('class' => 'form-control','required'=>'required')) }}
                 </div>
             </div>
         </div>

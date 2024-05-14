@@ -41,7 +41,7 @@ class JobController extends Controller
         $categories = JobCategory::where('created_by', \Auth::user()->creatorId())->get()->pluck('title', 'id');
         $categories->prepend('--', '');
 
-        $branches = BranchesList::all();
+        $branches = BranchesList::all()->pluck('bhfNm', 'id');
         $branches->prepend('All', 0);
 
         $status = Job::$status;
@@ -120,7 +120,7 @@ class JobController extends Controller
         $categories = JobCategory::where('created_by', \Auth::user()->creatorId())->get()->pluck('title', 'id');
         $categories->prepend('--', '');
 
-        $branches = BranchesList::all();
+        $branches = BranchesList::all()->pluck('bhfNm', 'id');
         $branches->prepend('All', 0);
 
         $status = Job::$status;

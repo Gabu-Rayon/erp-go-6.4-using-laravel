@@ -62,7 +62,7 @@
                                 <tr>
                                     <td>{{ !empty($goalTracking->goalType)?$goalTracking->goalType->name:'' }}</td>
                                     <td>{{$goalTracking->subject}}</td>
-                                    <td>{{ !empty($goalTracking->branches)?$goalTracking->branches->name:'' }}</td>
+                                    <td>{{ !empty($goalTracking->branches)?$goalTracking->branches->bhfNm:'' }}</td>
                                     <td>{{$goalTracking->target_achievement}}</td>
                                     <td>{{\Auth::user()->dateFormat($goalTracking->start_date)}}</td>
                                     <td>{{\Auth::user()->dateFormat($goalTracking->end_date)}}</td>

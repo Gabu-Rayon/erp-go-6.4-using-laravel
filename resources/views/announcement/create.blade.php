@@ -23,13 +23,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 {{Form::label('branch_id',__('Branch'),['class'=>'form-label'])}}
-                <select class="form-control select" name="branch_id" id="branch_id" placeholder="Select Branch">
-                    <option value="">{{__('Select Branch')}}</option>
-                    <option value="0">{{__('All Branch')}}</option>
-                    @foreach($branch as $branch)
-                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                    @endforeach
-                </select>
+                {{ Form::select('branch_id', $branch,null, array('class' => 'form-control','required'=>'required')) }}
             </div>
         </div>
 

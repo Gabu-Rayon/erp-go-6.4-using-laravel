@@ -41,7 +41,7 @@
                             <tbody class="font-style">
                             @foreach ($trainings as $training)
                                 <tr>
-                                    <td>{{ !empty($training->branches)?$training->branches->name:'' }}</td>
+                                    <td>{{ !empty($training->branches)?$training->branches->bhfNm:'' }}</td>
                                     <td>{{ !empty($training->types)?$training->types->name:'' }}
                                     </td>
                                     <td>

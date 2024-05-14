@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Branch;
+use App\Models\BranchesList;
 use App\Models\Trainer;
 use Illuminate\Http\Request;
 
@@ -28,7 +28,7 @@ class TrainerController extends Controller
     {
         if(\Auth::user()->can('create trainer'))
         {
-            $branches = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $branches = BranchesList::all()->pluck('bhfNm', 'id');
 
             return view('trainer.create', compact('branches'));
         }
@@ -90,7 +90,7 @@ class TrainerController extends Controller
     {
         if(\Auth::user()->can('edit trainer'))
         {
-            $branches = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $branches = BranchesList::all()->pluck('bhfNm', 'id');
 
             return view('trainer.edit', compact('branches', 'trainer'));
         }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Branch;
+use App\Models\BranchesList;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Event;
@@ -53,18 +53,23 @@ class EventController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create event'))
-        {
-            $employees   = Employee::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $branch      = Branch::where('created_by', '=', \Auth::user()->creatorId())->get();
-            $departments = Department::where('created_by', '=', \Auth::user()->creatorId())->get();
-            $settings = Utility::settings();
+        try {
+            if(\Auth::user()->can('create event'))
+            {
+                $employees   = Employee::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+                $branch      = BranchesList::all()->pluck('bhfNm', 'id');
+                $departments = Department::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+                $settings = Utility::settings();
 
-            return view('event.create', compact('employees', 'branch', 'departments','settings'));
-        }
-        else
-        {
-            return response()->json(['error' => __('Permission denied.')], 401);
+                return view('event.create', compact('employees', 'branch', 'departments','settings'));
+            }
+            else
+            {
+                return response()->json(['error' => __('Permission denied.')], 401);
+            }
+        } catch (\Exception $e) {
+            \Log::info('RENDER CREATE EVENT ERROR');
+            \Log::info($e);
         }
     }
 
@@ -127,7 +132,7 @@ class EventController extends Controller
 
             if($request->branch_id == 0)
             {
-                $branch = Branch::all()->pluck('name');
+                $branch = BranchesList::all()->pluck('bhfNm');
 
                 $result = '';
                 $separator = ',';
@@ -143,7 +148,7 @@ class EventController extends Controller
             }
             else
             {
-                $branch = Branch::find($request->branch_id);
+                $branch = BranchesList::find($request->branch_id);
                 $result = $branch->name;
 
             }
