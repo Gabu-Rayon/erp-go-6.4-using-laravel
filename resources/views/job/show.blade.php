@@ -32,7 +32,7 @@
                             </tr>
                             <tr>
                                 <td>{{__('Branch')}}</td>
-                                <td class="">{{ !empty($job->branches)?$job->branches->name:__('All') }}</td>
+                                <td class="">{{ !empty($job->branches)?$job->branches->bhfNm:__('All') }}</td>
                             </tr>
                             <tr>
                                 <td>{{__('Job Category')}}</td>

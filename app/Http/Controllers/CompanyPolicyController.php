@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Branch;
+use App\Models\BranchesList;
 use App\Models\CompanyPolicy;
 use App\Models\Utility;
 use Illuminate\Http\Request;
@@ -29,7 +29,7 @@ class CompanyPolicyController extends Controller
     {
         if(\Auth::user()->can('create company policy'))
         {
-            $branch = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $branch = BranchesList::all()->pluck('bhfNm', 'id');
             $branch->prepend('Select Branch','');
 
             return view('companyPolicy.create', compact('branch'));
@@ -100,7 +100,7 @@ class CompanyPolicyController extends Controller
 
             //For Notification
             $setting  = Utility::settings(\Auth::user()->creatorId());
-            $branch = Branch::find($request->branch);
+            $branch = BranchesList::find($request->branch);
             $policyNotificationArr = [
                 'company_policy_name' => $request->title,
                 'branch_name' => $branch->name,
@@ -155,7 +155,7 @@ class CompanyPolicyController extends Controller
 
         if(\Auth::user()->can('edit company policy'))
         {
-            $branch = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $branch = BranchesList::all()->pluck('bhfNm', 'id');
             $branch->prepend('Select Branch','');
 
             return view('companyPolicy.edit', compact('branch', 'companyPolicy'));

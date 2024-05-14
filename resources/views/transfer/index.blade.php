@@ -46,7 +46,7 @@
                                     @role('company')
                                     <td>{{ !empty($transfer->employee)?$transfer->employee->name:'' }}</td>
                                     @endrole
-                                    <td>{{ !empty($transfer->branch)?$transfer->branch->name:'' }}</td>
+                                    <td>{{ !empty($transfer->branch)?$transfer->branch->bhfNm:'' }}</td>
                                     <td>{{ !empty($transfer->department)?$transfer->department->name:'' }}</td>
                                     <td>{{  \Auth::user()->dateFormat($transfer->transfer_date) }}</td>
                                     <td>{{ $transfer->description }}</td>

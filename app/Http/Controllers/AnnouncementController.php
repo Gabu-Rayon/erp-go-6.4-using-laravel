@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Announcement;
 use App\Models\AnnouncementEmployee;
-use App\Models\Branch;
+use App\Models\BranchesList;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Utility;
@@ -43,17 +43,22 @@ class AnnouncementController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create announcement'))
-        {
-            $employees   = Employee::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $branch      = Branch::where('created_by', '=', Auth::user()->creatorId())->get();
-            $departments = Department::where('created_by', '=', Auth::user()->creatorId())->get();
+        try {
+            if(\Auth::user()->can('create announcement'))
+            {
+                $employees   = Employee::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+                $branch      = BranchesList::all()->pluck('bhfNm', 'id');
+                $departments = Department::where('created_by', '=', Auth::user()->creatorId())->get();
 
-            return view('announcement.create', compact('employees', 'branch', 'departments'));
-        }
-        else
-        {
-            return response()->json(['error' => __('Permission denied.')], 401);
+                return view('announcement.create', compact('employees', 'branch', 'departments'));
+            }
+            else
+            {
+                return response()->json(['error' => __('Permission denied.')], 401);
+            }
+        } catch (\Exception $e) {
+            \Log::info('CREATE ANNOUNCEMENT RENDER ERROR');
+            \Log::info($e);
         }
     }
 
@@ -116,11 +121,11 @@ class AnnouncementController extends Controller
             $setting  = Utility::settings(\Auth::user()->creatorId());
             if($request->branch_id == 0)
             {
-                $branch = Branch::get()->pluck('name' , 'id')->toArray();
+                $branch = BranchesList::get()->pluck('bhfId' , 'id')->toArray();
             }
             else
             {
-                $branch = Branch::find($request->branch_id);
+                $branch = BranchesList::find($request->branch_id);
                 $branch = explode(',',$branch->name);
             }
 
@@ -180,7 +185,7 @@ class AnnouncementController extends Controller
             $announcement = Announcement::find($announcement);
             if($announcement->created_by == Auth::user()->creatorId())
             {
-                $branch      = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+                $branch      = BranchesList::all()->pluck('bhfNm', 'id');
                 $departments = Department::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
                 return view('announcement.edit', compact('announcement', 'branch', 'departments'));

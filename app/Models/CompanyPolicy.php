@@ -16,6 +16,6 @@ class CompanyPolicy extends Model
 
     public function branches()
     {
-        return $this->hasOne('App\Models\Branch', 'id', 'branch');
+        return $this->hasOne('App\Models\BranchesList', 'id', 'branch');
     }
 }

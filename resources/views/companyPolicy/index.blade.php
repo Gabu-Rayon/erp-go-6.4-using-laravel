@@ -43,7 +43,7 @@
                                     $policyPath=\App\Models\Utility::get_file('uploads/companyPolicy');
                                 @endphp
                                 <tr>
-                                    <td>{{ !empty($policy->branches)?$policy->branches->name:'' }}</td>
+                                    <td>{{ !empty($policy->branches)?$policy->branches->bhfNm:'' }}</td>
                                     <td>{{ $policy->title }}</td>
                                     <td>{{ $policy->description }}</td>
                                     <td>

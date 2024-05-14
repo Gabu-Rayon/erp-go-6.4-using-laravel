@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Branch;
+use App\Models\BranchesList;
 use App\Models\Employee;
 use App\Models\Trainer;
 use App\Models\Training;
@@ -33,7 +33,7 @@ class TrainingController extends Controller
     {
         if(\Auth::user()->can('create training'))
         {
-            $branches      = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $branches      = BranchesList::all()->pluck('bhfNm', 'id');
             $trainingTypes = TrainingType::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $trainers      = Trainer::where('created_by', \Auth::user()->creatorId())->get()->pluck('firstname', 'id');
             $employees     = Employee::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -112,7 +112,7 @@ class TrainingController extends Controller
     {
         if(\Auth::user()->can('create training'))
         {
-            $branches      = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $branches      = BranchesList::all()->pluck('bhfNm', 'id');
             $trainingTypes = TrainingType::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $trainers      = Trainer::where('created_by', \Auth::user()->creatorId())->get()->pluck('firstname', 'id');
             $employees     = Employee::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');

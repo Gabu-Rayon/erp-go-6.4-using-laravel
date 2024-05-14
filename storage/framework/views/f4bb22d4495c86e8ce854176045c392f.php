@@ -63,7 +63,7 @@
                                 <tr>
                                     <td><?php echo e(!empty($goalTracking->goalType)?$goalTracking->goalType->name:''); ?></td>
                                     <td><?php echo e($goalTracking->subject); ?></td>
-                                    <td><?php echo e(!empty($goalTracking->branches)?$goalTracking->branches->name:''); ?></td>
+                                    <td><?php echo e(!empty($goalTracking->branches)?$goalTracking->branches->bhfNm:''); ?></td>
                                     <td><?php echo e($goalTracking->target_achievement); ?></td>
                                     <td><?php echo e(\Auth::user()->dateFormat($goalTracking->start_date)); ?></td>
                                     <td><?php echo e(\Auth::user()->dateFormat($goalTracking->end_date)); ?></td>

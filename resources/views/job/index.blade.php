@@ -132,7 +132,7 @@
                             <tbody class="font-style">
                             @foreach ($jobs as $job)
                                 <tr>
-                                    <td>{{ !empty($job->branches)?$job->branches->name:__('All') }}</td>
+                                    <td>{{ !empty($job->branches)?$job->branches->bhfNm:__('All') }}</td>
                                     <td>{{$job->title}}</td>
                                     <td>{{\Auth::user()->dateFormat($job->start_date)}}</td>
                                     <td>{{\Auth::user()->dateFormat($job->end_date)}}</td>

@@ -40,7 +40,7 @@
                             <tbody class="font-style">
                             @foreach ($trainers as $trainer)
                                 <tr>
-                                    <td>{{ !empty($trainer->branches)?$trainer->branches->name:'' }}</td>
+                                    <td>{{ !empty($trainer->branches)?$trainer->branches->bhfNm:'' }}</td>
                                     <td>{{$trainer->firstname .' '.$trainer->lastname}}</td>
                                     <td>{{$trainer->contact}}</td>
                                     <td>{{$trainer->email}}</td>
