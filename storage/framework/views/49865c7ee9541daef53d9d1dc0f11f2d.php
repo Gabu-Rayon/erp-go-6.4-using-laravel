@@ -32,15 +32,15 @@
                     <table class="table datatable">
                         <thead>
                         <tr>
-                            <th scope="col"><?php echo e(__('Main Item Code')); ?></th>
-                            <th scope="col"><?php echo e(__('Composition Item Code')); ?></th>
+                            <th scope="col"><?php echo e(__('Main Item')); ?></th>
+                            <th scope="col"><?php echo e(__('Composition Item')); ?></th>
                             <th scope="col"><?php echo e(__('Composition Item Quantity')); ?></th>
                         </tr>
                         </thead>
                         <tbody class="list">
                         <?php $__currentLoopData = $compositionslistitems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $compositionlistitem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <tr>
-                                <td><?php echo e($compositionlistitem->mainItemCode); ?></td>
+                                <td><?php echo e(\App\Models\ItemInformation::where('itemCd', $compositionlistitem->mainItemCode)->first()->itemNm); ?></td>
                                 <td><?php echo e($compositionlistitem->compoItemCode); ?></td>
                                 <td><?php echo e($compositionlistitem->compoItemQty); ?></td>
                             </tr>

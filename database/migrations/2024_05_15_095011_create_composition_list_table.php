@@ -16,8 +16,6 @@ return new class extends Migration {
         Schema::create('composition_list', function (Blueprint $table) {
             $table->id();
             $table->string('mainItemCode');
-            $table->json('compositionItems');
-            $table->foreign('mainItemCode')->references('itemCd')->on('item_list');
             $table->timestamps();
         });
     }

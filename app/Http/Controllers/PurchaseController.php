@@ -350,10 +350,11 @@ class PurchaseController extends Controller
      */
     public function create($vendorId)
     {
-        if (\Auth::user()->type == 'company') {
-            $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
-            $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
-            $category->prepend('Select Category', '');
+        // if(\Auth::user()->can('create purchase'))
+        // {
+        $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
+        $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
+        $category->prepend('Select Category', '');
 
             $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
             $venders = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'spplrNm');
@@ -380,10 +381,12 @@ class PurchaseController extends Controller
             $purchaseStatusCodes = PurchaseStatusCodes::get()->pluck('purchase_status_code', 'code');
             $ReceiptTypesCodes = ReceiptTypeCodes::get()->pluck('receipt_type_code', 'receipt_type_code');
 
-            return view('purchase.create', compact('venders', 'product_services_Codes', 'paymentTypeCodes', 'purchaseTypeCodes', 'purchaseStatusCodes', 'ReceiptTypesCodes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
-        } else {
-            return redirect()->back()->with('error', 'Permission Denied');
-        }
+        return view('purchase.create', compact('venders', 'product_services_Codes', 'paymentTypeCodes', 'purchaseTypeCodes', 'purchaseStatusCodes', 'ReceiptTypesCodes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
+        // }
+        // else
+        // {
+        //     return response()->json(['error' => __('Permission denied.')], 401);
+        // }
     }
 
 
@@ -640,41 +643,6 @@ class PurchaseController extends Controller
                     ];
 
                     array_push($purchaseItemsList, $itemData);
-
-                    // Get the tax code based on tax type code
-                    $taxCode = getTaxCode($itemDetails->taxTyCd);
-                    PurchaseProduct::create([
-                        'purchase_id' => $this->purchaseNumber(),
-                        'product_id' => $itemDetails->id,
-                        'quantity' => $item['quantity'],
-                        'tax' => $taxCode,
-                        'discount' => $item['discountAmt'],
-                        'price' => $item['unitPrice'],
-                        'description' => null,
-                        'saleItemCode' => $data['supplierInvcNo'],
-                        'itemSeq' => $itemDetails->itemSeq,
-                        'itemCd' => $itemDetails->itemCd,
-                        'itemClsCd' => $itemDetails->itemClsCd,
-                        'itemNm' => $itemDetails->itemNm,
-                        'bcd' => $itemDetails->bcd,
-                        'supplrItemClsCd' => $itemDetails->supplrItemClsCd,
-                        'supplrItemCd' => $itemDetails->supplrItemCls,
-                        'supplrIteNm' => $itemDetails->supplrItemNm,
-                        'pkgUnitCd' => $itemDetails->pkgUnitCd,
-                        'pkg' => $itemDetails->pkg,
-                        'qtyUnitCd' => $itemDetails->qtyUnitCd,
-                        'qty' => $itemDetails->qty,
-                        'prc' => $itemDetails->prc,
-                        'splyAmt' => $itemDetails->splyAmt,
-                        'dcAmt' => $item['discountAmt'],
-                        'taxTyCd' => $itemDetails->taxTyCd,
-                        'taxblAmt' => $itemTaxAmount,
-                        'taxAmt' => $itemTaxAmount,
-                        'totAmt' => $totalAmount,
-                        'itemExprDt' => $itemExprDate,
-                    ]);
-                    // Update warehouse stock
-                    Utility::addWarehouseStock($itemDetails->id, $item['quantity'], $data['warehouse']);
                 }
 
 
@@ -682,10 +650,8 @@ class PurchaseController extends Controller
                 // Log request data
                 \Log::info('Purchase INV REQ DATA  Before posting to Api :', $apiRequestData);
 
-                //Send request to API endpoint
-                // $response = Http::withOptions([
-                //     'verify' => false
-                // ])->withHeaders([
+                    //Send request to API endpoint
+                // $response = Http::withHeaders([
                 //     'accept' => 'application/json',
                 //     'key' => '123456',
                 //     'Content-Type' => 'application/json',
