@@ -51,4 +51,19 @@ class BranchesListController extends Controller
             ], 500);
         }
     }
+
+    public function getBranchByName($bhfNm) {
+        try {
+            $branch = BranchesList::where('bhfNm', $bhfNm)->first();
+            return response()->json([
+                'message' => 'success',
+                'data' => $branch
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'erroe',
+                'data' => $e->getMessage()
+            ]);
+        }
+    }
 }

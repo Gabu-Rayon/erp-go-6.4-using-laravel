@@ -2,43 +2,58 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Http;
 use App\Models\ApiInitialization;
+use App\Models\BranchesList;
+use Illuminate\Support\Facades\Http;
+
 
 class ApiInitializationController extends Controller
 {
-    //
-    public function index()
-    {
-            Log::info(\Auth::user()->type);
-            try {
-                if (\Auth::user()->type == 'company') {
-                    $apiinitializations = ApiInitialization::all();
-                    return view('apiinitialization.index', compact('apiinitializations'));
-                } else {
-                    return redirect()->back()->with('error', 'Permission Denied');
-                }
-            } catch (\Exception $e) {
-                Log::error($e->getMessage());
+    /**
+     * Display a listing of the resource.
+     */
+    public function index() {
+        \Log::info(\Auth::user()->type);
+        try {
+            if (\Auth::user()->type == 'company') {
+                $apiinitializations = ApiInitialization::all();
+                return view('apiinitialization.index', compact('apiinitializations'));
+            } else {
+                return redirect()->back()->with('error', 'Permission Denied');
             }
+        } catch (\Exception $e) {
+            \Log::error('RENDER API INITIALIZATION INDEX ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
-    public function show(APIInitialization $apiinitialization) {
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        try {
+            if (\Auth::user()->type == 'company') {
+                return view('apiinitialization.create');
+            } else {
+                return redirect()->back()->with('error', 'Permission Denied');
+            }
+        } catch (\Exception $e) {
+            \Log::error('RENDER API INITIALIZATION CREATE ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request) {
         
-        return view('apiinitialization.show', compact('apiinitialization'));
-    }
-
-    public function create () {
-        return view('apiinitialization.create');
-    }
-    
-
-    public function store (Request $request) {
-
-        $validator = Validator::make($request->all(), [
+        $validator = \Validator::make($request->all(), [
             'taxpayeridno' => 'required',
             'bhfId' => 'required',
             'devicesrlno' => 'required'
@@ -56,14 +71,18 @@ class ApiInitializationController extends Controller
             $bhfId = $request->bhfId;
             $devicesrlno = $request->devicesrlno;
 
-            $response = Http::withHeaders([
+            $response = Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
                 'key' => '123456'
             ])->post($url, [
                 'tin' => $taxpayeridno,
                 'bhfId' => $bhfId,
                 'dvcSrlNo' => $devicesrlno
             ]);
-            // Log::info($response->body());
+
+            \Log::info('CREATE API INITIALIZATION API RESPONSE');
+            \Log::info($response);
 
             $data = $response->json();
 
@@ -107,5 +126,71 @@ class ApiInitializationController extends Controller
         return redirect()->route('apiinitialization.index')->with('success', __('Successfully Initialized.'));
     }
 
- 
+    /**
+     * Display the specified resource.
+     */
+    public function show(ApiInitialization $apiinitialization)
+    {
+        try {
+            if (\Auth::user()->type == 'company') {
+                return view('apiinitialization.show', compact('apiinitialization'));
+            } else {
+                return redirect()->back()->with('error', 'Permission Denied');
+            }
+        } catch (\Exception $e) {
+            \Log::error('RENDER API INITIALIZATION SHOW ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(ApiInitialization $apiinitialization)
+    {
+        try {
+            if (\Auth::user()->type == 'company') {
+                $branches = BranchesList::all()->pluck('bhfNm', 'bhfNm');
+                return view('apiinitialization.edit', compact('apiinitialization', 'branches'));
+            } else {
+                return redirect()->back()->with('error', 'Permission Denied');
+            }
+        } catch (\Exception $e) {
+            \Log::error('RENDER API INITIALIZATION EDIT ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, ApiInitialization $apiinitialization)
+    {
+        try {
+            if (\Auth::user()->type == 'company') {
+                $data = $request->all();
+                \Log::info('STORE EXISTING INITIALIZATION REQUEST DATA');
+                \Log::info($data);
+                \Log::info('STORE EXISTING INITIALIZATION GIVEN INITIALIZATION');
+                \Log::info($apiinitialization);
+                return redirect()->to('apiinitialization')->with('success', 'Initialization Updated');
+            } else {
+                return redirect()->back()->with('error', 'Permission Denied');
+            }
+        } catch (\Exception $e) {
+            \Log::error('STORE EXISTING VIEW ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
 }

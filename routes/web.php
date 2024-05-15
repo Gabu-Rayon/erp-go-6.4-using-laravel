@@ -1444,6 +1444,8 @@ Route::group(['middleware' => ['verified']], function () {
             ],
         ], function () {
             Route::resource('apiinitialization', ApiInitializationController::class);
+            Route::get('apiinitialization/addexisting', [ApiInitializationController::class, 'addExisting'])->name('apiinitialization.addexisting');
+            Route::post('apiinitialization/storeexisting', [ApiInitializationController::class, 'storeExisting'])->name('apiinitialization.storeexisting');
         },
     );
 
@@ -1791,7 +1793,7 @@ Route::group(
     ],
     function () {
         Route::resource('brancheslist', BranchesListController::class);
-
+        Route::get('getbranchbyname/{name}', [BranchesListController::class, 'getBranchByName'])->name('brancheslist.getbranchbyname');
     }
 );
 

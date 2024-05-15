@@ -47,12 +47,23 @@ class PurchaseController extends Controller
     public function index(Request $request)
     {
 
-        $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-        $vender->prepend('Select Vendor', '');
-        $status = Purchase::$statues;
-        $purchases = Purchase::all();
+        try {
+            if (\Auth::user()->type == 'company') {
+                $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+                $vender->prepend('Select Vendor', '');
+                $status = Purchase::$statues;
+                $purchases = Purchase::all();
 
-        return view('purchase.index', compact('purchases', 'vender', 'status'));
+                return view('purchase.index', compact('purchases', 'vender', 'status'));
+            } else {
+                return redirect()->back()->with('error', 'Permission Denied');
+            }
+        } catch (\Exception $e) {
+            \Log::info('RENDER PURCHASE INDEX ERROR');
+            \Log::info($e);
+
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
 
@@ -106,117 +117,120 @@ class PurchaseController extends Controller
     {
 
         try {
+            if (\Auth::user()->type == 'company') {
+                ini_set('max_execution_time', 300);
 
-            ini_set('max_execution_time', 300);
+                $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
 
-            $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
+                // $response = Http::withHeaders([
+                //     'key' => '123456'
+                // ])->get($url);
 
-            // $response = Http::withHeaders([
-            //     'key' => '123456'
-            // ])->get($url);
+                $response = Http::withHeaders([
+                    'key' => '123456'
+                ])->timeout(300)->get($url);
 
-            $response = Http::withHeaders([
-                'key' => '123456'
-            ])->timeout(300)->get($url);
-
-            //  $response = retry(3, function () use ($url) {
-            //  return Http::withHeaders([
-            //  'key' => '123456'
-            //  ])->timeout(60000)->get($url); 
-            // }, 100); 
+                //  $response = retry(3, function () use ($url) {
+                //  return Http::withHeaders([
+                //  'key' => '123456'
+                //  ])->timeout(60000)->get($url); 
+                // }, 100); 
 
 
-            $data = $response->json();
-            $purchaseSalesList = $data['data']['data']['saleList'];
+                $data = $response->json();
+                $purchaseSalesList = $data['data']['data']['saleList'];
 
-            \Log::info('API Request Data  of Sales and Purchases: ' . json_encode($purchaseSalesList));
-            \Log::info('API Response: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
+                \Log::info('API Request Data  of Sales and Purchases: ' . json_encode($purchaseSalesList));
+                \Log::info('API Response: ' . $response->body());
+                \Log::info('API Response Status Code: ' . $response->status());
 
-            // Initialize purchase_id counter
-            $purchaseId = 1;
+                // Initialize purchase_id counter
+                $purchaseId = 1;
 
-            // Divide the data into batches of 100 items each
-            if (isset($purchaseSalesList)) {
-                foreach ($purchaseSalesList as $class) {
-                    // Initialize    $saleItemCode as null
-                    $saleItemCode = null;
+                // Divide the data into batches of 100 items each
+                if (isset($purchaseSalesList)) {
+                    foreach ($purchaseSalesList as $class) {
+                        // Initialize    $saleItemCode as null
+                        $saleItemCode = null;
 
-                    if (isset($class['spplrInvcNo'])) {
-                        $saleItemCode = $class['spplrInvcNo'];
-                    }
-                    \Log::info('API Request Data of Sales and Purchases All Invoices No: ' . json_encode($saleItemCode));
-                    $itemlists = $class['itemList'];
-                    if (isset($itemlists)) {
-                        $batches = array_chunk($itemlists, 100);
-                        foreach ($batches as $batch) {
-                            foreach ($batch as $item) {
-                                \Log::info('Processing item with spplrInvcNo: ' . $saleItemCode . ' and item: ' . json_encode($item));
-                                if (!empty($saleItemCode)) {
+                        if (isset($class['spplrInvcNo'])) {
+                            $saleItemCode = $class['spplrInvcNo'];
+                        }
+                        \Log::info('API Request Data of Sales and Purchases All Invoices No: ' . json_encode($saleItemCode));
+                        $itemlists = $class['itemList'];
+                        if (isset($itemlists)) {
+                            $batches = array_chunk($itemlists, 100);
+                            foreach ($batches as $batch) {
+                                foreach ($batch as $item) {
+                                    \Log::info('Processing item with spplrInvcNo: ' . $saleItemCode . ' and item: ' . json_encode($item));
+                                    if (!empty($saleItemCode)) {
 
-                                    // Initialize the tax code variable
-                                    $taxCode = null;
-                                    // Map the tax type code to the tax code
-                                    switch ($item['taxTyCd']) {
-                                        case 'A':
-                                            $taxCode = 1;
-                                            break;
-                                        case 'B':
-                                            $taxCode = 2;
-                                            break;
-                                        case 'C':
-                                            $taxCode = 3;
-                                            break;
-                                        case 'D':
-                                            $taxCode = 4;
-                                            break;
-                                        case 'E':
-                                            $taxCode = 5;
-                                            break;
-                                        case 'F':
-                                            $taxCode = 6;
-                                            break;
-                                        default:
-                                            $taxCode = null;
-                                            break;
+                                        // Initialize the tax code variable
+                                        $taxCode = null;
+                                        // Map the tax type code to the tax code
+                                        switch ($item['taxTyCd']) {
+                                            case 'A':
+                                                $taxCode = 1;
+                                                break;
+                                            case 'B':
+                                                $taxCode = 2;
+                                                break;
+                                            case 'C':
+                                                $taxCode = 3;
+                                                break;
+                                            case 'D':
+                                                $taxCode = 4;
+                                                break;
+                                            case 'E':
+                                                $taxCode = 5;
+                                                break;
+                                            case 'F':
+                                                $taxCode = 6;
+                                                break;
+                                            default:
+                                                $taxCode = null;
+                                                break;
+                                        }
+
+                                        PurchaseProduct::create([
+                                            'purchase_id' => null,
+                                            'quantity' => $item['totAmt'],
+                                            'tax' => $taxCode,
+                                            'price' => $item['prc'],
+                                            'discount' => $item['prc'] * $item['dcRt'] / 100,
+                                            'saleItemCode' => $saleItemCode,
+                                            'itemSeq' => $item['itemSeq'],
+                                            'itemCd' => $item['itemCd'],
+                                            'itemClsCd' => $item['itemClsCd'],
+                                            'itemNm' => $item['itemNm'],
+                                            'bcd' => $item['bcd'],
+                                            'spplrItemClsCd' => $item['spplrItemClsCd'],
+                                            'spplrItemCd' => $item['spplrItemCd'],
+                                            'spplrItemNm' => $item['spplrItemNm'],
+                                            'pkgUnitCd' => $item['pkgUnitCd'],
+                                            'pkg' => $item['pkg'],
+                                            'qtyUnitCd' => $item['qtyUnitCd'],
+                                            'qty' => $item['qty'],
+                                            'prc' => $item['prc'],
+                                            'splyAmt' => $item['splyAmt'],
+                                            'dcRt' => $item['dcRt'],
+                                            'taxTyCd' => $item['taxTyCd'],
+                                            'taxblAmt' => $item['taxblAmt'],
+                                            'taxAmt' => $item['taxAmt'],
+                                            'totAmt' => $item['totAmt'],
+                                            'itemExprDt' => $item['itemExprDt']
+                                        ]);
+
                                     }
-
-                                    PurchaseProduct::create([
-                                        'purchase_id' => null,
-                                        'quantity' => $item['totAmt'],
-                                        'tax' => $taxCode,
-                                        'price' => $item['prc'],
-                                        'discount' => $item['prc'] * $item['dcRt'] / 100,
-                                        'saleItemCode' => $saleItemCode,
-                                        'itemSeq' => $item['itemSeq'],
-                                        'itemCd' => $item['itemCd'],
-                                        'itemClsCd' => $item['itemClsCd'],
-                                        'itemNm' => $item['itemNm'],
-                                        'bcd' => $item['bcd'],
-                                        'spplrItemClsCd' => $item['spplrItemClsCd'],
-                                        'spplrItemCd' => $item['spplrItemCd'],
-                                        'spplrItemNm' => $item['spplrItemNm'],
-                                        'pkgUnitCd' => $item['pkgUnitCd'],
-                                        'pkg' => $item['pkg'],
-                                        'qtyUnitCd' => $item['qtyUnitCd'],
-                                        'qty' => $item['qty'],
-                                        'prc' => $item['prc'],
-                                        'splyAmt' => $item['splyAmt'],
-                                        'dcRt' => $item['dcRt'],
-                                        'taxTyCd' => $item['taxTyCd'],
-                                        'taxblAmt' => $item['taxblAmt'],
-                                        'taxAmt' => $item['taxAmt'],
-                                        'totAmt' => $item['totAmt'],
-                                        'itemExprDt' => $item['itemExprDt']
-                                    ]);
-
                                 }
                             }
                         }
                     }
                 }
+                return redirect()->route('purchase.index')->with('success', __('Sales Items Lists Details successfully created from Api.'));
+            } else {
+                return redirect()->route('purchase.index')->with('error', __('Permission Denied'));
             }
-            return redirect()->route('purchase.index')->with('success', __('Sales Items Lists Details successfully created from Api.'));
         } catch (\Exception $e) {
             \Log::error('Error adding Item Information from the API: ' . $e->getMessage());
             \Log::info($e);
@@ -335,8 +349,7 @@ class PurchaseController extends Controller
      */
     public function create($vendorId)
     {
-        // if(\Auth::user()->can('create purchase'))
-        // {
+        if (\Auth::user()->type == 'company') {
         $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
         $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
         $category->prepend('Select Category', '');
@@ -367,11 +380,11 @@ class PurchaseController extends Controller
         $ReceiptTypesCodes = ReceiptTypeCodes::get()->pluck('receipt_type_code', 'receipt_type_code');
 
         return view('purchase.create', compact('venders', 'product_services_Codes', 'paymentTypeCodes', 'purchaseTypeCodes', 'purchaseStatusCodes', 'ReceiptTypesCodes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
-        // }
-        // else
-        // {
-        //     return response()->json(['error' => __('Permission denied.')], 401);
-        // }
+        }
+        else
+        {
+            return redirect()->back()->with('error', 'Permission Denied');
+        }
     }
 
 

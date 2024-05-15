@@ -16,18 +16,33 @@ class CompositionListController extends Controller
     //
     public function index()
     {
-        $compositionslistitems = CompositionItem::all();
-        $compositionslist = CompositionList::all();
-        return view('compositionlist.index', compact('compositionslistitems'));
+        try {
+            if (\Auth::user()->type == 'company') {
+                $compositionslistitems = CompositionItem::all();
+                return view('compositionlist.index', compact('compositionslistitems'));
+            } else {
+                return redirect()->back()->with('error', 'Permission Denied');
+            }
+        } catch (\Exception $e) {
+            \Log::info('RENDER COMPOSITION ITEMS INDEX ERROR');
+            \Log::info($e);
+
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function create()
     {
         try {
-            $mainItemCode = ItemInformation::all()->pluck('itemNm','itemCd');
-            $compoItemCode = ItemType::all()->pluck('item_type_name', 'item_type_code');
-            return view('compositionlist.create', compact('mainItemCode', 'compoItemCode'));
+            if (\Auth::user()->type == 'company') {
+                $mainItemCode = ItemInformation::all()->pluck('itemNm','itemCd');
+                $compoItemCode = ItemType::all()->pluck('item_type_name', 'item_type_code');
+                return view('compositionlist.create', compact('mainItemCode', 'compoItemCode'));
+            } else {
+                return redirect()->back()->with('error', 'Permission Denied');
+            }
         } catch (\Exception $e) {
+            \Log::info('RENDER COMPOSITION ITEMS CREATE ERROR');
             Log::error($e);
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -37,42 +52,48 @@ class CompositionListController extends Controller
     public function store(Request $request)
     {
         try {
-            \Log::info('COMPO ITEMS LIST DATA');
-            \Log::info($request->all());
-            $data = $request->all();
-            $mainItemCode = $data['mainItemCode'];
-            $compositionItems = $data['items'];
+            if (\Auth::user()->type == 'company') {
 
-            $url = 'https://etims.your-apps.biz/api/AddCompositionItemList';
 
-            $response = Http::withOptions(['verify' => false])->withHeaders([
-                'key' => '123456',
-            ])->post($url, [
-                'mainItemCode' => $mainItemCode,
-                'compositionItems' => $compositionItems
-            ]);
+                \Log::info('COMPO ITEMS LIST DATA');
+                \Log::info($request->all());
+                $data = $request->all();
+                $mainItemCode = $data['mainItemCode'];
+                $compositionItems = $data['items'];
 
-            \Log::info($response);
+                $url = 'https://etims.your-apps.biz/api/AddCompositionItemList';
 
-            if ($response["statusCode"] == 500) {
-                return redirect()->back()->with('error', 'Server Error');
-            }
-
-            CompositionList::create([
-                'mainItemCode' => $mainItemCode
-            ]);
-
-            foreach ($data['items'] as $item) {
-                \Log::info($item);
-                CompositionItem::create([
-                    'mainItemCode'=> $mainItemCode,
-                    'compoItemCode' => $item['compoItemCode'],
-                    'compoItemQty' => $item['quantity']
+                $response = Http::withOptions(['verify' => false])->withHeaders([
+                    'key' => '123456',
+                ])->post($url, [
+                    'mainItemCode' => $mainItemCode,
+                    'compositionItems' => $compositionItems
                 ]);
+
+                \Log::info($response);
+
+                if ($response["statusCode"] != 200) {
+                    return redirect()->back()->with('error', 'Something Went Wrong');
+                }
+
+                CompositionList::create([
+                    'mainItemCode' => $mainItemCode
+                ]);
+
+                foreach ($data['items'] as $item) {
+                    \Log::info($item);
+                    CompositionItem::create([
+                        'mainItemCode'=> $mainItemCode,
+                        'compoItemCode' => $item['compoItemCode'],
+                        'compoItemQty' => $item['quantity']
+                    ]);
+                }
+
+
+                return redirect()->to('compositionlist')->with('success', 'Composition List Item Added');
+            } else {
+                return redirect()->back()->with('error', 'Permission Denied');
             }
-
-
-            return redirect()->to('compositionlist')->with('success', 'Composition List Item Added');
         } catch (\Exception $e) {
             \Log::info($e);
             return redirect()->back()->with('error', $e->getMessage());

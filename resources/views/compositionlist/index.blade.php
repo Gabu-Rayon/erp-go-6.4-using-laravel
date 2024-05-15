@@ -31,15 +31,15 @@
                     <table class="table datatable">
                         <thead>
                         <tr>
-                            <th scope="col">{{__('Main Item Code')}}</th>
-                            <th scope="col">{{__('Composition Item Code')}}</th>
+                            <th scope="col">{{__('Main Item')}}</th>
+                            <th scope="col">{{__('Composition Item')}}</th>
                             <th scope="col">{{__('Composition Item Quantity')}}</th>
                         </tr>
                         </thead>
                         <tbody class="list">
                         @foreach ($compositionslistitems as $compositionlistitem)
                             <tr>
-                                <td>{{ $compositionlistitem->mainItemCode }}</td>
+                                <td>{{ \App\Models\ItemInformation::where('itemCd', $compositionlistitem->mainItemCode)->first()->itemNm }}</td>
                                 <td>{{ $compositionlistitem->compoItemCode }}</td>
                                 <td>{{ $compositionlistitem->compoItemQty }}</td>
                             </tr>

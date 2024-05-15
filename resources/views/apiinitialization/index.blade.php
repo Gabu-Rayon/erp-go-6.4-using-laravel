@@ -15,9 +15,9 @@
 @endsection
 
 @section('action-btn')
-    <div class="float-end">
+    <div class="float-end m-2">
         <a href="#" data-url="{{ route('apiinitialization.create') }}" class="btn btn-sm btn-primary" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Create New Initialization')}}">
-            Initialization New
+            Create New Initialization
         </a>
     </div>
 @endsection
@@ -50,8 +50,25 @@
                                     <td>{{ $apiinitialization->taxprNm }}</td>
                                     <td>{{ $apiinitialization->hqYn }}</td>
                                     <td>
+                                        <div class="action-btn bg-info ms-2">
+                                            <a
+                                                href="{{ route('apiinitialization.show',$apiinitialization->id) }}"
+                                                class="mx-3 btn btn-sm d-inline-flex align-items-center"
+                                                data-bs-toggle="tooltip"
+                                                title="{{__('Details')}}"
+                                            >
+                                                <i class="ti ti-eye text-white"></i>
+                                            </a>
+                                        </div>
                                         <div class="action-btn bg-warning ms-2">
-                                            <a href="{{ route('apiinitialization.show',$apiinitialization->id) }}" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="{{__('Details')}}"><i class="ti ti-eye text-white"></i></a>
+                                            <a
+                                                href="{{ route('apiinitialization.edit',$apiinitialization->id) }}"
+                                                class="mx-3 btn btn-sm d-inline-flex align-items-center"
+                                                data-bs-toggle="tooltip"
+                                                title="{{__('Edit')}}"
+                                            >
+                                                <i class="ti ti-pencil text-white"></i>
+                                            </a>
                                         </div>
                                     </td>
                             @endforeach

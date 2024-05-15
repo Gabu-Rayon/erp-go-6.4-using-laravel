@@ -16,9 +16,9 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('action-btn'); ?>
-    <div class="float-end">
+    <div class="float-end m-2">
         <a href="#" data-url="<?php echo e(route('apiinitialization.create')); ?>" class="btn btn-sm btn-primary" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Create New Initialization')); ?>">
-            Initialization New
+            Create New Initialization
         </a>
     </div>
 <?php $__env->stopSection(); ?>
@@ -51,8 +51,25 @@
                                     <td><?php echo e($apiinitialization->taxprNm); ?></td>
                                     <td><?php echo e($apiinitialization->hqYn); ?></td>
                                     <td>
+                                        <div class="action-btn bg-info ms-2">
+                                            <a
+                                                href="<?php echo e(route('apiinitialization.show',$apiinitialization->id)); ?>"
+                                                class="mx-3 btn btn-sm d-inline-flex align-items-center"
+                                                data-bs-toggle="tooltip"
+                                                title="<?php echo e(__('Details')); ?>"
+                                            >
+                                                <i class="ti ti-eye text-white"></i>
+                                            </a>
+                                        </div>
                                         <div class="action-btn bg-warning ms-2">
-                                            <a href="<?php echo e(route('apiinitialization.show',$apiinitialization->id)); ?>" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="<?php echo e(__('Details')); ?>"><i class="ti ti-eye text-white"></i></a>
+                                            <a
+                                                href="<?php echo e(route('apiinitialization.edit',$apiinitialization->id)); ?>"
+                                                class="mx-3 btn btn-sm d-inline-flex align-items-center"
+                                                data-bs-toggle="tooltip"
+                                                title="<?php echo e(__('Edit')); ?>"
+                                            >
+                                                <i class="ti ti-pencil text-white"></i>
+                                            </a>
                                         </div>
                                     </td>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
