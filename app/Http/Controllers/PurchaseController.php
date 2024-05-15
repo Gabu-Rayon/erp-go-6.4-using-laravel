@@ -806,7 +806,6 @@ class PurchaseController extends Controller
             \Log::info($purchase);
             $category = ProductServiceCategory::all()->pluck('name', 'id');
             $warehouse = warehouse::all()->pluck('name', 'id');
-
             $purchase_number = $purchase->purchase_id;
             $venders = Vender::all()->pluck('name', 'id');
             $product_services = ItemInformation::all()->pluck('itemNm', 'id');
@@ -816,7 +815,6 @@ class PurchaseController extends Controller
             return response()->json(['error' => __('Permission denied.')], 401);
         }
     }
-
     public function update(Request $request, PurchaseProduct $purchase)
     {
         try {
