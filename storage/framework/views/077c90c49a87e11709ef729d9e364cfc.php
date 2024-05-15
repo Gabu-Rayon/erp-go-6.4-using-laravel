@@ -478,7 +478,7 @@
 
                         </div>
                         <div class="form-group col-md-4" id="vender-box">
-                                    <?php echo e(Form::label('category_id', __('Item (*)'), ['class' => 'form-label'])); ?>
+                                    <?php echo e(Form::label('category_id', __('Account Category (*)'), ['class' => 'form-label'])); ?>
 
                                     <?php echo e(Form::select('category_id', $category, null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
@@ -540,55 +540,8 @@
 
                                         <?php echo e(Form::select('itemCode', $product_services_Codes, '', ['class' => 'form-control select2 itemCode', 'data-url' => route('productservice.getiteminformation'), 'required' => 'required'])); ?>
 
-                                    </td>
-                                    <td>
-                                        <?php echo e(Form::label('itemNm', __('ItemNm'), ['class' => 'form-label'])); ?>
-
-                                        <?php echo e(Form::text('itemNm', null, ['class' => 'form-control itemNm', 'required' => 'required'])); ?>
-
-                                    </td>
-                                    <td>
-                                        <?php echo e(Form::label('itemClsCd', __('ItemClsCd'), ['class' => 'form-label'])); ?>
-
-                                        <?php echo e(Form::text('itemClsCd', null, ['class' => 'form-control itemClsCd', 'required' => 'required'])); ?>
-
-                                    </td>
-                                    <td>
-                                      <?php echo e(Form::label('itemId', __('Item Id'), ['class' => 'form-label'])); ?>
-
-                                        <?php echo e(Form::text('itemId', null, ['class' => 'form-control id', 'required' => 'required'])); ?>
-
-                                    </td>
+                                    </td>                                   
                                 </tr>
-                                <tr>
-                                    <td width="25%" class="form-group pt-1">
-                                        <?php echo e(Form::label('bcd', __('Bcd'), ['class' => 'form-label'])); ?>
-
-                                        <?php echo e(Form::text('bcd', null, ['class' => 'form-control bcd', 'required' => 'required'])); ?>
-
-                                    </td>
-                                    <td>
-                                        <?php echo e(Form::label('pkgUnitCd', __('Pkg Unit Cd'), ['class' => 'form-label'])); ?>
-
-                                        <?php echo e(Form::text('pkgUnitCd', null, ['class' => 'form-control pkgUnitCd', 'required' => 'required'])); ?>
-
-                                    </td>
-                                    <td>
-                                        <?php echo e(Form::label('pkg', __('Package'), ['class' => 'form-label'])); ?>
-
-                                        <?php echo e(Form::text('pkg', null, ['class' => 'form-control pkg', 'required' => 'required', 'placeholder' => __('1,2,100')])); ?>
-
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <?php echo e(Form::label('qtyUnitCd', __('Quantity'), ['class' => 'form-label'])); ?>
-
-                                        <?php echo e(Form::text('qtyUnitCd', null, ['class' => 'form-control qtyUnitCd', 'required' => 'required', 'placeholder' => __('U,T')])); ?>
-
-                                    </td>
-                                </tr>
-
                                 <tr>
                                     <td>
                                         <?php echo e(Form::label('supplritemClsCode', __('Supplier Item Cls Code'), ['class' => 'form-label'])); ?>
@@ -652,35 +605,13 @@
 
                                     </td>
                                 </tr>
-
                                 <tr>
-                                    <td>
-                                        <?php echo e(Form::label('tax', __('Tax'), ['class' => 'form-label'])); ?>
-
-                                        <?php echo e(Form::text('tax', '', ['class' => 'form-control tax'])); ?>
-
-                                    </td>
-                                    <td>
-                                        <?php echo e(Form::label('itemtaxprice', __('Taxable Amount'), ['class' => 'form-label'])); ?>
-
-                                        <?php echo e(Form::text('itemTaxPrice', '', ['class' => 'form-control itemTaxPrice'])); ?>
-
-                                    </td>
-                                    <td>
-                                        <?php echo e(Form::label('itemtaxrate', __('Item Tax Rate'), ['class' => 'form-label'])); ?>
-
-                                        <?php echo e(Form::text('itemTaxRate', '', ['class' => 'form-control itemTaxRate'])); ?>
-
-                                    </td>
-                                    <td colspan="5"></td>
-
                                     <td>
                                         <a href="#"
                                             class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2"
                                             data-repeater-delete></a>
                                     </td>
                                 </tr>
-
                             </tbody>
                             <tfoot>
                                 <tr>
