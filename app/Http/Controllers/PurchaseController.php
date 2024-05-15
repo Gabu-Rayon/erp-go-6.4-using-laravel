@@ -596,6 +596,62 @@ class PurchaseController extends Controller
                             return null; // Return null if tax type code not found
                     }
                 }
+
+                $thispurchase = Purchase::create([
+                    'purchase_id' => $this->purchaseNumber(),
+                    'vender_id' => $data['supplier_id'],
+                    'warehouse_id' => $data['warehouse'],
+                    'purchase_date' => $data['purchDate'],
+                    'purchase_number ' => $this->purchaseNumber(),
+                    'status' => 0,
+                    'shipping_display' => null,
+                    'send_date' => null,
+                    'discount_apply' => null,
+                    'category_id' => $data['category_id'],
+                    'created_by' => \Auth::user()->creatorId(),
+
+                    'spplrTin' => $data['supplierTin'],
+                    'spplrNm' => $data['supplierName'],
+                    'spplrBhfId' => $data['supplierBhfId'],
+                    'spplrInvcNo' => $data['supplierInvcNo'],
+                    'spplrSdcId' => $data['spplrSdcId'] ?? null,
+                    'spplrMrcNo' => $data['spplrMrcNo'] ?? null,//Can also be null
+                    'rcptTyCd' => $data['supplierName'] ?? null,//Can also be null
+                    'pmtTyCd' => $data['pmtTypeCode'] ?? null,
+                    'cfmDt' => $data['confirmDate'] ?? null,
+                    'salesDt' => $data['purchDate'] ?? null,
+                    'stockRlsDt' => $data['warehouseDate'] ?? null,
+                    'warehouseDate' => $data['warehouseDate'] ?? null,
+                    'warehouse' => $data['warehouse'] ?? null,
+                    //For totItemCnt  are total item posted in the  PurchaseProduct Model
+                    'totItemCnt' => null,
+                    // 'totItemCnt' => count($itemsDataList),
+                    // 'totItemCnt' => PurchaseProdcut::count(),
+                    'taxblAmtA' => $data['taxblAmtA'] ?? null,
+                    'taxblAmtB' => $data['taxblAmtB'] ?? null,
+                    'taxblAmtC' => $data['taxblAmtB'] ?? null,
+                    'taxblAmtD' => $data['taxblAmtD'] ?? null,
+                    'taxblAmtE' => $data['taxblAmtE'] ?? null,
+                    'taxRtA' => $data['taxRtA'] ?? null,
+                    'taxRtB' => $data['taxRtB'] ?? null,
+                    'taxRtC' => $data['taxRtC'] ?? null,
+                    'taxRtD' => $data['taxRtD'] ?? null,
+                    'taxRtE' => $data['taxRtE'] ?? null,
+                    'taxAmtA' => $data['taxAmtA'] ?? null,
+                    'taxAmtB' => $data['taxAmtB'] ?? null,
+                    'taxAmtC' => $data['taxAmtC'] ?? null,
+                    'taxAmtD' => $data['taxAmtD'] ?? null,
+                    'taxAmtE' => $data['taxAmtE'] ?? null,
+                    //totTaxblAmt will be the totals for all products totTaxblAmt's e
+                    'totTaxblAmt' => null,
+                    //    'totTaxblAmt' => $request->input('items')->sum('itemTaxPrice'),
+                    //totTaxAmt will be the totals for all products totTaxAmt's
+                    'totTaxAmt' =>null,
+                    //    'totTaxAmt' => $request->input('items')->sum('taxAmt'),
+                    //totAmt will be the totals for all products totAmt's
+                    'totAmt' =>null,
+                    'remark' => $data['remark'],
+                ]);
                 
                 foreach ($data['items'] as $item) {
                     $itemDetails = ItemInformation::where('itemCd', $item['itemCode'])->first();
@@ -646,7 +702,7 @@ class PurchaseController extends Controller
                     // Get the tax code based on tax type code
                     $taxCode = getTaxCode($itemDetails->taxTyCd);
                     PurchaseProduct::create([
-                       'purchase_id' => $this->purchaseNumber(),
+                       'purchase_id' => $thispurchase->id,
                         'product_id' => $itemDetails->id,
                         'quantity' => $item['quantity'],
                         'tax' => $taxCode,
@@ -713,61 +769,7 @@ class PurchaseController extends Controller
                 foreach ($purchaseItemsList as $item) {
                     $totalAmount += calculateTotalAmount($item['pkgQuantity'], $item['quantity'], $item['unitPrice']);
                 }
-                 Purchase::create([
-                    'purchase_id' => $this->purchaseNumber(),
-                    'vender_id' => $data['supplier_id'],
-                    'warehouse_id' => $data['warehouse'],
-                    'purchase_date' => $data['purchDate'],
-                    'purchase_number ' => $this->purchaseNumber(),
-                    'status' => 0,
-                    'shipping_display' => null,
-                    'send_date' => null,
-                    'discount_apply' => null,
-                    'category_id' => $data['category_id'],
-                    'created_by' => \Auth::user()->creatorId(),
-
-                    'spplrTin' => $data['supplierTin'],
-                    'spplrNm' => $data['supplierName'],
-                    'spplrBhfId' => $data['supplierBhfId'],
-                    'spplrInvcNo' => $data['supplierInvcNo'],
-                    'spplrSdcId' => $data['spplrSdcId'] ?? null,
-                    'spplrMrcNo' => $data['spplrMrcNo'] ?? null,//Can also be null
-                    'rcptTyCd' => $data['supplierName'] ?? null,//Can also be null
-                    'pmtTyCd' => $data['pmtTypeCode'] ?? null,
-                    'cfmDt' => $data['confirmDate'] ?? null,
-                    'salesDt' => $data['purchDate'] ?? null,
-                    'stockRlsDt' => $data['warehouseDate'] ?? null,
-                    'warehouseDate' => $data['warehouseDate'] ?? null,
-                    'warehouse' => $data['warehouse'] ?? null,
-                    //For totItemCnt  are total item posted in the  PurchaseProduct Model
-                    'totItemCnt' => $totalAmount,
-                    // 'totItemCnt' => count($itemsDataList),
-                    // 'totItemCnt' => PurchaseProdcut::count(),
-                    'taxblAmtA' => $data['taxblAmtA'] ?? null,
-                    'taxblAmtB' => $data['taxblAmtB'] ?? null,
-                    'taxblAmtC' => $data['taxblAmtB'] ?? null,
-                    'taxblAmtD' => $data['taxblAmtD'] ?? null,
-                    'taxblAmtE' => $data['taxblAmtE'] ?? null,
-                    'taxRtA' => $data['taxRtA'] ?? null,
-                    'taxRtB' => $data['taxRtB'] ?? null,
-                    'taxRtC' => $data['taxRtC'] ?? null,
-                    'taxRtD' => $data['taxRtD'] ?? null,
-                    'taxRtE' => $data['taxRtE'] ?? null,
-                    'taxAmtA' => $data['taxAmtA'] ?? null,
-                    'taxAmtB' => $data['taxAmtB'] ?? null,
-                    'taxAmtC' => $data['taxAmtC'] ?? null,
-                    'taxAmtD' => $data['taxAmtD'] ?? null,
-                    'taxAmtE' => $data['taxAmtE'] ?? null,
-                    //totTaxblAmt will be the totals for all products totTaxblAmt's e
-                    'totTaxblAmt' => $taxableAmount,
-                    //    'totTaxblAmt' => $request->input('items')->sum('itemTaxPrice'),
-                    //totTaxAmt will be the totals for all products totTaxAmt's
-                    'totTaxAmt' =>$taxableAmount,
-                    //    'totTaxAmt' => $request->input('items')->sum('taxAmt'),
-                    //totAmt will be the totals for all products totAmt's
-                    'totAmt' =>$totalAmount,
-                    'remark' => $data['remark'],
-                ]);
+                 
                 return redirect()->to('purchase')->with('success', 'Purchase Created Successfully');
             }
         } catch (\Exception $e) {
@@ -783,19 +785,27 @@ class PurchaseController extends Controller
 
         if (\Auth::user()->can('show purchase')) {
             try {
+                \Log::info('ids');
+                \Log::info($ids);
                 $id = Crypt::decrypt($ids);
             } catch (\Throwable $th) {
+                \Log::info('th');
+                \Log::info($th);
                 return redirect()->back()->with('error', __('Purchase Not Found.'));
             }
 
             $id = Crypt::decrypt($ids);
             $purchase = Purchase::find($id);
 
+            \Log::info('PURCHASE');
+            \Log::info($purchase);
+
             if ($purchase->created_by == \Auth::user()->creatorId()) {
 
                 $purchasePayment = PurchasePayment::where('purchase_id', $purchase->id)->first();
                 $vendor = $purchase->vender;
-                $iteams = $purchase->items;
+                \Log::info($purchase->id);
+                $iteams = PurchaseProduct::where('purchase_id', $purchase->id)->get();
 
                 return view('purchase.view', compact('purchase', 'vendor', 'iteams', 'purchasePayment'));
             } else {
