@@ -350,42 +350,43 @@ class PurchaseController extends Controller
      */
     public function create($vendorId)
     {
-        if (\Auth::user()->type == 'company') {
+        // if(\Auth::user()->can('create purchase'))
+        // {
         $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
         $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
         $category->prepend('Select Category', '');
 
-        $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
-        $venders = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'spplrNm');
-        $venders->prepend('Select Vender', '');
-        $suppliers = Vender::all()->pluck('name', 'id');
-        $suppliers->prepend('Select Supplier', '');
+            $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
+            $venders = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'spplrNm');
+            $venders->prepend('Select Vender', '');
+            $suppliers = Vender::all()->pluck('name', 'id');
+            $suppliers->prepend('Select Supplier', '');
 
-        $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-        $warehouse->prepend('Select Warehouse', '');
+            $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $warehouse->prepend('Select Warehouse', '');
 
-        // $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->where('type','!=', 'service')->get()->pluck('name', 'id');
-        // $product_services->prepend('--', '');
-        $product_services = ItemInformation::get()->pluck('itemNm', 'id');
-        $product_services_Codes = ItemInformation::get()->pluck('itemNm', 'itemCd');
-        $product_services_Codes->prepend('--', '');
-        $product_services->prepend('--', '');
+            // $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->where('type','!=', 'service')->get()->pluck('name', 'id');
+            // $product_services->prepend('--', '');
+            $product_services = ItemInformation::get()->pluck('itemNm', 'id');
+            $product_services_Codes = ItemInformation::get()->pluck('itemNm', 'itemCd');
+            $product_services_Codes->prepend('--', '');
+            $product_services->prepend('--', '');
 
-        // Fetch countries code  from the details model
-        $countries = Details::where('cdCls', '05')->get();
-        // Fetch countries data from the Details model where cdCls is 05
-        $countries = Details::where('cdCls', '05')->get()->pluck('cdNm', 'cdVal');
-        $paymentTypeCodes = PaymentTypeCodes::get()->pluck('payment_type_code', 'code');
-        $purchaseTypeCodes = PurchaseTypeCodes::get()->pluck('purchase_type_code', 'code');
-        $purchaseStatusCodes = PurchaseStatusCodes::get()->pluck('purchase_status_code', 'code');
-        $ReceiptTypesCodes = ReceiptTypeCodes::get()->pluck('receipt_type_code', 'receipt_type_code');
+            // Fetch countries code  from the details model
+            $countries = Details::where('cdCls', '05')->get();
+            // Fetch countries data from the Details model where cdCls is 05
+            $countries = Details::where('cdCls', '05')->get()->pluck('cdNm', 'cdVal');
+            $paymentTypeCodes = PaymentTypeCodes::get()->pluck('payment_type_code', 'code');
+            $purchaseTypeCodes = PurchaseTypeCodes::get()->pluck('purchase_type_code', 'code');
+            $purchaseStatusCodes = PurchaseStatusCodes::get()->pluck('purchase_status_code', 'code');
+            $ReceiptTypesCodes = ReceiptTypeCodes::get()->pluck('receipt_type_code', 'receipt_type_code');
 
         return view('purchase.create', compact('venders', 'product_services_Codes', 'paymentTypeCodes', 'purchaseTypeCodes', 'purchaseStatusCodes', 'ReceiptTypesCodes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
-        }
-        else
-        {
-            return redirect()->back()->with('error', 'Permission Denied');
-        }
+        // }
+        // else
+        // {
+        //     return response()->json(['error' => __('Permission denied.')], 401);
+        // }
     }
 
 
@@ -525,24 +526,24 @@ class PurchaseController extends Controller
                 $confirmDate = date('YmdHis', strtotime($request->input('confirmDate')));
                 $warehouseDate = date('YmdHis', strtotime($request->input('receiptPublishDate')));
 
-               
+
                 $purchaseItemsList = [];
-                
+
                 $apiRequestData = [
-                'supplierTin' => $request->input('supplierTin'),
-                'supplierBhfId' => $request->input('supplierBhfId'),
-                'supplierName' => $request->input('supplierName'),
-                'supplierInvcNo' => $request->input('supplierInvcNo'),
-                'purchTypeCode' => $request->input('purchTypeCode'),
-                'purchStatusCode' => $request->input('purchStatusCode'),
-                'pmtTypeCode' => $request->input('pmtTypeCode'),
-                'purchDate' => $purchDate,
-                'occurredDate' => $occurredDate,
-                'confirmDate' => $confirmDate,
-                'warehouseDate' => $warehouseDate,
-                'remark' => $request->input('remark'),
-                'mapping' => $request->input('mapping'),
-                'itemsDataList' => $purchaseItemsList,
+                    'supplierTin' => $request->input('supplierTin'),
+                    'supplierBhfId' => $request->input('supplierBhfId'),
+                    'supplierName' => $request->input('supplierName'),
+                    'supplierInvcNo' => $request->input('supplierInvcNo'),
+                    'purchTypeCode' => $request->input('purchTypeCode'),
+                    'purchStatusCode' => $request->input('purchStatusCode'),
+                    'pmtTypeCode' => $request->input('pmtTypeCode'),
+                    'purchDate' => $purchDate,
+                    'occurredDate' => $occurredDate,
+                    'confirmDate' => $confirmDate,
+                    'warehouseDate' => $warehouseDate,
+                    'remark' => $request->input('remark'),
+                    'mapping' => $request->input('mapping'),
+                    'itemsDataList' => $purchaseItemsList,
                 ];
                 $totalAmount = 0;
 
@@ -741,9 +742,7 @@ class PurchaseController extends Controller
                 \Log::info('Purchase INV REQ DATA  Before posting to Api :', $apiRequestData);
 
                     //Send request to API endpoint
-                // $response = Http::withOptions([
-                //     'verify' => false
-                // ])->withHeaders([
+                // $response = Http::withHeaders([
                 //     'accept' => 'application/json',
                 //     'key' => '123456',
                 //     'Content-Type' => 'application/json',
@@ -852,7 +851,6 @@ class PurchaseController extends Controller
             \Log::info($purchase);
             $category = ProductServiceCategory::all()->pluck('name', 'id');
             $warehouse = warehouse::all()->pluck('name', 'id');
-
             $purchase_number = $purchase->purchase_id;
             $venders = Vender::all()->pluck('name', 'id');
             $product_services = ItemInformation::all()->pluck('itemNm', 'id');
@@ -862,7 +860,6 @@ class PurchaseController extends Controller
             return response()->json(['error' => __('Permission denied.')], 401);
         }
     }
-
     public function update(Request $request, PurchaseProduct $purchase)
     {
         try {
