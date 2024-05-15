@@ -237,8 +237,7 @@
                 var el = $(this).closest('[data-clone]');
                 var price = parseFloat($(this).val());
                 var quantity = parseFloat($(el.find('.quantity')).val());
-                var discount = parseFloat($(el.find('.discount')).val()) ||
-                    0; // Use default value if discount is not provided
+                var discount = parseFloat($(el.find('.discount')).val()) || 0;
                 var totalItemPrice = (quantity * price) - discount;
 
                 var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
@@ -305,8 +304,8 @@
                 });
 
                 // Update total discount and Discount Amount input field for the closest cloned form
-                el.parent().find('.totalDiscount').html(totalDiscountAmount.toFixed(2));
-                el.closest('[data-clone]').find('.discountAmt').val(totalDiscountAmount.toFixed(2));
+                el.parent().find('.totalDiscount').html(totalDiscountAmount.toFixed(2) || 0);
+                el.closest('[data-clone]').find('.discountAmt').val(totalDiscountAmount.toFixed(2) || 0);
 
                 // Update total amount
                 var totalAmount = totalItemPrice + totalItemTaxPrice;
@@ -495,66 +494,57 @@
                 </div>
                 <div class="card-body table-border-style">
                     <div class="table-responsive">
-                        <table class="table mb-0" data-repeater-list="items" id="sortable-table">
+                        <table class="table mb-0">
                             <thead>
                             </thead>
-                            <tbody class="ui-sortable" data-repeater-item data-clone>
-                                <tr>
-                                    <td width="25%" class="form-group pt-1">
-                                        {{ Form::label('itemCode', __('Item Code'), ['class' => 'form-label']) }}
-                                        {{ Form::select('itemCode', $product_services_Codes, '', ['class' => 'form-control select2 itemCode', 'data-url' => route('productservice.getiteminformation'), 'required' => 'required']) }}
-                                    </td>                                   
-                                </tr>
-                                <tr>
-                                    <td>
-                                        {{ Form::label('supplritemClsCode', __('Supplier Item Cls Code'), ['class' => 'form-label']) }}
-                                        {{ Form::text('supplrItemClsCode', null, ['class' => 'form-control', 'required' => 'required']) }}
-                                        <small class="text-dark">Supplier Item Cls Code length must be 8 characters
-                                        </small>
-                                    </td>
-                                    <td>
-                                        {{ Form::label('supplierItemCode', __('Supplier Item Code'), ['class' => 'form-label']) }}
-                                        {{ Form::text('supplrItemCode', null, ['class' => 'form-control supplierItemCode', 'required' => 'required']) }}
-                                    </td>
-                                    <td>
-                                        {{ Form::label('supplrItemName', __('Supplier Item Name'), ['class' => 'form-label']) }}
-                                        {{ Form::text('supplrItemName', null, ['class' => 'form-control supplrItemName', 'required' => 'required']) }}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        {{ Form::label('quantity', __('Quantity'), ['class' => 'form-label']) }}
-                                        {{ Form::number('quantity', null, ['class' => 'form-control quantity', 'required' => 'required', 'placeholder' => __('Quantity'), 'required' => 'required']) }}
-                                    </td>
-                                    <td>
-                                        {{ Form::label('unitPrice', __('Unit Price'), ['class' => 'form-label']) }}
-                                        {{ Form::number('unitPrice', null, ['class' => 'form-control unitPrice', 'required' => 'required', 'placeholder' => __('unitPrice'), 'required' => 'required']) }}
-
-                                    </td>
-                                    <td>
-                                        {{ Form::label('pkgQuantity', __('Pkg Quantity'), ['class' => 'form-label']) }}
-                                        {{ Form::number('pkgQuantity', null, ['class' => 'form-control pkgQuantity', 'required' => 'required']) }}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        {{ Form::label('discount', __('Discount Rate (%)'), ['class' => 'form-label']) }}
-                                        {{ Form::number('discount', null, ['class' => 'form-control discount', 'required' => 'required']) }}
-                                    </td>
-                                    <td>
-                                        {{ Form::label('discountAmt', __('Discount Amount'), ['class' => 'form-label']) }}
-                                        {{ Form::text('discountAmt', null, ['class' => 'form-control discountAmt', 'required' => 'required']) }}
-                                    </td>
-                                    <td>
-                                        {{ Form::label('itemExprDt', __('item Expire Date'), ['class' => 'form-label']) }}
-                                        {{ Form::date('itemExprDt', null, ['class' => 'form-control itemExprDt', 'required' => 'required']) }}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <a href="#"
-                                            class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2"
-                                            data-repeater-delete></a>
+                            <tbody data-repeater-list="items" id="sortable-table">
+                                <tr class="ui-sortable" data-repeater-item data-clone>
+                                    <td class="row">
+                                        <div class="form-group col-4">
+                                            {{ Form::label('itemCode', __('Item Code'), ['class' => 'form-label']) }}
+                                            {{ Form::select('itemCode', $product_services_Codes, '', ['class' => 'form-control select2 itemCode', 'data-url' => route('productservice.getiteminformation'), 'required' => 'required']) }}
+                                        </div>
+                                        <div class="form-group col-4">
+                                            {{ Form::label('supplritemClsCode', __('Supplier Item Cls Code'), ['class' => 'form-label']) }}
+                                            {{ Form::text('supplrItemClsCode', null, ['class' => 'form-control', 'required' => 'required']) }}
+                                        </div>
+                                        <div class="form-group col-4">
+                                            {{ Form::label('supplierItemCode', __('Supplier Item Code'), ['class' => 'form-label']) }}
+                                            {{ Form::text('supplrItemCode', null, ['class' => 'form-control supplierItemCode', 'required' => 'required']) }}
+                                        </div>
+                                        <div class="form-group col-4">
+                                            {{ Form::label('supplrItemName', __('Supplier Item Name'), ['class' => 'form-label']) }}
+                                            {{ Form::text('supplrItemName', null, ['class' => 'form-control supplrItemName', 'required' => 'required']) }}
+                                        </div>
+                                        <div class="form-group col-4">
+                                            {{ Form::label('quantity', __('Quantity'), ['class' => 'form-label']) }}
+                                            {{ Form::number('quantity', null, ['class' => 'form-control quantity', 'required' => 'required', 'placeholder' => __('Quantity'), 'required' => 'required']) }}
+                                        </div>
+                                        <div class="form-group col-4">
+                                            {{ Form::label('unitPrice', __('Unit Price'), ['class' => 'form-label']) }}
+                                            {{ Form::number('unitPrice', null, ['class' => 'form-control unitPrice', 'required' => 'required', 'placeholder' => __('unitPrice'), 'required' => 'required']) }}
+                                        </div>
+                                        <div class="form-group col-4">
+                                            {{ Form::label('pkgQuantity', __('Pkg Quantity'), ['class' => 'form-label']) }}
+                                            {{ Form::number('pkgQuantity', null, ['class' => 'form-control pkgQuantity', 'required' => 'required']) }}
+                                        </div>
+                                        <div class="form-group col-4">
+                                            {{ Form::label('discount', __('Discount Rate (%)'), ['class' => 'form-label']) }}
+                                            {{ Form::number('discount', null, ['class' => 'form-control discount', 'required' => 'required']) }}
+                                        </div>
+                                        <div class="form-group col-4">
+                                            {{ Form::label('discountAmt', __('Discount Amount'), ['class' => 'form-label']) }}
+                                            {{ Form::text('discountAmt', null, ['class' => 'form-control discountAmt', 'required' => 'required']) }}
+                                        </div>
+                                        <div class="form-group col-4">
+                                            {{ Form::label('itemExprDt', __('item Expire Date'), ['class' => 'form-label']) }}
+                                            {{ Form::date('itemExprDt', null, ['class' => 'form-control itemExprDt', 'required' => 'required']) }}
+                                        </div>
+                                        <div>
+                                            <a href="#"
+                                                class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2"
+                                                data-repeater-delete></a>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
