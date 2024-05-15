@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SalesCreditNote;
-use App\Models\InvoiceStatusCode;
-use App\Models\PaymentTypeCodes;
-use App\Models\SalesTypeCode;
-use App\Models\CreditNoteReason;
 use App\Models\Sales;
-use App\Models\SalesCreditNoteItems;
 use App\Models\SalesItems;
-use App\Models\ItemInformation;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\SalesTypeCode;
+use App\Models\ItemInformation;
+use App\Models\SalesCreditNote;
+use App\Models\CreditNoteReason;
+use App\Models\PaymentTypeCodes;
+use App\Models\InvoiceStatusCode;
+use App\Http\Controllers\Controller;
+use App\Models\SalesCreditNoteItems;
+use Illuminate\Support\Facades\Http;
 
 class SalesCreditNoteController extends Controller
 {

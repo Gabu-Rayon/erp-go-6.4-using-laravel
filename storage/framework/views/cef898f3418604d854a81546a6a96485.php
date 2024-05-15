@@ -35,29 +35,12 @@
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create credit note')): ?>
-        <div class="d-inline-block mb-4">
-                <!-- <?php echo e(Form::open(['url' => 'credit.note.GetSalesByTraderInvoiceNo', 'class' => 'w-100'])); ?> -->
-                <?php echo e(Form::open(['route' => 'credit.note.GetSalesByTraderInvoiceNo', 'method' => 'GET', 'class' => 'w-100'])); ?>
-
-                <?php echo csrf_field(); ?>
-                <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
-                <div class="form-group">
-                    <?php echo e(Form::label('GetSalesByTraderInvoiceNo', __('Get Sales By Trader Invoice No'), ['class' => 'form-label'])); ?>
-
-                    <?php echo e(Form::number('GetSalesByTraderInvoiceNo', null, ['class' => 'form-control', 'required' => 'required'])); ?>
-
-                </div>
-                <button type="submit" class="btn btn-primary  sync"><?php echo e(__('Search      ')); ?></button>
-                <?php echo e(Form::close()); ?>
-
-            </div>
             <a href="#" data-url="<?php echo e(route('invoice.custom.credit.note')); ?>"data-bs-toggle="tooltip" title="<?php echo e(__('Create')); ?>" data-ajax-popup="true" data-title="<?php echo e(__('Create New Credit Note')); ?>" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
         <?php endif; ?>
     </div>
 <?php $__env->stopSection(); ?>
-
 
 <?php $__env->startSection('content'); ?>
     <div class="row">

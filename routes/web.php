@@ -499,7 +499,6 @@ Route::group(['middleware' => ['verified']], function () {
             ],
         ], function () {
             Route::get('invoice/{id}/duplicate', [InvoiceController::class, 'duplicate'])->name('invoice.duplicate');
-            Route::get('invoice/credit/note/{id}', [InvoiceController::class, 'addCreditNote'])->name('invoice.credit.note');
             Route::get('invoice/{id}/shipping/print', [InvoiceController::class, 'shippingDisplay'])->name('invoice.shipping.print');
             Route::get('invoice/{id}/payment/reminder', [InvoiceController::class, 'paymentReminder'])->name('invoice.payment.reminder');
             Route::get('invoice/index', [InvoiceController::class, 'index'])->name('invoice.index');

@@ -3,9 +3,9 @@
     {{ __('Invoice Detail') }}
 @endsection
 @section('breadcrumb')
-    <li class="breadcrumb-iteam"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-    <li class="breadcrumb-iteam"><a href="{{ route('invoice.index') }}">{{ __('Invoice') }}</a></li>
-    <li class="breadcrumb-iteam">{{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}</li>
+    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('invoice.index') }}">{{ __('Invoice') }}</a></li>
+    <li class="breadcrumb-item">{{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}</li>
 @endsection
 @php
     $settings = Utility::settings();
@@ -321,7 +321,7 @@
                     @if (!empty($invoicePayment))
                         <div class="all-button-box mx-2 mr-2">
                             <a href="#" class="btn btn-sm btn-primary"
-                                data-url="{{ route('creditNote.create', $invoice->id) }}" data-ajax-popup="true"
+                                data-url="{{ route('invoice.credit.note', $invoice->id) }}" data-ajax-popup="true"
                                 data-title="{{ __('Add Credit Note') }}">
                                 {{ __('Add Credit Note') }}
                             </a>

@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CreditNote;
 use App\Models\Invoice;
 use App\Models\Utility;
+use App\Models\CreditNote;
+use App\Models\SalesCreditNoteItems;
 use Illuminate\Http\Request;
+use App\Models\SalesTypeCode;
+use App\Models\CreditNoteReason;
+use App\Models\PaymentTypeCodes;
+use App\Models\InvoiceStatusCode;
 
 class CreditNoteController extends Controller
 {
@@ -30,21 +35,33 @@ class CreditNoteController extends Controller
     }
 
     public function create($invoice_id)
-    {
+    {    
 
         if(\Auth::user()->can('create credit note'))
         {
-
+            
+            
             $invoiceDue = Invoice::where('id', $invoice_id)->first();
+            $items = SalesCreditNoteItems::all();
+            $creditNoteReasons = CreditNoteReason::all()->pluck('reason', 'reason');
+            $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'saleTypeCode');
+            $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'payment_type_code');
+            $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusCode', 'invoiceStatusCode');
 
-            return view('creditNote.create', compact('invoiceDue', 'invoice_id'));
+            return view('creditNote.create', compact(
+                'invoiceDue', 
+                'invoice_id',
+                'items',
+                'creditNoteReasons',
+                'salesTypeCodes',
+                'paymentTypeCodes',
+                'invoiceStatusCodes'));
         }
         else
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
-
     public function store(Request $request, $invoice_id)
     {
 
