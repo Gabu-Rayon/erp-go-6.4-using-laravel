@@ -239,6 +239,8 @@
                                                 <th></th>
                                             </tr>
 
+                                            {{                \Log::info('ITEAMS')}}
+               {{ \Log::info($iteams)}}
                                             @foreach ($iteams as $item)
                                                 <tr>
                                                     <td> {{ !empty($item->id) ? $item->id : '' }}</td>

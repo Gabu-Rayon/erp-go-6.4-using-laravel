@@ -4,9 +4,9 @@
 
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('breadcrumb'); ?>
-    <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
-    <li class="breadcrumb-item"><a href="<?php echo e(route('invoice.index')); ?>"><?php echo e(__('Invoice')); ?></a></li>
-    <li class="breadcrumb-item"><?php echo e(AUth::user()->invoiceNumberFormat($invoice->invoice_id)); ?></li>
+    <li class="breadcrumb-iteam"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
+    <li class="breadcrumb-iteam"><a href="<?php echo e(route('invoice.index')); ?>"><?php echo e(__('Invoice')); ?></a></li>
+    <li class="breadcrumb-iteam"><?php echo e(AUth::user()->invoiceNumberFormat($invoice->invoice_id)); ?></li>
 <?php $__env->stopSection(); ?>
 <?php
     $settings = Utility::settings();
@@ -320,12 +320,12 @@
 
     <?php if(Gate::check('show invoice')): ?>
         <?php if($invoice->status != 0): ?>
-            <div class="row justify-content-between align-items-center mb-3">
-                <div class="col-md-12 d-flex align-items-center justify-content-between justify-content-md-end">
+            <div class="row justify-content-between align-iteams-center mb-3">
+                <div class="col-md-12 d-flex align-iteams-center justify-content-between justify-content-md-end">
                     <?php if(!empty($invoicePayment)): ?>
                         <div class="all-button-box mx-2 mr-2">
                             <a href="#" class="btn btn-sm btn-primary"
-                                data-url="<?php echo e(route('invoice.credit.note', $invoice->id)); ?>" data-ajax-popup="true"
+                                data-url="<?php echo e(route('creditNote.create', $invoice->id)); ?>" data-ajax-popup="true"
                                 data-title="<?php echo e(__('Add Credit Note')); ?>">
                                 <?php echo e(__('Add Credit Note')); ?>
 
@@ -371,7 +371,7 @@
                             </div>
                             <div class="row">
                                 <div class="col text-end">
-                                    <div class="d-flex align-items-center justify-content-end">
+                                    <div class="d-flex align-iteams-center justify-content-end">
                                         <div class="me-4">
                                             <small>
                                                 <strong><?php echo e(__('Issue Date')); ?> :</strong><br>
@@ -481,7 +481,7 @@
                             <div class="row mt-4">
                                 <div class="col-md-12">
                                     <div class="font-weight-bold"><?php echo e(__('Product Summary')); ?></div>
-                                    <small><?php echo e(__('All items here cannot be deleted.')); ?></small>
+                                    <small><?php echo e(__('All iteams here cannot be deleted.')); ?></small>
                                     <div class="table-responsive mt-2">
                                         <table class="table mb-0 table-striped">
                                             <tr>
@@ -505,78 +505,82 @@
                                                 $taxesData = [];
                                             ?>
                                             <?php $__currentLoopData = $iteams; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $iteam): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                
-                                                <tr>
-                                                    <td><?php echo e($key + 1); ?></td>
+                                                <td> <?php echo e(!empty($iteam->id) ? $iteam->id : ''); ?></td>
+                                                <td><?php echo e(!empty($iteam->itemName) ? $iteam->itemName : ''); ?></td>
+                                                <td><?php echo e(!empty($iteam->quantity) ? $iteam->quantity : ''); ?></td>
+                                                <td>Kes <?php echo e(!empty($iteam->unitPrice) ? $iteam->unitPrice : ''); ?></td>
+                                                <td><?php echo e(!empty($iteam->discountAmt) ? $iteam->discountAmt : ''); ?></td>
+                                                <td>
                                                     <?php
-                                                        $productName = $iteam->product;
-                                                        $totalRate += $iteam->price;
-                                                        $totalQuantity += $iteam->quantity;
-                                                        $totalDiscount += $iteam->discount;
+                                                        // Map taxTypeCode to its corresponding description
+                                                        $taxDescription = '';
+                                                        switch ($iteam->taxTypeCode) {
+                                                            case 'A':
+                                                                $taxDescription = 'A-Exmpt';
+                                                                break;
+                                                            case 'B':
+                                                                $taxDescription = 'B-VAT 16%';
+                                                                break;
+                                                            case 'C':
+                                                                $taxDescription = 'C-Zero Rated';
+                                                                break;
+                                                            case 'D':
+                                                                $taxDescription = 'D-Non VAT';
+                                                                break;
+                                                            case 'E':
+                                                                $taxDescription = 'E-VAT 8%';
+                                                                break;
+                                                            case 'F':
+                                                                $taxDescription = 'F-Non Tax';
+                                                                break;
+                                                            default:
+                                                                $taxDescription = ''; // Handle unknown tax codes here
+                                                                break;
+                                                        }
                                                     ?>
-                                                    <td><?php echo e(!empty($productName) ? $productName->name : ''); ?></td>
-                                                    <td><?php echo e($iteam->quantity . ' (' . $productName->unit->name . ')'); ?></td>
-                                                    <td><?php echo e(\Auth::user()->priceFormat($iteam->price)); ?></td>
-                                                    <td><?php echo e(\Auth::user()->priceFormat($iteam->discount)); ?></td>
+                                                    <?php echo e($taxDescription); ?>
 
-                                                    
-
-                                                    <td>
-                                                        <?php if(!empty($iteam->tax)): ?>
-                                                            <table>
-                                                                <?php
-                                                                    $itemTaxes = [];
-                                                                    $getTaxData = Utility::getTaxData();
-
-                                                                    if (!empty($iteam->tax)) {
-                                                                        foreach (explode(',', $iteam->tax) as $tax) {
-                                                                            $taxPrice = \Utility::taxRate($getTaxData[$tax]['rate'], $iteam->price, $iteam->quantity);
-                                                                            $totalTaxPrice += $taxPrice;
-                                                                            $itemTax['name'] = $getTaxData[$tax]['name'];
-                                                                            $itemTax['rate'] = $getTaxData[$tax]['rate'] . '%';
-                                                                            $itemTax['price'] = \Auth::user()->priceFormat($taxPrice);
-
-                                                                            $itemTaxes[] = $itemTax;
-                                                                            if (array_key_exists($getTaxData[$tax]['name'], $taxesData)) {
-                                                                                $taxesData[$getTaxData[$tax]['name']] = $taxesData[$getTaxData[$tax]['name']] + $taxPrice;
-                                                                            } else {
-                                                                                $taxesData[$getTaxData[$tax]['name']] = $taxPrice;
-                                                                            }
-                                                                        }
-                                                                        $iteam->itemTax = $itemTaxes;
-                                                                    } else {
-                                                                        $iteam->itemTax = [];
-                                                                    }
-                                                                ?>
-                                                                <?php $__currentLoopData = $iteam->itemTax; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tax): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-
-                                                                        <tr>
-                                                                            <td><?php echo e($tax['name'] .' ('.$tax['rate'] .'%)'); ?></td>
-                                                                            <td><?php echo e($tax['price']); ?></td>
-                                                                        </tr>
-                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                            </table>
-                                                        <?php else: ?>
-                                                            -
-                                                        <?php endif; ?>
-                                                    </td>
-
-                                                    <td><?php echo e(!empty($iteam->description) ? $iteam->description : '-'); ?></td>
-                                                    <td class="text-end">
-                                                        <?php echo e(\Auth::user()->priceFormat($iteam->price * $iteam->quantity - $iteam->discount + $totalTaxPrice)); ?>
-
-                                                    </td>
+                                                </td>
+                                                <td><?php echo e(!empty($iteam->description) ? $iteam->description : ''); ?></td>
+                                                <td>Kes <?php echo e(!empty($iteam->price) ? $iteam->price : ''); ?></td>
                                                 </tr>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             <tfoot>
                                                 <tr>
                                                     <td></td>
                                                     <td><b><?php echo e(__('Total')); ?></b></td>
-                                                    <td><b><?php echo e($totalQuantity); ?></b></td>
-                                                    <td><b><?php echo e(\Auth::user()->priceFormat($totalRate)); ?></b></td>
-                                                    <td><b><?php echo e(\Auth::user()->priceFormat($totalDiscount)); ?></b></td>
-                                                    <td><b><?php echo e(\Auth::user()->priceFormat($totalTaxPrice)); ?></b></td>
-                                                    <td></td>
+                                                    <td><b><?php echo e($iteam->sum('quantity')); ?> </b></td>
+                                                    <td><b><?php echo e($iteam->sum('price')); ?> </b></td>
+                                                    <td><b><?php echo e($iteam->sum('discountAmt')); ?></b></td>
+
+
+                                                    <?php
+                                                        $totalTaxableAmount = 0;
+                                                    ?>
+
+                                                    <?php $__currentLoopData = $invoice->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                        <?php
+                                                            // Get the tax rate based on the taxTypeCode
+                                                            switch ($item->taxTypeCode) {
+                                                                case 'B':
+                                                                    $taxRate = 16 / 100; // 16%
+                                                                    break;
+                                                                case 'E':
+                                                                    $taxRate = 8 / 100; // 8%
+                                                                    break;
+                                                                default:
+                                                                    $taxRate = 0; // No tax
+                                                            }
+
+                                                            // Calculate the taxable amount for the product
+                                                            $taxableAmount = $item->price * (1 + $taxRate);
+
+                                                            // Add the taxable amount to the total
+                                                            $totalTaxableAmount += $taxableAmount;
+                                                        ?>
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                                                    <td><b><?php echo e($totalTaxableAmount); ?></b></td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="6"></td>
@@ -726,7 +730,7 @@
                                                     ]); ?>
 
 
-                                                    <a href="#" class="mx-3 btn btn-sm align-items-center bs-pass-para"
+                                                    <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para"
                                                         data-bs-toggle="tooltip" title="Delete"
                                                         data-original-title="<?php echo e(__('Delete')); ?>"
                                                         data-confirm="<?php echo e(__('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?')); ?>"
@@ -776,7 +780,7 @@
                                                             data-url="<?php echo e(URL::to('invoice/' . $bankPayment->id . '/action')); ?>"
                                                             data-size="lg" data-ajax-popup="true"
                                                             data-title="<?php echo e(__('Payment Status')); ?>"
-                                                            class="mx-3 btn btn-sm align-items-center"
+                                                            class="mx-3 btn btn-sm align-iteams-center"
                                                             data-bs-toggle="tooltip" title="<?php echo e(__('Payment Status')); ?>"
                                                             data-original-title="<?php echo e(__('Payment Status')); ?>">
                                                             <i class="ti ti-caret-right text-white"></i>
@@ -791,7 +795,7 @@
                                                     ]); ?>
 
 
-                                                    <a href="#" class="mx-3 btn btn-sm align-items-center bs-pass-para"
+                                                    <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para"
                                                         data-bs-toggle="tooltip" title="Delete"
                                                         data-original-title="<?php echo e(__('Delete')); ?>"
                                                         data-confirm="<?php echo e(__('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?')); ?>"
@@ -848,7 +852,7 @@
                                                 <a data-url="<?php echo e(route('invoice.edit.credit.note', [$creditNote->invoice, $creditNote->id])); ?>"
                                                     data-ajax-popup="true" title="<?php echo e(__('Edit')); ?>"
                                                     data-original-title="<?php echo e(__('Credit Note')); ?>" href="#"
-                                                    class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip"
+                                                    class="mx-3 btn btn-sm align-iteams-center" data-bs-toggle="tooltip"
                                                     data-original-title="<?php echo e(__('Edit')); ?>">
                                                     <i class="ti ti-pencil text-white"></i>
                                                 </a>
@@ -862,7 +866,7 @@
                                                     'id' => 'delete-form-' . $creditNote->id,
                                                 ]); ?>
 
-                                                <a href="#" class="mx-3 btn btn-sm align-items-center bs-pass-para "
+                                                <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para "
                                                     data-bs-toggle="tooltip" title="Delete"
                                                     data-original-title="<?php echo e(__('Delete')); ?>"
                                                     data-confirm="<?php echo e(__('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?')); ?>"
