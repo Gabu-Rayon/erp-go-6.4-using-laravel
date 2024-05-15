@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Crypt;
 use App\Models\ProductServiceCategory;
 use App\Models\MappedPurchaseItemList;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ProductService;
 
 
 class PurchaseController extends Controller
@@ -641,6 +642,41 @@ class PurchaseController extends Controller
                     ];
 
                     array_push($purchaseItemsList, $itemData);
+
+                    // Get the tax code based on tax type code
+                    $taxCode = getTaxCode($itemDetails->taxTyCd);
+                    PurchaseProduct::create([
+                       'purchase_id' => $this->purchaseNumber(),
+                        'product_id' => $itemDetails->id,
+                        'quantity' => $item['quantity'],
+                        'tax' => $taxCode,
+                        'discount' => $item['discountAmt'],
+                        'price' => $item['unitPrice'],
+                        'description' => null,
+                        'saleItemCode' => $data['supplierInvcNo'],
+                        'itemSeq' => $itemDetails->itemSeq,
+                        'itemCd' =>  $itemDetails->itemCd,
+                        'itemClsCd' => $itemDetails->itemClsCd,
+                        'itemNm' =>  $itemDetails->itemNm,
+                        'bcd' => $itemDetails->bcd,
+                        'supplrItemClsCd' => $itemDetails->supplrItemClsCd,
+                        'supplrItemCd' =>  $itemDetails->supplrItemCls,
+                        'supplrIteNm' => $itemDetails->supplrItemNm,
+                        'pkgUnitCd' =>  $itemDetails->pkgUnitCd,
+                        'pkg' => $itemDetails->pkg,
+                        'qtyUnitCd' =>  $itemDetails->qtyUnitCd,
+                        'qty' => $itemDetails->qty,
+                        'prc' => $itemDetails->prc,
+                        'splyAmt' =>  $itemDetails->splyAmt,
+                        'dcAmt' => $item['discountAmt'],
+                        'taxTyCd' =>  $itemDetails->taxTyCd,
+                        'taxblAmt' => $itemTaxAmount,
+                        'taxAmt' => $itemTaxAmount,
+                        'totAmt' => $totalAmount,
+                        'itemExprDt' => $itemExprDate,
+                    ]);
+                    // Update warehouse stock
+                    Utility::addWarehouseStock($itemDetails->id, $item['quantity'], $data['warehouse']);
                 }
 
 
@@ -649,7 +685,9 @@ class PurchaseController extends Controller
                 \Log::info('Purchase INV REQ DATA  Before posting to Api :', $apiRequestData);
 
                     //Send request to API endpoint
-                // $response = Http::withHeaders([
+                // $response = Http::withOptions([
+                //     'verify' => false
+                // ])->withHeaders([
                 //     'accept' => 'application/json',
                 //     'key' => '123456',
                 //     'Content-Type' => 'application/json',
@@ -669,8 +707,8 @@ class PurchaseController extends Controller
                 //     return redirect()->back()->with('error', 'Purchase Inv already exists');
                 // }
 
-                // \Log::info('INV DEYTA');
-                // \Log::info($data);
+                \Log::info('INV DEYTA');
+                \Log::info($data);
 
                 foreach ($purchaseItemsList as $item) {
                     $totalAmount += calculateTotalAmount($item['pkgQuantity'], $item['quantity'], $item['unitPrice']);
@@ -730,45 +768,7 @@ class PurchaseController extends Controller
                     'totAmt' =>$totalAmount,
                     'remark' => $data['remark'],
                 ]);
-
-                foreach ($purchaseItemsList as $item) {
-                    // Get the tax code based on tax type code
-                    $taxCode = getTaxCode($itemDetails->taxTyCd);
-                    PurchaseProduct::create([
-                       'purchase_id' => $this->purchaseNumber(),
-                        'product_id' => $itemDetails->id,
-                        'quantity' => $item['quantity'],
-                        'tax' => $taxCode,
-                        'discount' => $item['discountAmt'],
-                        'price' => $item['unitPrice'],
-                        'description' => null,
-                        'saleItemCode' => $data['supplierInvcNo'],
-                        'itemSeq' => $itemDetails->itemSeq,
-                        'itemCd' =>  $itemDetails->itemCd,
-                        'itemClsCd' => $itemDetails->itemClsCd,
-                        'itemNm' =>  $itemDetails->itemNm,
-                        'bcd' => $itemDetails->bcd,
-                        'supplrItemClsCd' => $itemDetails->supplrItemClsCd,
-                        'supplrItemCd' =>  $itemDetails->supplrItemCls,
-                        'supplrIteNm' => $itemDetails->supplrItemNm,
-                        'pkgUnitCd' =>  $itemDetails->pkgUnitCd,
-                        'pkg' => $itemDetails->pkg,
-                        'qtyUnitCd' =>  $itemDetails->qtyUnitCd,
-                        'qty' => $itemDetails->qty,
-                        'prc' => $itemDetails->prc,
-                        'splyAmt' =>  $itemDetails->splyAmt,
-                        'dcAmt' => $item['discountAmt'],
-                        'taxTyCd' =>  $itemDetails->taxTyCd,
-                        'taxblAmt' => $itemTaxAmount,
-                        'taxAmt' => $itemTaxAmount,
-                        'totAmt' => $totalAmount,
-                        'itemExprDt' => $itemExprDate,
-                    ]);
-                    // Update warehouse stock
-                    Utility::addWarehouseStock($itemDetails->id, $item['quantity'], $data['warehouse']);
-
-                }
-                return redirect()->to('purchase.index')->with('success', 'Purchase Created Successfully');
+                return redirect()->to('purchase')->with('success', 'Purchase Created Successfully');
             }
         } catch (\Exception $e) {
             \Log::info('ADD Purchase ERROR');
