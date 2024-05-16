@@ -146,7 +146,7 @@
                                     <tr>
                                         <td class="Id">
                                             <a href="<?php echo e(route('invoice.show', \Crypt::encrypt($invoice->id))); ?>"
-                                                class="btn btn-outline-primary"><?php echo e(AUth::user()->invoiceNumberFormat($invoice->invoice_id)); ?></a>
+                                                class="btn btn-outline-primary"><?php echo e(Auth::user()->invoiceNumberFormat($invoice->invoice_id)); ?></a>
                                         </td>
                                         <td><?php echo e(Auth::user()->dateFormat($invoice->issue_date)); ?></td>
                                         <td>
