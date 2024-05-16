@@ -138,7 +138,7 @@
                                     <tr>
                                         <td class="Id">
                                             <a href="{{ route('invoice.show', \Crypt::encrypt($invoice->id)) }}"
-                                                class="btn btn-outline-primary">{{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}</a>
+                                                class="btn btn-outline-primary">{{ Auth::user()->invoiceNumberFormat($invoice->invoice_id) }}</a>
                                         </td>
                                         <td>{{ Auth::user()->dateFormat($invoice->issue_date) }}</td>
                                         <td>

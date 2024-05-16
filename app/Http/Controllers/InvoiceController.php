@@ -237,7 +237,7 @@ class InvoiceController extends Controller
     {
 
         // Log the entire request data
-        Log::info('Form data received:', $request->all());
+        \Log::info('Form data received:', $request->all());
         try {
             if (\Auth::user()->can('create invoice')) {
                 $validator = \Validator::make(
@@ -350,18 +350,18 @@ class InvoiceController extends Controller
                 \Log::info('INV REQ DATA');
                 \Log::info($apiRequestData);
 
-                $url = 'https://etims.your-apps.biz/api/AddSale';
+                // $url = 'https://etims.your-apps.biz/api/AddSale';
 
-                $response = Http::withOptions(['verify' => false])->withHeaders([
-                    'key' => '123456'
-                    ])->post($url, $apiRequestData);
+                // $response = Http::withOptions(['verify' => false])->withHeaders([
+                //     'key' => '123456'
+                //     ])->post($url, $apiRequestData);
 
-                \Log::info('SALES API RESPONSE');
-                \Log::info($response);
+                // \Log::info('SALES API RESPONSE');
+                // \Log::info($response);
 
-                if ($response['statusCode'] == 400) {
-                    return redirect()->back()->with('error', 'Trader invoice number already exists');
-                }
+                // if ($response['statusCode'] == 400) {
+                //     return redirect()->back()->with('error', $response['message']);
+                // }
 
                 \Log::info('INV DEYTA');
                 \Log::info($data);

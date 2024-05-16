@@ -1920,6 +1920,7 @@ Route::get('/getpurchasesalesdetailsforsuppliers', [PurchaseController::class, '
 Route::get('/getsupplier/{id}', [PurchaseController::class, 'getSupplier']);
 Route::get('/getitem/{id}', [PurchaseController::class, 'getItem']);
 Route::get('/getcustomer/{id}', [CustomerController::class, 'getCustomer']);
+Route::get('/getcustomerbyname/{name}', [CustomerController::class, 'getCustomerByName']);
 Route::get('stockinfoo/getstockmovelistfromapi', [StockMoveListController::class, 'getStockMoveListFromApi']);
 Route::get('stockinfo/cancel', [StockMoveListController::class, 'cancel'])->name('stockinfo.cancel');
 Route::get('stockinfo/stockmove', [StockMoveListController::class, 'stockmove'])->name('stockinfo.stockmove');

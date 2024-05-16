@@ -62,6 +62,7 @@
                             @foreach ($invoices as $invoice)
                                 @if(!empty($invoice->creditNote))
                                     @foreach ($invoice->creditNote as $creditNote)
+                                    {{ \Log::info($creditNote) }}
                                         <tr>
                                             <td class="Id">
                                                 <a href="{{ route('invoice.show',\Crypt::encrypt($creditNote->invoice)) }}" class="btn btn-outline-primary">{{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}</a>
@@ -69,7 +70,7 @@
                                             <td>{{ (!empty($invoice->customer)?$invoice->customer->name:'-') }}</td>
                                             <td>{{ Auth::user()->dateFormat($creditNote->date) }}</td>
                                             <td>{{ Auth::user()->priceFormat($creditNote->amount) }}</td>
-                                            <td>{{!empty($creditNote->description)?$creditNote->description:'-'}}</td>
+                                            <td>{{!empty($creditNote->remark)?$creditNote->remark:'-'}}</td>
                                             <td>
                                                 @can('edit credit note')
                                                     <div class="action-btn bg-primary ms-2">

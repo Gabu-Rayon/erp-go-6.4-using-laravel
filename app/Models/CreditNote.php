@@ -45,4 +45,5 @@ class CreditNote extends Model
     {
         return $this->hasOne('App\Models\Customer', 'customer_id', 'customer');
     }
+
 }

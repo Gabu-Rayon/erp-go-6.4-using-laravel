@@ -668,4 +668,24 @@ class CustomerController extends Controller
             ]);
         }
     }
+
+    public function getCustomerByName($name)
+    {
+        try {
+            $customerInfo = Customer::where('name', $name)->first();
+            \Log::info('CUSTOMER');
+            \Log::info($customerInfo);
+            return response()->json([
+                'message' => 'success',
+                'data' => $customerInfo
+            ]);
+        } catch (\Exception $e) {
+            \Log::info('Get Item Error');
+            \Log::info($e);
+            return response()->json([
+                'message' => 'error',
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
 }
