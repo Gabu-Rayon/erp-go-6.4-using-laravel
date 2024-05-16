@@ -983,7 +983,7 @@ class InvoiceController extends Controller
                 $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
                 if ($result == 1) {
                     $fileName = time() . "_" . $request->add_receipt->getClientOriginalName();
-                    $request->add_receipt->storeAs('uploads/payment', $fileName);
+                    $request->add_receipt->storeAs('', $fileName);
                     $invoicePayment->add_receipt = $fileName;
                 }
 

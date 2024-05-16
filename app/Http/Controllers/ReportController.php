@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Exports\AccountStatementExport;
 use App\Exports\BalanceSheetExport;
 use App\Exports\LeaveReportExport;
@@ -4894,14 +4893,14 @@ class ReportController extends Controller
             ->selectRaw('(credit_notes.amount) as price')
             ->selectRaw('0 as pay_price')
             ->selectRaw('0 as total_tax')
-            ->selectRaw('credit_notes.date as issue_date')
+            ->selectRaw('credit_notes.creditNoteDate as issue_date')
             ->selectRaw('5 as status')
             ->leftJoin('customers', 'customers.id', 'credit_notes.customer')
             ->leftJoin('invoice_products', 'invoice_products.invoice_id', 'credit_notes.invoice')
             ->leftJoin('invoices', 'invoices.id', 'credit_notes.invoice')
             ->where('invoices.created_by', \Auth::user()->creatorId())
-            ->where('credit_notes.date', '>=', $start)
-            ->where('credit_notes.date', '<=', $end)
+            ->where('credit_notes.creditNoteDate', '>=', $start)
+            ->where('credit_notes.creditNoteDate', '<=', $end)
             ->groupBy('credit_notes.id')
             ->get()
             ->toArray();
@@ -4930,18 +4929,21 @@ class ReportController extends Controller
             ->selectRaw('(credit_notes.id) as invoices')
             ->selectRaw('(credit_notes.amount) as price')
             ->selectRaw('(product_services.name) as product_name')
-            ->selectRaw('credit_notes.date as issue_date')
+            ->selectRaw('credit_notes.creditNoteDate as issue_date')
             ->selectRaw('5 as status')
             ->leftJoin('customers', 'customers.id', 'credit_notes.customer')
             ->leftJoin('invoice_products', 'invoice_products.invoice_id', 'credit_notes.invoice')
             ->leftJoin('product_services', 'product_services.id', 'invoice_products.product_id')
             ->leftJoin('invoices', 'invoices.id', 'credit_notes.invoice')
             ->where('invoices.created_by', \Auth::user()->creatorId())
-            ->where('credit_notes.date', '>=', $start)
-            ->where('credit_notes.date', '<=', $end)
+            ->where('credit_notes.creditNoteDate', '>=', $start)
+            ->where('credit_notes.creditNoteDate', '<=', $end)
             ->groupBy('credit_notes.id', 'product_services.name')
             ->get()
             ->toArray();
+
+            \Log::info('RECEIVABLE DETAILS CREDIT');
+            \Log::info($receivableDetailsCredit);
 
         $mergedArray = [];
         foreach ($receivableDetailsCredit as $item) {
@@ -4974,6 +4976,9 @@ class ReportController extends Controller
         $receivableDetailsCredits = array_values($mergedArray);
 
         $receivableDetails = (array_merge($receivableDetailsInvoice, $receivableDetailsCredits));
+
+        \Log::info('RECEIVABLE DETAILS');
+        \Log::info($receivableDetails);
 
         $agingSummary = Invoice::select('customers.name', 'invoices.due_date as due_date', 'invoices.status as status', 'invoices.invoice_id as invoice_id')
             ->selectRaw('sum((invoice_products.price * invoice_products.quantity) - invoice_products.discount) as price')
