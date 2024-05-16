@@ -103,7 +103,7 @@ class InvoiceController extends Controller
             )
             );
         } else {
-            return response()->json(['error' => __('Permission denied.')], 401);
+            return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
 
@@ -562,7 +562,7 @@ class InvoiceController extends Controller
 
             return view('invoice.edit', compact('customers', 'product_services', 'invoice', 'invoice_number', 'category', 'customFields'));
         } else {
-            return response()->json(['error' => __('Permission denied.')], 401);
+            return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
 

@@ -11,6 +11,7 @@ use App\Models\SalesTypeCode;
 use App\Models\CreditNoteReason;
 use App\Models\PaymentTypeCodes;
 use App\Models\InvoiceStatusCode;
+use App\Models\Customer;
 
 class CreditNoteController extends Controller
 {
@@ -42,6 +43,7 @@ class CreditNoteController extends Controller
             
             
             $invoiceDue = Invoice::where('id', $invoice_id)->first();
+            $customers = Customer::find($invoiceDue->customer_id);
             $items = SalesCreditNoteItems::all();
             $creditNoteReasons = CreditNoteReason::all()->pluck('reason', 'reason');
             $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'saleTypeCode');
@@ -49,7 +51,8 @@ class CreditNoteController extends Controller
             $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusCode', 'invoiceStatusCode');
 
             return view('creditNote.create', compact(
-                'invoiceDue', 
+                'invoiceDue',
+                'customers',
                 'invoice_id',
                 'items',
                 'creditNoteReasons',

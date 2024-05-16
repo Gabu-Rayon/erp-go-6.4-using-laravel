@@ -49,7 +49,7 @@
                 style: style
             });
 
-            // Add an instance of the card Element into the `card-element` <div>.
+            // Add an instance of the card Element into the card-element <div>.
             card.mount('#card-element');
 
             // Create a token or display an error when the form is submitted.
@@ -277,7 +277,7 @@
                                             {{ \Auth::user()->dateFormat($invoice->send_date) }}
                                         @else
                                             @can('send invoice')
-                                                <small>{{ __('Status') }} : {{ __('Not Sent') }}</small>
+                                                <small>{{ _('Status') }} : {{ _('Not Sent') }}</small>
                                             @endcan
                                         @endif
                                     </p>
@@ -295,7 +295,7 @@
                                         <i class="ti ti-report-money text-info"></i>
                                     </div>
                                     <h6 class="text-info my-3">{{ __('Get Paid') }}</h6>
-                                    <p class="text-muted text-sm mb-3">{{ __('Status') }} : {{ __('Awaiting payment') }} </p>
+                                    <p class="text-muted text-sm mb-3">{{ _('Status') }} : {{ _('Awaiting payment') }} </p>
                                     @if ($invoice->status != 0)
                                         @can('create payment invoice')
                                             <a href="#" data-url="{{ route('invoice.payment', $invoice->id) }}"
@@ -318,7 +318,6 @@
         @if ($invoice->status != 0)
             <div class="row justify-content-between align-iteams-center mb-3">
                 <div class="col-md-12 d-flex align-iteams-center justify-content-between justify-content-md-end">
-                    @if (!empty($invoicePayment))
                         <div class="all-button-box mx-2 mr-2">
                             <a href="#" class="btn btn-sm btn-primary"
                                 data-url="{{ route('invoice.credit.note', $invoice->id) }}" data-ajax-popup="true"
@@ -326,7 +325,6 @@
                                 {{ __('Add Credit Note') }}
                             </a>
                         </div>
-                    @endif
                     @if ($invoice->status != 4)
                         <div class="all-button-box mr-2">
                             <a href="{{ route('invoice.payment.reminder', $invoice->id) }}"
@@ -719,7 +717,7 @@
                                                     <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para"
                                                         data-bs-toggle="tooltip" title="Delete"
                                                         data-original-title="{{ __('Delete') }}"
-                                                        data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
+                                                        data-confirm="{{ _('Are You Sure?') . '|' . _('This action can not be undone. Do you want to continue?') }}"
                                                         data-confirm-yes="document.getElementById('delete-form-{{ $payment->id }}').submit();">
                                                         <i class="ti ti-trash text-white"></i>
                                                     </a>
@@ -781,7 +779,7 @@
                                                     <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para"
                                                         data-bs-toggle="tooltip" title="Delete"
                                                         data-original-title="{{ __('Delete') }}"
-                                                        data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
+                                                        data-confirm="{{ _('Are You Sure?') . '|' . _('This action can not be undone. Do you want to continue?') }}"
                                                         data-confirm-yes="document.getElementById('delete-form-{{ $bankPayment->id }}').submit();">
                                                         <i class="ti ti-trash text-white"></i>
                                                     </a>
@@ -850,7 +848,7 @@
                                                 <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para "
                                                     data-bs-toggle="tooltip" title="Delete"
                                                     data-original-title="{{ __('Delete') }}"
-                                                    data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
+                                                    data-confirm="{{ _('Are You Sure?') . '|' . _('This action can not be undone. Do you want to continue?') }}"
                                                     data-confirm-yes="document.getElementById('delete-form-{{ $creditNote->id }}').submit();">
                                                     <i class="ti ti-trash text-white"></i>
                                                 </a>
