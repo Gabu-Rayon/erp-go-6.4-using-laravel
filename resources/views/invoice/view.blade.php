@@ -5,7 +5,7 @@
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
     <li class="breadcrumb-item"><a href="{{ route('invoice.index') }}">{{ __('Invoice') }}</a></li>
-    <li class="breadcrumb-item">{{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}</li>
+    <li class="breadcrumb-item">{{ Auth::user()->invoiceNumberFormat($invoice->invoice_id) }}</li>
 @endsection
 @php
     $settings = Utility::settings();
@@ -319,8 +319,9 @@
             <div class="row justify-content-between align-iteams-center mb-3">
                 <div class="col-md-12 d-flex align-iteams-center justify-content-between justify-content-md-end">
                         <div class="all-button-box mx-2 mr-2">
-                            <a href="#" class="btn btn-sm btn-primary"
-                                data-url="{{ route('invoice.credit.note', $invoice->id) }}" data-ajax-popup="true"
+                            <a
+                                href="{{ route('invoice.credit.note', $invoice->id) }}"
+                                class="btn btn-sm btn-primary"
                                 data-title="{{ __('Add Credit Note') }}">
                                 {{ __('Add Credit Note') }}
                             </a>
