@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\Utility;
 use App\Models\CreditNote;
-use App\Models\CreditNoteItems;
+use App\Models\CreditNoteItem;
 use Illuminate\Http\Request;
 use App\Models\SalesTypeCode;
 use App\Models\ItemInformation;

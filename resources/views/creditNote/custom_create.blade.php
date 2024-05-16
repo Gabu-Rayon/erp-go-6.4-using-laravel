@@ -7,8 +7,6 @@
     <li class="breadcrumb-item"><a href="{{ route('credit.note') }}">{{ __('Credit Notes') }}</a></li>
     <li class="breadcrumb-item">{{ __('Add Direct Credit Note') }}</li>
 @endsection
-
-@<div class="modal-body">
     @push('script-page')
         <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
         <script src="{{ asset('js/jquery.repeater.min.js') }}"></script>
@@ -133,7 +131,7 @@
 
     @section('content')
         <div class="row">
-            {{ Form::open(['url' => 'sales', 'class' => 'w-100']) }}
+            {{ Form::open(array('route' => array('invoice.custom.credit.note'),'method'=>'post')) }}
             <div class="col-12">
                 <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
                 <div class="card">

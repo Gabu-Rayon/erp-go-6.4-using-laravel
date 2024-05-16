@@ -8,8 +8,6 @@
     <li class="breadcrumb-item"><a href="<?php echo e(route('credit.note')); ?>"><?php echo e(__('Credit Notes')); ?></a></li>
     <li class="breadcrumb-item"><?php echo e(__('Add Direct Credit Note')); ?></li>
 <?php $__env->stopSection(); ?>
-
-@<div class="modal-body">
     <?php $__env->startPush('script-page'); ?>
         <script src="<?php echo e(asset('js/jquery-ui.min.js')); ?>"></script>
         <script src="<?php echo e(asset('js/jquery.repeater.min.js')); ?>"></script>
@@ -134,7 +132,7 @@
 
     <?php $__env->startSection('content'); ?>
         <div class="row">
-            <?php echo e(Form::open(['url' => 'sales', 'class' => 'w-100'])); ?>
+            <?php echo e(Form::open(array('route' => array('invoice.custom.credit.note'),'method'=>'post'))); ?>
 
             <div class="col-12">
                 <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
