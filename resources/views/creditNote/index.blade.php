@@ -28,19 +28,18 @@
 @endpush
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
-    <li class="breadcrumb-item">{{__('Credit Note')}}</li>
+    <li class="breadcrumb-item">{{__('Credit Notes')}}</li>
 @endsection
 
 @section('action-btn')
     <div class="float-end">
         @can('create credit note')
-            <a href="#" data-url="{{ route('invoice.custom.credit.note') }}"data-bs-toggle="tooltip" title="{{__('Create')}}" data-ajax-popup="true" data-title="{{__('Create New Credit Note')}}" class="btn btn-sm btn-primary">
+            <a href="{{ route('invoice.custom.credit.note') }}" data-bs-toggle="tooltip" title="{{__('Add Direct Credit Note')}}" data-title="{{__('Add Direct Credit Note')}}" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
         @endcan
     </div>
 @endsection
-
 @section('content')
     <div class="row">
         <div class="col-md-12">
