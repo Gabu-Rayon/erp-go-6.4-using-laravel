@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sales_credit_note_items', function (Blueprint $table) {
+        Schema::create('credit_note_items', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('sales_credit_note_id');
+            $table->BigInteger('sales_credit_note_id');
             $table->string('itemCode');
             $table->string('itemClassCode');
             $table->string('itemTypeCode');
@@ -30,8 +30,7 @@ return new class extends Migration
             $table->decimal('discountAmt', 10, 2);
             $table->string('itemExprDate');
             $table->timestamps();
-
-            $table->foreign('sales_credit_note_id')->references('id')->on('sales_credit_notes')->onDelete('cascade');
+           
         });
     }
 

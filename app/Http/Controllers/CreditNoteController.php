@@ -4,14 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\Utility;
+use App\Models\Customer;
 use App\Models\CreditNote;
-use App\Models\SalesCreditNoteItems;
 use Illuminate\Http\Request;
 use App\Models\SalesTypeCode;
+use App\Models\ItemInformation;
 use App\Models\CreditNoteReason;
 use App\Models\PaymentTypeCodes;
 use App\Models\InvoiceStatusCode;
+<<<<<<< HEAD
+use App\Models\SalesCreditNoteItems;
+=======
 use App\Models\Customer;
+>>>>>>> 16df5f1828ffb0b9d952c8a0d10e0833420d20fa
 use App\Models\ItemInformation;
 use Illuminate\Support\Facades\Http;
 
@@ -45,7 +50,13 @@ class CreditNoteController extends Controller
             
             
             $invoiceDue = Invoice::where('id', $invoice_id)->first();
+<<<<<<< HEAD
+            // Retrieve customer details
+            $customer = Customer::find($invoiceDue->customer_id);
+            
+=======
             $customers = Customer::find($invoiceDue->customer_id)->pluck('name', 'name');
+>>>>>>> 16df5f1828ffb0b9d952c8a0d10e0833420d20fa
             $items = SalesCreditNoteItems::all();
             $itemsToAdd = ItemInformation::all()->pluck('itemNm', 'itemCd');
             $creditNoteReasons = CreditNoteReason::all()->pluck('reason', 'reason');
@@ -61,7 +72,8 @@ class CreditNoteController extends Controller
                 'creditNoteReasons',
                 'salesTypeCodes',
                 'paymentTypeCodes',
-                'invoiceStatusCodes',
+                'invoiceStatusCodes'
+            ,'customer',
                 'itemsToAdd'
             ));
         }
@@ -285,7 +297,25 @@ class CreditNoteController extends Controller
 
             $invoices = Invoice::where('created_by', \Auth::user()->creatorId())->get()->pluck('invoice_id', 'id');
 
-            return view('creditNote.custom_create', compact('invoices'));
+            // Retrieve customer details
+            $customer = Customer::all();
+            $items = SalesCreditNoteItems::all();
+            $creditNoteReasons = CreditNoteReason::all()->pluck('reason', 'reason');
+            $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'saleTypeCode');
+            $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'payment_type_code');
+            $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusCode', 'invoiceStatusCode');
+            $product_services = ItemInformation::get()->pluck('itemNm', 'id');
+            $product_services_Codes = ItemInformation::get()->pluck('itemNm', 'itemCd');
+            $product_services_Codes->prepend('--', '');
+            $product_services->prepend('--', '');
+
+            return view('creditNote.custom_create', compact(
+                'invoices','items',
+                'creditNoteReasons',
+                'salesTypeCodes','product_services_Codes',
+                'paymentTypeCodes',
+                'invoiceStatusCodes','customer'
+            ));
         }
         else
         {
@@ -345,6 +375,18 @@ class CreditNoteController extends Controller
         echo json_encode($invoice->getDue());
     }
 
+    public function getItemsToAddDirectCreditNote(Request $request){
+        // Fetch item information based on the item code
+        $itemCd = $request->input('itemCode');
+        $itemInfo['data'] = ItemInformation::where('itemCd', $itemCd)->first();
 
+        if ($itemInfo['data']) {
+            // Return item information as JSON response
+            return response()->json($itemInfo);
+        } else {
+            // If item information not found, return empty response
+            return response()->json([]);
+        }
+    }
 
 }

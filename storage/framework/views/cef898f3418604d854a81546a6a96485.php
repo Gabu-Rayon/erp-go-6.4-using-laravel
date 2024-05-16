@@ -29,19 +29,18 @@
 <?php $__env->stopPush(); ?>
 <?php $__env->startSection('breadcrumb'); ?>
     <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
-    <li class="breadcrumb-item"><?php echo e(__('Credit Note')); ?></li>
+    <li class="breadcrumb-item"><?php echo e(__('Credit Notes')); ?></li>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create credit note')): ?>
-            <a href="#" data-url="<?php echo e(route('invoice.custom.credit.note')); ?>"data-bs-toggle="tooltip" title="<?php echo e(__('Create')); ?>" data-ajax-popup="true" data-title="<?php echo e(__('Create New Credit Note')); ?>" class="btn btn-sm btn-primary">
+            <a href="<?php echo e(route('invoice.custom.credit.note')); ?>" data-bs-toggle="tooltip" title="<?php echo e(__('Add Direct Credit Note')); ?>" data-title="<?php echo e(__('Add Direct Credit Note')); ?>" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
         <?php endif; ?>
     </div>
 <?php $__env->stopSection(); ?>
-
 <?php $__env->startSection('content'); ?>
     <div class="row">
         <div class="col-md-12">

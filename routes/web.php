@@ -534,7 +534,6 @@ Route::group(['middleware' => ['verified']], function () {
         ], function () {
             Route::get('credit-note', [CreditNoteController::class, 'index'])->name('credit.note');
             Route::get('custom-credit-note', [CreditNoteController::class, 'customCreate'])->name('invoice.custom.credit.note');
-             Route::get('custom-credit-note', [CreditNoteController::class, 'customCreate'])->name('invoice.custom.credit.note');
             Route::post('custom-credit-note', [CreditNoteController::class, 'customStore'])->name('invoice.custom.credit.note');
             Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('invoice.get');
             Route::get('invoice/{id}/credit-note', [CreditNoteController::class, 'create'])->name('invoice.credit.note');
@@ -542,6 +541,8 @@ Route::group(['middleware' => ['verified']], function () {
             Route::get('invoice/{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'edit'])->name('invoice.edit.credit.note');
             Route::post('invoice/{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'update'])->name('invoice.edit.credit.note');
             Route::delete('invoice/{id}/credit-note/delete/{cn_id}', [CreditNoteController::class, 'destroy'])->name('invoice.delete.credit.note');
+            Route::any('/getItemInformationForAddingDirectCreditNote', [CreditNoteController::class, 'getItemsToAddDirectCreditNote'])->name('invoice.custom.credit.getiteminformation');
+       
         }
     );
     
