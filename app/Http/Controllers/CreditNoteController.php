@@ -339,7 +339,7 @@ class CreditNoteController extends Controller
             $invoices = Invoice::where('created_by', \Auth::user()->creatorId())->get()->pluck('invoice_id', 'id');
 
             // Retrieve customer details
-            $customer = Customer::all()->pluck('name', 'name');
+            $customer = Customer::all()->pluck('name', 'id');
             $invoices = Invoice::all()->pluck('invoiceNo', 'id');
             $creditNoteReasons = CreditNoteReason::all()->pluck('reason', 'reason');
             $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'saleTypeCode');
@@ -483,7 +483,7 @@ class CreditNoteController extends Controller
                 $occurredDate = date('Ymd', strtotime($occurredDate));
 
                 $apiDirectCreditNoteItemsList = [];
-                $localCreditNoteItemsList = [];
+                $localDirectCreditNoteItemsList = [];
                 $totalAmount = 0;
 
                 foreach ($data['items'] as $item) {
@@ -493,7 +493,7 @@ class CreditNoteController extends Controller
                     $itemExprDate = str_replace('-', '', $item['itemExprDate']);
                     $itemExprDate = date('Ymd', strtotime($itemExprDate));
 
-                    $totalForEachProduct = ($item['price'] * $item['quantity'] * $item['pkgQuantity']) - $item['discountAmt'];
+                    $totalForEachProduct = ($item['unitPrice'] * $item['quantity'] * $item['pkgQuantity']) - $item['discountAmt'];
                     $totalAmount += $totalForEachProduct;
 
                     $apiItemData = [
@@ -520,8 +520,8 @@ class CreditNoteController extends Controller
                         'itemExprDate' => $itemExprDate
                     ];
 
-                    array_push($apiCreditNoteItemsList, $apiItemData);
-                    array_push($localCreditNoteItemsList, $localDbItemData);
+                    array_push($apiDirectCreditNoteItemsList, $apiItemData);
+                    array_push($localDirectCreditNoteItemsList, $localDbItemData);
                 }
 
                 $apiRequestData = [
@@ -547,7 +547,7 @@ class CreditNoteController extends Controller
                 \Log::info('FINAL API REQUEST DATA');
                 \Log::info($apiRequestData);
 
-                // $url = 'https://etims.your-apps.biz/api/AddSaleCreditNote';
+                // $url = 'https://etims.your-apps.biz/api/AddDirectCreditNote';
 
                 // $response = Http::withOptions([
                 //     'verify' => false
@@ -564,8 +564,8 @@ class CreditNoteController extends Controller
 
                 $creditNoteCustomer = Customer::where('customerTin', $data['customerTin'])->first();
                 $creditNote = CreditNote::create([
-                    'invoice' => $selectedInvoice,
-                    'orgInvoiceNo' => $selectedInvoice,
+                    'invoice' => $data['invoice'],
+                    'orgInvoiceNo' => $data['orgInvoiceNo'],
                     'customerTin' => $data['customerTin'] ?? null,
                     'customer' => $creditNoteCustomer->id,
                     'customerName' => $creditNoteCustomer->name,
@@ -598,7 +598,7 @@ class CreditNoteController extends Controller
 
                 $totAmt = 0;
 
-                foreach ($apiCreditNoteItemsList as $item) {
+                foreach ($localDirectCreditNoteItemsList as $item) {
 
                     $totalForEachProduct = ($item['unitPrice'] * $item['quantity'] * $item['pkgQuantity']) - $item['discountAmt'];
                     $totAmt += $totalForEachProduct;

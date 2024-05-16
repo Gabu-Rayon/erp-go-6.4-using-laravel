@@ -250,6 +250,10 @@
                                                 <th></th>
                                             </tr>
 
+                                            <?php echo e(\Log::info('ITEAMS')); ?>
+
+               <?php echo e(\Log::info($iteams)); ?>
+
                                             <?php $__currentLoopData = $iteams; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <tr>
                                                     <td> <?php echo e(!empty($item->id) ? $item->id : ''); ?></td>

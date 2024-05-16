@@ -350,12 +350,6 @@
 
                                     </td>
                                     <td class="form-group col-md-3">
-                                        <?php echo e(Form::label('quantity', __('Quantity (*)'), ['class' => 'form-label'])); ?>
-
-                                        <?php echo e(Form::number('quantity', '', ['class' => 'form-control quantity', 'required' => 'required'])); ?>
-
-                                    </td>
-                                    <td class="form-group col-md-3">
                                         <?php echo e(Form::label('discountRate', __('Discount Rate'), ['class' => 'form-label'])); ?>
 
                                         <?php echo e(Form::number('discountRate', '', ['class' => 'form-control discountRate', 'required' => 'required'])); ?>

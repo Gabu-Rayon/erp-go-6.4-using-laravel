@@ -299,10 +299,6 @@
                                         {{ Form::number('pkgQuantity', '', ['class' => 'form-control pkgQuantity', 'required' => 'required']) }}
                                     </td>
                                     <td class="form-group col-md-3">
-                                        {{ Form::label('quantity', __('Quantity (*)'), ['class' => 'form-label']) }}
-                                        {{ Form::number('quantity', '', ['class' => 'form-control quantity', 'required' => 'required']) }}
-                                    </td>
-                                    <td class="form-group col-md-3">
                                         {{ Form::label('discountRate', __('Discount Rate'), ['class' => 'form-label']) }}
                                         {{ Form::number('discountRate', '', ['class' => 'form-control discountRate', 'required' => 'required']) }}
                                     </td>
