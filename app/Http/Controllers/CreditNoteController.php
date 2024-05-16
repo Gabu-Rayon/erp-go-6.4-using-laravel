@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\Utility;
-use App\Models\Customer;
 use App\Models\CreditNote;
 use App\Models\CreditNoteItems;
 use Illuminate\Http\Request;
@@ -13,11 +12,7 @@ use App\Models\ItemInformation;
 use App\Models\CreditNoteReason;
 use App\Models\PaymentTypeCodes;
 use App\Models\InvoiceStatusCode;
-<<<<<<< HEAD
-use App\Models\SalesCreditNoteItems;
-=======
 use App\Models\Customer;
->>>>>>> 16df5f1828ffb0b9d952c8a0d10e0833420d20fa
 
 class CreditNoteController extends Controller
 {
@@ -45,14 +40,10 @@ class CreditNoteController extends Controller
 
 
             $invoiceDue = Invoice::where('id', $invoice_id)->first();
-<<<<<<< HEAD
             // Retrieve customer details
             $customer = Customer::find($invoiceDue->customer_id);
-            
-=======
             $customers = Customer::find($invoiceDue->customer_id);
->>>>>>> 16df5f1828ffb0b9d952c8a0d10e0833420d20fa
-            $items = SalesCreditNoteItems::all();
+            $items = ItemInformation::all();
             $creditNoteReasons = CreditNoteReason::all()->pluck('reason', 'reason');
             $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeValue', 'saleTypeCode');
             $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'id');
