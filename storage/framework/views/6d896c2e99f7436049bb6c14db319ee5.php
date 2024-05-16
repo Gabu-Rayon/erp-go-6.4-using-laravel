@@ -173,18 +173,6 @@
 
     <div class="modal-body">
         <div class="row">
-            <div class="form-group  col-md-6">
-                <?php echo e(Form::label('date', __('Date Here'),['class'=>'form-label'])); ?>
-
-                <?php echo e(Form::date('date',null,array('class'=>'form-control','required'=>'required'))); ?>
-
-            </div>
-            <div class="form-group col-md-6">
-                <?php echo e(Form::label('amount', __('Amount'),['class'=>'form-label'])); ?>
-
-                <?php echo e(Form::number('amount', !empty($invoiceDue)?$invoiceDue->getDue():0, array('class' => 'form-control','required'=>'required','step'=>'0.01'))); ?>
-
-            </div>
             <div class="form-group col-md-3">
                 <?php echo e(Form::label('customerName', __('Customer Name (*)'), ['class' => 'form-label'])); ?>
 
