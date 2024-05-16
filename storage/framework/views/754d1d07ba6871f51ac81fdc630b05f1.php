@@ -4,9 +4,9 @@
 
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('breadcrumb'); ?>
-    <li class="breadcrumb-iteam"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
-    <li class="breadcrumb-iteam"><a href="<?php echo e(route('invoice.index')); ?>"><?php echo e(__('Invoice')); ?></a></li>
-    <li class="breadcrumb-iteam"><?php echo e(AUth::user()->invoiceNumberFormat($invoice->invoice_id)); ?></li>
+    <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
+    <li class="breadcrumb-item"><a href="<?php echo e(route('invoice.index')); ?>"><?php echo e(__('Invoice')); ?></a></li>
+    <li class="breadcrumb-item"><?php echo e(AUth::user()->invoiceNumberFormat($invoice->invoice_id)); ?></li>
 <?php $__env->stopSection(); ?>
 <?php
     $settings = Utility::settings();
@@ -50,7 +50,7 @@
                 style: style
             });
 
-            // Add an instance of the card Element into the `card-element` <div>.
+            // Add an instance of the card Element into the card-element <div>.
             card.mount('#card-element');
 
             // Create a token or display an error when the form is submitted.
@@ -281,7 +281,7 @@
 
                                         <?php else: ?>
                                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('send invoice')): ?>
-                                                <small><?php echo e(__('Status')); ?> : <?php echo e(__('Not Sent')); ?></small>
+                                                <small><?php echo e(_('Status')); ?> : <?php echo e(_('Not Sent')); ?></small>
                                             <?php endif; ?>
                                         <?php endif; ?>
                                     </p>
@@ -299,7 +299,7 @@
                                         <i class="ti ti-report-money text-info"></i>
                                     </div>
                                     <h6 class="text-info my-3"><?php echo e(__('Get Paid')); ?></h6>
-                                    <p class="text-muted text-sm mb-3"><?php echo e(__('Status')); ?> : <?php echo e(__('Awaiting payment')); ?> </p>
+                                    <p class="text-muted text-sm mb-3"><?php echo e(_('Status')); ?> : <?php echo e(_('Awaiting payment')); ?> </p>
                                     <?php if($invoice->status != 0): ?>
                                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create payment invoice')): ?>
                                             <a href="#" data-url="<?php echo e(route('invoice.payment', $invoice->id)); ?>"
@@ -322,16 +322,14 @@
         <?php if($invoice->status != 0): ?>
             <div class="row justify-content-between align-iteams-center mb-3">
                 <div class="col-md-12 d-flex align-iteams-center justify-content-between justify-content-md-end">
-                    <?php if(!empty($invoicePayment)): ?>
                         <div class="all-button-box mx-2 mr-2">
                             <a href="#" class="btn btn-sm btn-primary"
-                                data-url="<?php echo e(route('creditNote.create', $invoice->id)); ?>" data-ajax-popup="true"
+                                data-url="<?php echo e(route('invoice.credit.note', $invoice->id)); ?>" data-ajax-popup="true"
                                 data-title="<?php echo e(__('Add Credit Note')); ?>">
                                 <?php echo e(__('Add Credit Note')); ?>
 
                             </a>
                         </div>
-                    <?php endif; ?>
                     <?php if($invoice->status != 4): ?>
                         <div class="all-button-box mr-2">
                             <a href="<?php echo e(route('invoice.payment.reminder', $invoice->id)); ?>"
@@ -733,7 +731,7 @@
                                                     <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para"
                                                         data-bs-toggle="tooltip" title="Delete"
                                                         data-original-title="<?php echo e(__('Delete')); ?>"
-                                                        data-confirm="<?php echo e(__('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?')); ?>"
+                                                        data-confirm="<?php echo e(_('Are You Sure?') . '|' . _('This action can not be undone. Do you want to continue?')); ?>"
                                                         data-confirm-yes="document.getElementById('delete-form-<?php echo e($payment->id); ?>').submit();">
                                                         <i class="ti ti-trash text-white"></i>
                                                     </a>
@@ -798,7 +796,7 @@
                                                     <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para"
                                                         data-bs-toggle="tooltip" title="Delete"
                                                         data-original-title="<?php echo e(__('Delete')); ?>"
-                                                        data-confirm="<?php echo e(__('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?')); ?>"
+                                                        data-confirm="<?php echo e(_('Are You Sure?') . '|' . _('This action can not be undone. Do you want to continue?')); ?>"
                                                         data-confirm-yes="document.getElementById('delete-form-<?php echo e($bankPayment->id); ?>').submit();">
                                                         <i class="ti ti-trash text-white"></i>
                                                     </a>
@@ -869,7 +867,7 @@
                                                 <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para "
                                                     data-bs-toggle="tooltip" title="Delete"
                                                     data-original-title="<?php echo e(__('Delete')); ?>"
-                                                    data-confirm="<?php echo e(__('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?')); ?>"
+                                                    data-confirm="<?php echo e(_('Are You Sure?') . '|' . _('This action can not be undone. Do you want to continue?')); ?>"
                                                     data-confirm-yes="document.getElementById('delete-form-<?php echo e($creditNote->id); ?>').submit();">
                                                     <i class="ti ti-trash text-white"></i>
                                                 </a>
@@ -895,5 +893,4 @@
 
 
 <?php $__env->stopSection(); ?>
-
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/invoice/view.blade.php ENDPATH**/ ?>
