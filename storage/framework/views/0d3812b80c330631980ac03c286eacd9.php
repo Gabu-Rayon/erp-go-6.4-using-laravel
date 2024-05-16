@@ -6,7 +6,7 @@
 <?php $__env->startSection('breadcrumb'); ?>
     <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
     <li class="breadcrumb-item"><a href="<?php echo e(route('invoice.index')); ?>"><?php echo e(__('Invoice')); ?></a></li>
-    <li class="breadcrumb-item"><?php echo e(AUth::user()->invoiceNumberFormat($invoice->invoice_id)); ?></li>
+    <li class="breadcrumb-item"><?php echo e(Auth::user()->invoiceNumberFormat($invoice->invoice_id)); ?></li>
 <?php $__env->stopSection(); ?>
 <?php
     $settings = Utility::settings();
@@ -323,8 +323,9 @@
             <div class="row justify-content-between align-iteams-center mb-3">
                 <div class="col-md-12 d-flex align-iteams-center justify-content-between justify-content-md-end">
                         <div class="all-button-box mx-2 mr-2">
-                            <a href="#" class="btn btn-sm btn-primary"
-                                data-url="<?php echo e(route('invoice.credit.note', $invoice->id)); ?>" data-ajax-popup="true"
+                            <a
+                                href="<?php echo e(route('invoice.credit.note', $invoice->id)); ?>"
+                                class="btn btn-sm btn-primary"
                                 data-title="<?php echo e(__('Add Credit Note')); ?>">
                                 <?php echo e(__('Add Credit Note')); ?>
 

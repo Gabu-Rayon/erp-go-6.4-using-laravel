@@ -63,6 +63,8 @@
                             <?php $__currentLoopData = $invoices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $invoice): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <?php if(!empty($invoice->creditNote)): ?>
                                     <?php $__currentLoopData = $invoice->creditNote; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $creditNote): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php echo e(\Log::info($creditNote)); ?>
+
                                         <tr>
                                             <td class="Id">
                                                 <a href="<?php echo e(route('invoice.show',\Crypt::encrypt($creditNote->invoice))); ?>" class="btn btn-outline-primary"><?php echo e(AUth::user()->invoiceNumberFormat($invoice->invoice_id)); ?></a>
@@ -70,7 +72,7 @@
                                             <td><?php echo e((!empty($invoice->customer)?$invoice->customer->name:'-')); ?></td>
                                             <td><?php echo e(Auth::user()->dateFormat($creditNote->date)); ?></td>
                                             <td><?php echo e(Auth::user()->priceFormat($creditNote->amount)); ?></td>
-                                            <td><?php echo e(!empty($creditNote->description)?$creditNote->description:'-'); ?></td>
+                                            <td><?php echo e(!empty($creditNote->remark)?$creditNote->remark:'-'); ?></td>
                                             <td>
                                                 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit credit note')): ?>
                                                     <div class="action-btn bg-primary ms-2">
