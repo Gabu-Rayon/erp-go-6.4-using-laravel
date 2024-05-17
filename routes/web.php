@@ -1840,7 +1840,7 @@ Route::group(
         ],
     ],
     function () {
-        Route::resource('updateimporteditems', UpdateImportedItemsController::class);
+        Route::resource('mappimporteditems', ImportedItemsController::class);
     }
 );
 
