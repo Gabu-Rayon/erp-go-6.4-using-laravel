@@ -141,6 +141,7 @@ class PlanController extends Controller
                 'insurancecode' => 'required|string',
                 'insurancename' => 'required|string',
                 'premiumrate' => 'required|numeric',
+                'isUsed' => 'required',
             ]);
 
             // Prepare the data to be sent in the request
@@ -148,7 +149,7 @@ class PlanController extends Controller
                 'insuranceCode' => $request->insurancecode,
                 'insuranceName' => $request->insurancename,
                 'premiumRate' => $request->premiumrate,
-                'isUsed' => true,
+                'isUsed' => $request->isUsed,
             ];
 
             // $requestData = [
@@ -159,6 +160,7 @@ class PlanController extends Controller
             // ];
             // Save the data to the local database using the model
             $insurance = Insurance::create($requestData);
+            $insurance->save();
 
             // Send the POST request to the API endpoint
             $response = Http::withHeaders([
