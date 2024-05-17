@@ -545,7 +545,9 @@ Route::group(['middleware' => ['verified']], function () {
             Route::post('invoice/{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'update'])->name('invoice.edit.credit.note');
             Route::delete('invoice/{id}/credit-note/delete/{cn_id}', [CreditNoteController::class, 'destroy'])->name('invoice.delete.credit.note');
             Route::any('/getItemInformationForAddingDirectCreditNote', [CreditNoteController::class, 'getItemsToAddDirectCreditNote'])->name('invoice.custom.credit.getiteminformation');
-       
+            Route::any('/getCustomerDetailsToAddDirectCreditNote', [CreditNoteController::class, 'getCustomerDetailsToAddDirectCreditNote'])->name('invoice.custom.credit.getcustomerDetails');
+            
+             
         }
     );
     

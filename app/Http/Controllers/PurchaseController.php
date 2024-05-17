@@ -797,27 +797,48 @@ class PurchaseController extends Controller
 
         if (\Auth::user()->can('show purchase')) {
             try {
-                \Log::info('ids');
+                \Log::info('The Ecrypt when user click  show kids :');
+                
                 \Log::info($ids);
+                
                 $id = Crypt::decrypt($ids);
-            } catch (\Throwable $th) {
-                \Log::info('th');
-                \Log::info($th);
+                
+            } catch (\Throwable $e) {
+                
+                \Log::info('Exception Error if the Purchase is not Found :');
+                
+                \Log::info($e);
+                
                 return redirect()->back()->with('error', __('Purchase Not Found.'));
             }
 
             $id = Crypt::decrypt($ids);
+            
             $purchase = Purchase::find($id);
 
-            \Log::info('PURCHASE');
+            \Log::info('PURCHASE Fetched  to show in the View Blade: ');
+            
             \Log::info($purchase);
 
             if ($purchase->created_by == \Auth::user()->creatorId()) {
 
                 $purchasePayment = PurchasePayment::where('purchase_id', $purchase->id)->first();
+                
                 $vendor = $purchase->vender;
+
+                \Log::info('Vender For this Purchase  Fetched  to show in the View Blade : ');
+
+                \Log::info($vendor);
+
+                \Log::info('Purchase Id Fetched  to show in the View Blade : ');
+
                 \Log::info($purchase->id);
+
                 $iteams = PurchaseProduct::where('purchase_id', $purchase->id)->get();
+                
+                \Log::info('Iteams For the Purchase  Fetched  to show in the View Blade : ');
+
+                \Log::info($iteams);
 
                 return view('purchase.view', compact('purchase', 'vendor', 'iteams', 'purchasePayment'));
             } else {

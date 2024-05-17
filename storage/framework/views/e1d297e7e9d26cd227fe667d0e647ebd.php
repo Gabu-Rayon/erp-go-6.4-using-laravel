@@ -31,7 +31,7 @@
                             <?php $__currentLoopData = $warehouse; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $warehouses): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr class="font-style">
                                     <?php if(!empty($warehouses->product)): ?>
-                                        <td><?php echo e(!empty($warehouses->product)? $warehouses->product->name:''); ?></td>
+                                        <td><?php echo e(!empty($warehouses->product)? $warehouses->product->itemNm:''); ?></td>
                                         <td><?php echo e($warehouses->quantity); ?></td>
                                     <?php endif; ?>
                                 </tr>

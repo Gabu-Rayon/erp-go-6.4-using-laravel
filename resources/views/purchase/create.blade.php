@@ -321,75 +321,74 @@
             });
         });
 
-    $(document).ready(function() {
-    $(document).on('change', '.supplierName', function() {
-        var supplier_Info = $(this).val();
-        var url = $(this).data('url');
-        var el = $(this).closest('[data-autofill]');
+        $(document).ready(function() {
+            $(document).on('change', '.supplierName', function() {
+                var supplier_Info = $(this).val();
+                var url = $(this).data('url');
+                var el = $(this).closest('[data-autofill]');
 
-        if (el.length) {
-            console.log("Change event triggered for .supplierName[data-autofill]");
+                if (el.length) {
+                    console.log("Change event triggered for .supplierName[data-autofill]");
 
-            console.log("supplier_Info:", supplier_Info);
-            console.log("url:", url);
-            console.log("el:", el);
+                    console.log("supplier_Info:", supplier_Info);
+                    console.log("url:", url);
+                    console.log("el:", el);
 
-            $.ajax({
-                url: url,
-                type: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': jQuery('#token').val()
-                },
-                data: {
-                    'supplierName': supplier_Info
-                },
-                cache: false,
-                success: function(data) {
-                    try {
-                        console.log("supplier information:", data);
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': jQuery('#token').val()
+                        },
+                        data: {
+                            'supplierName': supplier_Info
+                        },
+                        cache: false,
+                        success: function(data) {
+                            try {
+                                console.log("supplier information:", data);
 
-                        if (!data || Object.keys(data).length === 0) {
-                            console.log("Supplier information is empty.");
-                        } else {
-                            console.log(
-                                "Supplier information is not empty. Processing...");
+                                if (!data || Object.keys(data).length === 0) {
+                                    console.log("Supplier information is empty.");
+                                } else {
+                                    console.log(
+                                        "Supplier information is not empty. Processing...");
 
-                            var supplier = data.data;
+                                    var supplier = data.data;
 
-                            console.log("Supplier object:", supplier);
+                                    console.log("Supplier object:", supplier);
 
-                            console.log("Populating supplierName:", supplier
-                                .spplrNm);
-                            el.find('.supplierName').val(supplier.spplrNm);
+                                    console.log("Populating supplierName:", supplier
+                                        .spplrNm);
+                                    el.find('.supplierName').val(supplier.spplrNm);
 
-                            console.log("Populating supplierTin:", supplier
-                                .spplrTin);
-                            el.find('.supplierTin').val(supplier.spplrTin);
+                                    console.log("Populating supplierTin:", supplier
+                                        .spplrTin);
+                                    el.find('.supplierTin').val(supplier.spplrTin);
 
-                            console.log("Populating supplierBhfId:", supplier
-                                .spplrBhfId);
-                            el.find('.supplierBhfId').val(supplier.spplrBhfId);
+                                    console.log("Populating supplierBhfId:", supplier
+                                        .spplrBhfId);
+                                    el.find('.supplierBhfId').val(supplier.spplrBhfId);
 
-                            console.log("Populating SupplierInvoiceNo:", supplier
-                                .spplrInvcNo);
-                            el.find('.supplierInvcNo').val(supplier
-                                .spplrInvcNo);
+                                    console.log("Populating SupplierInvoiceNo:", supplier
+                                        .spplrInvcNo);
+                                    el.find('.supplierInvcNo').val(supplier
+                                        .spplrInvcNo);
 
-                            console.log("Populating supplier Id:", supplier.id);
-                            el.find('.id').val(supplier.id);
+                                    console.log("Populating supplier Id:", supplier.id);
+                                    el.find('.id').val(supplier.id);
+                                }
+                            } catch (error) {
+                                console.error("Error processing Supplier Information:", error);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error retrieving Supplier Information:", error);
                         }
-                    } catch (error) {
-                        console.error("Error processing Supplier Information:", error);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error retrieving Supplier Information:", error);
+                    });
                 }
             });
-        }
-    });
-});
-
+        });
     </script>
 
     <script>
@@ -412,7 +411,7 @@
                             {{ Form::label('SupplierName', __('supplierName'), ['class' => 'form-label']) }}
                             {{ Form::select('supplierName', $venders, '', ['class' => 'form-control select2 supplierName', 'data-url' => route('venders.getSupplierInformation'), 'required' => 'required']) }}
                         </div>
-                            <div class="form-group col-md-4" id="vender-box">
+                        <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('supplier_id', __('supplier Id'), ['class' => 'form-label']) }}
                             {{ Form::text('supplier_id', null, ['class' => 'form-control id', 'required' => 'required']) }}
                         </div>
@@ -440,23 +439,23 @@
                             {{ Form::label('pmtTypeCode', __('Payment Type Code'), ['class' => 'form-label']) }}
                             {{ Form::select('pmtTypeCode', $paymentTypeCodes, null, ['class' => 'form-control select2 pmtTypeCode', 'required' => 'required']) }}
                         </div>
-                        <div  class="form-group col-md-4" id="vender-box">
+                        <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('purchDate', __('Purchase Date'), ['class' => 'form-label']) }}
                             {{ Form::date('purchDate', null, ['class' => 'form-control', 'required' => 'required']) }}
                         </div>
-                        <div  class="form-group col-md-4" id="vender-box">
+                        <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('occurredDate', __('Occurred Date'), ['class' => 'form-label']) }}
                             {{ Form::date('occurredDate', null, ['class' => 'form-control', 'required' => 'required']) }}
                         </div>
-                        <div  class="form-group col-md-4" id="vender-box">
+                        <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('confirmDate', __('Confirm Date'), ['class' => 'form-label']) }}
                             {{ Form::date('confirmDate', null, ['class' => 'form-control', 'required' => 'required']) }}
                         </div>
                         <div class="form-group col-md-4" id="vender-box">
-                                    {{ Form::label('category_id', __('Account Category (*)'), ['class' => 'form-label']) }}
-                                    {{ Form::select('category_id', $category, null, ['class' => 'form-control', 'required' => 'required']) }}
-                                </div>
-                        <div  class="form-group col-md-4" id="vender-box">
+                            {{ Form::label('category_id', __('Account Category (*)'), ['class' => 'form-label']) }}
+                            {{ Form::select('category_id', $category, null, ['class' => 'form-control', 'required' => 'required']) }}
+                        </div>
+                        <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('warehouseDate', __('Warehouse Date'), ['class' => 'form-label']) }}
                             {{ Form::date('warehouseDate', null, ['class' => 'form-control', 'required' => 'required']) }}
                         </div>
@@ -464,7 +463,7 @@
                             {{ Form::label('warehouse', __('Ware House'), ['class' => 'form-label']) }}
                             {{ Form::select('warehouse', $warehouse, null, ['class' => 'form-control select2 warehouse', 'required' => 'required']) }}
                         </div>
-                        <div  class="form-group col-md-4" id="vender-box">
+                        <div class="form-group col-md-4" id="vender-box">
                             {{ Form::label('mapping', __('Mapping'), ['class' => 'form-label']) }}
                             {{ Form::text('mapping', null, ['class' => 'form-control invno-field']) }}
                         </div>
@@ -614,13 +613,3 @@
         {{ Form::close() }}
     </div>
 @endsection
-
-
-
-
-
-
-
-
-
-
