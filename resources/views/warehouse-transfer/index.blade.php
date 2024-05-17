@@ -95,6 +95,7 @@
         });
         $(document).on('change', 'select[name=from_warehouse]', function() {
             var warehouse_id = $(this).val();
+            console.log('WAREHOUSE ID: ', warehouse_id);
             getProduct(warehouse_id);
         });
 
@@ -107,6 +108,7 @@
                     "_token": "{{ csrf_token() }}",
                 },
                 success: function(data) {
+                    console.log(data);
                     $('#product_id').empty();
 
                     $("#product_div").html('');
@@ -151,5 +153,11 @@
                 }
             });
         }
+    </script>
+@endpush
+
+@push ('script-page')
+    <script>
+        
     </script>
 @endpush

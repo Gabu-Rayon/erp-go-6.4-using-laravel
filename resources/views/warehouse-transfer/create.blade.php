@@ -3,16 +3,11 @@
     <div class="row">
         <div class="form-group col-md-6">
             {{ Form::label('from_warehouse', __('From Warehouse'),['class'=>'form-label']) }}<span class="text-danger">*</span>
-            <select class="form-control select" name="from_warehouse" id="warehouse_id" placeholder="Select Warehouse">
-                <option value="">{{__('Select Warehouse')}}</option>
-                @foreach($from_warehouses as $warehouse)
-                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                @endforeach
-            </select>
+            {{ Form::select('from_warehouse', $from_warehouse,null, array('class' => 'form-control select fromWarehouse','required'=>'required')) }}
         </div>
         <div class="form-group col-md-6">
             {{Form::label('to_warehouse',__('To Warehouse'),array('class'=>'form-label')) }}<span class="text-danger">*</span>
-            {{ Form::select('to_warehouse', $to_warehouses,null, array('class' => 'form-control select','required'=>'required')) }}
+            {{ Form::select('to_warehouse', [],null, array('class' => 'form-control select','required'=>'required')) }}
         </div>
         <div class="form-group col-md-6" id="product_div">
             {{Form::label('product',__('Product'),array('class'=>'form-label')) }}
