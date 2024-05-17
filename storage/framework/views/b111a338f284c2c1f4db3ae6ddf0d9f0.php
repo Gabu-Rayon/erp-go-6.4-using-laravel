@@ -322,7 +322,7 @@
             });
         });
 
-        $(document).ready(function() {
+    $(document).ready(function() {
     $(document).on('change', '.supplierName', function() {
         var supplier_Info = $(this).val();
         var url = $(this).data('url');

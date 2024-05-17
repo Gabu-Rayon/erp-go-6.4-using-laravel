@@ -23,14 +23,13 @@ class WarehouseTransferController extends Controller
 
     public function create()
     {
-        $from_warehouses      = warehouse::where('created_by', '=', \Auth::user()->creatorId())->get();
-        $to_warehouses     = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-        $to_warehouses->prepend('Select Warehouse', '');
-        $ware_pro= WarehouseProduct::join('product_services', 'warehouse_products.product_id', '=', 'product_services.id')
-                                ->pluck('name','product_id');
+        $from_warehouse = Warehouse::all()->pluck('name', 'id');
+        $from_warehouse->prepend('Select Warehouse', '');
+        $ware_pro= WarehouseProduct::join('item_list', 'warehouse_products.product_id', '=', 'item_list.id')
+                                ->pluck('itemNm','product_id');
         $ware_pro->prepend('Select products', '');
-
-        return view('warehouse-transfer.create',compact('from_warehouses','to_warehouses','ware_pro'));
+        \Log::info($ware_pro);
+        return view('warehouse-transfer.create',compact('from_warehouse', 'ware_pro'));
 
     }
 
@@ -113,17 +112,17 @@ class WarehouseTransferController extends Controller
     {
         if($request->warehouse_id == 0)
         {
-            $ware_products= WarehouseProduct::join('product_services', 'warehouse_products.product_id', '=', 'product_services.id')
+            $ware_products= WarehouseProduct::join('item_list', 'warehouse_products.product_id', '=', 'item_list.id')
                 ->get()
-                ->pluck('name', 'product_id')->toArray();
+                ->pluck('itemNm', 'product_id')->toArray();
             $to_warehouses     = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
         }
         else
         {
-            $ware_products= WarehouseProduct::join('product_services', 'warehouse_products.product_id', '=', 'product_services.id')
+            $ware_products= WarehouseProduct::join('item_list', 'warehouse_products.product_id', '=', 'item_list.id')
                 ->where('warehouse_id', $request->warehouse_id)
                 ->get()
-                ->pluck('name', 'product_id')->toArray();
+                ->pluck('itemNm', 'product_id')->toArray();
             $to_warehouses     = warehouse::where('id','!=',$request->warehouse_id)->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
         }
         $result = [];
@@ -147,5 +146,9 @@ class WarehouseTransferController extends Controller
     
         }
         return response()->json($pro_qty);
+    }
+
+    public function getWarehouseProducts($warehouse_id) {
+        $warehouse = Warehouse::find($warehouse_id);
     }
 }
