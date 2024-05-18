@@ -1,15 +1,16 @@
-@extends('layouts.admin')
-@section('page-title')
-    {{$deal->name}}
-@endsection
 
-@push('css-page')
-    <link rel="stylesheet" href="{{asset('css/summernote/summernote-bs4.css')}}">
-    <link rel="stylesheet" href="{{asset('assets/css/plugins/dropzone.min.css')}}">
-@endpush
-@push('script-page')
-    <script src="{{asset('css/summernote/summernote-bs4.js')}}"></script>
-    <script src="{{asset('assets/js/plugins/dropzone-amd-module.min.js')}}"></script>
+<?php $__env->startSection('page-title'); ?>
+    <?php echo e($deal->name); ?>
+
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startPush('css-page'); ?>
+    <link rel="stylesheet" href="<?php echo e(asset('css/summernote/summernote-bs4.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/css/plugins/dropzone.min.css')); ?>">
+<?php $__env->stopPush(); ?>
+<?php $__env->startPush('script-page'); ?>
+    <script src="<?php echo e(asset('css/summernote/summernote-bs4.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/js/plugins/dropzone-amd-module.min.js')); ?>"></script>
     <script>
         var scrollSpy = new bootstrap.ScrollSpy(document.body, {
             target: '#deal-sidenav',
@@ -23,7 +24,7 @@
             parallelUploads: 1,
             filename: false,
             // acceptedFiles: ".jpeg,.jpg,.png,.pdf,.doc,.txt",
-            url: "{{route('deals.file.upload',$deal->id)}}",
+            url: "<?php echo e(route('deals.file.upload',$deal->id)); ?>",
             success: function (file, response) {
                 if (response.is_success) {
                     if(response.status==1){
@@ -46,7 +47,7 @@
         });
         myDropzone.on("sending", function (file, xhr, formData) {
             formData.append("_token", $('meta[name="csrf-token"]').attr('content'));
-            formData.append("deal_id", {{$deal->id}});
+            formData.append("deal_id", <?php echo e($deal->id); ?>);
         });
 
         function dropzoneBtn(file, response) {
@@ -54,14 +55,14 @@
             download.setAttribute('href', response.download);
             download.setAttribute('class', "badge bg-info mx-1");
             download.setAttribute('data-toggle', "tooltip");
-            download.setAttribute('data-original-title', "{{__('Download')}}");
+            download.setAttribute('data-original-title', "<?php echo e(__('Download')); ?>");
             download.innerHTML = "<i class='ti ti-download'></i>";
 
             var del = document.createElement('a');
             del.setAttribute('href', response.delete);
             del.setAttribute('class', "badge bg-danger mx-1");
             del.setAttribute('data-toggle', "tooltip");
-            del.setAttribute('data-original-title', "{{__('Delete')}}");
+            del.setAttribute('data-original-title', "<?php echo e(__('Delete')); ?>");
             del.innerHTML = "<i class='ti ti-trash'></i>";
 
             del.addEventListener("click", function (e) {
@@ -94,34 +95,34 @@
 
             var html = document.createElement('div');
             html.appendChild(download);
-            @if(Auth::user()->type != 'client')
-            @can('edit deal')
+            <?php if(Auth::user()->type != 'client'): ?>
+            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit deal')): ?>
             html.appendChild(del);
-            @endcan
-            @endif
+            <?php endif; ?>
+            <?php endif; ?>
 
             file.previewTemplate.appendChild(html);
         }
 
-        @foreach($deal->files as $file)
-        @if (file_exists(storage_path('deal_files/'.$file->file_path)))
+        <?php $__currentLoopData = $deal->files; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $file): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <?php if(file_exists(storage_path('deal_files/'.$file->file_path))): ?>
         // Create the mock file:
-        var mockFile = {name: "{{$file->file_name}}", size: {{\File::size(storage_path('deal_files/'.$file->file_path))}}};
+        var mockFile = {name: "<?php echo e($file->file_name); ?>", size: <?php echo e(\File::size(storage_path('deal_files/'.$file->file_path))); ?>};
         // Call the default addedfile event handler
         myDropzone.emit("addedfile", mockFile);
         // And optionally show the thumbnail of the file:
-        myDropzone.emit("thumbnail", mockFile, "{{asset(Storage::url('deal_files/'.$file->file_path))}}");
+        myDropzone.emit("thumbnail", mockFile, "<?php echo e(asset(Storage::url('deal_files/'.$file->file_path))); ?>");
         myDropzone.emit("complete", mockFile);
 
-        dropzoneBtn(mockFile, {download: "{{route('deals.file.download',[$deal->id,$file->id])}}", delete: "{{route('deals.file.delete',[$deal->id,$file->id])}}"});
-        @endif
-        @endforeach
+        dropzoneBtn(mockFile, {download: "<?php echo e(route('deals.file.download',[$deal->id,$file->id])); ?>", delete: "<?php echo e(route('deals.file.delete',[$deal->id,$file->id])); ?>"});
+        <?php endif; ?>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-        @can('edit deal')
+        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit deal')): ?>
         $('.summernote-simple').on('summernote.blur', function () {
 
             $.ajax({
-                url: "{{route('deals.note.store',$deal->id)}}",
+                url: "<?php echo e(route('deals.note.store',$deal->id)); ?>",
                 data: {_token: $('meta[name="csrf-token"]').attr('content'), notes: $(this).val()},
                 type: 'POST',
                 success: function (response) {
@@ -141,11 +142,11 @@
                 }
             })
         });
-        @else
+        <?php else: ?>
         $('.summernote-simple').summernote('disable');
-        @endcan
+        <?php endif; ?>
 
-        @can('edit task')
+        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit task')): ?>
         $(document).on("click", ".task-checkbox", function () {
             var chbox = $(this);
             var lbl = chbox.parent().parent().find('label');
@@ -181,39 +182,39 @@
                 }
             })
         });
-        @endcan
+        <?php endif; ?>
     </script>
-@endpush
-@section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
-    <li class="breadcrumb-item"><a href="{{route('deals.index')}}">{{__('Deal')}}</a></li>
-    <li class="breadcrumb-item"> {{$deal->name}}</li>
-@endsection
-@section('action-btn')
+<?php $__env->stopPush(); ?>
+<?php $__env->startSection('breadcrumb'); ?>
+    <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
+    <li class="breadcrumb-item"><a href="<?php echo e(route('deals.index')); ?>"><?php echo e(__('Deal')); ?></a></li>
+    <li class="breadcrumb-item"> <?php echo e($deal->name); ?></li>
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
-        @can('convert deal to deal')
-            @if(!empty($deal))
-                <a href="@can('View Deal') @if($deal->is_active) {{route('deals.show',$deal->id)}} @else # @endif @else # @endcan" data-size="lg" data-bs-toggle="tooltip" title=" {{__('Already Converted To Deal')}}" class="btn btn-sm btn-primary">
+        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('convert deal to deal')): ?>
+            <?php if(!empty($deal)): ?>
+                <a href="<?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Deal')): ?> <?php if($deal->is_active): ?> <?php echo e(route('deals.show',$deal->id)); ?> <?php else: ?> # <?php endif; ?> <?php else: ?> # <?php endif; ?>" data-size="lg" data-bs-toggle="tooltip" title=" <?php echo e(__('Already Converted To Deal')); ?>" class="btn btn-sm btn-primary">
                     <i class="ti ti-exchange"></i>
                 </a>
-            @else
-                <a href="#" data-size="lg" data-url="{{ URL::to('deals/'.$deal->id.'/show_convert') }}" data-bs-toggle="tooltip" title="{{__('Convert ['.$deal->subject.'] To Deal')}}" class="btn btn-sm btn-primary">
+            <?php else: ?>
+                <a href="#" data-size="lg" data-url="<?php echo e(URL::to('deals/'.$deal->id.'/show_convert')); ?>" data-bs-toggle="tooltip" title="<?php echo e(__('Convert ['.$deal->subject.'] To Deal')); ?>" class="btn btn-sm btn-primary">
                     <i class="ti ti-exchange"></i>
                 </a>
-            @endif
-        @endcan
-        @can ('edit deal')
-        <a href="#" data-url="{{ URL::to('deals/'.$deal->id.'/labels') }}" data-ajax-popup="true" data-size="lg" data-bs-toggle="tooltip" title="{{__('Label')}}" class="btn btn-sm btn-primary">
+            <?php endif; ?>
+        <?php endif; ?>
+        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit deal')): ?>
+        <a href="#" data-url="<?php echo e(URL::to('deals/'.$deal->id.'/labels')); ?>" data-ajax-popup="true" data-size="lg" data-bs-toggle="tooltip" title="<?php echo e(__('Label')); ?>" class="btn btn-sm btn-primary">
             <i class="ti ti-bookmark"></i>
         </a>
-        <a href="#" data-size="lg" data-url="{{ route('deals.edit',$deal->id) }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Edit')}}" class="btn btn-sm btn-primary">
+        <a href="#" data-size="lg" data-url="<?php echo e(route('deals.edit',$deal->id)); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Edit')); ?>" class="btn btn-sm btn-primary">
             <i class="ti ti-pencil"></i>
         </a>
-        @endcan
+        <?php endif; ?>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="row">
         <div class="col-sm-12">
             <div class="row">
@@ -221,35 +222,43 @@
                     <div class="card sticky-top" style="top:30px">
                         <div class="list-group list-group-flush" id="deal-sidenav">
 
-                            <a href="#general" class="list-group-item list-group-item-action border-0">{{__('General')}}
+                            <a href="#general" class="list-group-item list-group-item-action border-0"><?php echo e(__('General')); ?>
+
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div>
                             </a>
 
-                            <a href="#tasks" class="list-group-item list-group-item-action border-0">{{__('Task')}}
+                            <a href="#tasks" class="list-group-item list-group-item-action border-0"><?php echo e(__('Task')); ?>
+
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div>
                             </a>
 
-                            <a href="#users_products" class="list-group-item list-group-item-action border-0">{{__('Users').' | '.__('Products')}}
+                            <a href="#users_products" class="list-group-item list-group-item-action border-0"><?php echo e(__('Users').' | '.__('Products')); ?>
+
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div>
                             </a>
 
-                            <a href="#sources_emails" class="list-group-item list-group-item-action border-0">{{__('Sources').' | '.__('Emails')}}
+                            <a href="#sources_emails" class="list-group-item list-group-item-action border-0"><?php echo e(__('Sources').' | '.__('Emails')); ?>
+
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div>
                             </a>
 
-                            <a href="#discussion_note" class="list-group-item list-group-item-action border-0">{{__('Discussion').' | '.__('Notes')}}
+                            <a href="#discussion_note" class="list-group-item list-group-item-action border-0"><?php echo e(__('Discussion').' | '.__('Notes')); ?>
+
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div>
                             </a>
 
-                            <a href="#files" class="list-group-item list-group-item-action border-0">{{__('Files')}}
+                            <a href="#files" class="list-group-item list-group-item-action border-0"><?php echo e(__('Files')); ?>
+
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div>
                             </a>
 
-                            <a href="#calls" class="list-group-item list-group-item-action border-0">{{__('Calls')}}
+                            <a href="#calls" class="list-group-item list-group-item-action border-0"><?php echo e(__('Calls')); ?>
+
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div>
                             </a>
 
-                            <a href="#activity" class="list-group-item list-group-item-action border-0">{{__('Activity')}}
+                            <a href="#activity" class="list-group-item list-group-item-action border-0"><?php echo e(__('Activity')); ?>
+
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div>
                             </a>
 
@@ -273,8 +282,8 @@
                                             <i class="ti ti-test-pipe"></i>
                                         </div>
                                         <div class="ms-2">
-                                            <p class="text-muted text-sm mb-0">{{__('Pipeline')}}</p>
-                                            <h5 class="mb-0 text-success">{{$deal->pipeline->name}}</h5>
+                                            <p class="text-muted text-sm mb-0"><?php echo e(__('Pipeline')); ?></p>
+                                            <h5 class="mb-0 text-success"><?php echo e($deal->pipeline->name); ?></h5>
                                         </div>
                                     </div>
                                 </div>
@@ -284,8 +293,8 @@
                                             <i class="ti ti-server"></i>
                                         </div>
                                         <div class="ms-2">
-                                            <p class="text-muted text-sm mb-0">{{__('Stage')}}</p>
-                                            <h5 class="mb-0 text-primary">{{$deal->stage->name}}</h5>
+                                            <p class="text-muted text-sm mb-0"><?php echo e(__('Stage')); ?></p>
+                                            <h5 class="mb-0 text-primary"><?php echo e($deal->stage->name); ?></h5>
                                         </div>
                                     </div>
                                 </div>
@@ -295,8 +304,8 @@
                                             <i class="ti ti-calendar"></i>
                                         </div>
                                         <div class="ms-2">
-                                            <p class="text-muted text-sm mb-0">{{__('Created')}}</p>
-                                            <h5 class="mb-0 text-warning">{{\Auth::user()->dateFormat($deal->created_at)}}</h5>
+                                            <p class="text-muted text-sm mb-0"><?php echo e(__('Created')); ?></p>
+                                            <h5 class="mb-0 text-warning"><?php echo e(\Auth::user()->dateFormat($deal->created_at)); ?></h5>
                                         </div>
                                     </div>
                                 </div>
@@ -306,8 +315,8 @@
                                             <i class="ti ti-report-money"></i>
                                         </div>
                                         <div class="ms-2">
-                                            <p class="text-muted text-sm mb-0">{{__('Price')}}</p>
-                                            <h5 class="mb-0 text-info">{{\Auth::user()->priceFormat($deal->price)}}</h5>
+                                            <p class="text-muted text-sm mb-0"><?php echo e(__('Price')); ?></p>
+                                            <h5 class="mb-0 text-info"><?php echo e(\Auth::user()->priceFormat($deal->price)); ?></h5>
                                         </div>
                                     </div>
                                 </div>
@@ -320,8 +329,8 @@
                                 <div class="card-body">
                                     <div class="row align-items-center justify-content-between">
                                         <div class="col-auto mb-3 mb-sm-0">
-                                            <small class="text-muted">{{__('Task')}}</small>
-                                            <h3 class="m-0">{{count($tasks)}}</h3>
+                                            <small class="text-muted"><?php echo e(__('Task')); ?></small>
+                                            <h3 class="m-0"><?php echo e(count($tasks)); ?></h3>
                                         </div>
                                         <div class="col-auto">
                                             <div class="theme-avtar bg-danger">
@@ -337,8 +346,8 @@
                                 <div class="card-body">
                                     <div class="row align-items-center justify-content-between">
                                         <div class="col-auto mb-3 mb-sm-0">
-                                            <small class="text-muted">{{__('Product')}}</small>
-                                            <h3 class="m-0">{{count($products)}}</h3>
+                                            <small class="text-muted"><?php echo e(__('Product')); ?></small>
+                                            <h3 class="m-0"><?php echo e(count($products)); ?></h3>
                                         </div>
                                         <div class="col-auto">
                                             <div class="theme-avtar bg-info">
@@ -354,8 +363,8 @@
                                 <div class="card-body">
                                     <div class="row align-items-center justify-content-between">
                                         <div class="col-auto mb-3 mb-sm-0">
-                                            <small class="text-muted">{{__('Source')}}</small>
-                                            <h3 class="m-0">{{count($sources)}}</h3>
+                                            <small class="text-muted"><?php echo e(__('Source')); ?></small>
+                                            <h3 class="m-0"><?php echo e(count($sources)); ?></h3>
                                         </div>
                                         <div class="col-auto">
                                             <div class="theme-avtar bg-primary">
@@ -371,8 +380,8 @@
                                 <div class="card-body">
                                     <div class="row align-items-center justify-content-between">
                                         <div class="col-auto mb-3 mb-sm-0">
-                                            <small class="text-muted">{{__('Files')}}</small>
-                                            <h3 class="m-0">{{count($deal->files)}}</h3>
+                                            <small class="text-muted"><?php echo e(__('Files')); ?></small>
+                                            <h3 class="m-0"><?php echo e(count($deal->files)); ?></h3>
                                         </div>
                                         <div class="col-auto">
                                             <div class="theme-avtar bg-warning">
@@ -389,72 +398,75 @@
                     <div id="tasks" class="card">
                         <div class="card-header">
                             <div class="d-flex align-items-center justify-content-between">
-                                <h5>{{__('Tasks')}}</h5>
-                                @can('create task')
+                                <h5><?php echo e(__('Tasks')); ?></h5>
+                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create task')): ?>
                                     <div class="float-end">
-                                        <a href="#" data-size="lg" data-url="{{ route('deals.tasks.create',$deal->id) }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Add Task')}}" class="btn btn-sm btn-primary">
+                                        <a href="#" data-size="lg" data-url="<?php echo e(route('deals.tasks.create',$deal->id)); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Add Task')); ?>" class="btn btn-sm btn-primary">
                                             <i class="ti ti-plus"></i>
                                         </a>
                                     </div>
-                                @endcan
+                                <?php endif; ?>
 
                             </div>
                         </div>
                         <div class="card-body">
-                            @if(!$tasks->isEmpty())
+                            <?php if(!$tasks->isEmpty()): ?>
                                 <ul class="list-group list-group-flush mt-2">
-                                    @foreach($tasks as $task)
+                                    <?php $__currentLoopData = $tasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $task): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <li class="list-group-item px-0">
                                             <div class="d-block d-sm-flex align-items-start">
                                                 <div class="form-check form-switch form-switch-right img-fluid me-3 mb-2 mb-sm-0">
-                                                    <input class="form-check-input task-checkbox" type="checkbox" role="switch" id="task_{{$task->id}}" @if($task->status) checked="checked" @endcan value="{{$task->status}}" data-url="{{route('deals.tasks.update_status',[$deal->id,$task->id])}}">
-                                                    <label class="form-check-label pe-5" for="task_{{$task->id}}"></label>
+                                                    <input class="form-check-input task-checkbox" type="checkbox" role="switch" id="task_<?php echo e($task->id); ?>" <?php if($task->status): ?> checked="checked" <?php endif; ?> value="<?php echo e($task->status); ?>" data-url="<?php echo e(route('deals.tasks.update_status',[$deal->id,$task->id])); ?>">
+                                                    <label class="form-check-label pe-5" for="task_<?php echo e($task->id); ?>"></label>
                                                 </div>
                                                 <div class="w-100">
                                                     <div class="d-flex align-items-center justify-content-between">
                                                         <div class="mb-3 mb-sm-0">
                                                             <h5 class="mb-0">
-                                                                {{$task->name}}
-                                                                @if($task->status)
-                                                                    <div class="badge bg-primary mb-1">{{__(\App\Models\DealTask::$status[$task->status])}}</div>
-                                                                @else
-                                                                    <div class="badge bg-warning mb-1">{{__(\App\Models\DealTask::$status[$task->status])}}</div>
-                                                                @endif
+                                                                <?php echo e($task->name); ?>
+
+                                                                <?php if($task->status): ?>
+                                                                    <div class="badge bg-primary mb-1"><?php echo e(__(\App\Models\DealTask::$status[$task->status])); ?></div>
+                                                                <?php else: ?>
+                                                                    <div class="badge bg-warning mb-1"><?php echo e(__(\App\Models\DealTask::$status[$task->status])); ?></div>
+                                                                <?php endif; ?>
                                                             </h5>
-                                                            <small class="text-sm">{{__(\App\Models\DealTask::$priorities[$task->priority])}} - {{Auth::user()->dateFormat($task->date)}} {{Auth::user()->timeFormat($task->time)}}</small>
+                                                            <small class="text-sm"><?php echo e(__(\App\Models\DealTask::$priorities[$task->priority])); ?> - <?php echo e(Auth::user()->dateFormat($task->date)); ?> <?php echo e(Auth::user()->timeFormat($task->time)); ?></small>
                                                             <span class="text-muted text-sm">
-                                                                @if($task->status)
-                                                                    <div class="badge badge-pill badge-success mb-1">{{__(\App\Models\DealTask::$status[$task->status])}}</div>
-                                                                @else
-                                                                    <div class="badge badge-pill badge-warning mb-1">{{__(\App\Models\DealTask::$status[$task->status])}}</div>
-                                                                @endif
+                                                                <?php if($task->status): ?>
+                                                                    <div class="badge badge-pill badge-success mb-1"><?php echo e(__(\App\Models\DealTask::$status[$task->status])); ?></div>
+                                                                <?php else: ?>
+                                                                    <div class="badge badge-pill badge-warning mb-1"><?php echo e(__(\App\Models\DealTask::$status[$task->status])); ?></div>
+                                                                <?php endif; ?>
                                                             </span>
                                                         </div>
                                                         <span>
-                                                        @can('edit task')
+                                                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit task')): ?>
                                                                 <div class="action-btn bg-info ms-2">
-                                                                <a href="#" class="" data-title="{{__('Edit Task')}}" data-url="{{route('deals.tasks.edit',[$deal->id,$task->id])}}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Edit')}}"><i class="ti ti-pencil text-white"></i></a>
+                                                                <a href="#" class="" data-title="<?php echo e(__('Edit Task')); ?>" data-url="<?php echo e(route('deals.tasks.edit',[$deal->id,$task->id])); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Edit')); ?>"><i class="ti ti-pencil text-white"></i></a>
                                                             </div>
-                                                            @endcan
-                                                            @can('delete task')
+                                                            <?php endif; ?>
+                                                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete task')): ?>
                                                                 <div class="action-btn bg-danger ms-2">
-                                                                {!! Form::open(['method' => 'DELETE', 'route' => ['deals.tasks.destroy',$deal->id,$task->id]]) !!}
-                                                                <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}"><i class="ti ti-trash text-white"></i></a>
-                                                                {!! Form::close() !!}
+                                                                <?php echo Form::open(['method' => 'DELETE', 'route' => ['deals.tasks.destroy',$deal->id,$task->id]]); ?>
+
+                                                                <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="<?php echo e(__('Delete')); ?>"><i class="ti ti-trash text-white"></i></a>
+                                                                <?php echo Form::close(); ?>
+
                                                                 </div>
-                                                            @endcan
+                                                            <?php endif; ?>
                                                         </span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </li>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </ul>
-                            @else
+                            <?php else: ?>
                                 <div class="text-center">
                                     No Tasks Available.!
                                 </div>
-                            @endif
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div id="users_products">
@@ -463,14 +475,14 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <div class="d-flex align-items-center justify-content-between">
-                                            <h5>{{__('Users')}}</h5>
-                                            @can('edit deal')
+                                            <h5><?php echo e(__('Users')); ?></h5>
+                                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit deal')): ?>
                                             <div class="float-end">
-                                                <a data-size="md" data-url="{{ route('deals.users.edit',$deal->id) }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Add User')}}" class="btn btn-sm btn-primary">
+                                                <a data-size="md" data-url="<?php echo e(route('deals.users.edit',$deal->id)); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Add User')); ?>" class="btn btn-sm btn-primary">
                                                     <i class="ti ti-plus"></i>
                                                 </a>
                                             </div>
-                                            @endcan
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                     <div class="card-body">
@@ -478,33 +490,35 @@
                                             <table class="table table-hover mb-0">
                                                 <thead>
                                                 <tr>
-                                                    <th>{{__('Name')}}</th>
-                                                    <th>{{__('Action')}}</th>
+                                                    <th><?php echo e(__('Name')); ?></th>
+                                                    <th><?php echo e(__('Action')); ?></th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                @foreach($deal->users as $user)
+                                                <?php $__currentLoopData = $deal->users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <tr>
                                                         <td>
                                                             <div class="d-flex align-items-center">
                                                                 <div>
-                                                                    <img @if($user->avatar) src="{{asset('/storage/uploads/avatar/'.$user->avatar)}}" @else src="{{asset('/storage/uploads/avatar/avatar.png')}}" @endif class="wid-30 rounded-circle me-3" >
+                                                                    <img <?php if($user->avatar): ?> src="<?php echo e(asset('/storage/uploads/avatar/'.$user->avatar)); ?>" <?php else: ?> src="<?php echo e(asset('/storage/uploads/avatar/avatar.png')); ?>" <?php endif; ?> class="wid-30 rounded-circle me-3" >
                                                                 </div>
-                                                                <p class="mb-0">{{$user->name}}</p>
+                                                                <p class="mb-0"><?php echo e($user->name); ?></p>
                                                             </div>
                                                         </td>
-                                                        @can('edit deal')
+                                                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit deal')): ?>
                                                             <td>
                                                                 <div class="action-btn bg-danger ms-2">
-                                                                    {!! Form::open(['method' => 'DELETE', 'route' => ['deals.users.destroy', $deal->id,$user->id],'id'=>'delete-form-'.$deal->id]) !!}
-                                                                    <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}"><i class="ti ti-trash text-white"></i></a>
+                                                                    <?php echo Form::open(['method' => 'DELETE', 'route' => ['deals.users.destroy', $deal->id,$user->id],'id'=>'delete-form-'.$deal->id]); ?>
 
-                                                                    {!! Form::close() !!}
+                                                                    <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="<?php echo e(__('Delete')); ?>"><i class="ti ti-trash text-white"></i></a>
+
+                                                                    <?php echo Form::close(); ?>
+
                                                                 </div>
                                                             </td>
-                                                        @endcan
+                                                        <?php endif; ?>
                                                     </tr>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -516,14 +530,14 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <div class="d-flex align-items-center justify-content-between">
-                                            <h5>{{__('Products')}}</h5>
-                                            @can ('edit deal')
+                                            <h5><?php echo e(__('Products')); ?></h5>
+                                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit deal')): ?>
                                             <div class="float-end">
-                                                <a  data-size="md" data-url="{{ route('deals.products.edit',$deal->id) }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Add Product')}}" class="btn btn-sm btn-primary">
+                                                <a  data-size="md" data-url="<?php echo e(route('deals.products.edit',$deal->id)); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Add Product')); ?>" class="btn btn-sm btn-primary">
                                                     <i class="ti ti-plus"></i>
                                                 </a>
                                             </div>
-                                            @endcan
+                                            <?php endif; ?>
                                         </div>
 
                                     </div>
@@ -532,32 +546,36 @@
                                             <table class="table table-hover mb-0">
                                                 <thead>
                                                 <tr>
-                                                    <th>{{__('Name')}}</th>
-                                                    <th>{{__('Price')}}</th>
-                                                    <th>{{__('Action')}}</th>
+                                                    <th><?php echo e(__('Name')); ?></th>
+                                                    <th><?php echo e(__('Price')); ?></th>
+                                                    <th><?php echo e(__('Action')); ?></th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                @foreach($deal->products() as $product)
+                                                <?php $__currentLoopData = $deal->products(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <tr>
                                                         <td>
-                                                            {{$product->name}}
+                                                            <?php echo e($product->name); ?>
+
                                                         </td>
                                                         <td>
-                                                            {{\Auth::user()->priceFormat($product->sale_price)}}
+                                                            <?php echo e(\Auth::user()->priceFormat($product->sale_price)); ?>
+
                                                         </td>
-                                                        @can('edit deal')
+                                                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit deal')): ?>
                                                             <td>
                                                                 <div class="action-btn bg-danger ms-2">
-                                                                    {!! Form::open(['method' => 'DELETE', 'route' => ['deals.products.destroy', $deal->id,$product->id]]) !!}
-                                                                    <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}"><i class="ti ti-trash text-white"></i></a>
+                                                                    <?php echo Form::open(['method' => 'DELETE', 'route' => ['deals.products.destroy', $deal->id,$product->id]]); ?>
 
-                                                                    {!! Form::close() !!}
+                                                                    <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="<?php echo e(__('Delete')); ?>"><i class="ti ti-trash text-white"></i></a>
+
+                                                                    <?php echo Form::close(); ?>
+
                                                                 </div>
                                                             </td>
-                                                        @endcan
+                                                        <?php endif; ?>
                                                     </tr>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -573,14 +591,14 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <div class="d-flex align-items-center justify-content-between">
-                                            <h5>{{__('Sources')}}</h5>
-                                            @can ('edit deal')
+                                            <h5><?php echo e(__('Sources')); ?></h5>
+                                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit deal')): ?>
                                             <div class="float-end">
-                                                <a  data-size="md" data-url="{{ route('deals.sources.edit',$deal->id) }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Add Source')}}" class="btn btn-sm btn-primary">
+                                                <a  data-size="md" data-url="<?php echo e(route('deals.sources.edit',$deal->id)); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Add Source')); ?>" class="btn btn-sm btn-primary">
                                                     <i class="ti ti-plus"></i>
                                                 </a>
                                             </div>
-                                            @endcan
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                     <div class="card-body">
@@ -588,26 +606,28 @@
                                             <table class="table table-hover mb-0">
                                                 <thead>
                                                 <tr>
-                                                    <th>{{__('Name')}}</th>
-                                                    <th>{{__('Action')}}</th>
+                                                    <th><?php echo e(__('Name')); ?></th>
+                                                    <th><?php echo e(__('Action')); ?></th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                @foreach($sources as $source)
+                                                <?php $__currentLoopData = $sources; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $source): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <tr>
-                                                        <td>{{$source->name}} </td>
-                                                        @can('edit deal')
+                                                        <td><?php echo e($source->name); ?> </td>
+                                                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit deal')): ?>
                                                             <td>
                                                                 <div class="action-btn bg-danger ms-2">
-                                                                    {!! Form::open(['method' => 'DELETE', 'route' => ['deals.sources.destroy', $deal->id,$source->id],'id'=>'delete-form-'.$deal->id]) !!}
-                                                                    <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}"><i class="ti ti-trash text-white"></i></a>
+                                                                    <?php echo Form::open(['method' => 'DELETE', 'route' => ['deals.sources.destroy', $deal->id,$source->id],'id'=>'delete-form-'.$deal->id]); ?>
 
-                                                                    {!! Form::close() !!}
+                                                                    <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="<?php echo e(__('Delete')); ?>"><i class="ti ti-trash text-white"></i></a>
+
+                                                                    <?php echo Form::close(); ?>
+
                                                                 </div>
                                                             </td>
-                                                        @endcan
+                                                        <?php endif; ?>
                                                     </tr>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -618,43 +638,45 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <div class="d-flex align-items-center justify-content-between">
-                                            <h5>{{__('Emails')}}</h5>
-                                            @can('create deal email')
+                                            <h5><?php echo e(__('Emails')); ?></h5>
+                                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create deal email')): ?>
                                             <div class="float-end">
-                                                <a  data-size="lg" data-url="{{ route('deals.emails.create',$deal->id) }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Create Email')}}" class="btn btn-sm btn-primary">
+                                                <a  data-size="lg" data-url="<?php echo e(route('deals.emails.create',$deal->id)); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Create Email')); ?>" class="btn btn-sm btn-primary">
                                                     <i class="ti ti-plus"></i>
                                                 </a>
                                             </div>
-                                        @endcan
+                                        <?php endif; ?>
                                         </div>
                                     </div>
                                     <div class="card-body">
                                         <ul class="list-group list-group-flush mt-2">
-                                            @if(!$emails->isEmpty())
-                                                @foreach($emails as $email)
+                                            <?php if(!$emails->isEmpty()): ?>
+                                                <?php $__currentLoopData = $emails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $email): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <li class="list-group-item px-0">
                                                         <div class="d-block d-sm-flex align-items-start">
-                                                            <img src="{{asset('/storage/uploads/avatar/avatar.png')}}"
+                                                            <img src="<?php echo e(asset('/storage/uploads/avatar/avatar.png')); ?>"
                                                                  class="img-fluid wid-40 me-3 mb-2 mb-sm-0" alt="image">
                                                             <div class="w-100">
                                                                 <div class="d-flex align-items-center justify-content-between">
                                                                     <div class="mb-3 mb-sm-0">
-                                                                        <h5 class="mb-0">{{$email->subject}}</h5>
-                                                                        <span class="text-muted text-sm">{{$email->to}}</span>
+                                                                        <h5 class="mb-0"><?php echo e($email->subject); ?></h5>
+                                                                        <span class="text-muted text-sm"><?php echo e($email->to); ?></span>
                                                                     </div>
                                                                     <div class="form-check form-switch form-switch-right mb-2">
-                                                                        {{$email->created_at->diffForHumans()}}
+                                                                        <?php echo e($email->created_at->diffForHumans()); ?>
+
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </li>
-                                                @endforeach
-                                            @else
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            <?php else: ?>
                                                 <li class="text-center">
-                                                    {{__(' No Emails Available.!')}}
+                                                    <?php echo e(__(' No Emails Available.!')); ?>
+
                                                 </li>
-                                            @endif
+                                            <?php endif; ?>
                                         </ul>
                                     </div>
                                 </div>
@@ -667,10 +689,10 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <div class="d-flex align-items-center justify-content-between">
-                                            <h5>{{__('Discussion')}}</h5>
+                                            <h5><?php echo e(__('Discussion')); ?></h5>
 
                                             <div class="float-end">
-                                                <a data-size="lg" data-url="{{ route('deals.discussions.create',$deal->id) }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Add Message')}}" class="btn btn-sm btn-primary">
+                                                <a data-size="lg" data-url="<?php echo e(route('deals.discussions.create',$deal->id)); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Add Message')); ?>" class="btn btn-sm btn-primary">
                                                     <i class="ti ti-plus"></i>
                                                 </a>
                                             </div>
@@ -678,20 +700,21 @@
                                     </div>
                                     <div class="card-body">
                                         <ul class="list-group list-group-flush mt-2">
-                                            @if(!$deal->discussions->isEmpty())
-                                                @foreach($deal->discussions as $discussion)
+                                            <?php if(!$deal->discussions->isEmpty()): ?>
+                                                <?php $__currentLoopData = $deal->discussions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $discussion): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <li class="list-group-item px-0">
                                                         <div class="d-block d-sm-flex align-items-start">
-                                                            <img src="@if($discussion->user->avatar) {{asset('/storage/uploads/avatar/'.$discussion->user->avatar)}} @else {{asset('/storage/uploads/avatar/avatar.png')}} @endif"
+                                                            <img src="<?php if($discussion->user->avatar): ?> <?php echo e(asset('/storage/uploads/avatar/'.$discussion->user->avatar)); ?> <?php else: ?> <?php echo e(asset('/storage/uploads/avatar/avatar.png')); ?> <?php endif; ?>"
                                                                  class="img-fluid wid-40 me-3 mb-2 mb-sm-0" alt="image">
                                                             <div class="w-100">
                                                                 <div class="d-flex align-items-center justify-content-between">
                                                                     <div class="mb-3 mb-sm-0">
-                                                                        <h5 class="mb-0"> {{$discussion->comment}}</h5>
-                                                                        <span class="text-muted text-sm">{{$discussion->user->name}}</span>
+                                                                        <h5 class="mb-0"> <?php echo e($discussion->comment); ?></h5>
+                                                                        <span class="text-muted text-sm"><?php echo e($discussion->user->name); ?></span>
                                                                     </div>
                                                                     <div class=" form-switch form-switch-right mb-4">
-                                                                        {{$discussion->created_at->diffForHumans()}}
+                                                                        <?php echo e($discussion->created_at->diffForHumans()); ?>
+
                                                                     </div>
 
 
@@ -700,12 +723,13 @@
                                                             </div>
                                                         </div>
                                                     </li>
-                                                @endforeach
-                                            @else
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            <?php else: ?>
                                                 <li class="text-center">
-                                                    {{__(' No Data Available.!')}}
+                                                    <?php echo e(__(' No Data Available.!')); ?>
+
                                                 </li>
-                                            @endif
+                                            <?php endif; ?>
                                         </ul>
                                     </div>
                                 </div>
@@ -714,29 +738,29 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <div class="d-flex align-items-center justify-content-between">
-                                            <h5>{{__('Notes')}}</h5>
-                                            @php
+                                            <h5><?php echo e(__('Notes')); ?></h5>
+                                            <?php
                     $user = \App\Models\User::find(\Auth::user()->creatorId());
                     $plan= \App\Models\Plan::getPlan($user->plan);
-                                            @endphp
-                                            @if($plan->chatgpt == 1)
+                                            ?>
+                                            <?php if($plan->chatgpt == 1): ?>
                                             <div class="float-end">
                                                 <a href="#" data-size="md" class="btn btn-primary btn-icon btn-sm"
-                                                   data-ajax-popup-over="true" id="grammarCheck" data-url="{{ route('grammar',['grammar']) }}"
-                                                   data-bs-placement="top" data-title="{{ __('Grammar check with AI') }}">
-                                                    <i class="ti ti-rotate"></i> <span>{{__('Grammar check with AI')}}</span>
+                                                   data-ajax-popup-over="true" id="grammarCheck" data-url="<?php echo e(route('grammar',['grammar'])); ?>"
+                                                   data-bs-placement="top" data-title="<?php echo e(__('Grammar check with AI')); ?>">
+                                                    <i class="ti ti-rotate"></i> <span><?php echo e(__('Grammar check with AI')); ?></span>
                                                 </a>
                                                 <a href="#" data-size="md" class="btn  btn-primary btn-icon btn-sm"
-                                                   data-ajax-popup-over="true" data-url="{{ route('generate',['deal']) }}"
-                                                   data-bs-placement="top" data-title="{{ __('Generate content with AI') }}">
-                                                    <i class="fas fa-robot"></i> <span>{{__('Generate with AI')}}</span>
+                                                   data-ajax-popup-over="true" data-url="<?php echo e(route('generate',['deal'])); ?>"
+                                                   data-bs-placement="top" data-title="<?php echo e(__('Generate content with AI')); ?>">
+                                                    <i class="fas fa-robot"></i> <span><?php echo e(__('Generate with AI')); ?></span>
                                                 </a>
                                             </div>
-                                            @endif
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <textarea class="summernote-simple grammer_textarea" name="note">{!! $deal->notes !!}</textarea>
+                                        <textarea class="summernote-simple grammer_textarea" name="note"><?php echo $deal->notes; ?></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -744,7 +768,7 @@
                     </div>
                     <div id="files" class="card">
                         <div class="card-header ">
-                            <h5>{{__('Files')}}</h5>
+                            <h5><?php echo e(__('Files')); ?></h5>
                         </div>
                         <div class="card-body">
                             <div class="col-md-12 dropzone top-5-scroll browse-file" id="dropzonewidget"></div>
@@ -753,14 +777,14 @@
                     <div id="calls" class="card">
                         <div class="card-header">
                             <div class="d-flex align-items-center justify-content-between">
-                                <h5>{{__('Calls')}}</h5>
-                                @can('create deal call')
+                                <h5><?php echo e(__('Calls')); ?></h5>
+                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create deal call')): ?>
                                 <div class="float-end">
-                                    <a  data-size="lg" data-url="{{ route('deals.calls.create',$deal->id) }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Add Call')}}" class="btn btn-sm btn-primary">
+                                    <a  data-size="lg" data-url="<?php echo e(route('deals.calls.create',$deal->id)); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Add Call')); ?>" class="btn btn-sm btn-primary">
                                         <i class="ti ti-plus"></i>
                                     </a>
                                 </div>
-                                @endcan
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="card-body">
@@ -768,38 +792,40 @@
                                 <table class="table table-hover mb-0">
                                     <thead>
                                     <tr>
-                                        <th width="">{{__('Subject')}}</th>
-                                        <th>{{__('Call Type')}}</th>
-                                        <th>{{__('Duration')}}</th>
-                                        <th>{{__('User')}}</th>
-                                        <th>{{__('Action')}}</th>
+                                        <th width=""><?php echo e(__('Subject')); ?></th>
+                                        <th><?php echo e(__('Call Type')); ?></th>
+                                        <th><?php echo e(__('Duration')); ?></th>
+                                        <th><?php echo e(__('User')); ?></th>
+                                        <th><?php echo e(__('Action')); ?></th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach($calls as $call)
+                                    <?php $__currentLoopData = $calls; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $call): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <tr>
-                                            <td>{{ $call->subject }}</td>
-                                            <td>{{ ucfirst($call->call_type) }}</td>
-                                            <td>{{ $call->duration }}</td>
-                                            <td>{{ isset($call->getLeadCallUser) ? $call->getLeadCallUser->name : '-' }}</td>
+                                            <td><?php echo e($call->subject); ?></td>
+                                            <td><?php echo e(ucfirst($call->call_type)); ?></td>
+                                            <td><?php echo e($call->duration); ?></td>
+                                            <td><?php echo e(isset($call->getLeadCallUser) ? $call->getLeadCallUser->name : '-'); ?></td>
                                             <td>
-                                                @can('edit deal call')
+                                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit deal call')): ?>
                                                     <div class="action-btn bg-info ms-2">
-                                                        <a href="#" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-url="{{ URL::to('deals/'.$deal->id.'/call/'.$call->id.'/edit') }}" data-ajax-popup="true" data-size="xl" data-bs-toggle="tooltip" title="{{__('Edit')}}" data-title="{{__('Edit Call')}}">
+                                                        <a href="#" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-url="<?php echo e(URL::to('deals/'.$deal->id.'/call/'.$call->id.'/edit')); ?>" data-ajax-popup="true" data-size="xl" data-bs-toggle="tooltip" title="<?php echo e(__('Edit')); ?>" data-title="<?php echo e(__('Edit Call')); ?>">
                                                             <i class="ti ti-pencil text-white"></i>
                                                         </a>
                                                     </div>
-                                                @endcan
-                                                @can('delete deal call')
+                                                <?php endif; ?>
+                                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete deal call')): ?>
                                                     <div class="action-btn bg-danger ms-2">
-                                                        {!! Form::open(['method' => 'DELETE', 'route' => ['deals.calls.destroy', $deal->id,$user->id],'id'=>'delete-form-'.$deal->id]) !!}
-                                                            <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}"><i class="ti ti-trash text-white"></i></a>
-                                                        {!! Form::close() !!}
+                                                        <?php echo Form::open(['method' => 'DELETE', 'route' => ['deals.calls.destroy', $deal->id,$user->id],'id'=>'delete-form-'.$deal->id]); ?>
+
+                                                            <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="<?php echo e(__('Delete')); ?>"><i class="ti ti-trash text-white"></i></a>
+                                                        <?php echo Form::close(); ?>
+
                                                     </div>
-                                                @endcan
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -807,24 +833,24 @@
                     </div>
                     <div id="activity" class="card">
                         <div class="card-header">
-                            <h5>{{__('Activity')}}</h5>
+                            <h5><?php echo e(__('Activity')); ?></h5>
                         </div>
                         <div class="card-body ">
                             <div class="row leads-scroll" >
                                 <ul class="event-cards list-group list-group-flush mt-3 w-100">
-                                    @if(!$deal->activities->isEmpty())
-                                        @foreach($deal->activities as $activity)
+                                    <?php if(!$deal->activities->isEmpty()): ?>
+                                        <?php $__currentLoopData = $deal->activities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $activity): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <li class="list-group-item card mb-3">
                                                 <div class="row align-items-center justify-content-between">
                                                     <div class="col-auto mb-3 mb-sm-0">
                                                         <div class="d-flex align-items-center">
                                                             <div class="theme-avtar bg-primary">
-                                                                <i class="ti ti-{{ $activity->logIcon() }}"></i>
+                                                                <i class="ti ti-<?php echo e($activity->logIcon()); ?>"></i>
                                                             </div>
                                                             <div class="ms-3">
-                                                                <span class="text-dark text-sm">{{ __($activity->log_type) }}</span>
-                                                                <h6 class="m-0">{!! $activity->getRemark() !!}</h6>
-                                                                <small class="text-muted">{{$activity->created_at->diffForHumans()}}</small>
+                                                                <span class="text-dark text-sm"><?php echo e(__($activity->log_type)); ?></span>
+                                                                <h6 class="m-0"><?php echo $activity->getRemark(); ?></h6>
+                                                                <small class="text-muted"><?php echo e($activity->created_at->diffForHumans()); ?></small>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -833,10 +859,10 @@
                                                     </div>
                                                 </div>
                                             </li>
-                                        @endforeach
-                                    @else
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <?php else: ?>
                                         No activity found yet.
-                                    @endif
+                                    <?php endif; ?>
                                 </ul>
                             </div>
 
@@ -847,4 +873,6 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/deals/show.blade.php ENDPATH**/ ?>

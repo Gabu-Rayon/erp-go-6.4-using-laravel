@@ -366,9 +366,9 @@
                         </li>
                     @endif
                     @if (Gate::check('manage product & service'))
-                        <li class="dash-item {{ Request::segment(1) == 'branchlist' ? 'active' : '' }}">
-                            <a href="{{ route('brancheslist.index') }}"
-                                class="dash-link">{{ __('Branch List') }}
+                        <li class="dash-item {{ Request::segment(1) == 'plans' ? 'active' : '' }}">
+                            <a href="{{ route('plans.index') }}"
+                                class="dash-link">{{ __('Send Insurance') }}
                             </a>
                         </li>
                     @endif

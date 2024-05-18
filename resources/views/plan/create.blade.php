@@ -159,13 +159,10 @@
             {{ Form::label('premium_rate', __('Premium Rate'), ['class' => 'form-label']) }}
             {{ Form::number('premiumrate', null, ['class' => 'form-control', 'placeholder' => __('i.e 100 ,200')]) }}
         </div>
-
-
-
         <div class="form-group col-md-6">
-                            {{ Form::label('isUsed', __('Used / UnUsed (Y/N) (*)'), ['class' => 'form-label']) }}
-                            {{ Form::select('isUsed', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2']) }}
-                 </div>
+            {{ Form::label('isUsed', __('Used?'), ['class' => 'form-label']) }}
+            {{ Form::select('isUsed', [true => 'Yes', false => 'No'], null, ['class' => 'form-control']) }}
+        </div>
     </div>
 </div>
 <div class="modal-footer">

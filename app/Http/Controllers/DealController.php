@@ -159,6 +159,8 @@ class DealController extends Controller
      */
     public function create()
     {
+        \Log::info('USER');
+        \Log::info(\Auth::user()->getAllPermissions());
         if(\Auth::user()->can('create deal'))
         {
             $clients      = User::where('created_by', '=', \Auth::user()->ownerId())->where('type', 'client')->get()->pluck('name', 'id');

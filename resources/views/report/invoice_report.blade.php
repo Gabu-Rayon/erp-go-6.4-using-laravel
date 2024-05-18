@@ -283,8 +283,6 @@
                                             <tr>
                                                 <th> {{__('Invoice')}}</th>
                                                 <th> {{__('Date')}}</th>
-                                                <th> {{__('Customer')}}</th>
-                                                <th> {{__('Category')}}</th>
                                                 <th> {{__('Status')}}</th>
                                                 <th> {{__('	Paid Amount')}}</th>
                                                 <th> {{__('Due Amount')}}</th>
@@ -299,8 +297,6 @@
                                                         <a href="{{ route('invoice.show',\Crypt::encrypt($invoice->id)) }}" class="btn btn-outline-primary">{{ Auth::user()->invoiceNumberFormat($invoice->invoice_id) }}</a>                                                    </td>
                                                     </td>
                                                     <td>{{\Auth::user()->dateFormat($invoice->send_date)}}</td>
-                                                    <td>{{!empty($invoice->customer)? $invoice->customer->name:'-' }} </td>
-                                                    <td>{{!empty($invoice->category)?$invoice->category->name:'-'}}</td>
                                                     <td>
                                                         @if($invoice->status == 0)
                                                             <span class="badge status_badge bg-primary p-2 px-3 rounded">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>

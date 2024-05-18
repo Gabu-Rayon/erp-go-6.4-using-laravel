@@ -144,12 +144,12 @@ class PlanController extends Controller
                 'isUsed' => 'required',
             ]);
 
-            // Prepare the data to be sent in the request
+            // Prepare the data to be sent in the request   
             $requestData = [
-                'insuranceCode' => $request->insurancecode,
-                'insuranceName' => $request->insurancename,
-                'premiumRate' => $request->premiumrate,
-                'isUsed' => $request->isUsed,
+                'insuranceCode' => $request->all()['insurancecode'],
+                'insuranceName' => $request->all()['insurancename'],
+                'premiumRate' => $request->all()['premiumrate'],
+                'isUsed' => (boolean)$request->all()['isUsed'],
             ];
 
             // $requestData = [
@@ -159,11 +159,11 @@ class PlanController extends Controller
             //     'isUsed' => true, 
             // ];
             // Save the data to the local database using the model
-            $insurance = Insurance::create($requestData);
-            $insurance->save();
 
             // Send the POST request to the API endpoint
-            $response = Http::withHeaders([
+            $response = Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
                 'accept' => 'application/json',
                 'key' => '123456',
                 'Content-Type' => 'application/json-patch+json',
@@ -176,6 +176,10 @@ class PlanController extends Controller
 
             // Check if the request was successful
             if ($response->successful()) {
+                if ($response['data']['resultCd'] == 910) {
+                    return redirect()->back()->with('error', __('Invalid Credentials'));
+                }
+                $insurance = Insurance::create($requestData);
                 return redirect()->back()->with('success', __('Insurance Plan Successfully created.'));
             } else {
                 // API call failed, log the error and return an error response

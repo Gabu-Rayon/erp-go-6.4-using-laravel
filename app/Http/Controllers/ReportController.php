@@ -793,7 +793,7 @@ class ReportController extends Controller
 
             $data['currentYear'] = $year;
 
-            $invoiceProducts = InvoiceProduct::selectRaw('invoice_products.* ,MONTH(invoice_products.created_at) as month,YEAR(invoice_products.created_at) as year')->leftjoin('product_services', 'invoice_products.product_id', '=', 'product_services.id')->whereRaw('YEAR(invoice_products.created_at) =?', [$year])->where('product_services.created_by', '=', \Auth::user()->creatorId())->get();
+            $invoiceProducts = InvoiceProduct::selectRaw('invoice_products.* ,MONTH(invoice_products.created_at) as month,YEAR(invoice_products.created_at) as year')->leftjoin('item_list', 'invoice_products.product_id', '=', 'item_list.id')->whereRaw('YEAR(invoice_products.created_at) =?', [$year])->get();
 
             $incomeTaxesData = [];
 
@@ -861,7 +861,7 @@ class ReportController extends Controller
                 }
             }
 
-            $billProducts = BillProduct::selectRaw('bill_products.* ,MONTH(bill_products.created_at) as month,YEAR(bill_products.created_at) as year')->leftjoin('product_services', 'bill_products.product_id', '=', 'product_services.id')->whereRaw('YEAR(bill_products.created_at) =?', [$year])->where('product_services.created_by', '=', \Auth::user()->creatorId())->get();
+            $billProducts = BillProduct::selectRaw('bill_products.* ,MONTH(bill_products.created_at) as month,YEAR(bill_products.created_at) as year')->leftjoin('item_list', 'bill_products.product_id', '=', 'item_list.id')->whereRaw('YEAR(bill_products.created_at) =?', [$year])->get();
 
             $expenseTaxesData = [];
             foreach ($billProducts as $billProduct) {
@@ -4728,10 +4728,10 @@ class ReportController extends Controller
             $start = date('Y-01-01');
             $end = date('Y-m-d', strtotime('+1 day'));
         }
-        $invoiceItems = InvoiceProduct::select('product_services.name', \DB::raw('sum(invoice_products.quantity) as quantity'), \DB::raw('sum(invoice_products.price * invoice_products.quantity) as price'), \DB::raw('sum(invoice_products.price)/sum(invoice_products.quantity) as avg_price'));
-        $invoiceItems->leftjoin('product_services', 'product_services.id', 'invoice_products.product_id');
+        $invoiceItems = InvoiceProduct::select('item_list.itemNm', \DB::raw('sum(invoice_products.quantity) as quantity'), \DB::raw('sum(invoice_products.price * invoice_products.quantity) as price'), \DB::raw('sum(invoice_products.price)/sum(invoice_products.quantity) as avg_price'));
+        $invoiceItems->leftjoin('item_list', 'item_list.id', 'invoice_products.product_id');
         $invoiceItems->leftjoin('invoices', 'invoices.id', 'invoice_products.invoice_id');
-        $invoiceItems->where('product_services.created_by', \Auth::user()->creatorId());
+        $invoiceItems->all();
         $invoiceItems->where('invoices.issue_date', '>=', $start);
         $invoiceItems->where('invoices.issue_date', '<=', $end);
         $invoiceItems->groupBy('invoice_products.product_id');
@@ -4785,10 +4785,10 @@ class ReportController extends Controller
             $end = date('Y-m-d', strtotime('+1 day'));
         }
         if ($request->report == '#item') {
-            $invoiceItems = InvoiceProduct::select('product_services.name', \DB::raw('sum(invoice_products.quantity) as quantity'), \DB::raw('sum(invoice_products.price * invoice_products.quantity) as price'), \DB::raw('sum(invoice_products.price)/sum(invoice_products.quantity) as avg_price'));
-            $invoiceItems->leftjoin('product_services', 'product_services.id', 'invoice_products.product_id');
+            $invoiceItems = InvoiceProduct::select('item_list.itemNm', \DB::raw('sum(invoice_products.quantity) as quantity'), \DB::raw('sum(invoice_products.price * invoice_products.quantity) as price'), \DB::raw('sum(invoice_products.price)/sum(invoice_products.quantity) as avg_price'));
+            $invoiceItems->leftjoin('item_list', 'item_list.id', 'invoice_products.product_id');
             $invoiceItems->leftjoin('invoices', 'invoices.id', 'invoice_products.invoice_id');
-            $invoiceItems->where('product_services.created_by', \Auth::user()->creatorId());
+            $invoiceItems->where('item_list.created_by', \Auth::user()->creatorId());
             $invoiceItems->where('invoices.issue_date', '>=', $start);
             $invoiceItems->where('invoices.issue_date', '<=', $end);
             $invoiceItems->groupBy('invoice_products.product_id');
@@ -4911,39 +4911,41 @@ class ReportController extends Controller
             ->selectRaw('(invoices.invoice_id) as invoice')
             ->selectRaw('sum(invoice_products.price) as price')
             ->selectRaw('(invoice_products.quantity) as quantity')
-            ->selectRaw('(product_services.name) as product_name')
+            ->selectRaw('(item_list.itemNm) as product_name')
             ->selectRaw('invoices.issue_date as issue_date')
             ->selectRaw('invoices.status as status')
             ->leftJoin('customers', 'customers.id', 'invoices.customer_id')
             ->leftJoin('invoice_products', 'invoice_products.invoice_id', 'invoices.id')
-            ->leftJoin('product_services', 'product_services.id', 'invoice_products.product_id')
+            ->leftJoin('item_list', 'item_list.id', 'invoice_products.product_id')
             ->where('invoices.created_by', \Auth::user()->creatorId())
             ->where('invoices.issue_date', '>=', $start)
             ->where('invoices.issue_date', '<=', $end)
-            ->groupBy('invoices.invoice_id', 'product_services.name')
+            ->groupBy('invoices.invoice_id', 'item_list.itemNm')
             ->get()
             ->toArray();
+
+            \Log::info('RECEIVABLE DETAILS INVOICE');
+            \Log::info($receivableDetailsInvoice);
 
         $receivableDetailsCredit = CreditNote::select('customers.name')
             ->selectRaw('null as invoice')
             ->selectRaw('(credit_notes.id) as invoices')
             ->selectRaw('(credit_notes.amount) as price')
-            ->selectRaw('(product_services.name) as product_name')
+            ->selectRaw('(item_list.itemNm) as product_name')
             ->selectRaw('credit_notes.creditNoteDate as issue_date')
             ->selectRaw('5 as status')
             ->leftJoin('customers', 'customers.id', 'credit_notes.customer')
             ->leftJoin('invoice_products', 'invoice_products.invoice_id', 'credit_notes.invoice')
-            ->leftJoin('product_services', 'product_services.id', 'invoice_products.product_id')
+            ->leftJoin('item_list', 'item_list.id', 'invoice_products.product_id')
             ->leftJoin('invoices', 'invoices.id', 'credit_notes.invoice')
             ->where('invoices.created_by', \Auth::user()->creatorId())
             ->where('credit_notes.creditNoteDate', '>=', $start)
             ->where('credit_notes.creditNoteDate', '<=', $end)
-            ->groupBy('credit_notes.id', 'product_services.name')
+            ->groupBy('credit_notes.id', 'item_list.itemNm')
             ->get()
             ->toArray();
 
-            \Log::info('RECEIVABLE DETAILS CREDIT');
-            \Log::info($receivableDetailsCredit);
+            
 
         $mergedArray = [];
         foreach ($receivableDetailsCredit as $item) {
@@ -5197,17 +5199,17 @@ class ReportController extends Controller
             ->selectRaw('(bills.type) as type')
             ->selectRaw('sum(bill_products.price) as price')
             ->selectRaw('(bill_products.quantity) as quantity')
-            ->selectRaw('(product_services.name) as product_name')
+            ->selectRaw('(item_list.itemNm) as product_name')
             ->selectRaw('bills.bill_date as bill_date')
             ->selectRaw('bills.status as status')
             ->leftJoin('venders', 'venders.id', 'bills.vender_id')
             ->leftJoin('bill_products', 'bill_products.bill_id', 'bills.id')
-            ->leftJoin('product_services', 'product_services.id', 'bill_products.product_id')
+            ->leftJoin('item_list', 'item_list.id', 'bill_products.product_id')
             ->where('bills.created_by', \Auth::user()->creatorId())
             ->whereNotIn('bills.user_type', ['employee', 'customer'])
             ->where('bills.bill_date', '>=', $start)
             ->where('bills.bill_date', '<=', $end)
-            ->groupBy('bills.bill_id', 'product_services.name')
+            ->groupBy('bills.bill_id', 'item_list.itemNm')
             ->get()
             ->toArray();
 
@@ -5215,17 +5217,17 @@ class ReportController extends Controller
             ->selectRaw('null as bill')
             ->selectRaw('(debit_notes.id) as bills')
             ->selectRaw('(debit_notes.amount) as price')
-            ->selectRaw('(product_services.name) as product_name')
+            ->selectRaw('(item_list.itemNm) as product_name')
             ->selectRaw('debit_notes.date as bill_date')
             ->selectRaw('5 as status')
             ->leftJoin('venders', 'venders.id', 'debit_notes.vendor')
             ->leftJoin('bill_products', 'bill_products.bill_id', 'debit_notes.bill')
-            ->leftJoin('product_services', 'product_services.id', 'bill_products.product_id')
+            ->leftJoin('item_list', 'item_list.id', 'bill_products.product_id')
             ->leftJoin('bills', 'bills.id', 'debit_notes.bill')
             ->where('bills.created_by', \Auth::user()->creatorId())
             ->where('debit_notes.date', '>=', $start)
             ->where('debit_notes.date', '<=', $end)
-            ->groupBy('debit_notes.id', 'product_services.name')
+            ->groupBy('debit_notes.id', 'item_list.itemNm')
             ->get()
             ->toArray();
 

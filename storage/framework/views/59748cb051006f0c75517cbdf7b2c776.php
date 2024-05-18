@@ -294,8 +294,6 @@
                                             <tr>
                                                 <th> <?php echo e(__('Invoice')); ?></th>
                                                 <th> <?php echo e(__('Date')); ?></th>
-                                                <th> <?php echo e(__('Customer')); ?></th>
-                                                <th> <?php echo e(__('Category')); ?></th>
                                                 <th> <?php echo e(__('Status')); ?></th>
                                                 <th> <?php echo e(__('	Paid Amount')); ?></th>
                                                 <th> <?php echo e(__('Due Amount')); ?></th>
@@ -310,8 +308,6 @@
                                                         <a href="<?php echo e(route('invoice.show',\Crypt::encrypt($invoice->id))); ?>" class="btn btn-outline-primary"><?php echo e(Auth::user()->invoiceNumberFormat($invoice->invoice_id)); ?></a>                                                    </td>
                                                     </td>
                                                     <td><?php echo e(\Auth::user()->dateFormat($invoice->send_date)); ?></td>
-                                                    <td><?php echo e(!empty($invoice->customer)? $invoice->customer->name:'-'); ?> </td>
-                                                    <td><?php echo e(!empty($invoice->category)?$invoice->category->name:'-'); ?></td>
                                                     <td>
                                                         <?php if($invoice->status == 0): ?>
                                                             <span class="badge status_badge bg-primary p-2 px-3 rounded"><?php echo e(__(\App\Models\Invoice::$statues[$invoice->status])); ?></span>
