@@ -63,14 +63,32 @@ class ImportedItemsController extends Controller
                     return redirect()->back()->with('error', 'Imported item  Selected not found in Database');
                 }
 
+<<<<<<< HEAD
                 // Retrieve the given item by its item code
                 $givenItem = ItemInformation::where('itemCd', $request['item'])->first();
+=======
+            $declarationDate = str_replace('-', '', $importItem->declarationDate);
+            $declarationDate = date('Ymd', strtotime($declarationDate));
+
+            // Extract necessary details from the imported item
+            $srNo = $importItem->srNo;
+            $taskCode = $request['importedItemName'];
+            $declarationDate = $declarationDate;
+            $itemSeq = $importItem->itemSeq;
+            $hsCode = $importItem->hsCode;
+            $itemCd = $givenItem->itemCd;
+            $itemClsCd = $givenItem->itemClsCd;
+            $importItemStatusCode = $request['importItemStatusCode'];
+            $occurredDate = date("Ymd");
+            $remark = $request['remark'];
+>>>>>>> 094f77d980069ecd4392fa21a9207dbaff657ee9
 
                 // Ensure the given item exists
                 if (!$givenItem) {
                     return redirect()->back()->with('error', 'Select item  not found in the Database ');
                 }
 
+<<<<<<< HEAD
                 $declarationDate = str_replace('-', '', $importItem->declarationDate);
                 $declarationDate = date('Ymd', strtotime($declarationDate));
 
@@ -104,12 +122,30 @@ class ImportedItemsController extends Controller
                                     'taskCode' => $request['importedItemName'],
                                     'itemCode' => $request['item'],
                                 ]
+=======
+            $response = Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
+                'key' => '123456',
+                'accept' => '*/*',
+                'Content-Type' => 'application/json'
+            ])->post($url, [
+                        'importItemStatusCode' => $request['importItemStatusCode'],
+                        'declarationDate' => $declarationDate,
+                        'occurredDate' => $occurredDate,
+                        'remark' => $remark,
+                        'importedItemLists' => [
+                            [
+                                'taskCode' => $request['importedItemName'],
+                                'itemCode' => $request['item'],
+>>>>>>> 094f77d980069ecd4392fa21a9207dbaff657ee9
                             ]
                         ]);
 
                 \Log::info('IMPORTED ITEMS API RESPONSE : ');
                 \Log::info($response);
 
+<<<<<<< HEAD
                 if ($response['statusCode'] != 200) {
                     return redirect()->route('importeditems.index')->with('error', $response['message']);
                 }
@@ -128,6 +164,23 @@ class ImportedItemsController extends Controller
             }
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
+=======
+            if ($response['statusCode'] != 200) {
+                return redirect()->route('importeditems.index')->with('error', $response['message']);
+            }
+
+            // Code to update the Imported item status, mapped_product_id, mapped_date
+            $importItem->update([
+                'status' => $importItemStatusCode,
+                'mapped_product_id' => $givenItem->id,
+                'mapped_date' => Carbon::now()->format('Ymd'),  // Current date in 'Ymd' format
+            ]);
+            return redirect()->route('importeditems.index')->with('success', __('Product / Item Mapped Successfully.'));
+        } catch (\Exception $e) {
+            \Log::info('IMPORTED ITEMS Mapping Error Exception ERROR : ');
+            \Log::info($e);
+            return redirect()->back()->with('error', 'Something Went Wrong When Mapping Imported Item');
+>>>>>>> 094f77d980069ecd4392fa21a9207dbaff657ee9
         }
     }
 
