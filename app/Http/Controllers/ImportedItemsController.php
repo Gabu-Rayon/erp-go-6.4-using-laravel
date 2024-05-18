@@ -49,83 +49,98 @@ class ImportedItemsController extends Controller
     public function store(Request $request)
     {
 
-
         if (\Auth::user()->can('create purchase')) {
-           try {
-            \Log::info('IMPORTED ITEMS DATA  From the Form :');
-            \Log::info($request->all());
+            try {
 
-            // Retrieve the imported item by its task code
-            $importItem = ImportedItems::where('taskCode', $request['importedItemName'])->first();
 
-            // Ensure the imported item exists
-            if (!$importItem) {
-                return redirect()->back()->with('error', 'Imported item  Selected not found in Database');
-            }
+                $validator = \Validator::make(
+                    $request->all(),
+                    [
+                        'importedItemName' => 'required',
+                        'item' => 'required',
+                        'importItemStatusCode' => 'required',
+                        'remark' => 'required',
+                    ]
+                );
+                if ($validator->fails()) {
+                    $messages = $validator->getMessageBag();
 
-            // Retrieve the given item by its item code
-            $givenItem = ItemInformation::where('itemCd', $request['item'])->first();
+                    return redirect()->back()->with('error', $messages->first());
+                }
+                \Log::info('IMPORTED ITEMS DATA  From the Form :');
+                \Log::info($request->all());
 
-            // Ensure the given item exists
-            if (!$givenItem) {
-                return redirect()->back()->with('error', 'Select item  not found in the Database ');
-            }
+                // Retrieve the imported item by its task code
+                $importItem = ImportedItems::where('taskCode', $request['importedItemName'])->first();
 
-            $declarationDateofImport = str_replace('-', '', $importItem->declarationDate);
-            $declarationDt = date('Ymd', strtotime($declarationDateofImport));
+                // Ensure the imported item exists
+                if (!$importItem) {
+                    return redirect()->back()->with('error', 'Imported item  Selected not found in Database');
+                }
 
-            // Extract necessary details from the imported item
-            $srNo = $importItem->srNo;
-            $taskCode = $request['importedItemName'];
-            $declarationDate = $declarationDt;
-            $itemSeq = $importItem->itemSeq;
-            $hsCode = $importItem->hsCode;
-            $itemCd = $givenItem->itemCd;
-            $itemClsCd = $givenItem->itemClsCd;
-            $importItemStatusCode = $request['importItemStatusCode'];
-            $occurredDate = date("Ymd");
-            $remark = $request['remark'];
+                // Retrieve the given item by its item code
+                $givenItem = ItemInformation::where('itemCd', $request['item'])->first();
 
-            $url = 'https://etims.your-apps.biz/api/MapImportedItem';
+                // Ensure the given item exists
+                if (!$givenItem) {
+                    return redirect()->back()->with('error', 'Select item  not found in the Database ');
+                }
 
-            $response = Http::withOptions([
-                'verify' => false
-            ])->withHeaders([
-                'key' => '123456',
-                'accept' => '*/*',
-                'Content-Type' => 'application/json'
-            ])->post($url, [
-                        'importItemStatusCode' => $request['importItemStatusCode'],
-                        'declarationDate' => $declarationDate,
-                        'occurredDate' => $occurredDate,
-                        'remark' => $remark,
-                        'importedItemLists' => [
-                            [
-                                'taskCode' => $request['importedItemName'],
-                                'itemCode' => $request['item'],
+                $declarationDateofImport = str_replace('-', '', $importItem->declarationDate);
+                $declarationDt = date('Ymd', strtotime($declarationDateofImport));
+
+                // Extract necessary details from the imported item
+                $srNo = $importItem->srNo;
+                $taskCode = $request['importedItemName'];
+                $declarationDate = $declarationDt;
+                $itemSeq = $importItem->itemSeq;
+                $hsCode = $importItem->hsCode;
+                $itemCd = $givenItem->itemCd;
+                $itemClsCd = $givenItem->itemClsCd;
+                $importItemStatusCode = $request['importItemStatusCode'];
+                $occurredDate = date("Ymd");
+                $remark = $request['remark'];
+
+                $url = 'https://etims.your-apps.biz/api/MapImportedItem';
+
+                $response = Http::withOptions([
+                    'verify' => false
+                ])->withHeaders([
+                            'key' => '123456',
+                            'accept' => '*/*',
+                            'Content-Type' => 'application/json'
+                        ])->post($url, [
+                            'importItemStatusCode' => $request['importItemStatusCode'],
+                            'declarationDate' => $declarationDate,
+                            'occurredDate' => $occurredDate,
+                            'remark' => $remark,
+                            'importedItemLists' => [
+                                [
+                                    'taskCode' => $request['importedItemName'],
+                                    'itemCode' => $request['item'],
+                                ]
                             ]
-                        ]
-                    ]);
+                        ]);
 
-            \Log::info('IMPORTED ITEMS API RESPONSE : ');
-            \Log::info($response);
+                \Log::info('IMPORTED ITEMS API RESPONSE : ');
+                \Log::info($response);
 
-            if ($response['statusCode'] != 200) {
-                return redirect()->route('importeditems.index')->with('error', $response['message']);
+                if ($response['statusCode'] != 200) {
+                    return redirect()->route('importeditems.index')->with('error', $response['message']);
+                }
+
+                // Code to update the Imported item status, mapped_product_id, mapped_date
+                $importItem->update([
+                    'status' => $importItemStatusCode,
+                    'mapped_itemCd' => $givenItem->id,
+                    'mapped_date' => Carbon::now()->format('Ymd'),  // Current date in 'Ymd' format
+                ]);
+                return redirect()->route('importeditems.index')->with('success', __('Product / Item Mapped Successfully.'));
+            } catch (\Exception $e) {
+                \Log::info('IMPORTED ITEMS Mapping Error Exception ERROR : ');
+                \Log::info($e);
+                return redirect()->back()->with('error', 'Something Went Wrong When Mapping Imported Item');
             }
-
-            // Code to update the Imported item status, mapped_product_id, mapped_date
-            $importItem->update([
-                'status' => $importItemStatusCode,
-                'mapped_product_id' => $givenItem->id,
-                'mapped_date' => Carbon::now()->format('Ymd'),  // Current date in 'Ymd' format
-            ]);
-            return redirect()->route('importeditems.index')->with('success', __('Product / Item Mapped Successfully.'));
-        } catch (\Exception $e) {
-            \Log::info('IMPORTED ITEMS Mapping Error Exception ERROR : ');
-            \Log::info($e);
-            return redirect()->back()->with('error', 'Something Went Wrong When Mapping Imported Item');
-        }
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
         }
@@ -230,7 +245,7 @@ class ImportedItemsController extends Controller
     public function update(Request $request, ImportedItems $importedItems)
     {
         if (\Auth::user()->can('show purchase')) {
-  //method code here  //method code here
+            //method code here  //method code here
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
         }
@@ -242,7 +257,7 @@ class ImportedItemsController extends Controller
     public function destroy(ImportedItems $importedItems)
     {
         if (\Auth::user()->can('show purchase')) {
-              //method code here
+            //method code here
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
         }

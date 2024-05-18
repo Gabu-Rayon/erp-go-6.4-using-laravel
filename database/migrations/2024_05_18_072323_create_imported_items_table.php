@@ -34,7 +34,7 @@ return new class extends Migration
             $table->string('grossWeight')->nullable();
             $table->string('invForCurrencyAmount')->nullable();
             $table->bigInteger('status')->nullable();
-            $table->bigInteger('mapped_product_id')->nullable();         
+            $table->bigInteger('mapped_itemCd')->nullable();         
             $table->timestamp('mapped_date')->nullable();
             $table->bigInteger('created_by')->nullable();
             $table->timestamps(); 

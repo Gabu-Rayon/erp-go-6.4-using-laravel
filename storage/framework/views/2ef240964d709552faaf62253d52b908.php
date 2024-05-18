@@ -368,8 +368,8 @@
                         </li>
                     <?php endif; ?>
                     <?php if(Gate::check('manage product & service')): ?>
-                        <li class="dash-item <?php echo e(Request::segment(1) == 'plans' ? 'active' : ''); ?>">
-                            <a href="<?php echo e(route('plans.index')); ?>"
+                        <li class="dash-item <?php echo e(Request::segment(1) == 'basicdata' ? 'active' : ''); ?>">
+                            <a href="<?php echo e(route('insurance.index')); ?>"
                                 class="dash-link"><?php echo e(__('Send Insurance')); ?>
 
                             </a>

@@ -32,7 +32,7 @@ class ImportedItems extends Model
         'grossWeight',
         'invForCurrencyAmount',
         'status',
-        'mapped_product_id',
+        'mapped_itemCd',
         'mapped_date',
         'created_by'
     ];

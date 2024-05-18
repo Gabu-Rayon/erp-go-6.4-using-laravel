@@ -16,6 +16,7 @@ return new class extends Migration {
         Schema::create('composition_list', function (Blueprint $table) {
             $table->id();
             $table->string('mainItemCode');
+            $table->bigInteger('compositionItems_count');
             $table->timestamps();
         });
     }

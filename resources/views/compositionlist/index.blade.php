@@ -32,16 +32,31 @@
                         <thead>
                         <tr>
                             <th scope="col">{{__('Main Item')}}</th>
-                            <th scope="col">{{__('Composition Item')}}</th>
-                            <th scope="col">{{__('Composition Item Quantity')}}</th>
+                            <th scope="col">{{__('Total CompItems')}}</th>
+                            <th scope="col">{{__('Action')}}</th>
                         </tr>
                         </thead>
                         <tbody class="list">
                         @foreach ($compositionslistitems as $compositionlistitem)
                             <tr>
                                 <td>{{ \App\Models\ItemInformation::where('itemCd', $compositionlistitem->mainItemCode)->first()->itemNm }}</td>
-                                <td>{{ $compositionlistitem->compoItemCode }}</td>
-                                <td>{{ $compositionlistitem->compoItemQty }}</td>
+                                <td>{{ $compositionlistitem->compositionItems_count }}</td>
+
+                                 @if(Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase'))
+                                        <td class="Action">
+                                            <span>
+                                                 @can('show purchase')
+                                                    <div class="action-btn bg-warning ms-2">
+                                                        <a href="{{ route('compositionlist.show', $compositionlistitem->id) }}"
+                                                           class="mx-3 btn btn-sm d-inline-flex align-items-center"
+                                                           data-bs-whatever="{{__('View composition list items')}}" data-bs-toggle="tooltip"
+                                                           data-bs-original-title="{{__('View')}}"> 
+                                                           <span class="text-white"><i class="ti ti-eye"></i></span></a>
+                                                    </div>
+                                                @endcan
+                                            </span>
+                                        </td>
+                                    @endif
                             </tr>
                         @endforeach
                         </tbody>
@@ -52,4 +67,3 @@
         </div>
     </div>
 @endsection
-

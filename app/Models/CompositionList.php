@@ -9,8 +9,9 @@ class CompositionList extends Model
 {
     use HasFactory;
 
-    protected $table = 'composition_list';
+    protected $table = 'composition_List';
     protected $fillable = [
         'mainItemCode',
+        'compositionItems_count',
     ];
 }

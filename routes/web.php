@@ -1,18 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\StockMoveListController;
-use App\Http\Controllers\SalesCreditNoteController;
-use App\Http\Controllers\StockAdjustmentListController;
-use App\Http\Controllers\ImportedItemsController;
-use App\Http\Controllers\StockMoveController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\CodeController;
 use App\Http\Controllers\DealController;
-use App\Http\Controllers\SalesController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LoanController;
@@ -25,6 +19,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\PaytrController;
+use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SspayController;
 use App\Http\Controllers\StageController;
 use App\Http\Controllers\BranchController;
@@ -83,6 +78,7 @@ use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SetSalaryController;
+use App\Http\Controllers\StockMoveController;
 use App\Http\Controllers\TaskStageController;
 use App\Http\Controllers\TimesheetController;
 use App\Http\Controllers\ToyyibpayController;
@@ -121,16 +117,20 @@ use App\Http\Controllers\TrainingTypeController;
 use App\Http\Controllers\CompanyPolicyController;
 use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\GetNoticeListController;
+use App\Http\Controllers\ImportedItemsController;
 use App\Http\Controllers\MolliePaymentController;
 use App\Http\Controllers\ProjectReportController;
 use App\Http\Controllers\ProjectstagesController;
+use App\Http\Controllers\PurchaseSalesController;
 use App\Http\Controllers\SkrillPaymentController;
+use App\Http\Controllers\StockMoveListController;
 use App\Http\Controllers\StripePaymentController;
 use App\Http\Controllers\XenditPaymentController;
 use App\Http\Controllers\BenefitPaymentController;
 use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\CustomQuestionController;
 use App\Http\Controllers\DucumentUploadController;
+use App\Http\Controllers\InsurancePlansController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\MercadoPaymentController;
 use App\Http\Controllers\ProductServiceController;
@@ -144,6 +144,7 @@ use App\Http\Controllers\NepalstePaymnetController;
 use App\Http\Controllers\PaystackPaymentController;
 use App\Http\Controllers\PerformanceTypeController;
 use App\Http\Controllers\RazorpayPaymentController;
+use App\Http\Controllers\SalesCreditNoteController;
 use App\Http\Controllers\TerminationTypeController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\ApiInitializationController;
@@ -160,13 +161,13 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\BankTransferPaymentController;
 use App\Http\Controllers\ItemClassificationsController;
 use App\Http\Controllers\SaturationDeductionController;
+use App\Http\Controllers\StockAdjustmentListController;
 use App\Http\Controllers\NotificationTemplatesController;
 use App\Http\Controllers\ItemClassificationCodeController;
 use App\Http\Controllers\ProductServiceCategoryController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\PurchaseSalesController;
 
 
 
@@ -1838,6 +1839,22 @@ Route::group(
     ],
     function () {
         Route::resource('compositionlist', CompositionListController::class);
+
+    }
+);
+
+
+
+Route::group(
+    [
+        'middleware' => [
+            'auth',
+            'XSS',
+            'revalidate',
+        ],
+    ],
+    function () {
+        Route::resource('insurance', InsurancePlansController::class);
 
     }
 );

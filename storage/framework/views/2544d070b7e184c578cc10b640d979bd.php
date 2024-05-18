@@ -113,6 +113,41 @@
                         <h6><?php echo e(__('Invoice Foreign Currency Amount: ')); ?></h6>
                         <p><?php echo e($importedItem->invForCurrencyAmount); ?></h6>
                     </div>
+                    <div class="col-md-3">
+                        <h6><?php echo e(__('mapped To item Code: ')); ?></h6>
+                        <p><?php echo e($importedItem->mapped_itemCd); ?></h6>
+                    </div>
+                    <div class="col-md-3">
+                        <h6><?php echo e(__('mapped Date Done: ')); ?></h6>
+                        <p><?php echo e($importedItem->mapped_date); ?></h6>
+                    </div>
+                     <div class="col-md-3">
+    <h6><?php echo e(__('Mapped Status: ')); ?></h6>
+    <p>
+        <?php
+            $statusText = '';
+            switch($importedItem->status) {
+                case 1:
+                    $statusText = __('Unsent');
+                    break;
+                case 2:
+                    $statusText = __('Waiting');
+                    break;
+                case 3:
+                    $statusText = __('Approved');
+                    break;
+                case 4:
+                    $statusText = __('Cancelled');
+                    break;
+                default:
+                    $statusText = __('Unknown');
+            }
+        ?>
+        <?php echo e($statusText); ?>
+
+    </p>
+</div>
+
                 </div>
             </div>
         </div>

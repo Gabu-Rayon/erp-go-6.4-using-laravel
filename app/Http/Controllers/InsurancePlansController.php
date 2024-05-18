@@ -1,0 +1,152 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Insurance;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Http;
+
+class InsurancePlansController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        if (\Auth::user()->can('manage purchase')) {
+            try {
+                $insurances = Insurance::all();
+                return view('insurance.index', compact('insurances'));
+            } catch (\Exception $e) {
+            }
+        } else {
+            return redirect()->back()->with('error', __('Permission Denied.'));
+        }
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        if (\Auth::user()->can('manage purchase')) {
+            return view('insurance.create');
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
+    /**
+     * Store a newly created resource in storage.
+     */
+     public function store(Request $request)
+    {
+        if (\Auth::user()->can('create plan')) {
+            // Validate the incoming request data
+            $request->validate([
+                'insurancecode' => 'required|string',
+                'insurancename' => 'required|string',
+                'premiumrate' => 'required|numeric',
+                'isUsed' => 'required',
+            ]);
+
+            // Prepare the data to be sent in the request   
+            $requestData = [
+                'insuranceCode' => $request->all()['insurancecode'],
+                'insuranceName' => $request->all()['insurancename'],
+                'premiumRate' => $request->all()['premiumrate'],
+                'isUsed' => (boolean)$request->all()['isUsed'],
+            ];
+
+            // $requestData = [
+            //     'insuranceCode' => 'ABC123',
+            //     'insuranceName' => 'Test Insurance',
+            //     'premiumRate' => 100,
+            //     'isUsed' => true, 
+            // ];
+            // Save the data to the local database using the model
+
+            // Send the POST request to the API endpoint
+            $response = Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
+                'accept' => 'application/json',
+                'key' => '123456',
+                'Content-Type' => 'application/json-patch+json',
+            ])->post('https://etims.your-apps.biz/api/AddInsurance', $requestData);
+
+            // Log the API response
+            \Log::info('API Request Data Posting Insurance Plan: ' . json_encode($requestData));
+            \Log::info('API Response from posting Insurance Plan: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+
+            // Check if the request was successful
+            if ($response->successful()) {
+                if ($response['data']['resultCd'] == 910) {
+                    return redirect()->back()->with('error', __('Invalid Credentials'));
+                }
+                $insurance = Insurance::create($requestData);
+                return redirect()->back()->with('success', __('Insurance Plan Successfully created.'));
+            } else {
+                // API call failed, log the error and return an error response
+                \Log::error('Failed to add insurance via API: ' . $response->status() . ' ' . $response->body());
+                return redirect()->back()->with('error', __('Failed to add insurance Plan via API.'));
+            }
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show($id)
+    {
+
+
+        if (\Auth::user()->can('show purchase')) {
+            $insurance = Insurance::find($id);
+            return view('insurance.view', compact('insurance'));
+
+        } else {
+            return redirect()->back()->with('error', __('Permission Denied.'));
+        }
+    }
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Insurance $Insurance)
+    {
+        if (\Auth::user()->can('show purchase')) {
+            //method code here
+        } else {
+            return redirect()->back()->with('error', __('Permission Denied.'));
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Insurance $Insurance)
+    {
+        if (\Auth::user()->can('edit plan')) {
+            //method code here  //method code here
+        } else {
+            return redirect()->back()->with('error', __('Permission Denied.'));
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Insurance $Insurance)
+    {
+        if (\Auth::user()->can('edit plan')) {
+            //method code here
+        } else {
+            return redirect()->back()->with('error', __('Permission Denied.'));
+        }
+    }
+
+}
