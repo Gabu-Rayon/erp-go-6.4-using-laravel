@@ -120,6 +120,59 @@
                 }
             });
         });
+        $(document).ready(function() {
+            $(document).on('change', '.customer', function() {
+                var customer_Info = $(this).val();
+                var url = $(this).data('url');
+                var el = $(this).closest('[data-autofill]');
+
+                if (el.length) {
+                    console.log("Change event triggered for .customer[data-autofill]");
+
+                    console.log("customer_Info:", customer_Info);
+                    console.log("url:", url);
+                    console.log("el:", el);
+
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': jQuery('#token').val()
+                        },
+                        data: {
+                            'customer': customer_Info
+                        },
+                        cache: false,
+                        success: function(data) {
+                            try {
+                                console.log("Customer information:", data);
+
+                                if (!data || Object.keys(data).length === 0) {
+                                    console.log("Customer information is empty.");
+                                } else {
+                                    console.log(
+                                        "Customer information is not empty. Processing...");
+
+                                    var customer = data.data;
+
+                                    console.log("Customer object:", customer);
+
+                                    console.log("Populating Customer:", customer
+                                        .customerTin);
+                                    el.find('.customerTin').val(customer.customerTin);
+
+                                }
+                            } catch (error) {
+                                console.error("Error processing Customer Information:", error);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error retrieving Customer Information:", error);
+                        }
+                    });
+                }
+            });
+        });
     </script>
     <script>
         $(document).on('click', '[data-repeater-delete]', function() {
@@ -129,39 +182,39 @@
         });
     </script>
     <script>
-          function calculateDiscountAmount(unitPrice, packageQuantity, quantity, discountRate) {
-        // Calculate the total price before discount
-        var totalPrice = unitPrice * quantity * packageQuantity;
+        function calculateDiscountAmount(unitPrice, packageQuantity, quantity, discountRate) {
+            // Calculate the total price before discount
+            var totalPrice = unitPrice * quantity * packageQuantity;
 
-        // Calculate the discounted price
-        var discountAmount = totalPrice * (discountRate / 100);
+            // Calculate the discounted price
+            var discountAmount = totalPrice * (discountRate / 100);
 
-        return discountAmount;
-    }
+            return discountAmount;
+        }
 
-    // Function to update discount amount field
-    function updateDiscountAmount(row) {
-        // Get values of required fields
-        var unitPrice = parseFloat(row.find('.unitPrice').val());
-        var packageQuantity = parseFloat(row.find('.pkgQuantity').val());
-        var quantity = parseFloat(row.find('.quantity').val());
-        var discountRate = parseFloat(row.find('.discountRate').val());
+        // Function to update discount amount field
+        function updateDiscountAmount(row) {
+            // Get values of required fields
+            var unitPrice = parseFloat(row.find('.unitPrice').val());
+            var packageQuantity = parseFloat(row.find('.pkgQuantity').val());
+            var quantity = parseFloat(row.find('.quantity').val());
+            var discountRate = parseFloat(row.find('.discountRate').val());
 
-        // Calculate discount amount
-        var discountAmt = calculateDiscountAmount(unitPrice, packageQuantity, quantity, discountRate) || 0;
+            // Calculate discount amount
+            var discountAmt = calculateDiscountAmount(unitPrice, packageQuantity, quantity, discountRate) || 0;
 
-        // Update discount amount field
-        row.find('.discountAmt').val(discountAmt.toFixed(2));
-    }
+            // Update discount amount field
+            row.find('.discountAmt').val(discountAmt.toFixed(2));
+        }
 
-    // Event listener for change in unitPrice, pkgQuantity, quantity, and discountRate fields
-    $(document).on('keyup change', '.unitPrice, .pkgQuantity, .quantity, .discountRate', function() {
-        // Find the closest row containing the changed field
-        var row = $(this).closest('tr');
+        // Event listener for change in unitPrice, pkgQuantity, quantity, and discountRate fields
+        $(document).on('keyup change', '.unitPrice, .pkgQuantity, .quantity, .discountRate', function() {
+            // Find the closest row containing the changed field
+            var row = $(this).closest('tr');
 
-        // Update discount amount for the row
-        updateDiscountAmount(row);
-    });
+            // Update discount amount for the row
+            updateDiscountAmount(row);
+        });
     </script>
 <?php $__env->stopPush(); ?>
 
@@ -172,12 +225,16 @@
         <div class="col-12">
             <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
             <div class="card">
-                <div class="card-body">
+                <div class="card-body" data-autofill>
                     <div class="row">
                         <div class="form-group col-md-6">
+                            <!-- <?php echo e(Form::label('customerName', __('Customer Name (*)'), ['class' => 'form-label'])); ?>
+
+                                    <?php echo e(Form::select('customerName', $customer, null, ['class' => 'form-control customerName', 'required' => 'required'])); ?> -->
+
                             <?php echo e(Form::label('customerName', __('Customer Name (*)'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::select('customerName', $customer, null, ['class' => 'form-control customerName', 'required' => 'required'])); ?>
+                            <?php echo e(Form::select('customerName', $customer, '', ['class' => 'form-control select2 customer', 'data-url' => route('invoice.custom.credit.getcustomerDetails'), 'required' => 'required'])); ?>
 
                         </div>
                         <div class="form-group col-md-6">
@@ -186,10 +243,16 @@
                             <?php echo e(Form::text('customerTin', '', ['class' => 'form-control customerTin', 'required' => 'required'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
-                            <?php echo e(Form::label('invoice', __('Customer Name (*)'), ['class' => 'form-label'])); ?>
+                        <!-- <div class="form-group col-md-6">
+                                    <?php echo e(Form::label('invoice', __('Invoice(*)'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::select('invoice', $invoices, null, ['class' => 'form-control invoice', 'required' => 'required'])); ?>
+                                    <?php echo e(Form::select('invoice', $invoices, null, ['class' => 'form-control invoice', 'required' => 'required'])); ?>
+
+                                </div> -->
+                        <div class="form-group col-md-6">
+                            <?php echo e(Form::label('invoice', __('Invoice(*)'), ['class' => 'form-label'])); ?>
+
+                            <?php echo e(Form::number('invoice', '', ['class' => 'form-control invoice', 'placeholder' => '1', 'required' => 'required'])); ?>
 
                         </div>
                         <div class="form-group  col-md-6">
@@ -208,13 +271,13 @@
                         <div class="form-group col-md-6">
                             <?php echo e(Form::label('salesType', __('Sales Type(*)'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::select('salesType', $salesTypeCodes, null, ['class' => 'form-control'])); ?>
+                            <?php echo e(Form::select('salesType', $salesTypeCodes, null, ['class' => 'form-control select2'])); ?>
 
                         </div>
                         <div class="form-group col-md-6">
                             <?php echo e(Form::label('paymentType', __('Payment Type'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::select('paymentType', $paymentTypeCodes, null, ['class' => 'form-control'])); ?>
+                            <?php echo e(Form::select('paymentType', $paymentTypeCodes, null, ['class' => 'form-control select2'])); ?>
 
                         </div>
                         <div class="form-group col-md-6">
@@ -256,25 +319,25 @@
                         <div class="form-group col-md-6">
                             <?php echo e(Form::label('creditNoteReason', __('Credit Note Reason(*)'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::select('creditNoteReason', $creditNoteReasons, null, ['class' => 'form-control'])); ?>
+                            <?php echo e(Form::select('creditNoteReason', $creditNoteReasons, null, ['class' => 'form-control select2'])); ?>
 
                         </div>
                         <div class="form-group col-md-6">
                             <?php echo e(Form::label('invoiceStatusCode', __('Invoice Status'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::select('invoiceStatusCode', $invoiceStatusCodes, null, ['class' => 'form-control'])); ?>
+                            <?php echo e(Form::select('invoiceStatusCode', $invoiceStatusCodes, null, ['class' => 'form-control select2'])); ?>
 
                         </div>
                         <div class="form-group col-md-6">
                             <?php echo e(Form::label('isPurchaseAccept', __('Purchase Accepted?'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::select('isPurchaseAccept', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control'])); ?>
+                            <?php echo e(Form::select('isPurchaseAccept', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2'])); ?>
 
                         </div>
                         <div class="form-group col-md-6">
                             <?php echo e(Form::label('isStockIOUpdate', __('Stock IO Update?'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::select('isStockIOUpdate', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control'])); ?>
+                            <?php echo e(Form::select('isStockIOUpdate', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2'])); ?>
 
                         </div>
                         <div class="form-group col-md-6">
@@ -283,12 +346,12 @@
                             <?php echo e(Form::text('mapping', '', ['class' => 'form-control'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
-                            <?php echo e(Form::label('amount', __('Amount(*)'), ['class' => 'form-label'])); ?>
+                        <!-- <div class="form-group col-md-6">
+                                    <?php echo e(Form::label('amount', __('Amount(*)'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::number('amount', '', ['class' => 'form-control'])); ?>
+                                    <?php echo e(Form::number('amount', '', ['class' => 'form-control'])); ?>
 
-                        </div>
+                                </div> -->
                         <div class="form-group col-md-12">
                             <?php echo e(Form::label('remark', __('Remark'), ['class' => 'form-label'])); ?>
 
@@ -327,7 +390,6 @@
                                         <?php echo e(Form::label('itemCode', __('Item Code'), ['class' => 'form-label'])); ?>
 
                                         <?php echo e(Form::select('itemCode', $product_services_Codes, '', ['class' => 'form-control select2 itemCode', 'data-url' => route('invoice.custom.credit.getiteminformation'), 'required' => 'required'])); ?>
-
 
                                     </td>
                                     <td class="form-group col-md-4">

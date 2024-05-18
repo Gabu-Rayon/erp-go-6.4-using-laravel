@@ -187,6 +187,15 @@
             <?php echo e(Form::number('premiumrate', null, ['class' => 'form-control', 'placeholder' => __('i.e 100 ,200')])); ?>
 
         </div>
+
+
+
+        <div class="form-group col-md-6">
+                            <?php echo e(Form::label('isUsed', __('Used / UnUsed (Y/N) (*)'), ['class' => 'form-label'])); ?>
+
+                            <?php echo e(Form::select('isUsed', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2'])); ?>
+
+                 </div>
     </div>
 </div>
 <div class="modal-footer">

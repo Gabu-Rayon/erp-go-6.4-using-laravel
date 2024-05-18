@@ -583,26 +583,36 @@ class CustomerController extends Controller
             }
 
             $customerData->customer_id = $customer[0];
-            $customerData->name = $customer[1];
-            $customerData->email = $customer[2];
-            $customerData->contact = $customer[3];
-            $customerData->is_active = 1;
-            $customerData->billing_name = $customer[4];
-            $customerData->billing_country = $customer[5];
-            $customerData->billing_state = $customer[6];
-            $customerData->billing_city = $customer[7];
-            $customerData->billing_phone = $customer[8];
-            $customerData->billing_zip = $customer[9];
-            $customerData->billing_address = $customer[10];
-            $customerData->shipping_name = $customer[11];
-            $customerData->shipping_country = $customer[12];
-            $customerData->shipping_state = $customer[13];
-            $customerData->shipping_city = $customer[14];
-            $customerData->shipping_phone = $customer[15];
-            $customerData->shipping_zip = $customer[16];
-            $customerData->shipping_address = $customer[17];
-            $customerData->balance = 0;
+            $customerData->customerNo = $customer[2];
+            $customerData->customertin = $customer[3];
+            $customerData->name = $customer[4];
+            $customerData->email = $customer[5];
+            $customerData->address = $customer[6];
+            $customerData->tax_number = $customer[7];
+            $customerData->contact = $customer[8];
+            $customerData->faxno = $customer[9];
+            $customerData->isUsed = $customer[10];
+            $customerData->remark = $customer[11];
+            $customerData->avatar = $customer[12];
             $customerData->created_by = \Auth::user()->creatorId();
+             $customerData->is_active = $customer[13];
+            $customerData->billing_name = $customer[14];
+            $customerData->billing_country = $customer[15];
+            $customerData->billing_state = $customer[16];
+            $customerData->billing_city = $customer[17];
+            $customerData->billing_phone = $customer[18];
+            $customerData->billing_zip = $customer[19];
+            $customerData->billing_address = $customer[20];
+            
+            $customerData->shipping_name = $customer[21];
+            $customerData->shipping_country = $customer[22];
+            $customerData->shipping_state = $customer[23];
+            $customerData->shipping_city = $customer[24];
+            $customerData->shipping_phone = $customer[25];
+            $customerData->shipping_zip = $customer[26];
+            $customerData->shipping_address = $customer[27];
+            $customerData->lang = $customer[28];
+            $customerData->balance = [29];
 
             if (empty($customerData)) {
                 $errorArray[] = $customerData;

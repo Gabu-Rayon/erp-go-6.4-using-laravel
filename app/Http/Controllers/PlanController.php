@@ -141,6 +141,7 @@ class PlanController extends Controller
                 'insurancecode' => 'required|string',
                 'insurancename' => 'required|string',
                 'premiumrate' => 'required|numeric',
+                'isUsed' => 'required',
             ]);
 
             // Prepare the data to be sent in the request   

@@ -657,5 +657,21 @@ class CreditNoteController extends Controller
             return response()->json([]);
         }
     }
+    public function getCustomerDetailsToAddDirectCreditNote(Request $request){
+        // Fetch Customer information based on the item code
+        $customerId = $request->input('customer');
+
+        \Log::info('Customer Id: ' . $customerId);
+        
+        $customerInfo['data'] = Customer::where('id', $customerId)->first();
+
+        if ($customerInfo['data']) {
+            // Return Customer information as JSON response
+            return response()->json($customerInfo);
+        } else {
+            // If customer information not found, return empty response
+            return response()->json([]);
+        }
+        }
 
 }
