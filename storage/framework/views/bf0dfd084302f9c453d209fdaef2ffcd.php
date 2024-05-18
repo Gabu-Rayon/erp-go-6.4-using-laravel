@@ -94,10 +94,11 @@
         <a href="<?php echo e(route('deals.export')); ?>" data-bs-toggle="tooltip" title="<?php echo e(__('Export')); ?>" class="btn btn-sm btn-primary">
             <i class="ti ti-file-export"></i>
         </a>
-
+        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create deal')): ?>
         <a href="#" data-size="lg" data-url="<?php echo e(route('deals.create')); ?>" data-ajax-popup="true" data-bs-toggle="tooltip" title="<?php echo e(__('Create New Deal')); ?>" data-title="<?php echo e(__('Create Deal')); ?>" class="btn btn-sm btn-primary">
             <i class="ti ti-plus"></i>
         </a>
+        <?php endif; ?>
     </div>
 <?php $__env->stopSection(); ?>
 

@@ -183,7 +183,7 @@
                                     <table class="table table-flush" id="report-dataTable">
                                         <thead>
                                             <tr>
-                                                <th width="33%"> <?php echo e(__('Customer Name')); ?></th>
+                                                <th width="33%"> <?php echo e(__('Customer')); ?></th>
                                                 <th width="33%"> <?php echo e(__('Invoice Balance')); ?></th>
                                                 <th width="33%"> <?php echo e(__('Available Credits')); ?></th>
                                                 <th class="text-end"> <?php echo e(__('Balance')); ?></th>
@@ -247,7 +247,7 @@
                                     <table class="table table-flush" id="report-dataTable">
                                         <thead>
                                             <tr>
-                                                <th><?php echo e(__('Customer Name')); ?></th>
+                                                <th><?php echo e(__('Customer')); ?></th>
                                                 <th><?php echo e(__('Date')); ?></th>
                                                 <th><?php echo e(__('Transaction')); ?></th>
                                                 <th><?php echo e(__('Status')); ?></th>
@@ -343,7 +343,7 @@
                                     <table class="table table-flush" id="report-dataTable">
                                         <thead>
                                             <tr>
-                                                <th><?php echo e(__('Customer Name')); ?></th>
+                                                <th><?php echo e(__('Customer')); ?></th>
                                                 <th><?php echo e(__('Date')); ?></th>
                                                 <th><?php echo e(__('Transaction')); ?></th>
                                                 <th><?php echo e(__('Status')); ?></th>
@@ -366,6 +366,10 @@
                                                 usort($receivableDetails, 'compares');
                                             ?>
                                             <?php $__currentLoopData = $receivableDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $receivableDetail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php echo e(\Log::info('RECEIVABLE DETAIL')); ?>
+
+                                            <?php echo e(\Log::info($receivableDetail)); ?>
+
                                                 <tr>
                                                     <?php
                                                         if ($receivableDetail['invoice']) {
@@ -452,7 +456,7 @@
                                     <table class="table table-flush" id="report-dataTable">
                                         <thead>
                                             <tr>
-                                                <th><?php echo e(__('Customer Name')); ?></th>
+                                                <th><?php echo e(__('Customer')); ?></th>
                                                 <th><?php echo e(__('Current')); ?></th>
                                                 <th><?php echo e(__('1-15 DAYS')); ?></th>
                                                 <th><?php echo e(__('16-30 DAYS')); ?></th>
@@ -521,7 +525,7 @@
                                                 <th><?php echo e(__('Transaction')); ?></th>
                                                 <th><?php echo e(__('Type')); ?></th>
                                                 <th><?php echo e(__('Status')); ?></th>
-                                                <th><?php echo e(__('Customer Name')); ?></th>
+                                                <th><?php echo e(__('Customer')); ?></th>
                                                 <th><?php echo e(__('Age')); ?></th>
                                                 <th><?php echo e(__('Amount')); ?></th>
                                                 <th><?php echo e(__('Balance Due')); ?></th>
