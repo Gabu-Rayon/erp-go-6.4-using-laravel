@@ -59,21 +59,26 @@ class ImportedItemsController extends Controller
                 return redirect()->back()->with('error', 'Select item  not found in the Database ');
             }
 
+            $declarationDate = str_replace('-', '', $importItem->declarationDate);
+            $declarationDate = date('Ymd', strtotime($declarationDate));
+
             // Extract necessary details from the imported item
             $srNo = $importItem->srNo;
             $taskCode = $request['importedItemName'];
-            $declarationDate = $importItem->declarationDate;
+            $declarationDate = $declarationDate;
             $itemSeq = $importItem->itemSeq;
             $hsCode = $importItem->hsCode;
             $itemCd = $givenItem->itemCd;
             $itemClsCd = $givenItem->itemClsCd;
             $importItemStatusCode = $request['importItemStatusCode'];
-            $occurredDate = $importItem->occurredDate;
+            $occurredDate = date("Ymd");
             $remark = $request['remark'];
 
             $url = 'https://etims.your-apps.biz/api/MapImportedItem';
 
-            $response = Http::withHeaders([
+            $response = Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
                 'key' => '123456',
                 'accept' => '*/*',
                 'Content-Type' => 'application/json'
@@ -92,6 +97,10 @@ class ImportedItemsController extends Controller
 
             \Log::info('IMPORTED ITEMS API RESPONSE : ');
             \Log::info($response);
+
+            if ($response['statusCode'] != 200) {
+                return redirect()->route('importeditems.index')->with('error', $response['message']);
+            }
 
             // Code to update the Imported item status, mapped_product_id, mapped_date
             $importItem->update([
