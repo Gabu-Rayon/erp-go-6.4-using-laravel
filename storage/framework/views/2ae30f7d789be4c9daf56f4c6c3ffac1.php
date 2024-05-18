@@ -13,12 +13,12 @@
 
 <?php $__env->startSection('content'); ?>
     <div class="row">
-        <div class="col-md-12">
+        <?php echo e(Form::open(['url' => 'mapimporteditem', 'method' => 'POST', 'class' => 'w-100'])); ?>
+
+        <div class="col-12">
+            <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
             <div class="card">
                 <div class="card-body" data-autofill>
-                    <?php echo e(Form::open(['url' => 'mapimporteditem', 'method' => 'POST', 'class' => 'w-100'])); ?>
-
-                    <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
                     <div class="row">
                         <div class="form-group col-md-12">
                             <?php echo e(Form::label('importedItemName', __('Imported Product Name'), ['class' => 'form-label'])); ?>
@@ -45,15 +45,15 @@
 
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <input type="button" value="<?php echo e(__('Cancel')); ?>" onclick="location.href = '<?php echo e(route('importeditems.index')); ?>';" class="btn btn-light">
-                        <input type="submit" value="<?php echo e(__('Save')); ?>" class="btn btn-primary">
-                    </div>
-                    <?php echo e(Form::close()); ?>
-
                 </div>
             </div>
         </div>
+        <div class="modal-footer">
+            <input type="button" value="<?php echo e(__('Cancel')); ?>" onclick="location.href = '<?php echo e(route('importeditems.index')); ?>';" class="btn btn-light">
+            <input type="submit" value="<?php echo e(__('Save')); ?>" class="btn btn-primary">
+        </div>
+        <?php echo e(Form::close()); ?>
+
     </div>
 <?php $__env->stopSection(); ?>
 

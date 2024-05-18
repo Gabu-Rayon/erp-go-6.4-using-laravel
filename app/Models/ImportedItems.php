@@ -33,7 +33,8 @@ class ImportedItems extends Model
         'invForCurrencyAmount',
         'status',
         'mapped_product_id',
-        'mapped_date'
+        'mapped_date',
+        'created_by'
     ];
 
     protected $casts = [

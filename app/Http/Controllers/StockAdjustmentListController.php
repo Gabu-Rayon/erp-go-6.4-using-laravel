@@ -14,11 +14,18 @@ class StockAdjustmentListController extends Controller
      */
     public function index()
     {
+
+        if (\Auth::user()->can('show purchase')) {
+
+       
         try {
             return view('stockadjustment.index');
         } catch (\Exception $e) {
             \Log::info($e);
             return redirect()->to('stockinfo.index')->with('error', e.getMessage());
+        }
+         } else {
+            return redirect()->back()->with('error', __('Permission Denied.'));
         }
     }
 
@@ -27,6 +34,9 @@ class StockAdjustmentListController extends Controller
      */
     public function create()
     {
+
+         if (\Auth::user()->can('show purchase')) {
+
         try {
             $items = ItemInformation::all()->pluck('itemNm', 'itemCd');
             $releaseTypes = ReleaseType::all()->pluck('type', 'id');
@@ -34,6 +44,10 @@ class StockAdjustmentListController extends Controller
         } catch (\Exception $e) {
             \Log::info($e);
             return redirect()->to('stockinfo.index')->with('error', $e.getMessage());
+        }
+
+         } else {
+            return redirect()->back()->with('error', __('Permission Denied.'));
         }
     }
 
@@ -43,6 +57,9 @@ class StockAdjustmentListController extends Controller
      */
     public function store(Request $request)
     {
+
+         if (\Auth::user()->can('show purchase')) {
+
         try {
             $data = $request->all();
             \Log::info('STOCK ADJ');
@@ -67,6 +84,11 @@ class StockAdjustmentListController extends Controller
             return  redirect()->to('stockadjustment')->with('success', 'Stock Adjustment Added.');
         } catch(\Exception $e) {
             return  redirect()->back()->with('error', $e->getMessage());
+        }
+
+    }else
+        {
+            return redirect()->back()->with('errors', __('Permission denied.'));
         }
     }
 

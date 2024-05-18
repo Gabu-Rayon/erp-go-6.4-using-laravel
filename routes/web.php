@@ -1842,6 +1842,20 @@ Route::group(
     }
 );
 
+// Route::group(
+//     [
+//         'middleware' => [
+//             'auth',
+//             'XSS',
+//             'revalidate',
+//         ],
+//     ],
+//     function () {
+//         Route::resource('importeditems', ImportedItemsController::class);
+
+//     }
+// );
+
 
 Route::get('importeditems/index', [ImportedItemsController::class, 'index'])->name('importeditems.index')->middleware(['auth', 'XSS']);;
 Route::get('importeditems/map', [ImportedItemsController::class, 'create'])->name('importeditems.mapImportedItem')->middleware(['auth', 'XSS']);;
