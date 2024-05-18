@@ -18,22 +18,14 @@ class CreateVendersTable extends Migration
             $table->integer('vender_id');
             $table->string('name')->nullable();
             $table->string('email')->nullable();
-<<<<<<<< HEAD:database/migrations/2024_05_13_104940_create_venders_table.php
-            $table->string('tax_number')->nullable();;
-
-========
             $table->string('tax_number')->nullable();
->>>>>>>> b9f40c16b949f4311c6ed8d84e36b70f261c85b2:database/migrations/2020_05_13_104945_create_venders_table.php
+            $table->string('tax_number')->nullable();
             $table->string('spplrTin')->nullable();
             $table->string('spplrNm')->nullable();
             $table->string('spplrBhfId')->nullable();
             $table->string('spplrInvcNo')->nullable();
             $table->string('spplrSdcId')->nullable();
             $table->string('spplrMrcNo')->nullable();
-<<<<<<<< HEAD:database/migrations/2024_05_13_104940_create_venders_table.php
-            
-========
->>>>>>>> b9f40c16b949f4311c6ed8d84e36b70f261c85b2:database/migrations/2020_05_13_104945_create_venders_table.php
             $table->string('password')->nullable();
             $table->string('contact')->nullable();
             $table->string('avatar', 100)->default('');

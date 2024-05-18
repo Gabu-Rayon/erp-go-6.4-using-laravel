@@ -1413,7 +1413,7 @@
                     <a class="dash-link" href="{{ route('importeditems.index') }}">{{ __('Get Import Items') }}</a>
                 </li>
                 <li class="dash-item {{ Request::route()->getName() == 'create' }}">
-                <a class="dash-link" href="{{ route('updateimporteditems.index') }}">{{ __('Send Import Item') }}</a>
+                <a class="dash-link" href="{{ route('importeditems.mapImportedItem') }}">{{ __('Send Import Item') }}</a>
                 </li>
             </ul>
         </li>

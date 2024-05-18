@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class ImportedItems extends Model
 {
     use HasFactory;
+    protected $table = 'imported_items';
+
     protected $fillable = [
         'srNo',
         'taskCode',
@@ -28,6 +30,13 @@ class ImportedItems extends Model
         'declarationNo',
         'package',
         'grossWeight',
-        'invForCurrencyAmount'
+        'invForCurrencyAmount',
+        'status',
+        'mapped_product_id',
+        'mapped_date'
+    ];
+
+    protected $casts = [
+        'mapped_date' => 'datetime',
     ];
 }

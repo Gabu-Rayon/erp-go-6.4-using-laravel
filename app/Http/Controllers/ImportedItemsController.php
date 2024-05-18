@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ImportedItems;
+use Illuminate\Support\Carbon;
 use App\Models\ItemInformation;
 use App\Models\ImportItemStatusCode;
 use Illuminate\Support\Facades\Http;
@@ -29,27 +30,36 @@ class ImportedItemsController extends Controller
     public function create()
     {
         $importedItems = ImportedItems::all()->pluck('itemName', 'taskCode');
-        $items = ItemInformation::all()->pluck('itemNm', 'itemCd');
-        $importItemStatusCode = ImportItemStatusCode::all()->pluck('code', 'id');
-        return view('updateimportitem.create', compact('importedItems', 'items', 'importItemStatusCode'));
+        $items = ItemInformation::all()->pluck('itemNm', 'id');
+        $importItemStatusCode = ImportItemStatusCode::all()->pluck('code', 'KRA_Code');
+        return view('importeditems.mapImportedItem', compact('importedItems', 'items', 'importItemStatusCode'));
     }
-
-    public function cancel(ImportedItems $importedItem)
-    {
-        return redirect()->to('importeditems.index')->with('success', 'Successfully Cancelled');
-    }
-
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
         try {
-            \Log::info('IMPORTED ITEMS DATA');
+            \Log::info('IMPORTED ITEMS DATA  From the Form :');
             \Log::info($request->all());
 
+            // Retrieve the imported item by its task code
             $importItem = ImportedItems::where('taskCode', $request['importedItemName'])->first();
+
+            // Ensure the imported item exists
+            if (!$importItem) {
+                return redirect()->back()->with('error', 'Imported item  Selected not found in Database');
+            }
+
+            // Retrieve the given item by its item code
             $givenItem = ItemInformation::where('itemCd', $request['item'])->first();
+
+            // Ensure the given item exists
+            if (!$givenItem) {
+                return redirect()->back()->with('error', 'Select item  not found in the Database ');
+            }
+
+            // Extract necessary details from the imported item
             $srNo = $importItem->srNo;
             $taskCode = $request['importedItemName'];
             $declarationDate = $importItem->declarationDate;
@@ -80,25 +90,20 @@ class ImportedItemsController extends Controller
                         ]
                     ]);
 
-            \Log::info('IMPORTED ITEMS API RESPONSE');
+            \Log::info('IMPORTED ITEMS API RESPONSE : ');
             \Log::info($response);
 
-            UpdateImportItems::create([
-                'srNo' => $srNo,
-                'taskCode' => $taskCode,
-                'declarationDate' => $declarationDate,
-                'itemSeq' => $itemSeq,
-                'hsCode' => $hsCode,
-                'itemClassificationCode' => $itemClsCd,
-                'itemCode' => $itemCd,
-                'importItemStatusCode' => $importItemStatusCode
+            // Code to update the Imported item status, mapped_product_id, mapped_date
+            $importItem->update([
+                'status' => $importItemStatusCode,
+                'mapped_product_id' => $givenItem->id,
+                'mapped_date' => Carbon::now()->format('Ymd'),  // Current date in 'Ymd' format
             ]);
-
-            return redirect()->back()->with('success', 'Item Added Successfully');
+            return redirect()->route('importeditems.index')->with('success', __('Product / Item Mapped Successfully.'));
         } catch (\Exception $e) {
-            \Log::info('IMPORTED ITEMS ERROR');
+            \Log::info('IMPORTED ITEMS Mapping Error Exception ERROR : ');
             \Log::info($e);
-            return redirect()->back()->with('error', 'Something Went Wrong');
+            return redirect()->back()->with('error', 'Something Went Wrong When Mapping Imported Item');
         }
     }
 
@@ -111,31 +116,7 @@ class ImportedItemsController extends Controller
         return view('importeditems.show', compact('importedItem'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ImportedItems $importedItems)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ImportedItems $importedItems)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ImportedItems $importedItems)
-    {
-        //
-    }
-
-    public function GetImportedItemInformation()
+        public function GetImportedItemInformation()
     {
         try {
             ini_set('max_execution_time', 300);
@@ -195,6 +176,30 @@ class ImportedItemsController extends Controller
             // return redirect()->back()->with('error', 'Error adding Item Information from the API.');
             return redirect()->route('importeditems.index')->with('error', __('Error adding Imported Items from the API.'));
         }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(ImportedItems $importedItems)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, ImportedItems $importedItems)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(ImportedItems $importedItems)
+    {
+        //
     }
 
 }

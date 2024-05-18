@@ -22,7 +22,7 @@
         </a>
     </div>
     <div class="float-end m-2">
-        <a href="{{ route('importeditems.cancel', $importedItem->id) }}" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="{{__('Cancel Sale')}}">
+        <a href="{{ route('importeditems.index') }}" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="{{__('Cancel Sale')}}">
             {{__('Cancel')}}
         </a>
     </div>
