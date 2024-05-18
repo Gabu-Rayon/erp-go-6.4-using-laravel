@@ -1424,7 +1424,7 @@
                     <a class="dash-link" href="<?php echo e(route('importeditems.index')); ?>"><?php echo e(__('Get Import Items')); ?></a>
                 </li>
                 <li class="dash-item <?php echo e(Request::route()->getName() == 'create'); ?>">
-                <a class="dash-link" href="<?php echo e(route('updateimporteditems.index')); ?>"><?php echo e(__('Send Import Item')); ?></a>
+                <a class="dash-link" href="<?php echo e(route('importeditems.create')); ?>"><?php echo e(__('Send Import Item')); ?></a>
                 </li>
             </ul>
         </li>

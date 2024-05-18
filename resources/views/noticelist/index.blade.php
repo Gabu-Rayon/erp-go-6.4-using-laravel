@@ -10,9 +10,9 @@
 @endsection
 @section('action-btn')
     <div class="float-end">
-        <button class="btn btn-sm btn-primary sync">
-            <i class="#">Synchronize</i>
-        </button>
+        <a href="{{ route('noticelist.synchronize') }}" class="btn btn-sm btn-primary">
+            Synchronize
+        </a>
     </div>
 @endsection
 @section('content')
@@ -30,22 +30,19 @@
                                     <th>{{ __('Cont') }}</th>
                                     <th>{{ __('registeredName') }}</th>
                                     <th>{{ __('Url') }}</th>
-                                    <th>{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @if ($notices)
+                                @foreach ($notices as $notice)
                                     <tr class="font-style">
-                                        <td>{{ $notices->id }}</td>
-                                        <td>{{ $notices->noticeNo }}</td>
-                                        <td>{{ $notices->title }}</td>
-                                        <td>{{ $notices->cont }}</td>
-                                        <td>{{ $notices->regrNm }}</td>
-                                        <td>{{ $notices->dtlUrl }}</td>
-                                    </tr>
-                                @else
-                                  
-                                @endif
+                                        <td>{{ $notice->id }}</td>
+                                        <td>{{ $notice->noticeNo }}</td>
+                                        <td>{{ $notice->title }}</td>
+                                        <td>{{ $notice->cont }}</td>
+                                        <td>{{ $notice->regrNm }}</td>
+                                        <td class="text-wrap text-truncate" style="max-width: 200px;">{{ $notice->dtlUrl }}</td>
+                                    </tr>                                  
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -54,55 +51,3 @@
         </div>
     </div>
 @endsection
-
-@push('script-page')
-    <script>
-        const sync = document.querySelector('.sync');
-        sync.addEventListener('click', async function() {
-            try {
-                const loader = document.createElement('div');
-                loader.classList.add('spinner-border', 'text-light', 'spinner-border-sm');
-                loader.role = 'status';
-                sync.appendChild(loader);
-                const response = await fetch('http://localhost:8000/noticeslist/synchronize', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
-                const data = await response.json();
-
-                sync.removeChild(loader);
-
-                console.log('success');
-                const popup = document.createElement('div');
-                popup.classList.add('alert', 'alert-success');
-                popup.innerHTML = data['message'] || 'Synced Successfully';
-                popup.style.position = 'absolute';
-                popup.style.top = '50%';
-                popup.style.left = '50%';
-                popup.style.transform = 'translate(-50%, -50%)';
-                popup.style.zIndex = '9999';
-                document.body.appendChild(popup);
-                setTimeout(() => {
-                    location.reload();
-                }, 3000);
-            } catch (error) {
-                console.log('error');
-                const popup = document.createElement('div');
-                popup.classList.add('alert', 'alert-danger');
-                popup.innerHTML = data['message'] || 'Sync Failed';
-                popup.style.position = 'absolute';
-                popup.style.top = '50%';
-                popup.style.left = '50%';
-                popup.style.transform = 'translate(-50%, -50%)';
-                popup.style.zIndex = '9999';
-                document.body.appendChild(popup);
-                setTimeout(() => {
-                    location.reload();
-                }, 3000);
-            }
-        });
-    </script>
-@endpush

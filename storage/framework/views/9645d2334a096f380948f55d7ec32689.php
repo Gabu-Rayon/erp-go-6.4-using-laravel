@@ -17,9 +17,9 @@
 
 <?php $__env->startSection('action-btn'); ?>
 <div class="float-end">
-    <button class="btn btn-sm btn-primary sync flex justify-center items-center text-center gap-2">
-        <i class="#">Synchronize</i>
-    </button>
+    <a href="<?php echo e(route('productservice.synccodelist')); ?>" class="btn btn-sm btn-primary flex justify-center items-center text-center gap-2">
+        Synchronize
+    </a>
 </div>
 <?php $__env->stopSection(); ?>
 
