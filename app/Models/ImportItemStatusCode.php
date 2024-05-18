@@ -9,6 +9,7 @@ class ImportItemStatusCode extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'code'
+        'code',
+        'KRA_Code'
     ];
 }

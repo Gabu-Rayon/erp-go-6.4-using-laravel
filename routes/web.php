@@ -5,7 +5,6 @@ use App\Http\Controllers\StockMoveListController;
 use App\Http\Controllers\SalesCreditNoteController;
 use App\Http\Controllers\StockAdjustmentListController;
 use App\Http\Controllers\ImportedItemsController;
-use App\Http\Controllers\UpdateImportedItemsController;
 use App\Http\Controllers\StockMoveController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\PosController;
@@ -278,8 +277,8 @@ Route::any('/invoice-with-xendit', [XenditPaymentController::class, 'invoicePayW
 Route::any('/invoice-xendit-status', [XenditPaymentController::class, 'getInvociePaymentStatus'])->name('invoice.xendit.status');
 
 Route::post('/invoice-nepalste/payment', [NepalstePaymnetController::class, 'invoicePayWithnepalste'])->name('customer.with.nepalste');
-Route::get('invoice-nepalste/status/',[NepalstePaymnetController::class,'invoiceGetNepalsteStatus'])->name('invoice.nepalste.status');
-Route::get('invoice-nepalste/cancel/',[NepalstePaymnetController::class,'invoiceGetNepalsteCancel'])->name('invoice.nepalste.cancel');
+Route::get('invoice-nepalste/status/', [NepalstePaymnetController::class, 'invoiceGetNepalsteStatus'])->name('invoice.nepalste.status');
+Route::get('invoice-nepalste/cancel/', [NepalstePaymnetController::class, 'invoiceGetNepalsteCancel'])->name('invoice.nepalste.cancel');
 
 /***********************************************************************************************************************************************/
 
@@ -344,7 +343,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('change-language/{lang}', [LanguageController::class, 'changeLanquage'])->name('change.language');
 
             Route::get('manage-language/{lang}', [LanguageController::class, 'manageLanguage'])->name('manage.language');
@@ -367,7 +367,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::resource('systems', SystemController::class);
             Route::post('email-settings', [SystemController::class, 'saveEmailSettings'])->name('email.settings');
             Route::post('company-email-settings', [SystemController::class, 'saveCompanyEmailSettings'])->name('company.email.settings');
@@ -410,14 +411,14 @@ Route::group(['middleware' => ['verified']], function () {
     Route::get('productservice/index', [ProductServiceController::class, 'index'])->name('productservice.index');
     Route::get('productservice/synchronize', [ProductServiceController::class, 'synchronize'])->name('productservice.synchronize');
     // productservice.synchronizeitemclassifications
-      Route::get('productservice/synchronizeitemclassifications', [ProductServiceController::class, 'synchronizeItemClassifications'])->name('productservice.synchronizeitemclassifications');
-      Route::get('productservice/synccodelist', [ProductServiceController::class, 'syncCodeList'])->name('productservice.synccodelist');
-   
-      
+    Route::get('productservice/synchronizeitemclassifications', [ProductServiceController::class, 'synchronizeItemClassifications'])->name('productservice.synchronizeitemclassifications');
+    Route::get('productservice/synccodelist', [ProductServiceController::class, 'syncCodeList'])->name('productservice.synccodelist');
+
+
     Route::get('productservice/getcodelist', [ProductServiceController::class, 'getCodeList'])->name('productservice.getcodelist');
     Route::get('productservice/itemclassifications', [ProductServiceController::class, 'showItemClassification'])->name('productservice.classifications');
 
-    Route::get('productservice/getiteminformation', [ProductServiceController::class, 'viewItemInformation'])->name('productservice.getiteminformation');    
+    Route::get('productservice/getiteminformation', [ProductServiceController::class, 'viewItemInformation'])->name('productservice.getiteminformation');
     Route::get('productservice/{id}/detail', [ProductServiceController::class, 'warehouseDetail'])->name('productservice.detail');
     Route::post('empty-cart', [ProductServiceController::class, 'emptyCart'])->middleware(['auth', 'XSS']);
     Route::post('warehouse-empty-cart', [ProductServiceController::class, 'warehouseemptyCart'])->name('warehouse-empty-cart')->middleware(['auth', 'XSS']);
@@ -434,7 +435,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('customer/{id}/show', [CustomerController::class, 'show'])->name('customer.show');
             Route::resource('customer', CustomerController::class);
         }
@@ -448,15 +450,16 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('vender/{id}/show', [VenderController::class, 'show'])->name('vender.show');
             Route::resource('vender', VenderController::class);
         }
     );
     //  getSuppliersDetailsFromApi
-     Route::get('/getSuppliersDetailsFromApi', [VenderController::class, 'getSuppliersDetailsFromApi']);
+    Route::get('/getSuppliersDetailsFromApi', [VenderController::class, 'getSuppliersDetailsFromApi']);
     Route::any('/getSupplierInformation', [VenderController::class, 'getSupplierInformation'])->name('venders.getSupplierInformation');
-    
+
 
     Route::group(
         [
@@ -465,7 +468,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::resource('bank-account', BankAccountController::class);
         }
     );
@@ -476,7 +480,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('bank-transfer/index', [BankTransferController::class, 'index'])->name('bank-transfer.index');
             Route::resource('bank-transfer', BankTransferController::class);
         }
@@ -497,7 +502,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('invoice/{id}/duplicate', [InvoiceController::class, 'duplicate'])->name('invoice.duplicate');
             Route::get('invoice/{id}/shipping/print', [InvoiceController::class, 'shippingDisplay'])->name('invoice.shipping.print');
             Route::get('invoice/{id}/payment/reminder', [InvoiceController::class, 'paymentReminder'])->name('invoice.payment.reminder');
@@ -531,13 +537,14 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('credit-note', [CreditNoteController::class, 'index'])->name('credit.note');
-            
+
             Route::get('custom-credit-note', [CreditNoteController::class, 'customCreate'])->name('invoice.custom.credit.note');
-            
+
             Route::post('custom-credit-note', [CreditNoteController::class, 'customStore'])->name('invoice.custom.credit.note');
-            
+
             Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('invoice.get');
             Route::get('invoice/{id}/credit-note', [CreditNoteController::class, 'create'])->name('invoice.credit.note');
             Route::post('invoice/{id}/credit-note', [CreditNoteController::class, 'store'])->name('invoice.credit.note');
@@ -546,11 +553,11 @@ Route::group(['middleware' => ['verified']], function () {
             Route::delete('invoice/{id}/credit-note/delete/{cn_id}', [CreditNoteController::class, 'destroy'])->name('invoice.delete.credit.note');
             Route::any('/getItemInformationForAddingDirectCreditNote', [CreditNoteController::class, 'getItemsToAddDirectCreditNote'])->name('invoice.custom.credit.getiteminformation');
             Route::any('/getCustomerDetailsToAddDirectCreditNote', [CreditNoteController::class, 'getCustomerDetailsToAddDirectCreditNote'])->name('invoice.custom.credit.getcustomerDetails');
-            
-             
+
+
         }
     );
-    
+
 
     Route::group(
         [
@@ -559,7 +566,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('debit-note', [DebitNoteController::class, 'index'])->name('debit.note');
             Route::get('custom-debit-note', [DebitNoteController::class, 'customCreate'])->name('bill.custom.debit.note');
             Route::post('custom-debit-note', [DebitNoteController::class, 'customStore'])->name('bill.custom.debit.note');
@@ -590,7 +598,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('bill/{id}/duplicate', [BillController::class, 'duplicate'])->name('bill.duplicate');
             Route::get('bill/{id}/shipping/print', [BillController::class, 'shippingDisplay'])->name('bill.shipping.print');
             Route::get('bill/index', [BillController::class, 'index'])->name('bill.index');
@@ -619,7 +628,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('report/transaction', [TransactionController::class, 'index'])->name('transaction.index');
         }
     );
@@ -631,12 +641,13 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('report/income-summary', [ReportController::class, 'incomeSummary'])->name('report.income.summary');
             Route::get('report/expense-summary', [ReportController::class, 'expenseSummary'])->name('report.expense.summary');
             Route::get('report/income-vs-expense-summary', [ReportController::class, 'incomeVsExpenseSummary'])->name('report.income.vs.expense.summary');
             Route::get('report/tax-summary', [ReportController::class, 'taxSummary'])->name('report.tax.summary');
-//        Route::get('report/profit-loss-summary', [ReportController::class, 'profitLossSummary'])->name('report.profit.loss.summary');
+            //        Route::get('report/profit-loss-summary', [ReportController::class, 'profitLossSummary'])->name('report.profit.loss.summary');
             Route::get('report/invoice-summary', [ReportController::class, 'invoiceSummary'])->name('report.invoice.summary');
             Route::get('report/bill-summary', [ReportController::class, 'billSummary'])->name('report.bill.summary');
             Route::get('report/product-stock-report', [ReportController::class, 'productStock'])->name('report.product.stock.report');
@@ -652,7 +663,7 @@ Route::group(['middleware' => ['verified']], function () {
             Route::get('reports-quarterly-cashflow', [ReportController::class, 'quarterlyCashflow'])->name('report.quarterly.cashflow')->middleware(['auth', 'XSS']);
             Route::post('export/trial-balance', [ReportController::class, 'trialBalanceExport'])->name('trial.balance.export');
             Route::post('export/balance-sheet', [ReportController::class, 'balanceSheetExport'])->name('balance.sheet.export');
-            Route::post('export/profit-loss', [ReportController::class, 'profitLossExport'])->name('profit.loss.export');            
+            Route::post('export/profit-loss', [ReportController::class, 'profitLossExport'])->name('profit.loss.export');
             Route::get('report/sales', [ReportController::class, 'salesReport'])->name('report.sales');
             Route::post('export/sales', [ReportController::class, 'salesReportExport'])->name('sales.export');
             Route::get('report/receivables', [ReportController::class, 'ReceivablesReport'])->name('report.receivables');
@@ -669,7 +680,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('proposal/{id}/status/change', [ProposalController::class, 'statusChange'])->name('proposal.status.change');
             Route::get('proposal/{id}/convert', [ProposalController::class, 'convert'])->name('proposal.convert');
             Route::get('proposal/{id}/duplicate', [ProposalController::class, 'duplicate'])->name('proposal.duplicate');
@@ -706,7 +718,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::resource('chart-of-account', ChartOfAccountController::class);
         }
     );
@@ -718,7 +731,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
 
             Route::post('journal-entry/account/destroy', [JournalEntryController::class, 'accountDestroy'])->name('journal.account.destroy');
 
@@ -1164,14 +1178,15 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::resource('contractType', ContractTypeController::class);
         }
     );
 
     // Project Timesheet
     Route::get('append-timesheet-task-html', [TimesheetController::class, 'appendTimesheetTaskHTML'])->name('append.timesheet.task.html')->middleware(['auth', 'XSS']);
-//    Route::get('timesheet-table-view', [TimesheetController::class, 'filterTimesheetTableView'])->name('filter.timesheet.table.view')->middleware(['auth', 'XSS']);
+    //    Route::get('timesheet-table-view', [TimesheetController::class, 'filterTimesheetTableView'])->name('filter.timesheet.table.view')->middleware(['auth', 'XSS']);
     Route::get('timesheet-view', [TimesheetController::class, 'filterTimesheetView'])->name('filter.timesheet.view')->middleware(['auth', 'XSS']);
     Route::get('timesheet-list', [TimesheetController::class, 'timesheetList'])->name('timesheet.list')->middleware(['auth', 'XSS']);
     Route::get('timesheet-list-get', [TimesheetController::class, 'timesheetListGet'])->name('timesheet.list.get')->middleware(['auth', 'XSS']);
@@ -1189,7 +1204,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'auth',
                 'XSS',
             ],
-        ], function () {
+        ],
+        function () {
             Route::resource('projectstages', ProjectstagesController::class);
             Route::post('/projectstages/order', [ProjectstagesController::class, 'order'])->name('projectstages.order')->middleware(['auth', 'XSS']);
             Route::post('projects/bug/kanban/order', [ProjectController::class, 'bugKanbanOrder'])->name('bug.kanban.order');
@@ -1223,7 +1239,7 @@ Route::group(['middleware' => ['verified']], function () {
     // saas
     Route::resource('users', UserController::class)->middleware(['auth', 'XSS', 'revalidate']);
     Route::resource('plans', PlanController::class)->middleware(['auth', 'XSS', 'revalidate']);
-    Route::get('plan-trial/{id}', [PlanController::class,'planTrial'])->name('plan.trial')->middleware(['auth', 'XSS', 'revalidate']);
+    Route::get('plan-trial/{id}', [PlanController::class, 'planTrial'])->name('plan.trial')->middleware(['auth', 'XSS', 'revalidate']);
     Route::resource('coupons', CouponController::class)->middleware(['auth', 'XSS', 'revalidate']);
 
     // Orders
@@ -1235,16 +1251,18 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('/orders', [StripePaymentController::class, 'index'])->name('order.index');
             Route::get('/stripe/{code}', [StripePaymentController::class, 'stripe'])->name('stripe');
             Route::post('/stripe', [StripePaymentController::class, 'stripePost'])->name('stripe.post');
-        });
+        }
+    );
 
     Route::get('/apply-coupon', [CouponController::class, 'applyCoupon'])->name('apply.coupon')->middleware(['auth', 'XSS', 'revalidate']);
 
     //================================= Form Builder ====================================//
-    
+
 
     // Form Builder
     Route::resource('form_builder', FormBuilderController::class)->middleware(['auth', 'XSS']);
@@ -1277,7 +1295,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('contract/{id}/description', [ContractController::class, 'description'])->name('contract.description');
             Route::get('contract/grid', [ContractController::class, 'grid'])->name('contract.grid');
             Route::resource('contract', ContractController::class);
@@ -1312,7 +1331,7 @@ Route::group(['middleware' => ['verified']], function () {
 
     // Custom Landing Page
 
-//    Route::get('/landingpage', [LandingPageSectionController::class, 'index'])->name('custom_landing_page.index')->middleware(['auth', 'XSS']);
+    //    Route::get('/landingpage', [LandingPageSectionController::class, 'index'])->name('custom_landing_page.index')->middleware(['auth', 'XSS']);
 //    Route::get('/LandingPage/show/{id}', [LandingPageSectionController::class, 'show']);
 //
 //    Route::post('/LandingPage/setConetent', [LandingPageSectionController::class, 'setConetent'])->middleware(['auth', 'XSS']);
@@ -1397,8 +1416,8 @@ Route::group(['middleware' => ['verified']], function () {
     Route::any('/xendit/payment/status', [XenditPaymentController::class, 'planGetXenditStatus'])->name('plan.xendit.status');
 
     Route::post('/nepalste/payment', [NepalstePaymnetController::class, 'planPayWithnepalste'])->name('plan.pay.with.nepalste');
-    Route::get('nepalste/status/',[NepalstePaymnetController::class,'planGetNepalsteStatus'])->name('nepalste.status');
-    Route::get('nepalste/cancel/',[NepalstePaymnetController::class,'planGetNepalsteCancel'])->name('nepalste.cancel');
+    Route::get('nepalste/status/', [NepalstePaymnetController::class, 'planGetNepalsteStatus'])->name('nepalste.status');
+    Route::get('nepalste/cancel/', [NepalstePaymnetController::class, 'planGetNepalsteCancel'])->name('nepalste.cancel');
 
 
 
@@ -1414,14 +1433,15 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('order', [StripePaymentController::class, 'index'])->name('order.index');
             Route::get('/stripe/{code}', [StripePaymentController::class, 'stripe'])->name('stripe');
             Route::post('/stripe', [StripePaymentController::class, 'stripePost'])->name('stripe.post');
 
         }
     );
-//    Route::post('plan-pay-with-paypal', [PaypalController::class, 'planPayWithPaypal'])->name('plan.pay.with.paypal')->middleware(['auth', 'XSS', 'revalidate']);
+    //    Route::post('plan-pay-with-paypal', [PaypalController::class, 'planPayWithPaypal'])->name('plan.pay.with.paypal')->middleware(['auth', 'XSS', 'revalidate']);
 //    Route::get('{id}/plan-get-payment-status', [PaypalController::class, 'planGetPaymentStatus'])->name('plan.get.payment.status')->middleware(['auth', 'XSS', 'revalidate']);
 
     Route::group(
@@ -1431,7 +1451,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('support/{id}/reply', [SupportController::class, 'reply'])->name('support.reply');
             Route::post('support/{id}/reply', [SupportController::class, 'replyAnswer'])->name('support.reply.answer');
             Route::get('support/grid', [SupportController::class, 'grid'])->name('support.grid');
@@ -1447,7 +1468,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::resource('apiinitialization', ApiInitializationController::class);
             Route::get('apiinitialization/addexisting', [ApiInitializationController::class, 'addExisting'])->name('apiinitialization.addexisting');
             Route::post('apiinitialization/storeexisting', [ApiInitializationController::class, 'storeExisting'])->name('apiinitialization.storeexisting');
@@ -1461,7 +1483,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::resource('stockinfo', StockMoveListController::class);
         },
     );
@@ -1478,7 +1501,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::resource('performanceType', PerformanceTypeController::class);
         }
     );
@@ -1562,9 +1586,10 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('purchase/items', [PurchaseController::class, 'items'])->name('purchase.items');
-            Route::resource('purchase', PurchaseController::class);             
+            Route::resource('purchase', PurchaseController::class);
             Route::get('purchase/{id}/show', [PurchaseController::class, 'show'])->name('purchase.show');
             Route::get('purchase/{spplrInvcNo}/details', [PurchaseController::class, 'details'])->name('purchase.details');
             Route::get('purchase/{id}/payment', [PurchaseController::class, 'payment'])->name('purchase.payment');
@@ -1578,14 +1603,14 @@ Route::group(['middleware' => ['verified']], function () {
             Route::get('purchase/{id}/sent', [PurchaseController::class, 'sent'])->name('purchase.sent');
             Route::get('purchase/{id}/resent', [PurchaseController::class, 'resent'])->name('purchase.resent');
             Route::put('purchase/{id}/update', [PurchaseController::class, 'update'])->name('purchase.update');
-           
+
         }
 
     );
-     // purchase.mapPurchase
-     Route::any('map-purchase', [PurchaseController::class, 'mapPurchase'])->name('purchase.mapPurchase');
+    // purchase.mapPurchase
+    Route::any('map-purchase', [PurchaseController::class, 'mapPurchase'])->name('purchase.mapPurchase');
     //  purchase.SearchByDate
-     Route::any('/searchByDate', [PurchaseController::class, 'searchByDate'])->name('purchase.searchByDate');
+    Route::any('/searchByDate', [PurchaseController::class, 'searchByDate'])->name('purchase.searchByDate');
     // mapPurchase blade
     Route::any('/mappedpurchases', [PurchaseController::class, 'mappedPurchases'])->name('purchase.mappedPurchases');
     //  getMapPurchaseSearchByDate
@@ -1748,7 +1773,8 @@ Route::group(['middleware' => ['verified']], function () {
                 'XSS',
                 'revalidate',
             ],
-        ], function () {
+        ],
+        function () {
             Route::get('expense/index', [ExpenseController::class, 'index'])->name('expense.index');
             Route::any('expense/customer', [ExpenseController::class, 'customer'])->name('expense.customer');
             Route::post('expense/vender', [ExpenseController::class, 'vender'])->name('expense.vender');
@@ -1772,7 +1798,7 @@ Route::get('/code', [CodeController::class, 'getCodesList']);
 Route::get('/getItemClassifications', [ItemClassificationController::class, 'addCategories']);
 Route::get('/details', [DetailsController::class, 'getDetailsList']);
 Route::get('/getnotices', [NoticesListController::class, 'getNoticeList']);
-Route::get('/get-item-information', [ProductServiceController::class,'getItemInformation']);
+Route::get('/get-item-information', [ProductServiceController::class, 'getItemInformation']);
 Route::group(
     [
         'middleware' => [
@@ -1816,33 +1842,12 @@ Route::group(
     }
 );
 
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'XSS',
-            'revalidate',
-        ],
-    ],
-    function () {
-        Route::resource('importeditems', ImportedItemsController::class);
-    }
-);
 
-Route::get('importeditems/cancel', [ImportedItemsController::class, 'cancel'])->name('importeditems.cancel');
+Route::get('importeditems/index', [ImportedItemsController::class, 'index'])->name('importeditems.index')->middleware(['auth', 'XSS']);;
+Route::get('importeditems/map', [ImportedItemsController::class, 'create'])->name('importeditems.mapImportedItem')->middleware(['auth', 'XSS']);;
+Route::post('mapimporteditem', [ImportedItemsController::class, 'store'])->name('importeditems.mapimporteditem')->middleware(['auth', 'XSS']);;
+Route::get('importeditems/show/{id}', [ImportedItemsController::class, 'show'])->name('importeditems.show')->middleware(['auth', 'XSS']);;
 
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'XSS',
-            'revalidate',
-        ],
-    ],
-    function () {
-        Route::resource('mappimporteditems', ImportedItemsController::class);
-    }
-);
 
 
 Route::group(

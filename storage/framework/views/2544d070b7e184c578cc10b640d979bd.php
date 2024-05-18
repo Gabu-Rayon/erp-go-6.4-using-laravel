@@ -24,7 +24,7 @@
         </a>
     </div>
     <div class="float-end m-2">
-        <a href="<?php echo e(route('importeditems.cancel', $importedItem->id)); ?>" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="<?php echo e(__('Cancel Sale')); ?>">
+        <a href="<?php echo e(route('importeditems.index')); ?>" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="<?php echo e(__('Cancel Sale')); ?>">
             <?php echo e(__('Cancel')); ?>
 
         </a>

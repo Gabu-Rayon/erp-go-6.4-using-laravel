@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('import_item_status_codes', function (Blueprint $table) {
             $table->id();
             $table->string('code');
+            $table->bigInteger('KRA_Code');
             $table->timestamps();
         });
     }
