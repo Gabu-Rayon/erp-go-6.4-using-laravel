@@ -71,13 +71,13 @@ class ImportedItemsController extends Controller
                 return redirect()->back()->with('error', 'Select item  not found in the Database ');
             }
 
-            $declarationDate = str_replace('-', '', $importItem->declarationDate);
-            $declarationDate = date('Ymd', strtotime($declarationDate));
+            $declarationDateofImport = str_replace('-', '', $importItem->declarationDate);
+            $declarationDt = date('Ymd', strtotime($declarationDateofImport));
 
             // Extract necessary details from the imported item
             $srNo = $importItem->srNo;
             $taskCode = $request['importedItemName'];
-            $declarationDate = $declarationDate;
+            $declarationDate = $declarationDt;
             $itemSeq = $importItem->itemSeq;
             $hsCode = $importItem->hsCode;
             $itemCd = $givenItem->itemCd;
