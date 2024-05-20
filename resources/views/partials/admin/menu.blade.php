@@ -1304,11 +1304,38 @@
                         </li>
                     @endif
                     @if (Gate::check('manage product & service'))
-                        <li class="dash-item {{ Request::segment(1) == 'productstock' ? 'active' : '' }}">
-                            <a href="{{ route('productstock.index') }}"
-                                class="dash-link">{{ __('Product Stock') }}
-                            </a>
-                        </li>
+                    <li
+                        class="dash-item dash-hasmenu {{ Request::segment(1) == 'productstock' ? 'active dash-trigger' : '' }}"
+                        href="#"
+                        data-toggle="collapse"
+                        role="button"
+                        aria-expanded="{{ Request::segment(1) == 'productstock'
+                                            || Request::segment(1) == 'stockadjustment'
+                                            || Request::segment(1) == 'stockinfo'
+                                            ? 'true'
+                                            : 'false' }}"
+                    >
+                        <a class="dash-link" href="#">
+                            {{ __('Product Stock') }}
+                            <span class="dash-arrow">
+                                <i data-feather="chevron-right"></i>
+                            </span>
+                        </a>
+                        <ul class="dash-submenu">
+                            <li class="dash-item {{ request()->is('productstock.index') ? 'active' : '' }}">
+                                <a class="dash-link" href="{{ route('productstock.index') }}">{{ __('Stock') }}</a>
+                            </li>
+                            <li class="dash-item {{ request()->is('stockinfo') ? 'active' : '' }}">
+                                <a class="dash-link" href="{{ route('stockinfo.index') }}">{{ __('Get Move List') }}</a>
+                            </li>
+                            <li class="dash-item {{ request()->is('stockadjustment') ? 'active' : '' }}">
+                                <a class="dash-link" href="{{ route('stockadjustment.index') }}">{{ __('Stock Adjustment') }}</a>
+                            </li>
+                            <li class="dash-item {{ request()->is('stockmove.create') ? 'active' : '' }}">
+                                <a class="dash-link" href="{{ route('stockmove.create') }}">{{ __('Move Stock') }}</a>
+                            </li>
+                        </ul>
+                    </li>
                     @endif
                 </ul>
             </li>
@@ -1414,32 +1441,6 @@
                 </li>
                 <li class="dash-item {{ Request::route()->getName() == 'create' }}">
                 <a class="dash-link" href="{{ route('importeditems.mapImportedItem') }}">{{ __('Send Import Item') }}</a>
-                </li>
-            </ul>
-        </li>
-        @endif
-
-
-        @if (\Auth::user()->type == 'company' || \Auth::user()->type == 'Employee')
-        <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : '' }}">
-            <a href="#!" class="dash-link">
-                <span class="dash-micon">
-                    <i class="ti ti-layers-difference"></i>
-                </span>
-                <span class="dash-mtext">{{ __('Stock Information') }}</span>
-                <span class="dash-arrow">
-                    <i data-feather="chevron-right"></i>
-                </span>
-            </a>
-            <ul class="dash-submenu {{ Request::segment(1) == 'index' || Request::segment(1) == 'create' || Request::segment(1) == 'adjust' }}">
-                <li class="dash-item {{ Request::route()->getName() == 'index' }}">
-                    <a class="dash-link" href="{{ route('stockinfo.index') }}">{{ __('Get Move List') }}</a>
-                </li>
-                <li class="dash-item {{ Request::route()->getName() == 'index' }}">
-                    <a class="dash-link" href="{{ route('stockadjustment.index') }}">{{ __('Stock Adjustment List') }}</a>
-                </li>
-                <li class="dash-item {{ Request::route()->getName() == 'create' }}">
-                    <a class="dash-link" href="{{ route('stockmove.create') }}">{{ __('Move Stock') }}</a>
                 </li>
             </ul>
         </li>
