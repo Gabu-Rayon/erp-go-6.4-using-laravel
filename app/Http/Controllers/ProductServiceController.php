@@ -52,7 +52,7 @@ class ProductServiceController extends Controller
                 $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->with(['category', 'unit'])->get();
             }
 
-            return view('productservice.index', compact('iteminformations','category'));
+            return view('productservice.index', compact('iteminformations', 'category'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -66,69 +66,84 @@ class ProductServiceController extends Controller
             $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
             $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
             $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
+            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
             $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
-            return view('productservice.create', compact(
-                'items',
-                'itemclassifications',
-                'itemtypes',
-                'countrynames',
-                'taxationtype'
-            ));
+            return view(
+                'productservice.create',
+                compact(
+                    'items',
+                    'category',
+                    'itemclassifications',
+                    'itemtypes',
+                    'countrynames',
+                    'taxationtype'
+                )
+            );
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
     }
 
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         try {
             if (\Auth::user()->can('create product & service')) {
                 \Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
-                \Log::info($request->all());
-    
+                \Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
+
                 $data = $request->all();
-    
+
                 \Log::info('ITEMS');
-                \Log::info($data['items']);
+                \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
 
-                \Log::info('KITU RARE');
-                \Log::info($request->file('pro_image'));
-
-                foreach ($request->file('pro_image') as $index => $uploadedFile) {
-                    \Log::info('Image File Object for Item '. ($index + 1));
-                    \Log::info($uploadedFile);
+                foreach ($data['items'] as $index => $item) {
+                    \Log::info('ITEM INDEX: ' . $index);
+                    if (isset($item['pro_image']) && $item['pro_image']->isValid()) {
+                        \Log::info('Image File Object for Item ' . ($index + 1));
+                        \Log::info(json_encode([
+                            'original_name' => $item['pro_image']->getClientOriginalName(),
+                            'mime_type' => $item['pro_image']->getClientMimeType(),
+                            'size' => $item['pro_image']->getSize(),
+                            'path' => $item['pro_image']->getPathname(),
+                        ], JSON_PRETTY_PRINT));
+                    } else {
+                        \Log::info('No valid image uploaded for item ' . ($index + 1));
+                    }
                 }
-                
-    
+
+
+
+
                 // foreach ($data['items'] as $item) {
 
-                    // $newItem = ItemInformation::create([
-                    //     'itemCd' => $item['itemCode'],
-                    //     'itemClsCd' => $item['itemClassifiCode'],
-                    //     'itemTyCd' => $item['itemTypeCode'],
-                    //     'itemNm' => $item['itemName'],
-                    //     'itemStdNm' => $item['itemStrdName'],
-                    //     'orgnNatCd' => $item['countryCode'],
-                    //     'pkgUnitCd' => $item['pkgUnitCode'],
-                    //     'qtyUnitCd' => $item['qtyUnitCode'],
-                    //     'taxTyCd' => $item['taxTypeCode'],
-                    //     'btchNo' => $item['batchNo'],
-                    //     'bcd' => $item['barcode'],
-                    //     'dftPrc' => $item['unitPrice'],
-                    //     'grpPrcL1' => $item['group1UnitPrice'],
-                    //     'grpPrcL2' => $item['group2UnitPrice'],
-                    //     'grpPrcL3' => $item['group3UnitPrice'],
-                    //     'grpPrcL4' => $item['group4UnitPrice'],
-                    //     'grpPrcL5' => $item['group5UnitPrice'],
-                    //     'addInfo' => $item['additionalInfo'],
-                    //     'sftyQty' => $item['saftyQuantity'],
-                    //     'isrcAplcbYn' => $item['isInrcApplicable'],
-                    //     'rraModYn' => $item['isUsed'],
-                    //     'quantity' => $item['quantity'],
-                    //     'packageQuantity' => $item['packageQuantity'],
-                    // ]);
+                // $newItem = ItemInformation::create([
+                //     'itemCd' => $item['itemCode'],
+                //     'itemClsCd' => $item['itemClassifiCode'],
+                //     'itemTyCd' => $item['itemTypeCode'],
+                //     'itemNm' => $item['itemName'],
+                //     'itemStdNm' => $item['itemStrdName'],
+                //     'orgnNatCd' => $item['countryCode'],
+                //     'pkgUnitCd' => $item['pkgUnitCode'],
+                //     'qtyUnitCd' => $item['qtyUnitCode'],
+                //     'taxTyCd' => $item['taxTypeCode'],
+                //     'btchNo' => $item['batchNo'],
+                //     'bcd' => $item['barcode'],
+                //     'dftPrc' => $item['unitPrice'],
+                //     'grpPrcL1' => $item['group1UnitPrice'],
+                //     'grpPrcL2' => $item['group2UnitPrice'],
+                //     'grpPrcL3' => $item['group3UnitPrice'],
+                //     'grpPrcL4' => $item['group4UnitPrice'],
+                //     'grpPrcL5' => $item['group5UnitPrice'],
+                //     'addInfo' => $item['additionalInfo'],
+                //     'sftyQty' => $item['saftyQuantity'],
+                //     'isrcAplcbYn' => $item['isInrcApplicable'],
+                //     'rraModYn' => $item['isUsed'],
+                //     'quantity' => $item['quantity'],
+                //     'packageQuantity' => $item['packageQuantity'],
+                // ]);
                 // }
-    
+
                 return redirect()->route('productservice.index')->with('success', 'Product / Service Added Successfully');
             } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
@@ -139,12 +154,6 @@ class ProductServiceController extends Controller
             return redirect()->back()->with('error', 'Something Went Wrong');
         }
     }
-<<<<<<< HEAD
-=======
-    
-    
-
->>>>>>> 332fa518d151006d07349216d122586004647ebe
     private function constructProductData($request, $key)
     {
         $productData = [
@@ -186,15 +195,15 @@ class ProductServiceController extends Controller
         try {
             $iteminformation = ItemInformation::where('itemCd', $code)->first();
             return response()->json([
-                'message'=> 'success',
+                'message' => 'success',
                 'data' => $iteminformation
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message'=> 'error',
+                'message' => 'error',
                 'data' => $e->getMessage()
             ]);
-        
+
         }
     }
     // public function edit($id)
@@ -373,18 +382,18 @@ class ProductServiceController extends Controller
                 "group5UnitPrice" => $data['grpPrcL5'],
                 "additionalInfo" => $data['addInfo'],
                 "saftyQuantity" => $data['saftyQuantity'],
-                "isInrcApplicable" => (boolean)$data['isrcAplcbYn'],
-                "isUsed" => (boolean)$data['useYn'],
+                "isInrcApplicable" => (boolean) $data['isrcAplcbYn'],
+                "isUsed" => (boolean) $data['useYn'],
                 "packageQuantity" => $data['packageQuantity'],
             ];
 
             $response = Http::withOptions([
                 'verify' => false
             ])->withHeaders([
-                'accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'key' => '123456'
-            ])->post($url, $reqData);
+                        'accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                        'key' => '123456'
+                    ])->post($url, $reqData);
 
             $res = $response->json();
 
@@ -418,8 +427,8 @@ class ProductServiceController extends Controller
                 "grpPrcL5" => $data['grpPrcL5'],
                 "addInfo" => $data['addInfo'],
                 "sftyQty" => $data['saftyQuantity'],
-                "isrcAplcbYn" => (boolean)$data['isrcAplcbYn'],
-                "useYn" => (boolean)$data['useYn'],
+                "isrcAplcbYn" => (boolean) $data['isrcAplcbYn'],
+                "useYn" => (boolean) $data['useYn'],
             ]);
 
             return redirect()->route('productservice.index')->with('success', 'Item Information updated successfully.');
@@ -1199,8 +1208,8 @@ class ProductServiceController extends Controller
             $response = Http::withOptions([
                 'verify' => false
             ])->withHeaders([
-                'key' => '123456'
-            ])->timeout(60)->get($url);
+                        'key' => '123456'
+                    ])->timeout(60)->get($url);
 
             $data = $response->json()['data'];
 
@@ -1230,7 +1239,7 @@ class ProductServiceController extends Controller
             $syncedCodes = 0;
 
             foreach ($codesToSync as $codeToSync) {
-                $exists = (boolean)Code::where('cdCls', $codeToSync['cdCls'])->exists();
+                $exists = (boolean) Code::where('cdCls', $codeToSync['cdCls'])->exists();
                 if (!$exists) {
                     Code::create($codeToSync);
                     $syncedCodes++;
@@ -1243,7 +1252,7 @@ class ProductServiceController extends Controller
                 return redirect()->back()->with('success', __('Codes Up To Date'));
             }
 
-            
+
         } catch (\Exception $e) {
             \Log::info('ERROR SYNCING CODE LIST');
             \Log::info($e);
@@ -1251,7 +1260,8 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function synchronize() {
+    public function synchronize()
+    {
         try {
 
             $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20210101120000';
@@ -1262,8 +1272,8 @@ class ProductServiceController extends Controller
             $response = Http::withOptions([
                 'verify' => false
             ])->withHeaders([
-                'key' => '123456'
-            ])->timeout(60)->get($url);
+                        'key' => '123456'
+                    ])->timeout(60)->get($url);
 
             $data = $response->json()['data'];
 
@@ -1310,7 +1320,7 @@ class ProductServiceController extends Controller
             $syncedItems = 0;
 
             foreach ($itemsToSync as $itemToSync) {
-                $exists = (boolean)ItemInformation::where('itemCd', $itemsToSync['itemCd'])->exists();
+                $exists = (boolean) ItemInformation::where('itemCd', $itemsToSync['itemCd'])->exists();
                 if (!$exists) {
                     ItemInformation::create($itemToSync);
                     $syncedItems++;
@@ -1329,7 +1339,8 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function synchronizeItemClassifications () {
+    public function synchronizeItemClassifications()
+    {
         try {
 
             $url = 'https://etims.your-apps.biz/api/GetItemClassificationList?date=20210101120000';
@@ -1337,8 +1348,8 @@ class ProductServiceController extends Controller
             $response = Http::withOptions([
                 'verify' => false
             ])->withHeaders([
-                'key' => '123456'
-            ])->timeout(60)->get($url);
+                        'key' => '123456'
+                    ])->timeout(60)->get($url);
 
             $data = $response->json()['data'];
 
@@ -1367,13 +1378,13 @@ class ProductServiceController extends Controller
             $syncedItemInfo = 0;
 
             foreach ($remoteItemInfoToSync as $remoteItemInfo) {
-                $exists = (boolean)ItemClassification::where('itemClsCd', $remoteItemInfo['itemClsCd'])->exists();
+                $exists = (boolean) ItemClassification::where('itemClsCd', $remoteItemInfo['itemClsCd'])->exists();
                 if (!$exists) {
                     ItemClassification::create($remoteItemInfo);
                     $syncedItemInfo++;
                 }
             }
-    
+
             if ($syncedItemInfo > 0) {
                 return redirect()->back()->with('success', __('Synced ' . $syncedItemInfo . ' Item Classifications' . 'Successfully'));
             } else {

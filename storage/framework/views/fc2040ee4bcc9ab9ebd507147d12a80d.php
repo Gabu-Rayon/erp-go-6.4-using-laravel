@@ -72,8 +72,9 @@
 
 <?php $__env->startSection('content'); ?>
     <div class="row">
-        <?php echo e(Form::open(['url' => 'productservice', 'class' => 'w-100'])); ?>
+    <?php echo e(Form::open(['url' => 'productservice', 'class' => 'w-100', 'enctype' => 'multipart/form-data'])); ?>
 
+    <!-- <?php echo e(Form::open(array('url' => 'productservice','enctype' => "multipart/form-data"))); ?> -->
         <div class="col-12">
             <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
         </div>
@@ -233,7 +234,7 @@
                                         <?php echo e(Form::number('packageQuantity', '', ['class' => 'form-control', 'required' => 'required'])); ?>
 
                                     </td>
-                                    <td class="form-group col-md-3">
+                                                     <td class="form-group col-md-3">
                                         <?php echo e(Form::label('category_id', __('Category'), ['class' => 'form-label'])); ?><span
                                             class="text-danger">*</span>
                                         <?php echo e(Form::select('category_id', $category, null, ['class' => 'form-control select', 'required' => 'required'])); ?>
@@ -244,6 +245,21 @@
                                                 href="<?php echo e(route('product-category.index')); ?>"><b><?php echo e(__('Add Category')); ?></b></a>
                                         </div>
                                     </td>
+                                     <td class="col-md-3 form-group">
+                                        <?php echo e(Form::label('pro_image',__('Product/Item Image'),['class'=>'form-label'])); ?>
+
+                                        <div class="choose-file ">
+                                            <label for="pro_image" class="form-label">
+                                                <input
+                                                    type="file"
+                                                    class="form-control"
+                                                    name="pro_image"
+                                                    id="pro_image"
+                                                    data-filename="pro_image_create">
+                                                <img id="image" class="mt-3" style="width:25%;"/>
+                                            </label>
+                                        </div>
+                                    </td>
                                     <td class="form-group col-md-6">
                                         <?php echo e(Form::label('additionalInfo', __('Additional Info'), ['class' => 'form-label'])); ?>
 
@@ -251,7 +267,8 @@
 
                                     </td>
                                     <td class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2"
-                                        data-repeater-delete></td>
+                                        data-repeater-delete></td>                                   
+                                    <td class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
                                 </tr>
                             </tbody>
                         </table>
