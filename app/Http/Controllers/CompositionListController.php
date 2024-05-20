@@ -71,7 +71,6 @@ class CompositionListController extends Controller
                         'items.*.compoItemQty' => 'required|integer',
                     ]
                 );
-
                 if ($validator->fails()) {
                     $messages = $validator->getMessageBag();
                     return redirect()->back()->with('error', $messages->first());
@@ -113,6 +112,7 @@ class CompositionListController extends Controller
                 $compositionList = CompositionList::create([
                     'mainItemCode' => $mainItemCode,
                     'compositionItems_count' => $compositionItemsCount,
+                    'created_by' => \Auth::user()->creatorId(),
                 ]);
 
                 //composition items for each composition list referencing the id of the composition list on each item column
@@ -122,6 +122,7 @@ class CompositionListController extends Controller
                         'mainItemCode_id' => $compositionList->id,
                         'compoItemCode' => $item['compoItemCode'],
                         'compoItemQty' => $item['compoItemQty'],
+                        'created_by'=> \Auth::user()->creatorId(), 
                     ]);
                 }
                 return redirect()->route('compositionlist.index')->with('success', 'Composition List Item Added');

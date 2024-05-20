@@ -42,8 +42,17 @@ class ProductServiceController extends Controller
 
         if (\Auth::user()->can('manage product & service')) {
             $iteminformations = ItemInformation::all();
+            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
+            $category->prepend('Select Category', '');
 
-            return view('productservice.index', compact('iteminformations'));
+            if (!empty($request->category)) {
+
+                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', $request->category)->with(['category', 'unit'])->get();
+            } else {
+                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->with(['category', 'unit'])->get();
+            }
+
+            return view('productservice.index', compact('iteminformations','category'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -131,7 +140,6 @@ class ProductServiceController extends Controller
             return redirect()->back()->with('error', 'Something Went Wrong');
         }
     }
-
     private function constructProductData($request, $key)
     {
         $productData = [
@@ -161,7 +169,6 @@ class ProductServiceController extends Controller
         ];
         return $productData;
     }
-
 
     public function show($id)
     {

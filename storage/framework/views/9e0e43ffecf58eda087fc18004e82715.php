@@ -1,8 +1,16 @@
 
-<?php echo e(Form::model($iteminformation, array('route' => array('productservice.update', $iteminformation->id), 'method' => 'PUT'))); ?>
+<?php echo e(Form::model($iteminformation, array('route' => array('productservice.update', $iteminformation), 'method' => 'PUT'))); ?>
 
 <div class="modal-body">
     <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <?php echo e(Form::label('tin', __('TIN (*)'),['class'=>'form-label'])); ?>
+
+                <?php echo e(Form::text('tin', null, array('class' => 'form-control','placeholder'=>__('Enter TIN'),'required'=>'required'))); ?>
+
+            </div>
+        </div>
         <div class="col-md-6">
             <div class="form-group">
                 <?php echo e(Form::label('itemCd', __('Item Code (*)'),['class'=>'form-label'])); ?>
@@ -141,9 +149,25 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
+                <?php echo e(Form::label('saftyQuantity', __('Safty Quantity'),['class'=>'form-label'])); ?>
+
+                <?php echo e(Form::number('saftyQuantity', $iteminformation->sftyQty, array('class' => 'form-control','placeholder'=>__('Enter Safty Quantity')))); ?>
+
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <?php echo e(Form::label('packageQuantity', __('Package Quantity'),['class'=>'form-label'])); ?>
+
+                <?php echo e(Form::number('packageQuantity', null, array('class' => 'form-control'))); ?>
+
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
                 <?php echo e(Form::label('addInfo', __('Additional Information'),['class'=>'form-label'])); ?>
 
-                <?php echo e(Form::text('addInfo', null, array('class' => 'form-control','placeholder'=>__('Additional Information')))); ?>
+                <?php echo e(Form::text('addInfo', $iteminformation->addInfo, array('class' => 'form-control','placeholder'=>__('Additional Information')))); ?>
 
             </div>
         </div>
@@ -151,7 +175,7 @@
             <div class="form-group">
                 <?php echo e(Form::label('isrcAplcbYn', __('Insurance Appicable (Y/N) (*)'),['class'=>'form-label'])); ?>
 
-                <?php echo e(Form::text('isrcAplcbYn', null, array('class' => 'form-control','placeholder'=>__('Insurance Appicable (Y/N)'), 'required'=>'required'))); ?>
+                <?php echo e(Form::select('isrcAplcbYn', [true => 'Y', false => 'N'], $iteminformation->isrcAplcbYn, ['class' => 'form-control', 'required' => 'required'])); ?>
 
             </div>
         </div>
@@ -159,7 +183,7 @@
             <div class="form-group">
                 <?php echo e(Form::label('useYn', __('Used / UnUsed (Y/N) (*)'),['class'=>'form-label'])); ?>
 
-                <?php echo e(Form::text('useYn', null, array('class' => 'form-control','placeholder'=>__('Used / UnUsed (Y/N)'), 'required'=>'required'))); ?>
+                <?php echo e(Form::select('useYn', [true => 'Y', false => 'N'], $iteminformation->useYn, ['class' => 'form-control', 'required' => 'required'])); ?>
 
             </div>
         </div>

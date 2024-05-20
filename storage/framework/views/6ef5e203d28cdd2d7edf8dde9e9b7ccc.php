@@ -29,13 +29,49 @@
         </a>
 
         <!-- Button to trigger the getItemInformationApi and Synchronize it to my Database() method -->
-        <button class="btn btn-sm btn-primary sync">
-            <i class="#">Synchronize</i>
-        </button>
+        <a href="<?php echo e(route('productservice.synchronize')); ?>" class="btn btn-sm btn-primary sync">
+            Synchronize
+        </a>
     </div>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class=" mt-2 <?php echo e(isset($_GET['category'])?'show':''); ?>" id="multiCollapseExample1">
+                <div class="card">
+                    <div class="card-body">
+                        <?php echo e(Form::open(['route' => ['productservice.index'], 'method' => 'GET', 'id' => 'product_service'])); ?>
+
+                        <div class="d-flex align-items-center justify-content-end">
+                            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12">
+                                <div class="btn-box">
+                                    <?php echo e(Form::label('category', __('Category'),['class'=>'form-label'])); ?>
+
+                                    <?php echo e(Form::select('category', $category, null, ['class' => 'form-control select','id'=>'choices-multiple', 'required' => 'required'])); ?>
+
+                                </div>
+                            </div>
+                            <div class="col-auto float-end ms-2 mt-4">
+                                <a href="#" class="btn btn-sm btn-primary"
+                                   onclick="document.getElementById('product_service').submit(); return false;"
+                                   data-bs-toggle="tooltip" title="<?php echo e(__('apply')); ?>">
+                                    <span class="btn-inner--icon"><i class="ti ti-search"></i></span>
+                                </a>
+                                <a href="<?php echo e(route('productservice.index')); ?>" class="btn btn-sm btn-danger" data-bs-toggle="tooltip"
+                                   title="<?php echo e(__('Reset')); ?>">
+                                    <span class="btn-inner--icon"><i class="ti ti-trash-off "></i></span>
+                                </a>
+                            </div>
+
+                        </div>
+                        <?php echo e(Form::close()); ?>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 <div class="row">
     <div class="col-md-12">
         <div class="card">
@@ -81,58 +117,4 @@
         </div>
     </div>
 <?php $__env->stopSection(); ?>
-
-<?php $__env->startPush('script-page'); ?>
-    <script>
-        const sync = document.querySelector('.sync');
-        sync.addEventListener('click', async function(){
-            try {
-                const loader = document.createElement('div');
-                loader.classList.add('spinner-border', 'text-light', 'spinner-border-sm');
-                loader.role = 'status';
-                sync.appendChild(loader);
-                const response = await fetch('http://localhost:8000/productservice/synchronize', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            });
-            const data = await response.json();
-            console.log(data);
-
-            sync.removeChild(loader);
-            
-            console.log('success');
-            const popup = document.createElement('div');
-            popup.classList.add('alert', 'alert-success');
-            popup.innerHTML = data.info || data.success || 'Synced Successfully';
-            popup.style.position = 'absolute';
-            popup.style.top = '50%';
-            popup.style.left = '50%';
-            popup.style.transform = 'translate(-50%, -50%)';
-            popup.style.zIndex = '9999';
-            document.body.appendChild(popup);
-            setTimeout(() => {
-                location.reload();
-            }, 3000);
-            } catch (error) {
-                console.log('error');
-                const popup = document.createElement('div');
-                popup.classList.add('alert', 'alert-danger');
-                popup.innerHTML = data.error || 'Sync Failed';
-                popup.style.position = 'absolute';
-                popup.style.top = '50%';
-                popup.style.left = '50%';
-                popup.style.transform = 'translate(-50%, -50%)';
-                popup.style.zIndex = '9999';
-                document.body.appendChild(popup);
-                setTimeout(() => {
-                    location.reload();
-                }, 3000);
-            }
-        });
-    </script>
-<?php $__env->stopPush(); ?>
-
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/productservice/index.blade.php ENDPATH**/ ?>
