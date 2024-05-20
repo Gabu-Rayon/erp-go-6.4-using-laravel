@@ -1,7 +1,13 @@
 
-{{ Form::model($iteminformation, array('route' => array('productservice.update', $iteminformation->id), 'method' => 'PUT')) }}
+{{ Form::model($iteminformation, array('route' => array('productservice.update', $iteminformation), 'method' => 'PUT')) }}
 <div class="modal-body">
     <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ Form::label('tin', __('TIN (*)'),['class'=>'form-label']) }}
+                {{ Form::text('tin', null, array('class' => 'form-control','placeholder'=>__('Enter TIN'),'required'=>'required')) }}
+            </div>
+        </div>
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('itemCd', __('Item Code (*)'),['class'=>'form-label']) }}
@@ -106,20 +112,32 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
+                {{ Form::label('saftyQuantity', __('Safty Quantity'),['class'=>'form-label']) }}
+                {{ Form::number('saftyQuantity', $iteminformation->sftyQty, array('class' => 'form-control','placeholder'=>__('Enter Safty Quantity'))) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ Form::label('packageQuantity', __('Package Quantity'),['class'=>'form-label']) }}
+                {{ Form::number('packageQuantity', null, array('class' => 'form-control')) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
                 {{ Form::label('addInfo', __('Additional Information'),['class'=>'form-label']) }}
-                {{ Form::text('addInfo', null, array('class' => 'form-control','placeholder'=>__('Additional Information'))) }}
+                {{ Form::text('addInfo', $iteminformation->addInfo, array('class' => 'form-control','placeholder'=>__('Additional Information'))) }}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('isrcAplcbYn', __('Insurance Appicable (Y/N) (*)'),['class'=>'form-label']) }}
-                {{ Form::text('isrcAplcbYn', null, array('class' => 'form-control','placeholder'=>__('Insurance Appicable (Y/N)'), 'required'=>'required')) }}
+                {{ Form::select('isrcAplcbYn', [true => 'Y', false => 'N'], $iteminformation->isrcAplcbYn, ['class' => 'form-control', 'required' => 'required']) }}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('useYn', __('Used / UnUsed (Y/N) (*)'),['class'=>'form-label']) }}
-                {{ Form::text('useYn', null, array('class' => 'form-control','placeholder'=>__('Used / UnUsed (Y/N)'), 'required'=>'required')) }}
+                {{ Form::select('useYn', [true => 'Y', false => 'N'], $iteminformation->useYn, ['class' => 'form-control', 'required' => 'required']) }}
             </div>
         </div>
     </div>
