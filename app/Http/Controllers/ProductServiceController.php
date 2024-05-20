@@ -97,6 +97,53 @@ class ProductServiceController extends Controller
                 \Log::info('ITEMS');
                 \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
 
+                $url = 'https://etims.your-apps.biz/api/AddItemsList';
+
+                $firstResponse = Http::withOptions([
+                    'verify' => false
+                ])->withHeaders([
+                    'key' => '123456'
+                ])->post($url, $data['items']);
+
+                \Log::info('FIRST RESPONSE');
+                \Log::info($firstResponse);
+
+                
+                if ($firstResponse["statusCode"] != 200) {
+                    return redirect()->back()->with('error', 'Something Went Wrong');
+                }
+
+                $urltwo = 'https://etims.your-apps.biz/api/ItemOpeningStock';
+                $secondReqData = [];
+
+                foreach ($data['items'] as $item) {
+                    $item = [
+                        "itemCode" => $item['itemCode'],
+                        "quantity" => $item['quantity'],
+                        "packageQuantity" => $item['packageQuantity'],
+                    ];
+                    array_push($secondReqData, $item);
+                }
+
+                \Log::info('SECOND REQUEST DATA');
+                \Log::info(json_encode($secondReqData, JSON_PRETTY_PRINT));
+
+                $secondResponse = Http::withOptions([
+                    'verify' => false
+                ])->withHeaders([
+                    'key' => '123456'
+                ])->post($urltwo, [
+                    'openingItemsLists' => $secondReqData
+                ]);
+
+                \Log::info('SECOND RESPONSE');
+                \Log::info($secondResponse);
+
+                
+                if ($secondResponse["statusCode"] == 400) {
+                    return redirect()->back()->with('error', $secondResponse["message"]);
+                }
+
                 foreach ($data['items'] as $index => $item) {
                     \Log::info('ITEM INDEX: ' . $index);
                     
