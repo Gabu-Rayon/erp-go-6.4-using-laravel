@@ -66,7 +66,7 @@ class ProductServiceController extends Controller
             $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
             $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
             $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
-            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
+            $category = ProductServiceCategory::all()->pluck('name', 'id');
             $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
             return view(
                 'productservice.create',
@@ -99,6 +99,7 @@ class ProductServiceController extends Controller
 
                 foreach ($data['items'] as $index => $item) {
                     \Log::info('ITEM INDEX: ' . $index);
+                    
                     if (isset($item['pro_image']) && $item['pro_image']->isValid()) {
                         \Log::info('Image File Object for Item ' . ($index + 1));
                         \Log::info(json_encode([
@@ -107,42 +108,54 @@ class ProductServiceController extends Controller
                             'size' => $item['pro_image']->getSize(),
                             'path' => $item['pro_image']->getPathname(),
                         ], JSON_PRETTY_PRINT));
+                        
+                        // Determine the storage disk based on your configuration
+                        $storageDisk = 'local'; // Change this to your configured disk
+                        
+                        // Determine the storage path where you want to store the file
+                        $storagePath = 'uploads/pro_image'; // Change this to your desired path
+                        
+                        // Generate a unique filename (if needed) or use the original filename
+                        $filename = $item['pro_image']->getClientOriginalName();
+                        
+                        // Store the file using the Storage facade
+                        $storedFilePath = \Storage::disk($storageDisk)->putFileAs($storagePath, $item['pro_image'], $filename);
+                        
+                        \Log::info('Stored File Path: ' . $storedFilePath);
+                        
+                        // Now $storedFilePath contains the path where the file is stored
+                        // You can use this path for further processing or storing in the database
+
+                        ItemInformation::create([
+                                'itemCd' => $item['itemCode'],
+                                'itemClsCd' => $item['itemClassifiCode'],
+                                'itemTyCd' => $item['itemTypeCode'],
+                                'itemNm' => $item['itemName'],
+                                'itemStdNm' => $item['itemStrdName'],
+                                'orgnNatCd' => $item['countryCode'],
+                                'pkgUnitCd' => $item['pkgUnitCode'],
+                                'qtyUnitCd' => $item['qtyUnitCode'],
+                                'taxTyCd' => $item['taxTypeCode'],
+                                'btchNo' => $item['batchNo'],
+                                'bcd' => $item['barcode'],
+                                'dftPrc' => $item['unitPrice'],
+                                'grpPrcL1' => $item['group1UnitPrice'],
+                                'grpPrcL2' => $item['group2UnitPrice'],
+                                'grpPrcL3' => $item['group3UnitPrice'],
+                                'grpPrcL4' => $item['group4UnitPrice'],
+                                'grpPrcL5' => $item['group5UnitPrice'],
+                                'addInfo' => $item['additionalInfo'],
+                                'sftyQty' => $item['saftyQuantity'],
+                                'isrcAplcbYn' => $item['isInrcApplicable'],
+                                'rraModYn' => $item['isUsed'],
+                                'quantity' => $item['quantity'],
+                                'packageQuantity' => $item['packageQuantity'],
+                                'image' => $storedFilePath
+                            ]);
                     } else {
                         \Log::info('No valid image uploaded for item ' . ($index + 1));
                     }
                 }
-
-
-
-
-                // foreach ($data['items'] as $item) {
-
-                // $newItem = ItemInformation::create([
-                //     'itemCd' => $item['itemCode'],
-                //     'itemClsCd' => $item['itemClassifiCode'],
-                //     'itemTyCd' => $item['itemTypeCode'],
-                //     'itemNm' => $item['itemName'],
-                //     'itemStdNm' => $item['itemStrdName'],
-                //     'orgnNatCd' => $item['countryCode'],
-                //     'pkgUnitCd' => $item['pkgUnitCode'],
-                //     'qtyUnitCd' => $item['qtyUnitCode'],
-                //     'taxTyCd' => $item['taxTypeCode'],
-                //     'btchNo' => $item['batchNo'],
-                //     'bcd' => $item['barcode'],
-                //     'dftPrc' => $item['unitPrice'],
-                //     'grpPrcL1' => $item['group1UnitPrice'],
-                //     'grpPrcL2' => $item['group2UnitPrice'],
-                //     'grpPrcL3' => $item['group3UnitPrice'],
-                //     'grpPrcL4' => $item['group4UnitPrice'],
-                //     'grpPrcL5' => $item['group5UnitPrice'],
-                //     'addInfo' => $item['additionalInfo'],
-                //     'sftyQty' => $item['saftyQuantity'],
-                //     'isrcAplcbYn' => $item['isInrcApplicable'],
-                //     'rraModYn' => $item['isUsed'],
-                //     'quantity' => $item['quantity'],
-                //     'packageQuantity' => $item['packageQuantity'],
-                // ]);
-                // }
 
                 return redirect()->route('productservice.index')->with('success', 'Product / Service Added Successfully');
             } else {
