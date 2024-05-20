@@ -138,7 +138,7 @@
                                         if (taxTyCd === 'B') {
                                             taxRate = 16; // VAT 16%
                                         } else if (taxTyCd === 'E') {
-                                            taxRate = 8; // VAT 8%
+                                            taxRate = 0; // VAT 8%
                                         }
 
                                         // Calculate item tax price based on unit price and tax rate
