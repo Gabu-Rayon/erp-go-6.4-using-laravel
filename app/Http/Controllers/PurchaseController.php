@@ -507,7 +507,7 @@ class PurchaseController extends Controller
                     case 'B':
                         return 16; // 16% tax rate for code B
                     case 'E':
-                        return 8; // 8% tax rate for code E
+                        return 0; // 8% tax rate for code E
                     default:
                         return 0; // Default tax rate if code not found
                 }

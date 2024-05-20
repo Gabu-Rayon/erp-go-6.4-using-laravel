@@ -46,7 +46,6 @@
             @endif
         @endcan
     </div>
-    Plan
 @endsection
 
 @section('content')
