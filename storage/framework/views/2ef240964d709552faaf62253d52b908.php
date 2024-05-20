@@ -1314,12 +1314,39 @@
                         </li>
                     <?php endif; ?>
                     <?php if(Gate::check('manage product & service')): ?>
-                        <li class="dash-item <?php echo e(Request::segment(1) == 'productstock' ? 'active' : ''); ?>">
-                            <a href="<?php echo e(route('productstock.index')); ?>"
-                                class="dash-link"><?php echo e(__('Product Stock')); ?>
+                    <li
+                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'productstock' ? 'active dash-trigger' : ''); ?>"
+                        href="#"
+                        data-toggle="collapse"
+                        role="button"
+                        aria-expanded="<?php echo e(Request::segment(1) == 'productstock'
+                                            || Request::segment(1) == 'stockadjustment'
+                                            || Request::segment(1) == 'stockinfo'
+                                            ? 'true'
+                                            : 'false'); ?>"
+                    >
+                        <a class="dash-link" href="#">
+                            <?php echo e(__('Product Stock')); ?>
 
-                            </a>
-                        </li>
+                            <span class="dash-arrow">
+                                <i data-feather="chevron-right"></i>
+                            </span>
+                        </a>
+                        <ul class="dash-submenu">
+                            <li class="dash-item <?php echo e(request()->is('productstock.index') ? 'active' : ''); ?>">
+                                <a class="dash-link" href="<?php echo e(route('productstock.index')); ?>"><?php echo e(__('Stock')); ?></a>
+                            </li>
+                            <li class="dash-item <?php echo e(request()->is('stockinfo') ? 'active' : ''); ?>">
+                                <a class="dash-link" href="<?php echo e(route('stockinfo.index')); ?>"><?php echo e(__('Get Move List')); ?></a>
+                            </li>
+                            <li class="dash-item <?php echo e(request()->is('stockadjustment') ? 'active' : ''); ?>">
+                                <a class="dash-link" href="<?php echo e(route('stockadjustment.index')); ?>"><?php echo e(__('Stock Adjustment')); ?></a>
+                            </li>
+                            <li class="dash-item <?php echo e(request()->is('stockmove.create') ? 'active' : ''); ?>">
+                                <a class="dash-link" href="<?php echo e(route('stockmove.create')); ?>"><?php echo e(__('Move Stock')); ?></a>
+                            </li>
+                        </ul>
+                    </li>
                     <?php endif; ?>
                 </ul>
             </li>
@@ -1425,32 +1452,6 @@
                 </li>
                 <li class="dash-item <?php echo e(Request::route()->getName() == 'create'); ?>">
                 <a class="dash-link" href="<?php echo e(route('importeditems.mapImportedItem')); ?>"><?php echo e(__('Send Import Item')); ?></a>
-                </li>
-            </ul>
-        </li>
-        <?php endif; ?>
-
-
-        <?php if(\Auth::user()->type == 'company' || \Auth::user()->type == 'Employee'): ?>
-        <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : ''); ?>">
-            <a href="#!" class="dash-link">
-                <span class="dash-micon">
-                    <i class="ti ti-layers-difference"></i>
-                </span>
-                <span class="dash-mtext"><?php echo e(__('Stock Information')); ?></span>
-                <span class="dash-arrow">
-                    <i data-feather="chevron-right"></i>
-                </span>
-            </a>
-            <ul class="dash-submenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' || Request::segment(1) == 'adjust'); ?>">
-                <li class="dash-item <?php echo e(Request::route()->getName() == 'index'); ?>">
-                    <a class="dash-link" href="<?php echo e(route('stockinfo.index')); ?>"><?php echo e(__('Get Move List')); ?></a>
-                </li>
-                <li class="dash-item <?php echo e(Request::route()->getName() == 'index'); ?>">
-                    <a class="dash-link" href="<?php echo e(route('stockadjustment.index')); ?>"><?php echo e(__('Stock Adjustment List')); ?></a>
-                </li>
-                <li class="dash-item <?php echo e(Request::route()->getName() == 'create'); ?>">
-                    <a class="dash-link" href="<?php echo e(route('stockmove.create')); ?>"><?php echo e(__('Move Stock')); ?></a>
                 </li>
             </ul>
         </li>

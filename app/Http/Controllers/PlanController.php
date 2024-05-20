@@ -62,7 +62,6 @@ class PlanController extends Controller
                     || $admin_payment_setting['is_cashfree_enabled'] == 'on' || $admin_payment_setting['is_aamarpay_enabled'] == 'on'
                     || $admin_payment_setting['is_paytr_enabled'] == 'on')
             ) {
-
                 $validation = [];
                 $validation['name'] = 'required|unique:plans';
                 $validation['price'] = 'required|numeric|min:0';

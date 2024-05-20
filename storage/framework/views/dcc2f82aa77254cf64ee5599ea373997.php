@@ -47,7 +47,6 @@
             <?php endif; ?>
         <?php endif; ?>
     </div>
-    Plan
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
