@@ -73,7 +73,7 @@
 
 @section('content')
     <div class="row">
-        {{ Form::open(['url' => 'productservice', 'class' => 'w-100']) }}
+    {{ Form::open(['url' => 'productservice', 'class' => 'w-100', 'enctype' => 'multipart/form-data']) }}
         <div class="col-12">
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
         </div>
@@ -191,6 +191,20 @@
                                     <td class="form-group col-md-3">
                                         {{ Form::label('packageQuantity', __('Package Quantity'),['class'=>'form-label']) }}
                                         {{ Form::number('packageQuantity', '', array('class' => 'form-control', 'required' => 'required')) }}
+                                    </td>
+                                    <td class="col-md-6 form-group">
+                                        {{Form::label('pro_image',__('Product Image'),['class'=>'form-label'])}}
+                                        <div class="choose-file ">
+                                            <label for="pro_image" class="form-label">
+                                                <input
+                                                    type="file"
+                                                    class="form-control"
+                                                    name="pro_image"
+                                                    id="pro_image"
+                                                    data-filename="pro_image_create">
+                                                <img id="image" class="mt-3" style="width:25%;"/>
+                                            </label>
+                                        </div>
                                     </td>
                                     <td class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
                                 </tr>

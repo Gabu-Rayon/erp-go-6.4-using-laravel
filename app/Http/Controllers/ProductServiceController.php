@@ -71,66 +71,67 @@ class ProductServiceController extends Controller
     }
 
 
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         try {
             if (\Auth::user()->can('create product & service')) {
-                \Log::info('CREATE PRODUCT SERVICE REQUEST DAYTA');
+                \Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
                 \Log::info($request->all());
-
+    
                 $data = $request->all();
-
-                \Log::info('ITEMSSSS');
+    
+                \Log::info('ITEMS');
                 \Log::info($data['items']);
 
-                $url = 'https://etims.your-apps.biz/api/AddItemsList';
+                \Log::info('KITU RARE');
+                \Log::info($request->file('pro_image'));
 
-                $response = Http::withOptions(['verify' => false])->withHeaders([
-                    'key' => '123456'
-                ])->post($url, $data['items']);
-
-                \Log::info('CREATE PRODUCT SERVICE API RESPONSE');
-                \Log::info($response);
-
-                foreach ($data['items'] as $item) {
-                    \Log::info($item);
-                    ItemInformation::create([
-                        'itemCd' => $item['itemCode'],
-                        'itemClsCd' => $item['itemClassifiCode'],
-                        'itemTyCd' => $item['itemTypeCode'],
-                        'itemNm' => $item['itemName'],
-                        'itemStdNm' => $item['itemStrdName'],
-                        'orgnNatCd' => $item['countryCode'],
-                        'pkgUnitCd' => $item['pkgUnitCode'],
-                        'qtyUnitCd' => $item['qtyUnitCode'],
-                        'taxTyCd' => $item['taxTypeCode'],
-                        'btchNo' => $item['batchNo'],
-                        'bcd' => $item['barcode'],
-                        'dftPrc' => $item['unitPrice'],
-                        'grpPrcL1' => $item['group1UnitPrice'],
-                        'grpPrcL2' => $item['group2UnitPrice'],
-                        'grpPrcL3' => $item['group3UnitPrice'],
-                        'grpPrcL4' => $item['group4UnitPrice'],
-                        'grpPrcL5' => $item['group5UnitPrice'],
-                        'addInfo' => $item['additionalInfo'],
-                        'sftyQty' => $item['saftyQuantity'],
-                        'isrcAplcbYn' => $item['isInrcApplicable'],
-                        'rraModYn' => $item['isUsed'],
-                        'quantity' => $item['quantity'],
-                        'packageQuantity' => $item['packageQuantity'],
-                    ]);
+                foreach ($request->file('pro_image') as $index => $uploadedFile) {
+                    \Log::info('Image File Object for Item '. ($index + 1));
+                    \Log::info($uploadedFile);
                 }
+                
+    
+                // foreach ($data['items'] as $item) {
 
-                return redirect()->to('productservice')->with('success', 'Product / Service Added Successfully');
-            }else {
+                    // $newItem = ItemInformation::create([
+                    //     'itemCd' => $item['itemCode'],
+                    //     'itemClsCd' => $item['itemClassifiCode'],
+                    //     'itemTyCd' => $item['itemTypeCode'],
+                    //     'itemNm' => $item['itemName'],
+                    //     'itemStdNm' => $item['itemStrdName'],
+                    //     'orgnNatCd' => $item['countryCode'],
+                    //     'pkgUnitCd' => $item['pkgUnitCode'],
+                    //     'qtyUnitCd' => $item['qtyUnitCode'],
+                    //     'taxTyCd' => $item['taxTypeCode'],
+                    //     'btchNo' => $item['batchNo'],
+                    //     'bcd' => $item['barcode'],
+                    //     'dftPrc' => $item['unitPrice'],
+                    //     'grpPrcL1' => $item['group1UnitPrice'],
+                    //     'grpPrcL2' => $item['group2UnitPrice'],
+                    //     'grpPrcL3' => $item['group3UnitPrice'],
+                    //     'grpPrcL4' => $item['group4UnitPrice'],
+                    //     'grpPrcL5' => $item['group5UnitPrice'],
+                    //     'addInfo' => $item['additionalInfo'],
+                    //     'sftyQty' => $item['saftyQuantity'],
+                    //     'isrcAplcbYn' => $item['isInrcApplicable'],
+                    //     'rraModYn' => $item['isUsed'],
+                    //     'quantity' => $item['quantity'],
+                    //     'packageQuantity' => $item['packageQuantity'],
+                    // ]);
+                // }
+    
+                return redirect()->route('productservice.index')->with('success', 'Product / Service Added Successfully');
+            } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
         } catch (\Exception $e) {
-            \Log::info('CREATE PRODUCT SERVICE ERROR');
-            \Log::info($e);
+            \Log::error('CREATE PRODUCT SERVICE ERROR');
+            \Log::error($e);
             return redirect()->back()->with('error', 'Something Went Wrong');
         }
     }
+    
+    
 
     private function constructProductData($request, $key)
     {
