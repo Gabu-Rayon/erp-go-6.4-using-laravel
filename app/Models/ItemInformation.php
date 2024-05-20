@@ -36,5 +36,6 @@ class ItemInformation extends Model
         'isrcAplcbYn',
         'rraModYn',
         'useYn',
+        'image'
     ];
 }

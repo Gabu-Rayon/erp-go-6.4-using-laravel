@@ -36,6 +36,42 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class=" mt-2 <?php echo e(isset($_GET['category'])?'show':''); ?>" id="multiCollapseExample1">
+                <div class="card">
+                    <div class="card-body">
+                        <?php echo e(Form::open(['route' => ['productservice.index'], 'method' => 'GET', 'id' => 'product_service'])); ?>
+
+                        <div class="d-flex align-items-center justify-content-end">
+                            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12">
+                                <div class="btn-box">
+                                    <?php echo e(Form::label('category', __('Category'),['class'=>'form-label'])); ?>
+
+                                    <?php echo e(Form::select('category', $category, null, ['class' => 'form-control select','id'=>'choices-multiple', 'required' => 'required'])); ?>
+
+                                </div>
+                            </div>
+                            <div class="col-auto float-end ms-2 mt-4">
+                                <a href="#" class="btn btn-sm btn-primary"
+                                   onclick="document.getElementById('product_service').submit(); return false;"
+                                   data-bs-toggle="tooltip" title="<?php echo e(__('apply')); ?>">
+                                    <span class="btn-inner--icon"><i class="ti ti-search"></i></span>
+                                </a>
+                                <a href="<?php echo e(route('productservice.index')); ?>" class="btn btn-sm btn-danger" data-bs-toggle="tooltip"
+                                   title="<?php echo e(__('Reset')); ?>">
+                                    <span class="btn-inner--icon"><i class="ti ti-trash-off "></i></span>
+                                </a>
+                            </div>
+
+                        </div>
+                        <?php echo e(Form::close()); ?>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 <div class="row">
     <div class="col-md-12">
         <div class="card">

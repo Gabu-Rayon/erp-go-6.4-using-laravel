@@ -66,7 +66,7 @@ class ProductServiceController extends Controller
             $itemclassifications = ItemClassification::pluck('itemClsNm', 'itemClsCd');
             $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
             $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
-            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
+            $category = ProductServiceCategory::all()->pluck('name', 'id');
             $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
             return view(
                 'productservice.create',
@@ -99,6 +99,7 @@ class ProductServiceController extends Controller
 
                 foreach ($data['items'] as $index => $item) {
                     \Log::info('ITEM INDEX: ' . $index);
+                    
                     if (isset($item['pro_image']) && $item['pro_image']->isValid()) {
                         \Log::info('Image File Object for Item ' . ($index + 1));
                         \Log::info(json_encode([
@@ -111,6 +112,9 @@ class ProductServiceController extends Controller
                         \Log::info('No valid image uploaded for item ' . ($index + 1));
                     }
                 }
+
+
+
 
                 // foreach ($data['items'] as $item) {
 
