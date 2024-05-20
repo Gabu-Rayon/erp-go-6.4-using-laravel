@@ -108,42 +108,54 @@ class ProductServiceController extends Controller
                             'size' => $item['pro_image']->getSize(),
                             'path' => $item['pro_image']->getPathname(),
                         ], JSON_PRETTY_PRINT));
+                        
+                        // Determine the storage disk based on your configuration
+                        $storageDisk = 'local'; // Change this to your configured disk
+                        
+                        // Determine the storage path where you want to store the file
+                        $storagePath = 'uploads/pro_image'; // Change this to your desired path
+                        
+                        // Generate a unique filename (if needed) or use the original filename
+                        $filename = $item['pro_image']->getClientOriginalName();
+                        
+                        // Store the file using the Storage facade
+                        $storedFilePath = \Storage::disk($storageDisk)->putFileAs($storagePath, $item['pro_image'], $filename);
+                        
+                        \Log::info('Stored File Path: ' . $storedFilePath);
+                        
+                        // Now $storedFilePath contains the path where the file is stored
+                        // You can use this path for further processing or storing in the database
+
+                        ItemInformation::create([
+                                'itemCd' => $item['itemCode'],
+                                'itemClsCd' => $item['itemClassifiCode'],
+                                'itemTyCd' => $item['itemTypeCode'],
+                                'itemNm' => $item['itemName'],
+                                'itemStdNm' => $item['itemStrdName'],
+                                'orgnNatCd' => $item['countryCode'],
+                                'pkgUnitCd' => $item['pkgUnitCode'],
+                                'qtyUnitCd' => $item['qtyUnitCode'],
+                                'taxTyCd' => $item['taxTypeCode'],
+                                'btchNo' => $item['batchNo'],
+                                'bcd' => $item['barcode'],
+                                'dftPrc' => $item['unitPrice'],
+                                'grpPrcL1' => $item['group1UnitPrice'],
+                                'grpPrcL2' => $item['group2UnitPrice'],
+                                'grpPrcL3' => $item['group3UnitPrice'],
+                                'grpPrcL4' => $item['group4UnitPrice'],
+                                'grpPrcL5' => $item['group5UnitPrice'],
+                                'addInfo' => $item['additionalInfo'],
+                                'sftyQty' => $item['saftyQuantity'],
+                                'isrcAplcbYn' => $item['isInrcApplicable'],
+                                'rraModYn' => $item['isUsed'],
+                                'quantity' => $item['quantity'],
+                                'packageQuantity' => $item['packageQuantity'],
+                                'image' => $storedFilePath
+                            ]);
                     } else {
                         \Log::info('No valid image uploaded for item ' . ($index + 1));
                     }
                 }
-
-
-
-
-                // foreach ($data['items'] as $item) {
-
-                // $newItem = ItemInformation::create([
-                //     'itemCd' => $item['itemCode'],
-                //     'itemClsCd' => $item['itemClassifiCode'],
-                //     'itemTyCd' => $item['itemTypeCode'],
-                //     'itemNm' => $item['itemName'],
-                //     'itemStdNm' => $item['itemStrdName'],
-                //     'orgnNatCd' => $item['countryCode'],
-                //     'pkgUnitCd' => $item['pkgUnitCode'],
-                //     'qtyUnitCd' => $item['qtyUnitCode'],
-                //     'taxTyCd' => $item['taxTypeCode'],
-                //     'btchNo' => $item['batchNo'],
-                //     'bcd' => $item['barcode'],
-                //     'dftPrc' => $item['unitPrice'],
-                //     'grpPrcL1' => $item['group1UnitPrice'],
-                //     'grpPrcL2' => $item['group2UnitPrice'],
-                //     'grpPrcL3' => $item['group3UnitPrice'],
-                //     'grpPrcL4' => $item['group4UnitPrice'],
-                //     'grpPrcL5' => $item['group5UnitPrice'],
-                //     'addInfo' => $item['additionalInfo'],
-                //     'sftyQty' => $item['saftyQuantity'],
-                //     'isrcAplcbYn' => $item['isInrcApplicable'],
-                //     'rraModYn' => $item['isUsed'],
-                //     'quantity' => $item['quantity'],
-                //     'packageQuantity' => $item['packageQuantity'],
-                // ]);
-                // }
 
                 return redirect()->route('productservice.index')->with('success', 'Product / Service Added Successfully');
             } else {
@@ -344,6 +356,7 @@ class ProductServiceController extends Controller
         $iteminformation = ItemInformation::find($id);
         \Log::info('ITEM INFO');
         \Log::info($iteminformation);
+
         try {
 
             $request->validate([
