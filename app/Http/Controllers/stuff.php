@@ -1,62 +1,90 @@
 <?php
 
-function synchronizeItemClassifications() {
-
+function synchronize() {
     try {
-        // Fetch local item classifications
-        $localClassifications = ItemClassification::select(
+        // Fetch local items  information
+        $localiteminfo = ItemInformation::select(
+            'tin',
+            'itemCd',
             'itemClsCd',
-            'itemClsNm',
-            'itemClsLvl',
+            'itemTyCd',
+            'itemNm',
+            'itemStdNm',
+            'orgnNatCd',
+            'pkgUnitCd',
+            'qtyUnitCd',
             'taxTyCd',
-            'mjrTgYn',
+            'btchNo',
+            'regBhfId',
+            'bcd',
+            'dftPrc',
+            'grpPrcL1',
+            'grpPrcL1',
+            'grpPrcL2',
+            'grpPrcL3',
+            'grpPrcL4',
+            'grpPrcL5',
+            'addInfo',
+            'sftyQty',
+            'isrcAplcbYn',
             'useYn'
         )->get()->toArray();
+        $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';
 
-
-
-        // Fetch remote item classifications
-        $url = 'https://etims.your-apps.biz/api/GetItemClassificationList?date=20220409120000';
         $response = Http::withHeaders([
             'key' => '123456'
         ])->get($url);
 
         $data = $response->json()['data'];
-        $remoteClassifications = $data['data']['itemClsList'];
+        $remoteiteminfo = $data['data']['itemList'];
 
-        // Log API request data, response, and status code
         \Log::info('API Request Data: ' . json_encode($data));
+        \Log::info('API Request Data: ' . json_encode($remoteiteminfo));
         \Log::info('API Response: ' . $response->body());
         \Log::info('API Response Status Code: ' . $response->status());
 
         // Compare local and remote classifications
-        $newClassifications = array_udiff($remoteClassifications, $localClassifications, function ($a, $b) {
-            return $a['itemClsCd'] <=> $b['itemClsCd'];
+        $newItemsInfo = array_udiff($remoteiteminfo, $localiteminfo, function ($a, $b) {
+            return $a['itemCd'] <=> $b['itemCd'];
         });
 
-        if (empty($newClassifications)) {
-            \Log::info('No new item Classification  to be added from the API Item Classification are up to date');
-            return response()->json(['info' => 'No new item Classification  to be added from the API Item Classification are up to date']);
+        if (empty($newItemsInfo)) {
+            \Log::info('No new items Information to be added from the API Items are up to date');
+            return response()->json(['info' => 'No new items Information to be added from the API Items are up to date']);
         }
 
-        // Insert new classifications
-        foreach ($newClassifications as $classification) {
-            if (!is_null($classification)) {
-                ItemClassification::create([
-                    'itemClsCd' => $classification['itemClsCd'],
-                    'itemClsNm' => $classification['itemClsNm'],
-                    'itemClsLvl' => $classification['itemClsLvl'],
-                    'taxTyCd' => $classification['taxTyCd'],
-                    'mjrTgYn' => $classification['mjrTgYn'],
-                    'useYn' => $classification['useYn']
-                ]);
-            }
+        foreach ($newItemsInfo as $item) {
+            ItemInformation::create([
+                'tin' => $item['tin'],
+                'itemCd' => $item['itemCd'],
+                'itemClsCd' => $item['itemClsCd'],
+                'itemTyCd' => $item['itemTyCd'],
+                'itemNm' => $item['itemNm'],
+                'itemStdNm' => $item['itemStdNm'],
+                'orgnNatCd' => $item['orgnNatCd'],
+                'pkgUnitCd' => $item['pkgUnitCd'],
+                'qtyUnitCd' => $item['qtyUnitCd'],
+                'taxTyCd' => $item['taxTyCd'],
+                'btchNo' => $item['btchNo'],
+                'regBhfId' => $item['regBhfId'],
+                'bcd' => $item['bcd'],
+                'dftPrc' => $item['dftPrc'],
+                'grpPrcL1' => $item['grpPrcL1'],
+                'grpPrcL2' => $item['grpPrcL2'],
+                'grpPrcL3' => $item['grpPrcL3'],
+                'grpPrcL4' => $item['grpPrcL4'],
+                'grpPrcL5' => $item['grpPrcL5'],
+                'addInfo' => $item['addInfo'],
+                'sftyQty' => $item['sftyQty'],
+                'isrcAplcbYn' => $item['isrcAplcbYn'],
+                'rraModYn' => $item['rraModYn'],
+                'useYn' => $item['useYn']
+            ]);
         }
-        \Log::info('Synchronizing Item Classifications from the API successfully');
-        return response()->json(['success' => 'Synchronizing Item Classifications from the API successfully']);
-
+        \Log::info('Synchronizing Item Informations from the API successfully successfully');
+        return response()->json(['success' => 'Synchronizing Item Informations from the API successfully successfully']);
     } catch (\Exception $e) {
-        \Log::error('Error synchronizing Item Classifications from the API: ' . $e);
-        return response()->json(['error' => 'Error synchronizing Item Classifications from the API']);
+        \Log::error('Error Synchronizing Item Informations from the API: ' . $e->getMessage());
+        return response()->json(['error' => 'Error Synchronizing Item Informations from the API']);
     }
 }

@@ -316,9 +316,15 @@ class ProductServiceController extends Controller
 //             return redirect()->back()->with('error', __('Permission denied.'));
 //         }
 //     }
-    public function update(Request $request, ItemInformation $iteminformation)
+    public function update(Request $request, $id)
     {
+
+        $iteminformation = ItemInformation::find($id);
+        \Log::info('ITEM INFO');
+        \Log::info($iteminformation);
+
         try {
+
             $request->validate([
                 'itemCd' => 'required',
                 'itemClsCd' => 'required',
@@ -334,50 +340,80 @@ class ProductServiceController extends Controller
             ]);
 
             $url = 'https://etims.your-apps.biz/api/UpdateItem';
-            //Mapped the into 
-            /****
-             * [
-{
-  "itemCode": "string",
-  "itemClassifiCode": "string",
-  "itemTypeCode": "string",
-  "itemName": "string",
-  "itemStrdName": "string",
-  "countryCode": "string",
-  "pkgUnitCode": "string",
-  "qtyUnitCode": "string",
-  "taxTypeCode": "string",
-  "batchNo": "string",
-  "barcode": "string",
-  "unitPrice": 0,
-  "group1UnitPrice": 0,
-  "group2UnitPrice": 0,
-  "group3UnitPrice": 0,
-  "group4UnitPrice": 0,
-  "group5UnitPrice": 0,
-  "additionalInfo": "string",
-  "saftyQuantity": 0,
-  "isInrcApplicable": true,
-  "isUsed": true,
-  "quantity": 0,
-  "packageQuantity": 0
-}
-]
-             */
-            $response = Http::withHeaders([
+            $data = $request->all();
+            $reqData = [
+                "itemCode" => $data['itemCd'],
+                "itemClassifiCode" => $data['itemClsCd'],
+                "itemTypeCode" => $data['itemTyCd'],
+                "itemName" => $data['itemNm'],
+                "itemStrdName" => $data['itemStdNm'],
+                "countryCode" => $data['orgnNatCd'],
+                "pkgUnitCode" => $data['pkgUnitCd'],
+                "qtyUnitCode" => $data['qtyUnitCd'],
+                "taxTypeCode" => $data['taxTyCd'],
+                "batchNo" => $data['btchNo'],
+                "barcode" => $data['bcd'],
+                "unitPrice" => $data['dftPrc'],
+                "group1UnitPrice" => $data['grpPrcL1'],
+                "group2UnitPrice" => $data['grpPrcL2'],
+                "group3UnitPrice" => $data['grpPrcL3'],
+                "group4UnitPrice" => $data['grpPrcL4'],
+                "group5UnitPrice" => $data['grpPrcL5'],
+                "additionalInfo" => $data['addInfo'],
+                "saftyQuantity" => $data['saftyQuantity'],
+                "isInrcApplicable" => (boolean)$data['isrcAplcbYn'],
+                "isUsed" => (boolean)$data['useYn'],
+                "packageQuantity" => $data['packageQuantity'],
+            ];
+
+            $response = Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
                 'accept' => 'application/json',
                 'Content-Type' => 'application/json',
                 'key' => '123456'
-            ])->post($url, $request->all());
+            ])->post($url, $reqData);
 
-            $data = $response->json();
+            $res = $response->json();
 
             \Log::info('API Request Data: ' . json_encode($request->all()));
 
-            $iteminformation->update($request->all());
+            \Log::info('API RESPONSE');
+            \Log::info($res);
+
+            if ($res['statusCode'] != 200) {
+                return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
+            }
+
+            $iteminformation->update([
+                "tin" => $data['tin'],
+                "itemCd" => $data['itemCd'],
+                "itemClsCd" => $data['itemClsCd'],
+                "itemTyCd" => $data['itemTyCd'],
+                "itemNm" => $data['itemNm'],
+                "itemStdNm" => $data['itemStdNm'],
+                "orgnNatCd" => $data['orgnNatCd'],
+                "pkgUnitCd" => $data['pkgUnitCd'],
+                "qtyUnitCd" => $data['qtyUnitCd'],
+                "taxTyCd" => $data['taxTyCd'],
+                "btchNo" => $data['btchNo'],
+                "bcd" => $data['bcd'],
+                "dftPrc" => $data['dftPrc'],
+                "grpPrcL1" => $data['grpPrcL1'],
+                "grpPrcL2" => $data['grpPrcL2'],
+                "grpPrcL3" => $data['grpPrcL3'],
+                "grpPrcL4" => $data['grpPrcL4'],
+                "grpPrcL5" => $data['grpPrcL5'],
+                "addInfo" => $data['addInfo'],
+                "sftyQty" => $data['saftyQuantity'],
+                "isrcAplcbYn" => (boolean)$data['isrcAplcbYn'],
+                "useYn" => (boolean)$data['useYn'],
+            ]);
 
             return redirect()->route('productservice.index')->with('success', 'Item Information updated successfully.');
         } catch (\Exception $e) {
+            \Log::info('ERROR UPDATING ITEM INFO');
+            \Log::info($e);
             return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
         }
     }
@@ -1203,95 +1239,84 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function synchronize()
-    {
+    public function synchronize() {
         try {
-            // Fetch local items  information
-            $localiteminfo = ItemInformation::select(
-                'tin',
-                'itemCd',
-                'itemClsCd',
-                'itemTyCd',
-                'itemNm',
-                'itemStdNm',
-                'orgnNatCd',
-                'pkgUnitCd',
-                'qtyUnitCd',
-                'taxTyCd',
-                'btchNo',
-                'regBhfId',
-                'bcd',
-                'dftPrc',
-                'grpPrcL1',
-                'grpPrcL1',
-                'grpPrcL2',
-                'grpPrcL3',
-                'grpPrcL4',
-                'grpPrcL5',
-                'addInfo',
-                'sftyQty',
-                'isrcAplcbYn',
-                'useYn'
-            )->get()->toArray();
-            $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';
 
-            $response = Http::withHeaders([
+            $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20210101120000';
+
+            \Log::info('URL');
+            \Log::info($url);
+
+            $response = Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
                 'key' => '123456'
-            ])->get($url);
+            ])->timeout(60)->get($url);
 
             $data = $response->json()['data'];
-            $remoteiteminfo = $data['data']['itemList'];
 
-            \Log::info('API Request Data: ' . json_encode($data));
-            \Log::info('API Request Data: ' . json_encode($remoteiteminfo));
-            \Log::info('API Response: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
+            $remoteItems = $data['data']['itemList'];
 
-            // Compare local and remote classifications
-            $newItemsInfo = array_udiff($remoteiteminfo, $localiteminfo, function ($a, $b) {
-                return $a['itemCd'] <=> $b['itemCd'];
-            });
+            \Log::info('REMOTE ITEMS');
+            \Log::info($remoteItems);
 
-            if (empty($newItemsInfo)) {
-                \Log::info('No new items Information to be added from the API Items are up to date');
-                return response()->json(['info' => 'No new items Information to be added from the API Items are up to date']);
+            $itemsToSync = [];
+
+            foreach ($remoteItems as $remoteItem) {
+                $item = [
+                    'tin' => $remoteItem['tin'],
+                    'itemCd' => $remoteItem['itemCd'],
+                    'itemClsCd' => $remoteItem['itemClsCd'],
+                    'itemTyCd' => $remoteItem['itemTyCd'],
+                    'itemNm' => $remoteItem['itemNm'],
+                    'itemStdNm' => $remoteItem['itemStdNm'],
+                    'orgnNatCd' => $remoteItem['orgnNatCd'],
+                    'pkgUnitCd' => $remoteItem['pkgUnitCd'],
+                    'qtyUnitCd' => $remoteItem['qtyUnitCd'],
+                    'taxTyCd' => $remoteItem['taxTyCd'],
+                    'btchNo' => $remoteItem['btchNo'],
+                    'regBhfId' => $remoteItem['regBhfId'],
+                    'bcd' => $remoteItem['bcd'],
+                    'dftPrc' => $remoteItem['dftPrc'],
+                    'grpPrcL1' => $remoteItem['grpPrcL1'],
+                    'grpPrcL2' => $remoteItem['grpPrcL2'],
+                    'grpPrcL3' => $remoteItem['grpPrcL3'],
+                    'grpPrcL4' => $remoteItem['grpPrcL4'],
+                    'grpPrcL5' => $remoteItem['grpPrcL5'],
+                    'addInfo' => $remoteItem['addInfo'],
+                    'sftyQty' => $remoteItem['sftyQty'],
+                    'isrcAplcbYn' => $remoteItem['isrcAplcbYn'],
+                    'rraModYn' => $remoteItem['rraModYn'],
+                    'useYn' => $remoteItem['useYn']
+                ];
+                array_push($itemsToSync, $item);
             }
 
-            foreach ($newItemsInfo as $item) {
-                ItemInformation::create([
-                    'tin' => $item['tin'],
-                    'itemCd' => $item['itemCd'],
-                    'itemClsCd' => $item['itemClsCd'],
-                    'itemTyCd' => $item['itemTyCd'],
-                    'itemNm' => $item['itemNm'],
-                    'itemStdNm' => $item['itemStdNm'],
-                    'orgnNatCd' => $item['orgnNatCd'],
-                    'pkgUnitCd' => $item['pkgUnitCd'],
-                    'qtyUnitCd' => $item['qtyUnitCd'],
-                    'taxTyCd' => $item['taxTyCd'],
-                    'btchNo' => $item['btchNo'],
-                    'regBhfId' => $item['regBhfId'],
-                    'bcd' => $item['bcd'],
-                    'dftPrc' => $item['dftPrc'],
-                    'grpPrcL1' => $item['grpPrcL1'],
-                    'grpPrcL2' => $item['grpPrcL2'],
-                    'grpPrcL3' => $item['grpPrcL3'],
-                    'grpPrcL4' => $item['grpPrcL4'],
-                    'grpPrcL5' => $item['grpPrcL5'],
-                    'addInfo' => $item['addInfo'],
-                    'sftyQty' => $item['sftyQty'],
-                    'isrcAplcbYn' => $item['isrcAplcbYn'],
-                    'rraModYn' => $item['rraModYn'],
-                    'useYn' => $item['useYn']
-                ]);
+            \Log::info('ITEMS TO SYNC');
+            \Log::info($itemsToSync);
+
+            $syncedItems = 0;
+
+            foreach ($itemsToSync as $itemToSync) {
+                $exists = (boolean)ItemInformation::where('itemCd', $itemsToSync['itemCd'])->exists();
+                if (!$exists) {
+                    ItemInformation::create($itemToSync);
+                    $syncedItems++;
+                }
             }
-            \Log::info('Synchronizing Item Informations from the API successfully successfully');
-            return response()->json(['success' => 'Synchronizing Item Informations from the API successfully successfully']);
+
+            if ($syncedItems > 0) {
+                return redirect()->back()->with('success', __('Synced ' . $syncedItems . ' Items' . 'Successfully'));
+            } else {
+                return redirect()->back()->with('success', __('Items Up To Date'));
+            }
         } catch (\Exception $e) {
-            \Log::error('Error Synchronizing Item Informations from the API: ' . $e->getMessage());
-            return response()->json(['error' => 'Error Synchronizing Item Informations from the API']);
+            \Log::info('ERROR SYNCING ITEM INFO');
+            \Log::info($e);
+            return redirect()->back()->with('error', __('Error Syncing Item Information'));
         }
     }
+
     public function synchronizeItemClassifications () {
         try {
 
