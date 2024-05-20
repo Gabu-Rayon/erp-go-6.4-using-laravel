@@ -112,9 +112,6 @@ class ProductServiceController extends Controller
                     }
                 }
 
-
-
-
                 // foreach ($data['items'] as $item) {
 
                 // $newItem = ItemInformation::create([
@@ -343,7 +340,6 @@ class ProductServiceController extends Controller
         $iteminformation = ItemInformation::find($id);
         \Log::info('ITEM INFO');
         \Log::info($iteminformation);
-
         try {
 
             $request->validate([
