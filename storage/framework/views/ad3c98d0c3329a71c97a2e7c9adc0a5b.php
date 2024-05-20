@@ -74,7 +74,7 @@
 
 <?php $__env->startSection('content'); ?>
     <div class="row">
-        <?php echo e(Form::open(['url' => 'productservice', 'class' => 'w-100'])); ?>
+    <?php echo e(Form::open(['url' => 'productservice', 'class' => 'w-100', 'enctype' => 'multipart/form-data'])); ?>
 
         <div class="col-12">
             <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
@@ -240,6 +240,21 @@
 
                                         <?php echo e(Form::number('packageQuantity', '', array('class' => 'form-control', 'required' => 'required'))); ?>
 
+                                    </td>
+                                    <td class="col-md-6 form-group">
+                                        <?php echo e(Form::label('pro_image',__('Product Image'),['class'=>'form-label'])); ?>
+
+                                        <div class="choose-file ">
+                                            <label for="pro_image" class="form-label">
+                                                <input
+                                                    type="file"
+                                                    class="form-control"
+                                                    name="pro_image"
+                                                    id="pro_image"
+                                                    data-filename="pro_image_create">
+                                                <img id="image" class="mt-3" style="width:25%;"/>
+                                            </label>
+                                        </div>
                                     </td>
                                     <td class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
                                 </tr>
