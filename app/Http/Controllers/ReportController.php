@@ -4728,14 +4728,24 @@ class ReportController extends Controller
             $start = date('Y-01-01');
             $end = date('Y-m-d', strtotime('+1 day'));
         }
-        $invoiceItems = InvoiceProduct::select('item_list.itemNm', \DB::raw('sum(invoice_products.quantity) as quantity'), \DB::raw('sum(invoice_products.price * invoice_products.quantity) as price'), \DB::raw('sum(invoice_products.price)/sum(invoice_products.quantity) as avg_price'));
-        $invoiceItems->leftjoin('item_list', 'item_list.id', 'invoice_products.product_id');
-        $invoiceItems->leftjoin('invoices', 'invoices.id', 'invoice_products.invoice_id');
-        $invoiceItems->all();
-        $invoiceItems->where('invoices.issue_date', '>=', $start);
-        $invoiceItems->where('invoices.issue_date', '<=', $end);
-        $invoiceItems->groupBy('invoice_products.product_id');
-        $invoiceItems = $invoiceItems->get()->toArray();
+        $invoiceItems = InvoiceProduct::select(
+            'item_list.itemNm',
+            \DB::raw('sum(invoice_products.quantity) as quantity'),
+            \DB::raw('sum(invoice_products.price * invoice_products.quantity) as price'),
+            \DB::raw('sum(invoice_products.price) / count(invoice_products.id) as average_price')
+        )
+        ->leftJoin('item_list', 'item_list.id', '=', 'invoice_products.product_id')
+        ->leftJoin('invoices', 'invoices.id', '=', 'invoice_products.invoice_id')
+        ->where('invoices.issue_date', '>=', $start)
+        ->where('invoices.issue_date', '<=', $end)
+        ->groupBy('invoice_products.product_id')
+        ->get()
+        ->toArray();
+
+        
+        \Log::info('INVOICE ITEMS');
+        \Log::info($invoiceItems);
+
 
         $invoiceCustomeres = Invoice::select('customers.name', \DB::raw('count(DISTINCT invoices.customer_id, invoice_products.invoice_id) as invoice_count'))
             ->selectRaw('sum((invoice_products.price * invoice_products.quantity) - invoice_products.discount) as price')

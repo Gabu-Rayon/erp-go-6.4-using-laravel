@@ -192,10 +192,10 @@
                                         <tbody>
                                             <?php $__currentLoopData = $invoiceItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $invoiceItem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <tr>
-                                                    <td><?php echo e($invoiceItem['name']); ?></td>
+                                                    <td><?php echo e($invoiceItem['itemNm']); ?></td>
                                                     <td><?php echo e($invoiceItem['quantity']); ?></td>
                                                     <td><?php echo e(\Auth::user()->priceFormat($invoiceItem['price'])); ?></td>
-                                                    <td><?php echo e(\Auth::user()->priceFormat($invoiceItem['avg_price'])); ?></td>
+                                                    <td><?php echo e(\Auth::user()->priceFormat($invoiceItem['average_price'])); ?></td>
                                                 </tr>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>

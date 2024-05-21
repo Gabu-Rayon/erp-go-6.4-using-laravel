@@ -140,7 +140,7 @@ class ProductServiceController extends Controller
                 \Log::info($secondResponse);
 
                 
-                if ($secondResponse["statusCode"] == 400) {
+                if ($secondResponse["statusCode"] != 200) {
                     return redirect()->back()->with('error', $secondResponse["message"]);
                 }
 
