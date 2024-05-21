@@ -137,6 +137,7 @@ class ProductServiceController extends Controller
                 \Log::info('ITEMS');
                 \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
 
+<<<<<<< HEAD
                 $apiData = [];
 
                 // Define the mapping array for taxTypeCode to tax_id
@@ -148,6 +149,54 @@ class ProductServiceController extends Controller
                     'E' => 5,
                     'F' => 6,
                 ];
+=======
+                $url = 'https://etims.your-apps.biz/api/AddItemsList';
+
+                $firstResponse = Http::withOptions([
+                    'verify' => false
+                ])->withHeaders([
+                    'key' => '123456'
+                ])->post($url, $data['items']);
+
+                \Log::info('FIRST RESPONSE');
+                \Log::info($firstResponse);
+
+                
+                if ($firstResponse["statusCode"] != 200) {
+                    return redirect()->back()->with('error', 'Something Went Wrong');
+                }
+
+                $urltwo = 'https://etims.your-apps.biz/api/ItemOpeningStock';
+                $secondReqData = [];
+
+                foreach ($data['items'] as $item) {
+                    $item = [
+                        "itemCode" => $item['itemCode'],
+                        "quantity" => $item['quantity'],
+                        "packageQuantity" => $item['packageQuantity'],
+                    ];
+                    array_push($secondReqData, $item);
+                }
+
+                \Log::info('SECOND REQUEST DATA');
+                \Log::info(json_encode($secondReqData, JSON_PRETTY_PRINT));
+
+                $secondResponse = Http::withOptions([
+                    'verify' => false
+                ])->withHeaders([
+                    'key' => '123456'
+                ])->post($urltwo, [
+                    'openingItemsLists' => $secondReqData
+                ]);
+
+                \Log::info('SECOND RESPONSE');
+                \Log::info($secondResponse);
+
+                
+                if ($secondResponse["statusCode"] != 200) {
+                    return redirect()->back()->with('error', $secondResponse["message"]);
+                }
+>>>>>>> ccf9747233b13a82e758c8e314b59a755077897f
 
                 foreach ($data['items'] as $index => $item) {
                     \Log::info('ITEM INDEX: ' . $index);
@@ -165,6 +214,7 @@ class ProductServiceController extends Controller
                             'size' => $item['pro_image']->getSize(),
                             'path' => $item['pro_image']->getPathname(),
                         ], JSON_PRETTY_PRINT));
+<<<<<<< HEAD
 
                         $storageDisk = 'local';
                         $storagePath = 'uploads/pro_image';
@@ -220,11 +270,58 @@ class ProductServiceController extends Controller
 
                         // Prepare data for the API
                         $apiData[] = $this->constructProductData($item, $index);
+=======
+                        
+                        // Determine the storage disk based on your configuration
+                        $storageDisk = 'local'; // Change this to your configured disk
+                        
+                        // Determine the storage path where you want to store the file
+                        $storagePath = 'uploads/pro_image'; // Change this to your desired path
+                        
+                        // Generate a unique filename (if needed) or use the original filename
+                        $filename = $item['pro_image']->getClientOriginalName();
+                        
+                        // Store the file using the Storage facade
+                        $storedFilePath = \Storage::disk($storageDisk)->putFileAs($storagePath, $item['pro_image'], $filename);
+                        
+                        \Log::info('Stored File Path: ' . $storedFilePath);
+                        
+                        // Now $storedFilePath contains the path where the file is stored
+                        // You can use this path for further processing or storing in the database
+
+                        ItemInformation::create([
+                                'itemCd' => $item['itemCode'],
+                                'itemClsCd' => $item['itemClassifiCode'],
+                                'itemTyCd' => $item['itemTypeCode'],
+                                'itemNm' => $item['itemName'],
+                                'itemStdNm' => $item['itemStrdName'],
+                                'orgnNatCd' => $item['countryCode'],
+                                'pkgUnitCd' => $item['pkgUnitCode'],
+                                'qtyUnitCd' => $item['qtyUnitCode'],
+                                'taxTyCd' => $item['taxTypeCode'],
+                                'btchNo' => $item['batchNo'],
+                                'bcd' => $item['barcode'],
+                                'dftPrc' => $item['unitPrice'],
+                                'grpPrcL1' => $item['group1UnitPrice'],
+                                'grpPrcL2' => $item['group2UnitPrice'],
+                                'grpPrcL3' => $item['group3UnitPrice'],
+                                'grpPrcL4' => $item['group4UnitPrice'],
+                                'grpPrcL5' => $item['group5UnitPrice'],
+                                'addInfo' => $item['additionalInfo'],
+                                'sftyQty' => $item['saftyQuantity'],
+                                'isrcAplcbYn' => $item['isInrcApplicable'],
+                                'rraModYn' => $item['isUsed'],
+                                'quantity' => $item['quantity'],
+                                'packageQuantity' => $item['packageQuantity'],
+                                'image' => $storedFilePath
+                            ]);
+>>>>>>> ccf9747233b13a82e758c8e314b59a755077897f
                     } else {
                         \Log::info('No valid image uploaded for item ' . ($index + 1));
                     }
                 }
 
+<<<<<<< HEAD
                 // Post data to the external API
                 $response = \Http::withHeaders([
                     'Accept' => 'application/json',
@@ -237,6 +334,8 @@ class ProductServiceController extends Controller
                     \Log::error('Error posting data to the API: ' . $response->body());
                 }
 
+=======
+>>>>>>> ccf9747233b13a82e758c8e314b59a755077897f
                 return redirect()->route('productservice.index')->with('success', 'Product / Service Added Successfully');
             } else {
                 return redirect()->back()->with('error', __('Permission denied.'));

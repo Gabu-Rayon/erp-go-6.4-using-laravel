@@ -183,10 +183,10 @@
                                         <tbody>
                                             @foreach($invoiceItems as $invoiceItem)
                                                 <tr>
-                                                    <td>{{ $invoiceItem['name']}}</td>
+                                                    <td>{{ $invoiceItem['itemNm']}}</td>
                                                     <td>{{ $invoiceItem['quantity']}}</td>
                                                     <td>{{ \Auth::user()->priceFormat($invoiceItem['price']) }}</td>
-                                                    <td>{{ \Auth::user()->priceFormat($invoiceItem['avg_price']) }}</td>
+                                                    <td>{{ \Auth::user()->priceFormat($invoiceItem['average_price']) }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>

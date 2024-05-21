@@ -674,25 +674,27 @@ class PurchaseController extends Controller
                 \Log::info('ITEMS DATA');
                 \Log::info($givenItems);
 
-                // $response = Http::withHeaders([
-                //     'accept' => 'application/json',
-                //     'key' => '123456',
-                //     'Content-Type' => 'application/json',
-                // ])->post('https://etims.your-apps.biz/api/AddPurchase', $apiRequestData);
+                $response = Http::withOptions([
+                    'verify' => false
+                ])->withHeaders([
+                    'accept' => 'application/json',
+                    'key' => '123456',
+                    'Content-Type' => 'application/json',
+                ])->post('https://etims.your-apps.biz/api/AddPurchase', $apiRequestData);
 
-                //    //Log response data
-                // \Log::info('API Response Status  Code For Posting Purchase Data: ' . $response->status());
-                // \Log::info('API Request   Purchase  Data Posted: ' . json_encode($apiRequestData));
-                // \Log::info('API Response  Body For Posting Purchase Data: ' . $response->body());
-                // \Log::info('API Response Status Code For Posting Purchase Data: ' . $response->status());
+                   //Log response data
+                \Log::info('API Response Status  Code For Posting Purchase Data: ' . $response->status());
+                \Log::info('API Request   Purchase  Data Posted: ' . json_encode($apiRequestData));
+                \Log::info('API Response  Body For Posting Purchase Data: ' . $response->body());
+                \Log::info('API Response Status Code For Posting Purchase Data: ' . $response->status());
 
 
-                // \Log::info('SALES API RESPONSE');
-                // \Log::info($response);
+                \Log::info('SALES API RESPONSE');
+                \Log::info($response);
 
-                // if ($response['statusCode'] == 400) {
-                //     return redirect()->back()->with('error', 'Purchase Inv already exists');
-                // }
+                if ($response['statusCode'] != 200) {
+                    return redirect()->back()->with('error', $response['message']);
+                }
 
                 $purchase = [
                     'purchase_id' => $this->purchaseNumber(),
