@@ -78,19 +78,17 @@
                         <th scope="col">{{__('SrNo')}}</th>
                         <th scope="col">{{__('Code')}}</th>
                         <th scope="col">{{__('Classification Code')}}</th>
-                        <th scope="col">{{__('Type Code')}}</th>
                         <th scope="col">{{__('Name')}}</th>
                         <th scope="col">{{__('Price')}}</th>
                         <th scope="col" >{{__('Action')}}</th>
                         </tr>
                         </thead>
                         <tbody class="list">
-                        @foreach ($iteminformations as $iteminformation)
+                        @foreach ($productServices as $iteminformation)
                             <tr>
                                 <td>{{ $iteminformation->id }}</td>
                                 <td>{{ $iteminformation->itemCd }}</td>
                                 <td>{{ $iteminformation->itemClsCd }}</td>
-                                <td></td>
                                 <td>{{ $iteminformation->itemNm }}</td>
                                 <td>{{ $iteminformation->dftPrc }}</td>
                                 <td>

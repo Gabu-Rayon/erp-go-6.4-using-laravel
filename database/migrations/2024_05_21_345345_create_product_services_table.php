@@ -14,21 +14,18 @@ class CreateProductServicesTable extends Migration
     public function up()
     {
         Schema::create('product_services', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->id();
             $table->string('name')->nullable();
-            $table->string('sku')->nullable();
-            $table->decimal('sale_price', 16, 2)->default('0.0')->nullable();
-            $table->decimal('purchase_price', 16, 2)->default('0.0')->nullable();
-            $table->float('quantity')->default('0.0')->nullable();
-            $table->string('tax_id','50')->nullable();
-            $table->integer('category_id')->default('0');
-            $table->integer('unit_id')->default('0')->nullable();
+            $table->string('sku')->unique()->nullable();
+            $table->decimal('sale_price', 15, 2)->nullable();
+            $table->decimal('purchase_price', 15, 2)->nullable();
+            $table->unsignedBigInteger('tax_id')->nullable();
+            $table->unsignedBigInteger('category_id')->nullable();
+            $table->unsignedBigInteger('unit_id')->nullable();
             $table->string('type')->nullable();
-            $table->integer('sale_chartaccount_id')->default('0')->nullable();
-            $table->integer('expense_chartaccount_id')->default('0')->nullable();
-            $table->text('description')->nullable();
-            $table->string('pro_image')->nullable();
-            $table->integer('created_by')->default('0');
+            $table->unsignedBigInteger('sale_chartaccount_id')->nullable();
+            $table->unsignedBigInteger('expense_chartaccount_id')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
             $table->string('tin')->nullable();
             $table->string('itemCd')->nullable();
             $table->string('itemClsCd')->nullable();
@@ -42,18 +39,17 @@ class CreateProductServicesTable extends Migration
             $table->string('btchNo')->nullable();
             $table->string('regBhfId')->nullable();
             $table->string('bcd')->nullable();
-            $table->double('dftPrc')->nullable();
-            $table->double('grpPrcL1')->nullable();
-            $table->double('grpPrcL2')->nullable();
-            $table->double('grpPrcL3')->nullable();
-            $table->double('grpPrcL4')->nullable();
-            $table->double('grpPrcL5')->nullable();
-            $table->string('addInfo')->nullable();
+            $table->decimal('dftPrc', 15, 2)->nullable();
+            $table->decimal('grpPrcL1', 15, 2)->nullable();
+            $table->decimal('grpPrcL2', 15, 2)->nullable();
+            $table->decimal('grpPrcL3', 15, 2)->nullable();
+            $table->decimal('grpPrcL4', 15, 2)->nullable();
+            $table->decimal('grpPrcL5', 15, 2)->nullable();
+            $table->text('addInfo')->nullable();
             $table->integer('sftyQty')->nullable();
-            $table->string('isrcAplcbYn')->nullable();
-            $table->string('rraModYn')->nullable();
-            $table->string('useYn')->nullable();
-            $table->index('itemCd')->nullable();
+            $table->boolean('isrcAplcbYn')->default(false)->nullable();
+            $table->boolean('rraModYn')->default(false)->nullable();
+            $table->boolean('useYn')->default(true)->nullable();
             $table->timestamps();
         });
     }

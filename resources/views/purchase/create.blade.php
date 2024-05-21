@@ -138,7 +138,7 @@
                                         if (taxTyCd === 'B') {
                                             taxRate = 16; // VAT 16%
                                         } else if (taxTyCd === 'E') {
-                                            taxRate = 0; // VAT 8%
+                                            taxRate = 0; // VAT 0.00%
                                         }
 
                                         // Calculate item tax price based on unit price and tax rate
@@ -604,7 +604,6 @@
                 </div>
             </div>
         </div>
-
         <div class="modal-footer">
             <input type="button" value="{{ __('Cancel') }}" onclick="location.href = '{{ route('purchase.index') }}';"
                 class="btn btn-light">

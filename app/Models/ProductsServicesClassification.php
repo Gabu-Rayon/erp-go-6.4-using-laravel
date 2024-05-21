@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ItemClassification extends Model
+class  ProductsServicesClassification extends Model
 {
-    protected $table = "item_classifications";
+    protected $table = "productServices_classifications";
     protected $fillable = [
         'itemClsCd',
         'itemClsNm',
