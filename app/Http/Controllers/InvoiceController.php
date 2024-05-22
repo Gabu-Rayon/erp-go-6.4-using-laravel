@@ -661,7 +661,7 @@ class InvoiceController extends Controller
             if ($user->type == 'super admin') {
                 return view('invoice.view', compact('invoice', 'customer', 'iteams', 'user'));
             } elseif ($user->type == 'company') {
-                return view('invoice.customer_invoice', compact('invoice', 'customer', 'iteams', 'user'));
+                return view('invoice.customer_invoice', compact('invoice', 'customer', 'iteams', 'user', 'taxationtype'));
             }
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));

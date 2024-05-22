@@ -294,16 +294,18 @@
                                                 ?>
                                                 <?php $__currentLoopData = $iteams; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $iteam): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 
+                                                
+
                                                     <tr>
                                                         <td><?php echo e($key + 1); ?></td>
                                                         <?php
-                                                            $productName = $iteam->product;
+                                                            $productName = $iteam->itemName;
                                                             $totalRate += $iteam->price;
                                                             $totalQuantity += $iteam->quantity;
                                                             $totalDiscount += $iteam->discount;
                                                         ?>
-                                                        <td><?php echo e(!empty($productName) ? $productName->name : ''); ?></td>
-                                                        <td><?php echo e($iteam->quantity . ' (' . $productName->unit->name . ')'); ?>
+                                                        <td><?php echo e(!empty($productName) ? $productName : ''); ?></td>
+                                                        <td><?php echo e($iteam->quantity . ' (' . $iteam->qtyUnitCd . ')'); ?>
 
                                                         </td>
                                                         <td><?php echo e(\App\Models\Utility::priceFormat($settings, $iteam->price)); ?>
@@ -313,25 +315,34 @@
 
                                                         </td>
                                                         <td>
-                                                            <?php if(!empty($iteam->tax)): ?>
+                                                            <?php echo e(\Log::info('TAX TYPE CODE')); ?>
+
+                                                            <?php echo e(\Log::info($iteam->taxTypeCode)); ?>
+
+                                                            <?php if(!empty($iteam->taxTypeCode)): ?>
                                                                 <table>
                                                                     <?php
                                                                         $itemTaxes = [];
                                                                         $getTaxData = Utility::getTaxData();
-
-                                                                        if (!empty($iteam->tax)) {
-                                                                            foreach (explode(',', $iteam->tax) as $tax) {
-                                                                                $taxPrice = \Utility::taxRate($getTaxData[$tax]['rate'], $iteam->price, $iteam->quantity);
+                                                                        $taxationtype = App\Models\Details::where('cdCls', '04')->pluck('cdNm', 'cd')->toArray();
+                                                                        
+                                                                        if (!empty($iteam->taxTypeCode)) {
+                                                                            foreach (explode(',', $iteam->taxTypeCode) as $tax) {
+                                                                                $taxPrice = \Utility::taxRate($getTaxData[$tax], $iteam->price, $iteam->quantity);
                                                                                 $totalTaxPrice += $taxPrice;
-                                                                                $itemTax['name'] = $getTaxData[$tax]['name'];
-                                                                                $itemTax['rate'] = $getTaxData[$tax]['rate'] . '%';
+                                                                                $itemTax['name'] = $taxationtype[$tax];
+                                                                                $itemTax['rate'] = $getTaxData[$tax] . '%';
                                                                                 $itemTax['price'] = \App\Models\Utility::priceFormat($settings, $taxPrice);
 
+                                                                                \Log::info('ITEM TAX');
+                                                                                \Log::info($itemTax);
+
                                                                                 $itemTaxes[] = $itemTax;
-                                                                                if (array_key_exists($getTaxData[$tax]['name'], $taxesData)) {
-                                                                                    $taxesData[$getTaxData[$tax]['name']] = $taxesData[$getTaxData[$tax]['name']] + $taxPrice;
+                                                                                
+                                                                                if (array_key_exists($taxationtype[$tax], $taxesData)) {
+                                                                                    $taxesData[$taxationtype[$tax]] = $taxesData[$taxationtype[$tax]] + $taxPrice;
                                                                                 } else {
-                                                                                    $taxesData[$getTaxData[$tax]['name']] = $taxPrice;
+                                                                                    $taxesData[$taxationtype[$tax]] = $taxPrice;
                                                                                 }
                                                                             }
                                                                             $iteam->itemTax = $itemTaxes;

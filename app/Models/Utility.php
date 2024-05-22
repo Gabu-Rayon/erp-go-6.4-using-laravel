@@ -15,6 +15,7 @@ use Spatie\GoogleCalendar\Event as GoogleEvent;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Twilio\Rest\Client;
+use App\Models\Details;
 
 class Utility extends Model
 {
@@ -695,24 +696,16 @@ class Utility extends Model
     {
         $data = [];
         if (self::$rates == null) {
-            $rates = Tax::get();
+            $rates = Details::where('cdCls', '04')->pluck('userDfnCd1', 'cd')->toArray();
             self::$rates = $rates;
-            foreach (self::$rates as $rate) {
-                $data[$rate->id]['id'] = $rate->id
-                ;
-                $data[$rate->id]['name'] = $rate->name;
-                $data[$rate->id]['rate'] = $rate->rate;
-                $data[$rate->id]['created_by'] = $rate->created_by;
-            }
-            self::$data = $data;
+            self::$data = $rates;
         }
         return self::$data;
     }
 
-    public static function taxRate($taxRate, $price, $quantity, $discount = 0)
-    {
-
-//        return ($taxRate / 100) * (($price-$discount) * $quantity);
+    public static function taxRate($taxRate, $price, $quantity, $discount = 0) {
+        \Log::info('TAX RATEEE');
+        \Log::info($taxRate);
         return (($price * $quantity) - $discount) * ($taxRate / 100);
     }
 
