@@ -4059,39 +4059,16 @@ class Utility extends Model
                     $mimes = !empty($settings['local_storage_validation']) ? $settings['local_storage_validation'] : '';
                 }
 
-                $file = $request->$key_name;
+                $file = $request[$key_name];
 
-                if (count($custom_validation) > 0) {
-
-                    $validation = $custom_validation;
-                } else {
-
-                    $validation = [
-                        'mimes:' . $mimes,
-                        'max:' . $max_size,
-                    ];
-
-                }
-
-                $validator = \Validator::make($request->all(), [
-                    $key_name => $validation,
-                ]);
-
-                if ($validator->fails()) {
-
-                    $res = [
-                        'flag' => 0,
-                        'msg' => $validator->messages()->first(),
-                    ];
-
-                    return $res;
-                } else {
+                \Log::info('FILELELELELE');
+                        \Log::info($file);
 
                     $name = $name;
 
                     if ($settings['storage_setting'] == 'local') {
 //                    dd(\Storage::disk(),$path);
-                        $request->$key_name->move(storage_path($path), $name);
+                        $request[$key_name]->move(storage_path($path), $name);
                         $path = $path . $name;
                     } else if ($settings['storage_setting'] == 'wasabi') {
 
@@ -4120,7 +4097,6 @@ class Utility extends Model
                         'url' => $path,
                     ];
                     return $res;
-                }
 
             } else {
                 $res = [
@@ -4134,7 +4110,7 @@ class Utility extends Model
 
             $res = [
                 'flag' => 0,
-                'msg' => $e->getMessage(),
+                'msg' => $e,
             ];
             return $res;
         }
