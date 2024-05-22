@@ -1,15 +1,16 @@
 @extends('layouts.admin')
 @section('page-title')
-    {{__('Manage Tax Rate')}}
+    {{__('Languages')}}
 @endsection
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
-    <li class="breadcrumb-item">{{__('Taxes')}}</li>
+    <li class="breadcrumb-item">{{__('Languages')}}</li>
 @endsection
+
 @section('action-btn')
     <div class="float-end">
         <a
-            href="{{ route('details.sync', 'taxes') }}"
+            href="{{ route('details.sync', 'languages') }}"
             class="btn btn-sm btn-primary">
             Synchronize
         </a>
@@ -27,19 +28,18 @@
                     <div class="table-responsive">
                         <table class="table datatable">
                             <thead>
-                            <tr>
-                                <th> {{__('Tax Name')}}</th>
-                                <th> {{__('Rate %')}}</th>
-                            </tr>
-                            </thead>
-
-                            <tbody>
-                            @foreach ($taxes as $taxe)
-                                <tr class="font-style">
-                                    <td>{{ $taxe->cdNm }}</td>
-                                    <td>{{ $taxe->userDfnCd1 }}</td>
+                                <tr>
+                                    <th> {{__('Language')}}</th>
+                                    <th> {{__('Code')}}</th>
                                 </tr>
-                            @endforeach
+                            </thead>
+                            <tbody>
+                                @foreach ($languages as $language)
+                                    <tr class="font-style">
+                                        <td>{{ $language->cdNm }}</td>
+                                        <td>{{ $language->cd }}</td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

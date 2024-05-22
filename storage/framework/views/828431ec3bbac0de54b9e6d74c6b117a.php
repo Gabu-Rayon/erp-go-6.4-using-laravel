@@ -2,6 +2,76 @@
     <div class="list-group list-group-flush" id="useradd-sidenav">
         <a href="<?php echo e(route('taxes.index')); ?>" class="list-group-item list-group-item-action border-0 <?php echo e((Request::route()->getName() == 'taxes.index' ) ? ' active' : ''); ?>"><?php echo e(__('Taxes')); ?> <div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
 
+        <a
+            href="<?php echo e(route('details.countries')); ?>"
+            class="list-group-item list-group-item-action border-0
+                <?php echo e((Request::route()->getName() == 'details.countries' )
+                    ? ' active'
+                    : ''); ?>"
+            >
+                <?php echo e(__('Countries')); ?>
+
+                <div class="float-end">
+                    <i class="ti ti-chevron-right"></i>
+                </div>
+        </a>
+
+        <a
+            href="<?php echo e(route('details.refundreasons')); ?>"
+            class="list-group-item list-group-item-action border-0
+                <?php echo e((Request::route()->getName() == 'details.refundreasons' )
+                    ? ' active'
+                    : ''); ?>"
+            >
+                <?php echo e(__('Refund Reasons')); ?>
+
+                <div class="float-end">
+                    <i class="ti ti-chevron-right"></i>
+                </div>
+        </a>
+
+        <a
+            href="<?php echo e(route('details.currencies')); ?>"
+            class="list-group-item list-group-item-action border-0
+                <?php echo e((Request::route()->getName() == 'details.currencies' )
+                    ? ' active'
+                    : ''); ?>"
+            >
+                <?php echo e(__('Currencies')); ?>
+
+                <div class="float-end">
+                    <i class="ti ti-chevron-right"></i>
+                </div>
+        </a>
+
+        <a
+            href="<?php echo e(route('details.banks')); ?>"
+            class="list-group-item list-group-item-action border-0
+                <?php echo e((Request::route()->getName() == 'details.banks' )
+                    ? ' active'
+                    : ''); ?>"
+            >
+                <?php echo e(__('Banks')); ?>
+
+                <div class="float-end">
+                    <i class="ti ti-chevron-right"></i>
+                </div>
+        </a>
+
+        <a
+            href="<?php echo e(route('details.languages')); ?>"
+            class="list-group-item list-group-item-action border-0
+                <?php echo e((Request::route()->getName() == 'details.languages' )
+                    ? ' active'
+                    : ''); ?>"
+            >
+                <?php echo e(__('Languages')); ?>
+
+                <div class="float-end">
+                    <i class="ti ti-chevron-right"></i>
+                </div>
+        </a>
+
         <a href="<?php echo e(route('product-category.index')); ?>" class="list-group-item list-group-item-action border-0 <?php echo e((Request::route()->getName() == 'product-category.index' ) ? 'active' : ''); ?>"><?php echo e(__('Category')); ?><div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
 
         <a href="<?php echo e(route('product-unit.index')); ?>" class="list-group-item list-group-item-action border-0 <?php echo e((Request::route()->getName() == 'product-unit.index' ) ? ' active' : ''); ?>"><?php echo e(__('Unit')); ?><div class="float-end"><i class="ti ti-chevron-right"></i></div></a>

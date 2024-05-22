@@ -136,17 +136,52 @@ class ProductServiceController extends Controller
                 \Log::info('ITEMS');
                 \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
 
-                $apiData = [];
+                $url = 'https://etims.your-apps.biz/api/AddItemsList';
 
-                // Define the mapping array for taxTypeCode to tax_id
-                $taxTypeMapping = [
-                    'A' => 1,
-                    'B' => 2,
-                    'C' => 3,
-                    'D' => 4,
-                    'E' => 5,
-                    'F' => 6,
-                ];
+                $firstResponse = Http::withOptions([
+                    'verify' => false
+                ])->withHeaders([
+                    'key' => '123456'
+                ])->post($url, $data['items']);
+
+                \Log::info('FIRST RESPONSE');
+                \Log::info($firstResponse);
+
+                
+                if ($firstResponse["statusCode"] != 200) {
+                    return redirect()->back()->with('error', 'Something Went Wrong');
+                }
+
+                $urltwo = 'https://etims.your-apps.biz/api/ItemOpeningStock';
+                $secondReqData = [];
+
+                foreach ($data['items'] as $item) {
+                    $item = [
+                        "itemCode" => $item['itemCode'],
+                        "quantity" => $item['quantity'],
+                        "packageQuantity" => $item['packageQuantity'],
+                    ];
+                    array_push($secondReqData, $item);
+                }
+
+                \Log::info('SECOND REQUEST DATA');
+                \Log::info(json_encode($secondReqData, JSON_PRETTY_PRINT));
+
+                $secondResponse = Http::withOptions([
+                    'verify' => false
+                ])->withHeaders([
+                    'key' => '123456'
+                ])->post($urltwo, [
+                    'openingItemsLists' => $secondReqData
+                ]);
+
+                \Log::info('SECOND RESPONSE');
+                \Log::info($secondResponse);
+
+                
+                if ($secondResponse["statusCode"] != 200) {
+                    return redirect()->back()->with('error', $secondResponse["message"]);
+                }
 
                 foreach ($data['items'] as $index => $item) {
                     \Log::info('ITEM INDEX: ' . $index);
@@ -156,87 +191,61 @@ class ProductServiceController extends Controller
                         ? $taxTypeMapping[$item['taxTypeCode']]
                         : null;
 
-                    // Handling image upload with storage limit check
-                    if (!empty($item['pro_image']) && $item['pro_image']->isValid()) {
-                        \Log::info('Image File Object for Item ' . ($index + 1));
-                        $image_size = $item['pro_image']->getSize();
-                        $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
+                    if (isset($item['pro_image']) && $item['pro_image']->isValid()) {
+                        \Log::info('Image File Object for * Item ' . ($index + 1));
+                        \Log::info(json_encode([
+                            'original_name' => $item['pro_image']->getClientOriginalName(),
+                            'mime_type' => $item['pro_image']->getClientMimeType(),
+                            'size' => $item['pro_image']->getSize(),
+                            'path' => $item['pro_image']->getPathname(),
+                        ], JSON_PRETTY_PRINT));
+                        
+                        // Determine the storage disk based on your configuration
+                        $storageDisk = 'local'; // Change this to your configured disk
+                        
+                        // Determine the storage path where you want to store the file
+                        $storagePath = 'uploads/pro_image'; // Change this to your desired path
+                        
+                        // Generate a unique filename (if needed) or use the original filename
+                        $filename = $item['pro_image']->getClientOriginalName();
+                        
+                        // Store the file using the Storage facade
+                        $storedFilePath = \Storage::disk($storageDisk)->putFileAs($storagePath, $item['pro_image'], $filename);
+                        
+                        \Log::info('Stored File Path: ' . $storedFilePath);
+                        
+                        // Now $storedFilePath contains the path where the file is stored
+                        // You can use this path for further processing or storing in the database
 
-                        if ($result == 1) {
-                            $fileName = $item['pro_image']->getClientOriginalName();
-                            $dir = 'uploads/pro_image';
-                            $path = Utility::upload_file($request, 'pro_image', $fileName, $dir, []);
-
-                            $productService = ProductService::create([
-                                'name' => $item['itemName'] ?? null,
-                                'sku' => $item['sku'] ?? null,
-                                'sale_price' => $item['sale_price'] ?? null,
-                                'purchase_price' => $item['purchase_price'] ?? null,
-                                'quantity' => $item['quantity'],
-                                'tax_id' => $taxIdCode,
-                                'category_id' => $item['category_id'] ?? null,
-                                'unit_id' => $item['unit_id'] ?? null,
-                                'type' => $item['type'] ?? null,
-                                'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
-                                'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
-                                'description' => $item['description'] ?? null,
-                                'pro_image' => $fileName,
-                                'created_by' => \Auth::user()->creatorId(),
-                                'tin' => $item['tin'] ?? null,
+                        ItemInformation::create([
                                 'itemCd' => $item['itemCode'],
                                 'itemClsCd' => $item['itemClassifiCode'],
                                 'itemTyCd' => $item['itemTypeCode'],
                                 'itemNm' => $item['itemName'],
                                 'itemStdNm' => $item['itemStrdName'],
-                                'orgnNatCd' => $item['countryCode'] ?? null,
-                                'pkgUnitCd' => $item['pkgUnitCode'] ?? null,
-                                'qtyUnitCd' => $item['qtyUnitCode'] ?? null,
-                                'taxTyCd' => $item['taxTypeCode'] ?? null,
-                                'btchNo' => $item['batchNo'] ?? null,
-                                'regBhfId' => $item['regBhfId'] ?? null,
-                                'bcd' => $item['barcode'] ?? null,
-                                'dftPrc' => $item['unitPrice'] ?? null,
-                                'grpPrcL1' => $item['group1UnitPrice'] ?? null,
-                                'grpPrcL2' => $item['group2UnitPrice'] ?? null,
-                                'grpPrcL3' => $item['group3UnitPrice'] ?? null,
-                                'grpPrcL4' => $item['group4UnitPrice'] ?? null,
-                                'grpPrcL5' => $item['group5UnitPrice'] ?? null,
-                                'addInfo' => $item['additionalInfo'] ?? null,
-                                'sftyQty' => $item['saftyQuantity'] ?? null,
-                                'isrcAplcbYn' => $item['isInrcApplicable'] ?? null,
-                                'rraModYn' => $item['isUsed'] ?? null,
-                                'packageQuantity' => $item['packageQuantity'] ?? null,
-                                'useYn' => $item['useYn'] ?? null,
+                                'orgnNatCd' => $item['countryCode'],
+                                'pkgUnitCd' => $item['pkgUnitCode'],
+                                'qtyUnitCd' => $item['qtyUnitCode'],
+                                'taxTyCd' => $item['taxTypeCode'],
+                                'btchNo' => $item['batchNo'],
+                                'bcd' => $item['barcode'],
+                                'dftPrc' => $item['unitPrice'],
+                                'grpPrcL1' => $item['group1UnitPrice'],
+                                'grpPrcL2' => $item['group2UnitPrice'],
+                                'grpPrcL3' => $item['group3UnitPrice'],
+                                'grpPrcL4' => $item['group4UnitPrice'],
+                                'grpPrcL5' => $item['group5UnitPrice'],
+                                'addInfo' => $item['additionalInfo'],
+                                'sftyQty' => $item['saftyQuantity'],
+                                'isrcAplcbYn' => $item['isInrcApplicable'],
+                                'rraModYn' => $item['isUsed'],
+                                'quantity' => $item['quantity'],
+                                'packageQuantity' => $item['packageQuantity'],
+                                'image' => $storedFilePath
                             ]);
-
-                            $productService->save();
-
-                            // Prepare data for the API
-                            $apiData[] = $this->constructProductData($item, $index);
-                        } else {
-                            \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
-                            return redirect()->back()->with('error', 'Storage limit exceeded.');
-                        }
                     } else {
                         \Log::info('No valid image uploaded for item ' . ($index + 1));
                     }
-                }
-
-                // Post data to the external API
-                $response = \Http::withHeaders([
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                ])->post('https://etims.your-apps.biz/api/AddItemsList', $apiData);
-
-                // Log response data
-                \Log::info('API Response Status Code For Posting Product Data: ' . $response->status());
-                \Log::info('API Request Product Data Posted: ' . json_encode($apiData));
-                \Log::info('API Response Body For Posting Product Data: ' . $response->body());
-
-                if ($response->successful()) {
-                    \Log::info('Data successfully posted to the API');
-                } else {
-                    \Log::error('Error posting data to the API: ' . $response->body());
                 }
 
                 return redirect()->route('productservice.index')->with('success', 'Product / Service Added Successfully');

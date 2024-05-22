@@ -6,6 +6,7 @@ use App\Models\BillProduct;
 use App\Models\InvoiceProduct;
 use App\Models\ProposalProduct;
 use App\Models\Tax;
+use App\Models\Details;
 use Auth;
 use Illuminate\Http\Request;
 
@@ -17,7 +18,7 @@ class TaxController extends Controller
     {
         if(\Auth::user()->can('manage constant tax'))
         {
-            $taxes = Tax::where('created_by', '=', \Auth::user()->creatorId())->get();
+            $taxes = Details::where('cdCls', '=', '04')->get();
 
             return view('taxes.index')->with('taxes', $taxes);
         }

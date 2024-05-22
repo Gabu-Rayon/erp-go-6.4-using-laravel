@@ -1,15 +1,15 @@
 @extends('layouts.admin')
 @section('page-title')
-    {{__('Manage Tax Rate')}}
+    {{__('Banks')}}
 @endsection
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
-    <li class="breadcrumb-item">{{__('Taxes')}}</li>
+    <li class="breadcrumb-item">{{__('Banks')}}</li>
 @endsection
 @section('action-btn')
     <div class="float-end">
         <a
-            href="{{ route('details.sync', 'taxes') }}"
+            href="{{ route('details.sync', 'bank') }}"
             class="btn btn-sm btn-primary">
             Synchronize
         </a>
@@ -27,19 +27,16 @@
                     <div class="table-responsive">
                         <table class="table datatable">
                             <thead>
-                            <tr>
-                                <th> {{__('Tax Name')}}</th>
-                                <th> {{__('Rate %')}}</th>
-                            </tr>
-                            </thead>
-
-                            <tbody>
-                            @foreach ($taxes as $taxe)
-                                <tr class="font-style">
-                                    <td>{{ $taxe->cdNm }}</td>
-                                    <td>{{ $taxe->userDfnCd1 }}</td>
+                                <tr>
+                                    <th> {{__('Bank')}}</th>
                                 </tr>
-                            @endforeach
+                            </thead>
+                            <tbody>
+                                @foreach ($banks as $bank)
+                                    <tr class="font-style">
+                                        <td>{{ $bank->cdNm }}</td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

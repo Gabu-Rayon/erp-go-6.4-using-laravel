@@ -1,16 +1,17 @@
 
 <?php $__env->startSection('page-title'); ?>
-    <?php echo e(__('Manage Tax Rate')); ?>
+    <?php echo e(__('Languages')); ?>
 
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('breadcrumb'); ?>
     <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
-    <li class="breadcrumb-item"><?php echo e(__('Taxes')); ?></li>
+    <li class="breadcrumb-item"><?php echo e(__('Languages')); ?></li>
 <?php $__env->stopSection(); ?>
+
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
         <a
-            href="<?php echo e(route('details.sync', 'taxes')); ?>"
+            href="<?php echo e(route('details.sync', 'languages')); ?>"
             class="btn btn-sm btn-primary">
             Synchronize
         </a>
@@ -28,19 +29,18 @@
                     <div class="table-responsive">
                         <table class="table datatable">
                             <thead>
-                            <tr>
-                                <th> <?php echo e(__('Tax Name')); ?></th>
-                                <th> <?php echo e(__('Rate %')); ?></th>
-                            </tr>
-                            </thead>
-
-                            <tbody>
-                            <?php $__currentLoopData = $taxes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $taxe): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <tr class="font-style">
-                                    <td><?php echo e($taxe->cdNm); ?></td>
-                                    <td><?php echo e($taxe->userDfnCd1); ?></td>
+                                <tr>
+                                    <th> <?php echo e(__('Language')); ?></th>
+                                    <th> <?php echo e(__('Code')); ?></th>
                                 </tr>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </thead>
+                            <tbody>
+                                <?php $__currentLoopData = $languages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $language): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <tr class="font-style">
+                                        <td><?php echo e($language->cdNm); ?></td>
+                                        <td><?php echo e($language->cd); ?></td>
+                                    </tr>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>
                         </table>
                     </div>
@@ -50,4 +50,4 @@
     </div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/taxes/index.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Developer\Desktop\apps\erp-go-6.4-using-laravel\resources\views/details/languages.blade.php ENDPATH**/ ?>
