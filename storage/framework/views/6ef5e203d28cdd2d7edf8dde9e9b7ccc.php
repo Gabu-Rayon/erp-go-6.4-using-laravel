@@ -60,7 +60,7 @@
                                 </a>
                                 <a href="<?php echo e(route('productservice.index')); ?>" class="btn btn-sm btn-danger" data-bs-toggle="tooltip"
                                    title="<?php echo e(__('Reset')); ?>">
-                                    <span class="btn-inner--icon"><i class="ti ti-trash-off "></i></span>
+                                    <span class="btn-inner--icon"><i class="ti ti-trash-off"></i></span>
                                 </a>
                             </div>
 
@@ -110,9 +110,10 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-        </div>
-    </div>
+                  </div>
+                    </div>
+                      </div>
+                        </div>
+ 
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/productservice/index.blade.php ENDPATH**/ ?>

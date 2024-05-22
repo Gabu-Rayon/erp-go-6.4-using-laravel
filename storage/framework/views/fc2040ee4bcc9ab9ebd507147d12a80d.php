@@ -107,7 +107,7 @@
                                         <div class="form-group">
                                             <?php echo e(Form::label('sku', __('SKU'), ['class' => 'form-label'])); ?><span
                                                 class="text-danger">*</span>
-                                            <?php echo e(Form::text('sku', '', ['class' => 'form-control', 'required' => 'required'])); ?>
+                                            <?php echo e(Form::text('sku', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'ABC-12345-S-BL'])); ?>
 
                                         </div>
                                     </td>
@@ -226,7 +226,7 @@
                                     <td class="form-group col-md-3">
                                         <?php echo e(Form::label('barcode', __('Bar Code'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::text('barcode', '', ['class' => 'form-control', 'required' => 'required'])); ?>
+                                        <?php echo e(Form::text('barcode', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'9347408001101'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-3">
@@ -275,6 +275,12 @@
                                         <?php echo e(Form::label('isInrcApplicable', __('Is Inrc Applicable'), ['class' => 'form-label'])); ?>
 
                                         <?php echo e(Form::select('isInrcApplicable', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control', 'required' => 'required'])); ?>
+
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <?php echo e(Form::label('useYn', __('useYn'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::select('useYn', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-3">

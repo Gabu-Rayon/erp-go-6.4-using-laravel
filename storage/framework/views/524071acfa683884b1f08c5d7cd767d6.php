@@ -281,7 +281,7 @@
 
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <?php echo e(Form::select('productItem', $itemInformation, null, ['class' => 'form-control select2 productItem', 'required' => 'required'])); ?>
+                                            <?php echo e(Form::select('productItem', $ProductService, null, ['class' => 'form-control select2 productItem', 'required' => 'required'])); ?>
 
                                         </div>
                                     </div>

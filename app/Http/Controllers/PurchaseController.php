@@ -18,7 +18,7 @@ use App\Models\Transaction;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Purchase_Sales;
-use App\Models\ItemInformation;
+use App\Models\ProductService;
 use App\Models\mappedPurchases;
 use App\Models\PurchasePayment;
 use App\Models\PurchaseProduct;
@@ -35,7 +35,7 @@ use Illuminate\Support\Facades\Crypt;
 use App\Models\ProductServiceCategory;
 use App\Models\MappedPurchaseItemList;
 use Illuminate\Support\Facades\Storage;
-use App\Models\ProductService;
+
 
 
 class PurchaseController extends Controller
@@ -92,8 +92,8 @@ class PurchaseController extends Controller
     //         $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
     //         $warehouse->prepend('Select Warehouse', '');
 
-    //         $product_services = ItemInformation::get()->pluck('itemNm', 'id');
-    //         $product_services_Codes = ItemInformation::get()->pluck('itemNm', 'itemCd');
+    //         $product_services = ProductService::get()->pluck('itemNm', 'id');
+    //         $product_services_Codes = ProductService::get()->pluck('itemNm', 'itemCd');
     //         $product_services_Codes->prepend('--', '');
     //         $product_services->prepend('--', '');
     //         // Fetch countries code  from the details model
@@ -367,8 +367,8 @@ class PurchaseController extends Controller
 
             // $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->where('type','!=', 'service')->get()->pluck('name', 'id');
             // $product_services->prepend('--', '');
-            $product_services = ItemInformation::get()->pluck('itemNm', 'id');
-            $product_services_Codes = ItemInformation::get()->pluck('itemNm', 'itemCd');
+            $product_services = ProductService::get()->pluck('itemNm', 'id');
+            $product_services_Codes = ProductService::get()->pluck('itemNm', 'itemCd');
             $product_services_Codes->prepend('--', '');
             $product_services->prepend('--', '');
 
@@ -392,7 +392,7 @@ class PurchaseController extends Controller
 
     public function getProductData(Request $request)
     {
-        $data['product'] = $product = ItemInformation::find($request->product_id);
+        $data['product'] = $product = ProductService::find($request->product_id);
         $data['unit'] = !empty($product->unit) ? $product->unit->name : '';
         $data['taxRate'] = $taxRate = !empty($product->tax_id) ? $product->taxRate($product->tax_id) : 0;
         $data['taxes'] = !empty($product->tax_id) ? $product->tax($product->tax_id) : 0;
@@ -584,7 +584,7 @@ class PurchaseController extends Controller
                 $totAmt = 0;
 
                 foreach ($data['items'] as $item) {
-                    $itemDetails = ItemInformation::where('itemCd', $item['itemCode'])->first();
+                    $itemDetails = ProductService::where('itemCd', $item['itemCode'])->first();
                     $itemExprDt = str_replace('-', '', $item['itemExprDt']);
                     $itemExprDate = date('Ymd', strtotime($itemExprDt));
 
@@ -859,9 +859,9 @@ class PurchaseController extends Controller
                 if ($purchase) {
                     // Fetch related items
                     $purchaseItems = PurchaseProduct::where('saleItemCode', $spplrInvcNo)->get();
-                    // Fetch ItemInformation model
-                    $itemInformation = ItemInformation::get()->pluck('itemNm', 'itemCd');
-                    return view('purchase.details', compact('purchase', 'purchaseItems', 'itemInformation'));
+                    // Fetch ProductService model
+                    $ProductService = ProductService::get()->pluck('itemNm', 'itemCd');
+                    return view('purchase.details', compact('purchase', 'purchaseItems', 'ProductService'));
                 } else {
                     return view('errors.not_found'); // Create a custom error view
                 }
@@ -889,7 +889,7 @@ class PurchaseController extends Controller
             $warehouse = warehouse::all()->pluck('name', 'id');
             $purchase_number = $purchase->purchase_id;
             $venders = Vender::all()->pluck('name', 'id');
-            $product_services = ItemInformation::all()->pluck('itemNm', 'id');
+            $product_services = ProductService::all()->pluck('itemNm', 'id');
 
             return view('purchase.edit', compact('venders', 'product_services', 'purchase', 'warehouse', 'purchase_number', 'category'));
         } else {
@@ -1596,7 +1596,7 @@ class PurchaseController extends Controller
     {
         // Fetch item information based on the item code
         $itemCd = $request->input('itemCode');
-        $itemInfo['data'] = ItemInformation::where('itemCd', $itemCd)->first();
+        $itemInfo['data'] = ProductService::where('itemCd', $itemCd)->first();
 
         if ($itemInfo['data']) {
             // Return item information as JSON response
@@ -1610,7 +1610,7 @@ class PurchaseController extends Controller
     public function getItem($itemCd)
     {
         try {
-            $itemInfo = ItemInformation::where('itemCd', $itemCd)->first();
+            $itemInfo = ProductService::where('itemCd', $itemCd)->first();
             return response()->json([
                 'message' => 'success',
                 'data' => $itemInfo

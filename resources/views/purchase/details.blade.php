@@ -220,7 +220,7 @@
                                             <strong>Item Expire Date</strong> : {{ $item->itemExprDt }}
                                         </div>
                                         <div class="form-group col-md-4">
-                                            {{ Form::select('productItem', $itemInformation, null, ['class' => 'form-control select2 productItem', 'required' => 'required']) }}
+                                            {{ Form::select('productItem', $ProductService, null, ['class' => 'form-control select2 productItem', 'required' => 'required']) }}
                                         </div>
                                     </div>
                                 </div>

@@ -80,8 +80,7 @@ class ProductServiceClassificationController extends Controller
                 array_push($remoteItemInfoToSync, $item);
             }
 
-            \Log::info('REMOTE ITEM INFO TO SYNC');
-            \Log::info($remoteItemInfoToSync);
+            \Log::info('REMOTE ITEM INFO TO SYNC :', $remoteItemInfoToSync);
 
             $syncedItemInfo = 0;
 

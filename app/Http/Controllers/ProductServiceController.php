@@ -124,7 +124,6 @@ class ProductServiceController extends Controller
         }
     }
 
-
     public function store(Request $request)
     {
         try {
@@ -137,7 +136,6 @@ class ProductServiceController extends Controller
                 \Log::info('ITEMS');
                 \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
 
-<<<<<<< HEAD
                 $apiData = [];
 
                 // Define the mapping array for taxTypeCode to tax_id
@@ -149,54 +147,6 @@ class ProductServiceController extends Controller
                     'E' => 5,
                     'F' => 6,
                 ];
-=======
-                $url = 'https://etims.your-apps.biz/api/AddItemsList';
-
-                $firstResponse = Http::withOptions([
-                    'verify' => false
-                ])->withHeaders([
-                    'key' => '123456'
-                ])->post($url, $data['items']);
-
-                \Log::info('FIRST RESPONSE');
-                \Log::info($firstResponse);
-
-                
-                if ($firstResponse["statusCode"] != 200) {
-                    return redirect()->back()->with('error', 'Something Went Wrong');
-                }
-
-                $urltwo = 'https://etims.your-apps.biz/api/ItemOpeningStock';
-                $secondReqData = [];
-
-                foreach ($data['items'] as $item) {
-                    $item = [
-                        "itemCode" => $item['itemCode'],
-                        "quantity" => $item['quantity'],
-                        "packageQuantity" => $item['packageQuantity'],
-                    ];
-                    array_push($secondReqData, $item);
-                }
-
-                \Log::info('SECOND REQUEST DATA');
-                \Log::info(json_encode($secondReqData, JSON_PRETTY_PRINT));
-
-                $secondResponse = Http::withOptions([
-                    'verify' => false
-                ])->withHeaders([
-                    'key' => '123456'
-                ])->post($urltwo, [
-                    'openingItemsLists' => $secondReqData
-                ]);
-
-                \Log::info('SECOND RESPONSE');
-                \Log::info($secondResponse);
-
-                
-                if ($secondResponse["statusCode"] != 200) {
-                    return redirect()->back()->with('error', $secondResponse["message"]);
-                }
->>>>>>> ccf9747233b13a82e758c8e314b59a755077897f
 
                 foreach ($data['items'] as $index => $item) {
                     \Log::info('ITEM INDEX: ' . $index);
@@ -206,127 +156,82 @@ class ProductServiceController extends Controller
                         ? $taxTypeMapping[$item['taxTypeCode']]
                         : null;
 
-                    if (isset($item['pro_image']) && $item['pro_image']->isValid()) {
-                        \Log::info('Image File Object for * Item ' . ($index + 1));
-                        \Log::info(json_encode([
-                            'original_name' => $item['pro_image']->getClientOriginalName(),
-                            'mime_type' => $item['pro_image']->getClientMimeType(),
-                            'size' => $item['pro_image']->getSize(),
-                            'path' => $item['pro_image']->getPathname(),
-                        ], JSON_PRETTY_PRINT));
-<<<<<<< HEAD
+                    // Handling image upload with storage limit check
+                    if (!empty($item['pro_image']) && $item['pro_image']->isValid()) {
+                        \Log::info('Image File Object for Item ' . ($index + 1));
+                        $image_size = $item['pro_image']->getSize();
+                        $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
 
-                        $storageDisk = 'local';
-                        $storagePath = 'uploads/pro_image';
-                        $filename = $item['pro_image']->getClientOriginalName();
-                        $storedFilePath = \Storage::disk($storageDisk)->putFileAs($storagePath, $item['pro_image'], $filename);
+                        if ($result == 1) {
+                            $fileName = $item['pro_image']->getClientOriginalName();
+                            $dir = 'uploads/pro_image';
+                            $path = Utility::upload_file($request, 'pro_image', $fileName, $dir, []);
 
-                        \Log::info('Stored Image File Path: ' . $storedFilePath);
-
-                        // Save to local database
-                        $itemInfo = ProductService::create([
-                            'name' => $item['itemName'] ?? null,
-                            'sku' => $item['sku'] ?? null,
-                            'sale_price' => $item['sale_price'] ?? null,
-                            'purchase_price' => $item['purchase_price'] ?? null,
-                            'quantity' => $item['quantity'],
-                            'tax_id' => $taxIdCode,
-                            'category_id' => $item['category_id'] ?? null,
-                            'unit_id' => $item['unit_id'] ?? null,
-                            'type' => $item['type'] ?? null,
-                            'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
-                            'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
-                            'description' => $item['description'] ?? null,
-                            'pro_image' => $storedFilePath,
-                            'created_by' => \Auth::user()->creatorId(),
-                            'tin' => $item['tin'] ?? null,
-                            'itemCd' => $item['itemCode'],
-                            'itemClsCd' => $item['itemClassifiCode'],
-                            'itemTyCd' => $item['itemTypeCode'],
-                            'itemNm' => $item['itemName'],
-                            'itemStdNm' => $item['itemStrdName'],
-                            'orgnNatCd' => $item['countryCode'] ?? null,
-                            'pkgUnitCd' => $item['pkgUnitCode'] ?? null,
-                            'qtyUnitCd' => $item['qtyUnitCode'] ?? null,
-                            'taxTyCd' => $item['taxTypeCode'] ?? null,
-                            'btchNo' => $item['batchNo'] ?? null,
-                            'regBhfId' => $item['regBhfId'] ?? null,
-                            'bcd' => $item['barcode'] ?? null,
-                            'dftPrc' => $item['unitPrice'] ?? null,
-                            'grpPrcL1' => $item['group1UnitPrice'] ?? null,
-                            'grpPrcL2' => $item['group2UnitPrice'] ?? null,
-                            'grpPrcL3' => $item['group3UnitPrice'] ?? null,
-                            'grpPrcL4' => $item['group4UnitPrice'] ?? null,
-                            'grpPrcL5' => $item['group5UnitPrice'] ?? null,
-                            'addInfo' => $item['additionalInfo'] ?? null,
-                            'sftyQty' => $item['saftyQuantity'] ?? null,
-                            'isrcAplcbYn' => $item['isInrcApplicable'] ?? null,
-                            'rraModYn' => $item['isUsed'] ?? null,
-                            'packageQuantity' => $item['packageQuantity'] ?? null,
-                            'useYn' => $item['useYn'] ?? null,
-                        ]);
-
-                        $itemInfo->save();
-
-                        // Prepare data for the API
-                        $apiData[] = $this->constructProductData($item, $index);
-=======
-                        
-                        // Determine the storage disk based on your configuration
-                        $storageDisk = 'local'; // Change this to your configured disk
-                        
-                        // Determine the storage path where you want to store the file
-                        $storagePath = 'uploads/pro_image'; // Change this to your desired path
-                        
-                        // Generate a unique filename (if needed) or use the original filename
-                        $filename = $item['pro_image']->getClientOriginalName();
-                        
-                        // Store the file using the Storage facade
-                        $storedFilePath = \Storage::disk($storageDisk)->putFileAs($storagePath, $item['pro_image'], $filename);
-                        
-                        \Log::info('Stored File Path: ' . $storedFilePath);
-                        
-                        // Now $storedFilePath contains the path where the file is stored
-                        // You can use this path for further processing or storing in the database
-
-                        ItemInformation::create([
+                            $productService = ProductService::create([
+                                'name' => $item['itemName'] ?? null,
+                                'sku' => $item['sku'] ?? null,
+                                'sale_price' => $item['sale_price'] ?? null,
+                                'purchase_price' => $item['purchase_price'] ?? null,
+                                'quantity' => $item['quantity'],
+                                'tax_id' => $taxIdCode,
+                                'category_id' => $item['category_id'] ?? null,
+                                'unit_id' => $item['unit_id'] ?? null,
+                                'type' => $item['type'] ?? null,
+                                'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
+                                'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
+                                'description' => $item['description'] ?? null,
+                                'pro_image' => $fileName,
+                                'created_by' => \Auth::user()->creatorId(),
+                                'tin' => $item['tin'] ?? null,
                                 'itemCd' => $item['itemCode'],
                                 'itemClsCd' => $item['itemClassifiCode'],
                                 'itemTyCd' => $item['itemTypeCode'],
                                 'itemNm' => $item['itemName'],
                                 'itemStdNm' => $item['itemStrdName'],
-                                'orgnNatCd' => $item['countryCode'],
-                                'pkgUnitCd' => $item['pkgUnitCode'],
-                                'qtyUnitCd' => $item['qtyUnitCode'],
-                                'taxTyCd' => $item['taxTypeCode'],
-                                'btchNo' => $item['batchNo'],
-                                'bcd' => $item['barcode'],
-                                'dftPrc' => $item['unitPrice'],
-                                'grpPrcL1' => $item['group1UnitPrice'],
-                                'grpPrcL2' => $item['group2UnitPrice'],
-                                'grpPrcL3' => $item['group3UnitPrice'],
-                                'grpPrcL4' => $item['group4UnitPrice'],
-                                'grpPrcL5' => $item['group5UnitPrice'],
-                                'addInfo' => $item['additionalInfo'],
-                                'sftyQty' => $item['saftyQuantity'],
-                                'isrcAplcbYn' => $item['isInrcApplicable'],
-                                'rraModYn' => $item['isUsed'],
-                                'quantity' => $item['quantity'],
-                                'packageQuantity' => $item['packageQuantity'],
-                                'image' => $storedFilePath
+                                'orgnNatCd' => $item['countryCode'] ?? null,
+                                'pkgUnitCd' => $item['pkgUnitCode'] ?? null,
+                                'qtyUnitCd' => $item['qtyUnitCode'] ?? null,
+                                'taxTyCd' => $item['taxTypeCode'] ?? null,
+                                'btchNo' => $item['batchNo'] ?? null,
+                                'regBhfId' => $item['regBhfId'] ?? null,
+                                'bcd' => $item['barcode'] ?? null,
+                                'dftPrc' => $item['unitPrice'] ?? null,
+                                'grpPrcL1' => $item['group1UnitPrice'] ?? null,
+                                'grpPrcL2' => $item['group2UnitPrice'] ?? null,
+                                'grpPrcL3' => $item['group3UnitPrice'] ?? null,
+                                'grpPrcL4' => $item['group4UnitPrice'] ?? null,
+                                'grpPrcL5' => $item['group5UnitPrice'] ?? null,
+                                'addInfo' => $item['additionalInfo'] ?? null,
+                                'sftyQty' => $item['saftyQuantity'] ?? null,
+                                'isrcAplcbYn' => $item['isInrcApplicable'] ?? null,
+                                'rraModYn' => $item['isUsed'] ?? null,
+                                'packageQuantity' => $item['packageQuantity'] ?? null,
+                                'useYn' => $item['useYn'] ?? null,
                             ]);
->>>>>>> ccf9747233b13a82e758c8e314b59a755077897f
+
+                            $productService->save();
+
+                            // Prepare data for the API
+                            $apiData[] = $this->constructProductData($item, $index);
+                        } else {
+                            \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
+                            return redirect()->back()->with('error', 'Storage limit exceeded.');
+                        }
                     } else {
                         \Log::info('No valid image uploaded for item ' . ($index + 1));
                     }
                 }
 
-<<<<<<< HEAD
                 // Post data to the external API
                 $response = \Http::withHeaders([
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
                 ])->post('https://etims.your-apps.biz/api/AddItemsList', $apiData);
+
+                // Log response data
+                \Log::info('API Response Status Code For Posting Product Data: ' . $response->status());
+                \Log::info('API Request Product Data Posted: ' . json_encode($apiData));
+                \Log::info('API Response Body For Posting Product Data: ' . $response->body());
 
                 if ($response->successful()) {
                     \Log::info('Data successfully posted to the API');
@@ -334,8 +239,6 @@ class ProductServiceController extends Controller
                     \Log::error('Error posting data to the API: ' . $response->body());
                 }
 
-=======
->>>>>>> ccf9747233b13a82e758c8e314b59a755077897f
                 return redirect()->route('productservice.index')->with('success', 'Product / Service Added Successfully');
             } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
@@ -375,11 +278,18 @@ class ProductServiceController extends Controller
             "packageQuantity" => $item["packageQuantity"],
         ];
     }
-    
+
+
     public function show($id)
     {
-        $iteminformation = ProductService::find($id);
-        return view('productservice.show', compact('iteminformation'));
+        $productServiceInfo = ProductService::findOrFail($id);
+        $taxName = DB::table('taxes')->where('id', $productServiceInfo->tax_id)->value('name');
+        $categoryName = DB::table('product_service_categories')->where('id', $productServiceInfo->category_id)->value('name');
+        $unitName = DB::table('product_service_units')->where('id', $productServiceInfo->unit_id)->value('name');
+        $saleChartAccountName = DB::table('chart_of_accounts')->where('id', $productServiceInfo->sale_chartaccount_id)->value('name');
+        $expenseChartAccounName = DB::table('chart_of_accounts')->where('id', $productServiceInfo->expense_chartaccount_id)->value('name');
+         
+        return view('productservice.show', compact('productServiceInfo', 'taxName','categoryName','unitName','saleChartAccountName','expenseChartAccounName'));
     }
 
     public function getItem($code)
@@ -649,20 +559,58 @@ class ProductServiceController extends Controller
     {
         if (\Auth::user()->can('manage product & service')) {
             $iteminformation = ProductService::find($id);
-            $customFields = CustomField::where('module', '=', 'iteminformation')->get();
+            
             $itemclassifications = ProductsServicesClassification::pluck('itemClsNm', 'itemClsCd');
             $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
             \Log::info($itemtypes);
             $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
             $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
+
+
+              $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
+                $unit     = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+                $tax      = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+                $customFields                = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();            
+                $incomeChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
+                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type')
+                ->where('chart_of_account_types.name' ,'income')
+                ->where('parent', '=', 0)
+                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+                ->pluck('code_name', 'id');
+            $incomeChartAccounts->prepend('Select Account', 0);
+            $incomeSubAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name' , 'chart_of_account_parents.account');
+            $incomeSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
+            $incomeSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type');
+            $incomeSubAccounts->where('chart_of_account_types.name' ,'income');
+            $incomeSubAccounts->where('chart_of_accounts.parent', '!=', 0);
+            $incomeSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
+            $incomeSubAccounts = $incomeSubAccounts->get()->toArray();
+            $expenseChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
+            ->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type')
+            ->whereIn('chart_of_account_types.name' ,['Expenses','Costs of Goods Sold'])
+            ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+            ->pluck('code_name', 'id');
+            $expenseChartAccounts->prepend('Select Account', '');
+            $expenseSubAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name' , 'chart_of_account_parents.account');
+            $expenseSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
+            $expenseSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id','chart_of_accounts.type');
+            $expenseSubAccounts->whereIn('chart_of_account_types.name' ,['Expenses','Costs of Goods Sold']);
+            $expenseSubAccounts->where('chart_of_accounts.parent', '!=', 0);
+            $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
+            $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
+
+
+
+
+            
             return view(
                 'productservice.edit',
                 compact(
-                    'iteminformation',
-                    'itemclassifications',
-                    'itemtypes',
-                    'countrynames',
-                    'taxationtype'
+                    'iteminformation','itemclassifications','itemtypes','countrynames','taxationtype',
+
+                    'category', 'unit', 'tax', 'productService', 'customFields',
+
+                    'incomeChartAccounts','expenseChartAccounts' , 'incomeSubAccounts' , 'expenseSubAccounts'
                 )
             );
 

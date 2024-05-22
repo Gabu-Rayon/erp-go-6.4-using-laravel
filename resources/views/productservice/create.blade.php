@@ -104,7 +104,7 @@
                                         <div class="form-group">
                                             {{ Form::label('sku', __('SKU'), ['class' => 'form-label']) }}<span
                                                 class="text-danger">*</span>
-                                            {{ Form::text('sku', '', ['class' => 'form-control', 'required' => 'required']) }}
+                                            {{ Form::text('sku', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'ABC-12345-S-BL']) }}
                                         </div>
                                     </td>
 
@@ -195,7 +195,7 @@
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('barcode', __('Bar Code'), ['class' => 'form-label']) }}
-                                        {{ Form::text('barcode', '', ['class' => 'form-control', 'required' => 'required']) }}
+                                        {{ Form::text('barcode', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'9347408001101']) }}
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('unitPrice', __('Unit Price'), ['class' => 'form-label']) }}

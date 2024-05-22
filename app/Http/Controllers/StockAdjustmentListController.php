@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ItemInformation;
+use App\Models\ProductService;
 use App\Models\ReleaseType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -38,7 +38,7 @@ class StockAdjustmentListController extends Controller
          if (\Auth::user()->can('show purchase')) {
 
         try {
-            $items = ItemInformation::all()->pluck('itemNm', 'itemCd');
+            $items = ProductService::all()->pluck('itemNm', 'itemCd');
             $releaseTypes = ReleaseType::all()->pluck('type', 'id');
             return view('stockadjustment.create', compact('items', 'releaseTypes'));
         } catch (\Exception $e) {

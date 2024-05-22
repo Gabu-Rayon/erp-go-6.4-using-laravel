@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\BranchesList;
-use App\Models\ItemInformation;
+use App\Models\ProductService;
 use App\Models\StockReleaseType;
 
 class StockMoveController extends Controller
@@ -17,14 +17,14 @@ class StockMoveController extends Controller
     {
         //
     }
-
     /**
      * Show the form for creating a new resource.
+     * 
      */
     public function create()
     {
         $branches = BranchesList::all()->pluck('bhfNm', 'bhfId');
-        $items = ItemInformation::all()->pluck('itemNm', 'itemCd');
+        $items = ProductService::all()->pluck('itemNm', 'itemCd');
         $releaseTypes = StockReleaseType::all()->pluck('type', 'id');
         return view('stockmove.create', compact('branches', 'items', 'releaseTypes'));
     }

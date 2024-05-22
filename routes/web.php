@@ -153,8 +153,6 @@ use App\Http\Controllers\WarehouseTransferController;
 use App\Http\Controllers\AddCompositionListController;
 use App\Http\Controllers\AttendanceEmployeeController;
 use App\Http\Controllers\FlutterwavePaymentController;
-use App\Http\Controllers\GetItemInformationController;
-use App\Http\Controllers\ItemClassificationController;
 use App\Http\Controllers\PaymentWallPaymentController;
 use App\Http\Controllers\ProductServiceUnitController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -167,6 +165,7 @@ use App\Http\Controllers\ItemClassificationCodeController;
 use App\Http\Controllers\ProductServiceCategoryController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\ProductServiceClassificationController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 
 
@@ -412,7 +411,7 @@ Route::group(['middleware' => ['verified']], function () {
     Route::get('productservice/index', [ProductServiceController::class, 'index'])->name('productservice.index');
     Route::get('productservice/synchronize', [ProductServiceController::class, 'synchronize'])->name('productservice.synchronize');
     // productservice.synchronizeitemclassifications
-    Route::get('productservice/synchronizeitemclassifications', [ProductServiceController::class, 'synchronizeItemClassifications'])->name('productservice.synchronizeitemclassifications');
+    Route::get('productserviceclassification/synchronizeitemclassifications', [ProductServiceClassificationController::class, 'synchronizeItemClassifications'])->name('productservice.synchronizeitemclassifications');
     Route::get('productservice/synccodelist', [ProductServiceController::class, 'syncCodeList'])->name('productservice.synccodelist');
 
 
@@ -1796,7 +1795,7 @@ Route::group(['middleware' => ['verified']], function () {
 });
 Route::any('/cookie-consent', [SystemController::class, 'CookieConsent'])->name('cookie-consent');
 Route::get('/code', [CodeController::class, 'getCodesList']);
-Route::get('/getItemClassifications', [ItemClassificationController::class, 'addCategories']);
+Route::get('/getItemClassifications', [ ProductServiceClassificationController::class, 'getItemClassifications']);
 Route::get('/details', [DetailsController::class, 'getDetailsList']);
 Route::get('/getnotices', [NoticesListController::class, 'getNoticeList']);
 Route::get('/get-item-information', [ProductServiceController::class, 'getItemInformation']);

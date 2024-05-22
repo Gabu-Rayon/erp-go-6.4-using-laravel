@@ -9,6 +9,9 @@ class BranchUser extends Model
 {
     use HasFactory;
 
+    // Specify the table associated with the model
+    protected $table = 'branch_users';
+
     protected $fillable = [
         'branchUserId',
         'branchUserName',

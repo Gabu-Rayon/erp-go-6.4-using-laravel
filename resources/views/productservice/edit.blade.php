@@ -128,6 +128,28 @@
                 {{ Form::text('addInfo', $iteminformation->addInfo, array('class' => 'form-control','placeholder'=>__('Additional Information'))) }}
             </div>
         </div>
+
+
+           <div class="form-group col-md-6">
+            {{ Form::label('sale_chartaccount_id', __('Income Account'),['class'=>'form-label']) }}
+            {{-- {{ Form::select('sale_chartaccount_id',$incomeChartAccounts,null, array('class' => 'form-control select','required'=>'required')) }} --}}
+            <select name="sale_chartaccount_id" class="form-control" required="required">
+                @foreach ($incomeChartAccounts as $key => $chartAccount)
+                    <option value="{{ $key }}" class="subAccount" {{ ($productService->sale_chartaccount_id == $key) ? 'selected' : ''}}>{{ $chartAccount }}</option>
+                    @foreach ($incomeSubAccounts as $subAccount)
+                        @if ($key == $subAccount['account'])
+                            <option value="{{ $subAccount['id'] }}" class="ms-5" {{ ($productService->sale_chartaccount_id == $subAccount['id']) ? 'selected' : ''}}> &nbsp; &nbsp;&nbsp; {{ $subAccount['code_name'] }}</option>
+                        @endif
+                    @endforeach
+                @endforeach
+            </select>
+        </div>
+
+
+
+
+
+
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('isrcAplcbYn', __('Insurance Appicable (Y/N) (*)'),['class'=>'form-label']) }}
