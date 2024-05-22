@@ -1797,7 +1797,12 @@ Route::group(['middleware' => ['verified']], function () {
 Route::any('/cookie-consent', [SystemController::class, 'CookieConsent'])->name('cookie-consent');
 Route::get('/code', [CodeController::class, 'getCodesList']);
 Route::get('/getItemClassifications', [ItemClassificationController::class, 'addCategories']);
-Route::get('/details', [DetailsController::class, 'getDetailsList']);
+Route::get('/details/sync', [DetailsController::class, 'synchronize'])->name('details.sync');
+Route::get('/details/countries', [DetailsController::class, 'countries'])->name('details.countries');
+Route::get('/details/refundreasons', [DetailsController::class, 'refundreasons'])->name('details.refundreasons');
+Route::get('/details/currencies', [DetailsController::class, 'currencies'])->name('details.currencies');
+Route::get('/details/banks', [DetailsController::class, 'banks'])->name('details.banks');
+Route::get('/details/languages', [DetailsController::class, 'languages'])->name('details.languages');
 Route::get('/getnotices', [NoticesListController::class, 'getNoticeList']);
 Route::get('/get-item-information', [ProductServiceController::class, 'getItemInformation']);
 Route::group(

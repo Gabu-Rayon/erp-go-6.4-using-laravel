@@ -137,19 +137,6 @@ class ProductServiceController extends Controller
                 \Log::info('ITEMS');
                 \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
 
-<<<<<<< HEAD
-                $apiData = [];
-
-                // Define the mapping array for taxTypeCode to tax_id
-                $taxTypeMapping = [
-                    'A' => 1,
-                    'B' => 2,
-                    'C' => 3,
-                    'D' => 4,
-                    'E' => 5,
-                    'F' => 6,
-                ];
-=======
                 $url = 'https://etims.your-apps.biz/api/AddItemsList';
 
                 $firstResponse = Http::withOptions([
@@ -196,7 +183,6 @@ class ProductServiceController extends Controller
                 if ($secondResponse["statusCode"] != 200) {
                     return redirect()->back()->with('error', $secondResponse["message"]);
                 }
->>>>>>> ccf9747233b13a82e758c8e314b59a755077897f
 
                 foreach ($data['items'] as $index => $item) {
                     \Log::info('ITEM INDEX: ' . $index);
@@ -214,63 +200,6 @@ class ProductServiceController extends Controller
                             'size' => $item['pro_image']->getSize(),
                             'path' => $item['pro_image']->getPathname(),
                         ], JSON_PRETTY_PRINT));
-<<<<<<< HEAD
-
-                        $storageDisk = 'local';
-                        $storagePath = 'uploads/pro_image';
-                        $filename = $item['pro_image']->getClientOriginalName();
-                        $storedFilePath = \Storage::disk($storageDisk)->putFileAs($storagePath, $item['pro_image'], $filename);
-
-                        \Log::info('Stored Image File Path: ' . $storedFilePath);
-
-                        // Save to local database
-                        $itemInfo = ProductService::create([
-                            'name' => $item['itemName'] ?? null,
-                            'sku' => $item['sku'] ?? null,
-                            'sale_price' => $item['sale_price'] ?? null,
-                            'purchase_price' => $item['purchase_price'] ?? null,
-                            'quantity' => $item['quantity'],
-                            'tax_id' => $taxIdCode,
-                            'category_id' => $item['category_id'] ?? null,
-                            'unit_id' => $item['unit_id'] ?? null,
-                            'type' => $item['type'] ?? null,
-                            'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
-                            'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
-                            'description' => $item['description'] ?? null,
-                            'pro_image' => $storedFilePath,
-                            'created_by' => \Auth::user()->creatorId(),
-                            'tin' => $item['tin'] ?? null,
-                            'itemCd' => $item['itemCode'],
-                            'itemClsCd' => $item['itemClassifiCode'],
-                            'itemTyCd' => $item['itemTypeCode'],
-                            'itemNm' => $item['itemName'],
-                            'itemStdNm' => $item['itemStrdName'],
-                            'orgnNatCd' => $item['countryCode'] ?? null,
-                            'pkgUnitCd' => $item['pkgUnitCode'] ?? null,
-                            'qtyUnitCd' => $item['qtyUnitCode'] ?? null,
-                            'taxTyCd' => $item['taxTypeCode'] ?? null,
-                            'btchNo' => $item['batchNo'] ?? null,
-                            'regBhfId' => $item['regBhfId'] ?? null,
-                            'bcd' => $item['barcode'] ?? null,
-                            'dftPrc' => $item['unitPrice'] ?? null,
-                            'grpPrcL1' => $item['group1UnitPrice'] ?? null,
-                            'grpPrcL2' => $item['group2UnitPrice'] ?? null,
-                            'grpPrcL3' => $item['group3UnitPrice'] ?? null,
-                            'grpPrcL4' => $item['group4UnitPrice'] ?? null,
-                            'grpPrcL5' => $item['group5UnitPrice'] ?? null,
-                            'addInfo' => $item['additionalInfo'] ?? null,
-                            'sftyQty' => $item['saftyQuantity'] ?? null,
-                            'isrcAplcbYn' => $item['isInrcApplicable'] ?? null,
-                            'rraModYn' => $item['isUsed'] ?? null,
-                            'packageQuantity' => $item['packageQuantity'] ?? null,
-                            'useYn' => $item['useYn'] ?? null,
-                        ]);
-
-                        $itemInfo->save();
-
-                        // Prepare data for the API
-                        $apiData[] = $this->constructProductData($item, $index);
-=======
                         
                         // Determine the storage disk based on your configuration
                         $storageDisk = 'local'; // Change this to your configured disk
@@ -315,27 +244,11 @@ class ProductServiceController extends Controller
                                 'packageQuantity' => $item['packageQuantity'],
                                 'image' => $storedFilePath
                             ]);
->>>>>>> ccf9747233b13a82e758c8e314b59a755077897f
                     } else {
                         \Log::info('No valid image uploaded for item ' . ($index + 1));
                     }
                 }
 
-<<<<<<< HEAD
-                // Post data to the external API
-                $response = \Http::withHeaders([
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                ])->post('https://etims.your-apps.biz/api/AddItemsList', $apiData);
-
-                if ($response->successful()) {
-                    \Log::info('Data successfully posted to the API');
-                } else {
-                    \Log::error('Error posting data to the API: ' . $response->body());
-                }
-
-=======
->>>>>>> ccf9747233b13a82e758c8e314b59a755077897f
                 return redirect()->route('productservice.index')->with('success', 'Product / Service Added Successfully');
             } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
