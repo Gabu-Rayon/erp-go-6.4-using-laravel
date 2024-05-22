@@ -19,7 +19,6 @@ use App\Exports\InvoiceExport;
 use App\Models\InvoicePayment;
 use App\Models\InvoiceProduct;
 use App\Models\ProductService;
-use App\Models\ItemInformation;
 use App\Models\PaymentTypeCodes;
 use App\Models\TransactionLines;
 use App\Models\InvoiceStatusCode;
@@ -82,12 +81,12 @@ class InvoiceController extends Controller
             $customers->prepend('Select Customer', '');
             $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'income')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
-            $product_services = ItemInformation::all()->pluck('itemNm', 'itemCd');
+            $product_services = ProductService::all()->pluck('itemNm', 'itemCd');
             $product_services->prepend('--', '');
             $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'saleTypeCode');
             $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'code');
             $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusCode', 'invoiceStatusCode');
-            $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
+            $taxationtype = Details::where('cdCls', '04')->pluck('userDfnCd1', 'cd');
 
             return view('invoice.create', compact(
                 'customers',
@@ -128,118 +127,16 @@ class InvoiceController extends Controller
     }
 
 
-    // public function store(Request $request){
-    //     //        dd($request->all());
-    //     if (\Auth::user()->can('create invoice')) {
-    //         $validator = \Validator::make(
-    //             $request->all(),
-    //             [
-    //                 'customer_id' => 'required',
-    //                 'issue_date' => 'required',
-    //                 'due_date' => 'required',
-    //                 'category_id' => 'required',
-    //                 'items' => 'required',
-    //             ]
-    //         );
-    //         if ($validator->fails()) {
-    //             $messages = $validator->getMessageBag();
-    //             return redirect()->back()->with('error', $messages->first());
-    //         }
-    //         $status = Invoice::$statues;
-    //         $invoice = new Invoice();
-    //         $invoice->invoice_id = $this->invoiceNumber();
-    //         $invoice->customer_id = $request->customer_id;
-    //         $invoice->status = 0;
-    //         $invoice->issue_date = $request->issue_date;
-    //         $invoice->due_date = $request->due_date;
-    //         $invoice->category_id = $request->category_id;
-    //         $invoice->ref_number = $request->ref_number;
-    //         //            $invoice->discount_apply = isset($request->discount_apply) ? 1 : 0;
-    //         $invoice->created_by = \Auth::user()->creatorId();
-    //         $invoice->save();
-    //         CustomField::saveData($invoice, $request->customField);
-    //         $products = $request->items;
-
-    //         for ($i = 0; $i < count($products); $i++) {
-
-    //             $invoiceProduct = new InvoiceProduct();
-    //             $invoiceProduct->invoice_id = $invoice->id;
-    //             $invoiceProduct->product_id = $products[$i]['item'];
-    //             $invoiceProduct->quantity = $products[$i]['quantity'];
-    //             $invoiceProduct->tax = $products[$i]['tax'];
-    //             //                $invoiceProduct->discount    = isset($products[$i]['discount']) ? $products[$i]['discount'] : 0;
-    //             $invoiceProduct->discount = $products[$i]['discount'];
-    //             $invoiceProduct->price = $products[$i]['price'];
-    //             $invoiceProduct->description = $products[$i]['description'];
-    //             $invoiceProduct->save();
-
-    //             //inventory management (Quantity)
-    //             Utility::total_quantity('minus', $invoiceProduct->quantity, $invoiceProduct->product_id);
-
-    //             //For Notification
-    //             $setting = Utility::settings(\Auth::user()->creatorId());
-    //             $customer = Customer::find($request->customer_id);
-    //             $invoiceNotificationArr = [
-    //                 'invoice_number' => \Auth::user()->invoiceNumberFormat($invoice->invoice_id),
-    //                 'user_name' => \Auth::user()->name,
-    //                 'invoice_issue_date' => $invoice->issue_date,
-    //                 'invoice_due_date' => $invoice->due_date,
-    //                 'customer_name' => $customer->name,
-    //             ];
-    //             //Slack Notification
-    //             if (isset($setting['invoice_notification']) && $setting['invoice_notification'] == 1) {
-    //                 Utility::send_slack_msg('new_invoice', $invoiceNotificationArr);
-    //             }
-    //             //Telegram Notification
-    //             if (isset($setting['telegram_invoice_notification']) && $setting['telegram_invoice_notification'] == 1) {
-    //                 Utility::send_telegram_msg('new_invoice', $invoiceNotificationArr);
-    //             }
-    //             //Twilio Notification
-    //             if (isset($setting['twilio_invoice_notification']) && $setting['twilio_invoice_notification'] == 1) {
-    //                 Utility::send_twilio_msg($customer->contact, 'new_invoice', $invoiceNotificationArr);
-    //             }
-
-    //         }
-
-    //         //Product Stock Report
-    //         $type = 'invoice';
-    //         $type_id = $invoice->id;
-    //         StockReport::where('type', '=', 'invoice')->where('type_id', '=', $invoice->id)->delete();
-    //         $description = $invoiceProduct->quantity . '  ' . __(' quantity sold in invoice') . ' ' . \Auth::user()->invoiceNumberFormat($invoice->invoice_id);
-    //         Utility::addProductStock($invoiceProduct->product_id, $invoiceProduct->quantity, $type, $description, $type_id);
-
-    //         //webhook
-    //         $module = 'New Invoice';
-    //         $webhook = Utility::webhookSetting($module);
-    //         if ($webhook) {
-    //             $parameter = json_encode($invoice);
-    //             $status = Utility::WebhookCall($webhook['url'], $parameter, $webhook['method']);
-    //             if ($status == true) {
-    //                 return redirect()->route('invoice.index', $invoice->id)->with('success', __('Invoice successfully created.'));
-    //             } else {
-    //                 return redirect()->back()->with('error', __('Webhook call failed.'));
-    //             }
-    //         }
-
-    //         return redirect()->route('invoice.index', $invoice->id)->with('success', __('Invoice successfully created.'));
-    //     } else {
-    //         return redirect()->back()->with('error', __('Permission denied.'));
-    //     }
-    // }
-
-
-
     /****************************************************************
      * Post the data to api EnPoint
      * 
      ***************************************************************************/
-    public function store(Request $request)
-    {
-
-        // Log the entire request data
-        \Log::info('Form data received:', $request->all());
+    public function store (Request $request) {
         try {
             if (\Auth::user()->can('create invoice')) {
+                \Log::info('CREATE INVOICE REQUEST DATA');
+                \Log::info($request);
+
                 $validator = \Validator::make(
                     $request->all(),
                     [
@@ -251,11 +148,13 @@ class InvoiceController extends Controller
                         'items' => 'required'
                     ]
                 );
+
                 if ($validator->fails()) {
                     $messages = $validator->getMessageBag();
                     return redirect()->back()->with('error', $messages->first());
                 }
 
+                \Log::info('VALIDATED');
 
                 $data = $request->all();
                 $customer = Customer::find($data['customer_id']);
@@ -314,7 +213,7 @@ class InvoiceController extends Controller
                 }
 
                 foreach ($data['items'] as $item) {
-                    $itemDetails = ItemInformation::where('itemCd', $item['itemCode'])->first();
+                    $itemDetails = ProductService::where('itemCd', $item['item'])->first();
                     $itemExprDt = str_replace('-', '', $item['itemExprDate']);
                     $itemExprDate = date('Ymd', strtotime($itemExprDt));
                     $itemData = [
@@ -324,20 +223,15 @@ class InvoiceController extends Controller
                         "itemName" => $itemDetails->itemNm,
                         "orgnNatCd" => $itemDetails->orgnNatCd,
                         "taxTypeCode" => $itemDetails->taxTyCd,
-                        "unitPrice" => $item['unitPrice'],
+                        "unitPrice" => $item['price'],
                         "isrcAplcbYn" => $itemDetails->isrcAplcbYn,
                         "pkgUnitCode" => $itemDetails->pkgUnitCd,
                         "pkgQuantity" => $item['pkgQuantity'],
                         "tax" => $item['tax'],
                         "qtyUnitCd" => $itemDetails->qtyUnitCd,
                         "quantity" => $item['quantity'],
-                        "discountRate" => $item['discountRate'],
-                        "discountAmt" => calculateDiscountAmount(
-                            $item['pkgQuantity'],
-                            $item['quantity'],
-                            $item['unitPrice'],
-                            $item['discountRate'],
-                        ),
+                        "discountRate" => $item['discount'],
+                        "discountAmt" => $item['discountAmount'],
                         "itemExprDate" => $itemExprDate
                     ];
 
@@ -446,6 +340,9 @@ class InvoiceController extends Controller
                 ]);
 
                 foreach ($saleItemList as $item) {
+                    \Log::info('ITEM TO CREATE');
+                    \Log::info($item);
+                    $itemDetails = ProductService::where('itemCd', $item['itemCode'])->first();
                     InvoiceProduct::create([
                         'product_id' => $item['itemCode'],
                         'invoice_id' => $inv['invoice_id'],
@@ -480,72 +377,17 @@ class InvoiceController extends Controller
                     ]);
                 }
                 return redirect()->to('invoice')->with('success', 'Sale Created Successfully');
+
+            } else {
+                return redirect()->back()->with('error', __('Permission denied.'));
             }
         } catch (\Exception $e) {
-            \Log::info('ADD INV ERROR');
+            \Log::info('CREATE INVOICE ERROR');
             \Log::info($e);
 
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
-
-    // if (\Auth::user()->can('create invoice')) {
-    //     $validator = \Validator::make(
-    //         $request->all(),
-    //         [
-    //             'customer_id' => 'required',
-    //             'issue_date' => 'required',
-    //             'due_date' => 'required',
-    //             'category_id' => 'required',
-    //             'items' => 'required',
-    //         ]
-    //     );
-    //     if ($validator->fails()) {
-    //         $messages = $validator->getMessageBag();
-    //         return redirect()->back()->with('error', $messages->first());
-    //     }
-
-    //     $invoiceData = [
-    //         'customer_id' => $request->customer_id,
-    //         'issue_date' => $request->issue_date,
-    //         'due_date' => $request->due_date,
-    //         'category_id' => $request->category_id,
-    //         'items' => $request->items,
-    //         // Add other fields as needed
-
-    //         "customerTin" => $request->customer_tin,
-    //         "salesType" => $request->sales_types,
-    //         "paymentType" => $request->payment_type,
-    //         "invoiceStatusCode" => $request->invoice_status_code,
-    //         "remark" => $request->remark,
-    //         "isPurchaseAccept" => $request->is_purchase_accept,
-    //         "itemCode" => $request->item_code,
-    //         "unitPrice" => $request->unit_price,
-    //         "quantity" => $request->quantity,
-    //         "discountRate" => $request->discount_rate,
-    //         "discountAmt" => $request->discount_amount
-    //     ];
-
-    //     // Post data to the API endpoint
-    //     $response = Http::post('https://etims.your-apps.biz/api/SaveSales', $invoiceData);
-    //     // $response = Http::post('https://etims.your-apps.biz/api/AddSale', $invoiceData);           
-
-    //     // Check if the request was successful (status code 2xx)
-    //     if ($response->successful()) {
-    //         // API request was successful, handle response if needed
-    //         $apiResponse = $response->json(); // Convert response to JSON
-    //         // Handle API response here
-    //     } else {
-    //         // API request failed, handle error
-    //         $errorResponse = $response->json(); // Convert error response to JSON
-    //         // Handle error response here
-    //         return redirect()->back()->with('error', 'Failed to post data to API.');
-    //     }
-
-    //     // Rest of your logic...
-    // } else {
-    //     return redirect()->back()->with('error', __('Permission denied.'));
-    // }
 
     public function edit($ids)
     {
@@ -850,7 +692,7 @@ class InvoiceController extends Controller
 
                 $invoice_products = InvoiceProduct::where('invoice_id', $invoice->id)->get();
                 foreach ($invoice_products as $invoice_product) {
-                    $product = ItemInformation::find($invoice_product->product_id);
+                    $product = ProductService::find($invoice_product->product_id);
                     $totalTaxPrice = 0;
                     // Manually specify tax rates based on taxTypeCode
                     switch ($invoice_product->taxTypeCode) {
@@ -1673,7 +1515,7 @@ class InvoiceController extends Controller
     public function getItem($itemCd)
     {
         try {
-            $itemInfo = ItemInformation::where('itemCd', $itemCd)->first();
+            $itemInfo = ProductService::where('itemCd', $itemCd)->first();
             return response()->json([
                 'message' => 'success',
                 'data' => $itemInfo

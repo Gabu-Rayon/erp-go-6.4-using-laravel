@@ -136,7 +136,8 @@ class Invoice extends Model
         $subTotal = 0;
         foreach($this->items as $product)
         {
-
+            \Log::info('SUB TOTAL ITEM');
+            \Log::info($product);
             $subTotal += ($product->price * $product->quantity);
         }
 
