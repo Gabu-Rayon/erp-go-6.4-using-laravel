@@ -66,6 +66,10 @@
             $(".price").change();
             $(".discount").change();
         });
+        document.getElementById('pro_image').onchange = function() {
+            var src = URL.createObjectURL(this.files[0]);
+            document.getElementById('image').src = src;
+        };
     </script>
 @endpush
 
@@ -104,7 +108,7 @@
                                         <div class="form-group">
                                             {{ Form::label('sku', __('SKU'), ['class' => 'form-label']) }}<span
                                                 class="text-danger">*</span>
-                                            {{ Form::text('sku', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'ABC-12345-S-BL']) }}
+                                            {{ Form::text('sku', '', ['class' => 'form-control', 'required' => 'required', 'placeholder ' => 'ABC-12345-S-BL']) }}
                                         </div>
                                     </td>
 
@@ -195,7 +199,7 @@
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('barcode', __('Bar Code'), ['class' => 'form-label']) }}
-                                        {{ Form::text('barcode', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'9347408001101']) }}
+                                        {{ Form::text('barcode', '', ['class' => 'form-control', 'required' => 'required', 'placeholder ' => '9347408001101']) }}
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('unitPrice', __('Unit Price'), ['class' => 'form-label']) }}
@@ -265,6 +269,7 @@
                                             </label>
                                         </div>
                                     </td>
+
                                     <td class="form-group col-md-3">
                                         <div class="form-group">
                                             <div class="btn-box">
@@ -322,22 +327,3 @@
         {{ Form::close() }}
     </div>
 @endsection
-<script>
-    document.getElementById('pro_image').onchange = function() {
-        var src = URL.createObjectURL(this.files[0])
-        document.getElementById('image').src = src
-    }
-
-    //hide & show quantity
-
-    $(document).on('click', '.type', function() {
-        var type = $(this).val();
-        if (type == 'product') {
-            $('.quantity').removeClass('d-none')
-            $('.quantity').addClass('d-block');
-        } else {
-            $('.quantity').addClass('d-none')
-            $('.quantity').removeClass('d-block');
-        }
-    });
-</script>

@@ -67,6 +67,10 @@
             $(".price").change();
             $(".discount").change();
         });
+        document.getElementById('pro_image').onchange = function() {
+            var src = URL.createObjectURL(this.files[0]);
+            document.getElementById('image').src = src;
+        };
     </script>
 <?php $__env->stopPush(); ?>
 
@@ -107,7 +111,7 @@
                                         <div class="form-group">
                                             <?php echo e(Form::label('sku', __('SKU'), ['class' => 'form-label'])); ?><span
                                                 class="text-danger">*</span>
-                                            <?php echo e(Form::text('sku', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'ABC-12345-S-BL'])); ?>
+                                            <?php echo e(Form::text('sku', '', ['class' => 'form-control', 'required' => 'required', 'placeholder ' => 'ABC-12345-S-BL'])); ?>
 
                                         </div>
                                     </td>
@@ -226,7 +230,7 @@
                                     <td class="form-group col-md-3">
                                         <?php echo e(Form::label('barcode', __('Bar Code'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::text('barcode', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'9347408001101'])); ?>
+                                        <?php echo e(Form::text('barcode', '', ['class' => 'form-control', 'required' => 'required', 'placeholder ' => '9347408001101'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-3">
@@ -323,6 +327,7 @@
                                             </label>
                                         </div>
                                     </td>
+
                                     <td class="form-group col-md-3">
                                         <div class="form-group">
                                             <div class="btn-box">
@@ -383,24 +388,5 @@
 
     </div>
 <?php $__env->stopSection(); ?>
-<script>
-    document.getElementById('pro_image').onchange = function() {
-        var src = URL.createObjectURL(this.files[0])
-        document.getElementById('image').src = src
-    }
-
-    //hide & show quantity
-
-    $(document).on('click', '.type', function() {
-        var type = $(this).val();
-        if (type == 'product') {
-            $('.quantity').removeClass('d-none')
-            $('.quantity').addClass('d-block');
-        } else {
-            $('.quantity').addClass('d-none')
-            $('.quantity').removeClass('d-block');
-        }
-    });
-</script>
 
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/productservice/create.blade.php ENDPATH**/ ?>
