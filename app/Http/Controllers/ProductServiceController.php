@@ -453,147 +453,100 @@ class ProductServiceController extends Controller
 //     }
 
 
-    public function update(Request $request, $id)
-    {
-        $iteminformation = ProductService::find($id);
-        \Log::info('Product Service INFO being edited :', ['item' => $iteminformation]);
+   public function update(Request $request, $id)
+{
+    $iteminformation = ProductService::find($id);
+    \Log::info('Product Service INFO being edited :', ['item' => $iteminformation]);
+    try {
+        $request->validate([
+            'itemCd' => 'required',
+            'itemClsCd' => 'required',
+            'itemTyCd' => 'required',
+            'itemNm' => 'required',
+            'orgnNatCd' => 'required',
+            'pkgUnitCd' => 'required',
+            'qtyUnitCd' => 'required',
+            'taxTyCd' => 'required',
+            'dftPrc' => 'required',
+            'isrcAplcbYn' => 'required',
+            'useYn' => 'required',
+        ]);
 
-        try {
-            $request->validate([
-                'itemCd' => 'required',
-                'itemClsCd' => 'required',
-                'itemTyCd' => 'required',
-                'itemNm' => 'required',
-                'orgnNatCd' => 'required',
-                'pkgUnitCd' => 'required',
-                'qtyUnitCd' => 'required',
-                'taxTyCd' => 'required',
-                'dftPrc' => 'required',
-                'isrcAplcbYn' => 'required',
-                'useYn' => 'required',
-            ]);
+        $data = $request->all();
+        \Log::info('Product Service INFO being edited and posted to the API:', $data);
 
-            $data = $request->all();
-            \Log::info('Product Service INFO being edited and posted to the API:', $data);
+        $reqData = [
+            "itemCode" => $data['itemCd'],
+            "itemClassifiCode" => $data['itemClsCd'],
+            "itemTypeCode" => $data['itemTyCd'],
+            "itemName" => $data['itemNm'],
+            "itemStrdName" => $data['itemStdNm'],
+            "countryCode" => $data['orgnNatCd'],
+            "pkgUnitCode" => $data['pkgUnitCd'],
+            "qtyUnitCode" => $data['qtyUnitCd'],
+            "taxTypeCode" => $data['taxTyCd'],
+            "batchNo" => $data['btchNo'],
+            "barcode" => $data['bcd'],
+            "unitPrice" => $data['dftPrc'],
+            "group1UnitPrice" => $data['grpPrcL1'],
+            "group2UnitPrice" => $data['grpPrcL2'],
+            "group3UnitPrice" => $data['grpPrcL3'],
+            "group4UnitPrice" => $data['grpPrcL4'],
+            "group5UnitPrice" => $data['grpPrcL5'],
+            "additionalInfo" => $data['addInfo'],
+            "saftyQuantity" => $data['saftyQuantity'],
+            "isInrcApplicable" => (boolean) $data['isrcAplcbYn'],
+            "isUsed" => (boolean) $data['useYn'],
+            "packageQuantity" => $data['packageQuantity'],
+        ];
 
-            $reqData = [
-                "itemCode" => $data['itemCd'],
-                "itemClassifiCode" => $data['itemClsCd'],
-                "itemTypeCode" => $data['itemTyCd'],
-                "itemName" => $data['itemNm'],
-                "itemStrdName" => $data['itemStdNm'],
-                "countryCode" => $data['orgnNatCd'],
-                "pkgUnitCode" => $data['pkgUnitCd'],
-                "qtyUnitCode" => $data['qtyUnitCd'],
-                "taxTypeCode" => $data['taxTyCd'],
-                "batchNo" => $data['btchNo'],
-                "barcode" => $data['bcd'],
-                "unitPrice" => $data['dftPrc'],
-                "group1UnitPrice" => $data['grpPrcL1'],
-                "group2UnitPrice" => $data['grpPrcL2'],
-                "group3UnitPrice" => $data['grpPrcL3'],
-                "group4UnitPrice" => $data['grpPrcL4'],
-                "group5UnitPrice" => $data['grpPrcL5'],
-                "additionalInfo" => $data['addInfo'],
-                "saftyQuantity" => $data['saftyQuantity'],
-                "isInrcApplicable" => (boolean) $data['isrcAplcbYn'],
-                "isUsed" => (boolean) $data['useYn'],
-                "packageQuantity" => $data['packageQuantity'],
-            ];
+        $response = Http::withOptions([
+            'verify' => false
+        ])->withHeaders([
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+            'key' => '123456'
+        ])->post('https://etims.your-apps.biz/api/UpdateItem', $reqData);
 
-            $response = Http::withOptions([
-                'verify' => false
-            ])->withHeaders([
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/json',
-                        'key' => '123456'
-                    ])->post('https://etims.your-apps.biz/api/UpdateItem', $reqData);
+        $res = $response->json();
 
-            $res = $response->json();
+        \Log::info('API Request Data: ' . json_encode($reqData));
+        \Log::info('API RESPONSE when posting the Product Details When being Edited: ', ['response' => $res]);
 
-            \Log::info('API Request Data: ' . json_encode($reqData));
-            \Log::info('API RESPONSE when posting the Product Details When being Edited: ', ['response' => $res]);
+        if ($res['statusCode'] != 200) {
+            return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
+        }
 
-            if ($res['statusCode'] != 200) {
-                return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
-            }
+        // Mapping array for taxTypeCode to tax_id
+        $taxTypeMapping = [
+            'A' => 1,
+            'B' => 2,
+            'C' => 3,
+            'D' => 4,
+            'E' => 5,
+            'F' => 6,
+        ];
 
-            // mapping array for taxTypeCode to tax_id
-            $taxTypeMapping = [
-                'A' => 1,
-                'B' => 2,
-                'C' => 3,
-                'D' => 4,
-                'E' => 5,
-                'F' => 6,
-            ];
+        // Determine the tax_id based on taxTypeCode
+        $taxIdCode = isset($data['taxTyCd']) && array_key_exists($data['taxTyCd'], $taxTypeMapping)
+            ? $taxTypeMapping[$data['taxTyCd']]
+            : null;
 
-            // tax_id based on taxTypeCode
-            $taxIdCode = isset($data['taxTyCd']) && array_key_exists($data['taxTyCd'], $taxTypeMapping)
-                ? $taxTypeMapping[$data['taxTyCd']]
-                : null;
+        // Handling image upload with storage limit check
+        if (!empty($data['pro_image']) && $data['pro_image']->isValid()) {
+            \Log::info('Image File Object for Item being edited');
+            $image_size = $data['pro_image']->getSize();
+            $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
 
-            // Handling image upload with storage limit check
-            if (!empty($data['pro_image']) && $data['pro_image']->isValid()) {
-                \Log::info('Image File Object for Item being edited');
-                $image_size = $data['pro_image']->getSize();
-                $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
+            if ($result == 1) {
+                $fileName = $data['pro_image']->getClientOriginalName();
+                $dir = 'uploads/pro_image';
+                $path = Utility::upload_file($data, 'pro_image', $fileName, $dir, []);
 
-                if ($result == 1) {
-                    $fileName = $data['pro_image']->getClientOriginalName();
-                    $dir = 'uploads/pro_image';
-                    $path = Utility::upload_file($data, 'pro_image', $fileName, $dir, []);
+                \Log::info('PATH');
+                \Log::info($path);
 
-                    \Log::info('PATH');
-                    \Log::info($path);
-
-                    // Update the product Service information including the new image name
-                    $iteminformation->update([
-                        'name' => $data['itemNm'],
-                        'sku' => $data['sku'],
-                        'sale_price' => $data['sale_price'],
-                        'purchase_price' => $data['purchase_price'],
-                        'quantity' => $data['quantity'],
-                        'tax_id' => $taxIdCode,
-                        'category_id' => $data['category_id'],
-                        'unit_id' => $data['unit_id'],
-                        'type' => $data['type'],
-                        'sale_chartaccount_id' => $data['sale_chartaccount_id'],
-                        'expense_chartaccount_id' => $data['expense_chartaccount_id'],
-                        'description' => $data['description'],
-                        'pro_image' => $fileName,
-                        'tin' => $data['tin'],
-                        'itemCd' => $data['itemCd'],
-                        'itemClsCd' => $data['itemClsCd'],
-                        'itemTyCd' => $data['itemTyCd'],
-                        'itemNm' => $data['itemNm'],
-                        'itemStdNm' => $data['itemStdNm'],
-                        'orgnNatCd' => $data['orgnNatCd'],
-                        'pkgUnitCd' => $data['pkgUnitCd'],
-                        'qtyUnitCd' => $data['qtyUnitCd'],
-                        'taxTyCd' => $data['taxTyCd'],
-                        'btchNo' => $data['btchNo'],
-                        'regBhfId' => $data['regBhfId'],
-                        'bcd' => $data['bcd'],
-                        'dftPrc' => $data['dftPrc'],
-                        'grpPrcL1' => $data['grpPrcL1'],
-                        'grpPrcL2' => $data['grpPrcL2'],
-                        'grpPrcL3' => $data['grpPrcL3'],
-                        'grpPrcL4' => $data['grpPrcL4'],
-                        'grpPrcL5' => $data['grpPrcL5'],
-                        'addInfo' => $data['addInfo'],
-                        'sftyQty' => $data['sftyQty'],
-                        'isrcAplcbYn' => $data['isrcAplcbYn'],
-                        'rraModYn' => $data['isUsed'],
-                        'packageQuantity' => $data['packageQuantity'],
-                        'useYn' => $data['useYn'],
-                    ]);
-                } else {
-                    \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
-                    return redirect()->back()->with('error', 'Storage limit exceeded.');
-                }
-            } else {
-                // Update the Product Service information without changing the image
+                // Update the product Service information including the new image name
                 $iteminformation->update([
                     'name' => $data['itemNm'],
                     'sku' => $data['sku'],
@@ -607,6 +560,7 @@ class ProductServiceController extends Controller
                     'sale_chartaccount_id' => $data['sale_chartaccount_id'],
                     'expense_chartaccount_id' => $data['expense_chartaccount_id'],
                     'description' => $data['description'],
+                    'pro_image' => $fileName,
                     'tin' => $data['tin'],
                     'itemCd' => $data['itemCd'],
                     'itemClsCd' => $data['itemClsCd'],
@@ -633,15 +587,59 @@ class ProductServiceController extends Controller
                     'packageQuantity' => $data['packageQuantity'],
                     'useYn' => $data['useYn'],
                 ]);
+            } else {
+                \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
+                return redirect()->back()->with('error', 'Storage limit exceeded.');
             }
-
-            return redirect()->route('productservice.index')->with('success', 'Product / Service Updated Successfully');
-        } catch (\Exception $e) {
-            \Log::error('UPDATE PRODUCT SERVICE ERROR', $e);
-            \Log::info($e);            
-            return redirect()->back()->with('error', 'Something Went Wrong');
+        } else {
+            // Update the Product Service information without changing the image
+            $iteminformation->update([
+                'name' => $data['itemNm'],
+                'sku' => $data['sku'],
+                'sale_price' => $data['sale_price'],
+                'purchase_price' => $data['purchase_price'],
+                'quantity' => $data['quantity'],
+                'tax_id' => $taxIdCode,
+                'category_id' => $data['category_id'],
+                'unit_id' => $data['unit_id'],
+                'type' => $data['type'],
+                'sale_chartaccount_id' => $data['sale_chartaccount_id'],
+                'expense_chartaccount_id' => $data['expense_chartaccount_id'],
+                'description' => $data['description'],
+                'tin' => $data['tin'],
+                'itemCd' => $data['itemCd'],
+                'itemClsCd' => $data['itemClsCd'],
+                'itemTyCd' => $data['itemTyCd'],
+                'itemNm' => $data['itemNm'],
+                'itemStdNm' => $data['itemStdNm'],
+                'orgnNatCd' => $data['orgnNatCd'],
+                'pkgUnitCd' => $data['pkgUnitCd'],
+                'qtyUnitCd' => $data['qtyUnitCd'],
+                'taxTyCd' => $data['taxTyCd'],
+                'btchNo' => $data['btchNo'],
+                'regBhfId' => $data['regBhfId'],
+                'bcd' => $data['bcd'],
+                'dftPrc' => $data['dftPrc'],
+                'grpPrcL1' => $data['grpPrcL1'],
+                'grpPrcL2' => $data['grpPrcL2'],
+                'grpPrcL3' => $data['grpPrcL3'],
+                'grpPrcL4' => $data['grpPrcL4'],
+                'grpPrcL5' => $data['grpPrcL5'],
+                'addInfo' => $data['addInfo'],
+                'sftyQty' => $data['sftyQty'],
+                'isrcAplcbYn' => $data['isrcAplcbYn'],
+                'rraModYn' => $data['isUsed'],
+                'packageQuantity' => $data['packageQuantity'],
+                'useYn' => $data['useYn'],
+            ]);
         }
+
+        return redirect()->route('productservice.index')->with('success', 'Product / Service Updated Successfully');
+    } catch (\Exception $e) {
+        \Log::error('UPDATE PRODUCT SERVICE ERROR', ['exception' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+        return redirect()->back()->with('error', 'Something Went Wrong');
     }
+}
     public function edit($id)
     {
         if (\Auth::user()->can('manage product & service')) {
