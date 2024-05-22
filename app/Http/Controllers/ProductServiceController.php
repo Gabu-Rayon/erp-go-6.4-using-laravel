@@ -70,7 +70,6 @@ class ProductServiceController extends Controller
 
 
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
-            $category     = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
             $unit         = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $tax          = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $incomeChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
@@ -165,7 +164,10 @@ class ProductServiceController extends Controller
                     if ($result == 1) {
                         $fileName = $item['pro_image']->getClientOriginalName();
                         $dir = 'uploads/pro_image';
-                        $path = Utility::upload_file($request, 'pro_image', $fileName, $dir, []);
+                        $path = Utility::upload_file($item, 'pro_image', $fileName, $dir, []);
+
+                        \Log::info('PATH');
+                        \Log::info($path);
 
                         $productService = ProductService::create([
                             'name' => $item['itemName'] ?? null,
@@ -223,9 +225,12 @@ class ProductServiceController extends Controller
             }
 
             // Post data to the external API
-            $response = \Http::withHeaders([
+            $response = \Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
+                'key' => '123456'
             ])->post('https://etims.your-apps.biz/api/AddItemsList', $apiData);
 
             // Log response data
@@ -1559,7 +1564,9 @@ private function constructProductData($item, $key)
         // ])->get($url);
 
 
-        $response = Http::withHeaders([
+        $response = Http::withOptions([
+            'verify' => false
+        ])->withHeaders([
             'key' => '123456'
         ])->timeout(300)->get($url);
 
