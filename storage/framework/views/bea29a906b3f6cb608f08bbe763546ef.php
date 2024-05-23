@@ -116,46 +116,42 @@
                 const stot = (subTotal + totalDiscount) - totalTax;
                 $('.subTotal').html(stot.toFixed(2));
                 $('.totalAmount').html(subTotal.toFixed(2));
-        }
-
-    // Function to calculate total discount
-    function calculateTotalDiscount() {
-        var discounts = $(".discountAmount");
-        var totalDiscount = 0;
-        for (var i = 0; i < discounts.length; i++) {
-            totalDiscount += parseFloat($(discounts[i]).val()) || parseFloat(0);
-        }
-        $('.totalDiscount').html(totalDiscount.toFixed(2));
-    }
-
-    // Function to calculate total tax
-    function calculateTotalTax() {
-        var taxAmounts = $(".taxAmount");
-        var totalTax = 0;
-        for (var i = 0; i < taxAmounts.length; i++) {
-            totalTax += parseFloat($(taxAmounts[i]).val()) || parseFloat(0);
-        }
-        $('.totalTax').html(totalTax.toFixed(2));
-    }
-
-    // Trigger calculations when page loads
-    calculateSubtotal();
-    calculateTotalDiscount();
-    calculateTotalTax();
-
-    // Trigger calculations when relevant inputs change
-    $(document).on('change', '.quantity, .unitPrice, .pkgQuantity, .discount, .taxCode', function() {
-        calculateSubtotal();
-        calculateTotalDiscount();
-        calculateTotalTax();
-    });
-
-    // Trigger calculations when an item is removed
-    $(document).on('click', '[data-repeater-delete]', function () {
-        calculateSubtotal();
-        calculateTotalDiscount();
-        calculateTotalTax();
-    });
+            }
+            
+            function calculateTotalDiscount() {
+                var discounts = $(".discountAmount");
+                var totalDiscount = 0;
+                for (var i = 0; i < discounts.length; i++) {
+                    totalDiscount += parseFloat($(discounts[i]).val()) || parseFloat(0);
+                }
+                $('.totalDiscount').html(totalDiscount.toFixed(2));
+            }
+            
+            function calculateTotalTax() {
+                var taxAmounts = $(".taxAmount");
+                var totalTax = 0;
+                for (var i = 0; i < taxAmounts.length; i++) {
+                    totalTax += parseFloat($(taxAmounts[i]).val()) || parseFloat(0);
+                }
+                $('.totalTax').html(totalTax.toFixed(2));
+            }
+            
+            calculateSubtotal();
+            calculateTotalDiscount();
+            calculateTotalTax();
+            
+            $(document).on('change', '.quantity, .unitPrice, .pkgQuantity, .discount, .taxCode', function() {
+                calculateSubtotal();
+                calculateTotalDiscount();
+                calculateTotalTax();
+            });
+            
+            $(document).on('click', '[data-repeater-delete]', function () {
+                calculateSubtotal();
+                calculateTotalDiscount();
+                calculateTotalTax();
+            });
+            
             $(document).on('change', '.itemCode', async function() {
                 const el = $(this);
                 const id = $(this).val();
@@ -284,7 +280,7 @@
                 $(el).closest('tr').find('.amount').html(parseFloat(finalAmount));
                 });
 
-            // Initialize Select2 for all select elements with the class 'select2'
+                
             $('.select2').select2({
                 templateResult: function(data) {
                     var $option = $(data.element);
@@ -344,9 +340,9 @@
 
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <?php echo e(Form::label('traderInvoiceNo', __('Trader Invoive No (*)'), ['class' => 'form-label'])); ?>
+                                    <?php echo e(Form::label('traderInvoiceNo', __('Trader Invoice No (*)'), ['class' => 'form-label'])); ?>
 
-                                    <?php echo e(Form::text('traderInvoiceNo', $invoice_number, array('class' => 'form-control', 'required' => true, 'readonly' => 'readonly'))); ?>
+                                    <?php echo e(Form::text('traderInvoiceNo', $invoice_number, array('class' => 'form-control', 'required' =>'required',))); ?>
 
                                 </div>
                                 <div class="form-group col-md-4">
@@ -577,6 +573,8 @@
                 </div>
             </div>
         </div>
+
+
         <div class="modal-footer">
             <input type="button" value="<?php echo e(__('Cancel')); ?>" onclick="location.href = '<?php echo e(route("invoice.index")); ?>';" class="btn btn-light">
             <input type="submit" value="<?php echo e(__('Create')); ?>" class="btn btn-primary">

@@ -539,7 +539,9 @@ class InvoiceController extends Controller
         $saleItemList = [];
 
         foreach ($items as $item) {
-            $itemDetails = ProductService::where('itemCd', $item['itemCode'])->first();
+            \Log::info('MAVITU');
+            \Log::info($item);
+            $itemDetails = ProductService::where('itemCd', $item['item'])->first();
             $itemExprDate = $this->formatDate($item['itemExprDate']);
             $saleItemList[] = [
                 "itemCode" => $itemDetails->itemCd,
@@ -548,20 +550,15 @@ class InvoiceController extends Controller
                 "itemName" => $itemDetails->itemNm,
                 "orgnNatCd" => $itemDetails->orgnNatCd,
                 "taxTypeCode" => $itemDetails->taxTyCd,
-                "unitPrice" => $item['unitPrice'],
+                "unitPrice" => $item['price'],
                 "isrcAplcbYn" => $itemDetails->isrcAplcbYn,
                 "pkgUnitCode" => $itemDetails->pkgUnitCd,
                 "pkgQuantity" => $item['pkgQuantity'],
                 "tax" => $item['tax'],
                 "qtyUnitCd" => $itemDetails->qtyUnitCd,
                 "quantity" => $item['quantity'],
-                "discountRate" => $item['discountRate'],
-                "discountAmt" => $this->calculateDiscountAmount(
-                    $item['pkgQuantity'],
-                    $item['quantity'],
-                    $item['unitPrice'],
-                    $item['discountRate']
-                ),
+                "discountRate" => $item['discount'],
+                "discountAmt" => $item['discountAmount'],
                 "itemExprDate" => $itemExprDate
             ];
         }
