@@ -140,6 +140,8 @@
                                     </tr>
                                     </thead>
                                     <tbody id="tbody">
+                                        {{ \Log::info('LAST SEGMENT') }}
+                                        {{ \Log::info(session($lastsegment)) }}
                                         @if(session($lastsegment) && !empty(session($lastsegment)) && count(session($lastsegment)) > 0)
                                         @foreach(session($lastsegment) as $id => $details)
                                             @php

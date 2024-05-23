@@ -146,6 +146,10 @@
                                     </tr>
                                     </thead>
                                     <tbody id="tbody">
+                                        <?php echo e(\Log::info('LAST SEGMENT')); ?>
+
+                                        <?php echo e(\Log::info(session($lastsegment))); ?>
+
                                         <?php if(session($lastsegment) && !empty(session($lastsegment)) && count(session($lastsegment)) > 0): ?>
                                         <?php $__currentLoopData = session($lastsegment); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $id => $details): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <?php

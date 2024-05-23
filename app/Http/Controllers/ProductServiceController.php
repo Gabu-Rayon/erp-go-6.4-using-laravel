@@ -140,7 +140,6 @@ class ProductServiceController extends Controller
                 \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
 
                 $apiData = [];
-                $openingStockData = [];
 
                 // Define the mapping array for taxTypeCode to tax_id
                 $taxTypeMapping = [
@@ -172,7 +171,7 @@ class ProductServiceController extends Controller
                             $path = Utility::upload_file($item, 'pro_image', $fileName, $dir, []);
 
                             \Log::info('product image path:', $path);
-
+                            
                             // Assign the file name to the pro_image field
                             $item['pro_image'] = $fileName;
 
@@ -220,15 +219,8 @@ class ProductServiceController extends Controller
 
                             $productService->save();
 
-                            // data for the API
+                            // Prepare data for the API
                             $apiData[] = $this->constructProductData($item, $index);
-
-                            // data for opening stock API
-                            $openingStockData[] = [
-                                "itemCode" => $item["itemCode"] ?? null,
-                                "quantity" => $item["quantity"] ?? null,
-                                "packageQuantity" => $item["packageQuantity"] ?? null
-                            ];
                         } else {
                             \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
                             return redirect()->back()->with('error', 'Storage limit exceeded.');
@@ -254,28 +246,6 @@ class ProductServiceController extends Controller
 
                 if ($response->successful()) {
                     \Log::info('Data successfully posted to the API');
-
-                    // Post opening stock data to the external API
-                    $openingStockResponse = \Http::withOptions([
-                        'verify' => false
-                    ])->withHeaders([
-                                'Accept' => 'application/json',
-                                'Content-Type' => 'application/json',
-                                'key' => '123456'
-                            ])->post('https://etims.your-apps.biz/api/ItemOpeningStock', [
-                                'openingItemsLists' => $openingStockData
-                            ]);
-
-                    // Log opening stock response data
-                    \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $openingStockResponse->status());
-                    \Log::info('API Request Opening Stock Data Posted: ' . json_encode($openingStockData));
-                    \Log::info('API Response Body For Posting Opening Stock Data: ' . $openingStockResponse->body());
-
-                    if ($openingStockResponse->successful()) {
-                        \Log::info('Opening stock data successfully posted to the API');
-                    } else {
-                        \Log::error('Error posting opening stock data to the API: ' . $openingStockResponse->body());
-                    }
                 } else {
                     \Log::error('Error posting data to the API: ' . $response->body());
                 }
@@ -301,7 +271,7 @@ class ProductServiceController extends Controller
             "itemStrdName" => $item["itemStrdName"],
             "countryCode" => $item["countryCode"],
             "pkgUnitCode" => $item["pkgUnitCode"],
-            "qtyUnitCode" => $item["qtyUnitCode"],
+            "qtyUnitCode" => $item["pkgUnitCode"],
             "taxTypeCode" => $item["taxTypeCode"],
             "batchNo" => $item["batchNo"],
             "barcode" => $item["barcode"],
@@ -483,146 +453,100 @@ class ProductServiceController extends Controller
 //     }
 
 
-    public function update(Request $request, $id)
-    {
-        $iteminformation = ProductService::find($id);
-        \Log::info('Product Service INFO being edited :', ['item' => $iteminformation]);
-        try {
-            $request->validate([
-                'itemCd' => 'required',
-                'itemClsCd' => 'required',
-                'itemTyCd' => 'required',
-                'itemNm' => 'required',
-                'orgnNatCd' => 'required',
-                'pkgUnitCd' => 'required',
-                'qtyUnitCd' => 'required',
-                'taxTyCd' => 'required',
-                'dftPrc' => 'required',
-                'isrcAplcbYn' => 'required',
-                'useYn' => 'required',
-            ]);
+   public function update(Request $request, $id)
+{
+    $iteminformation = ProductService::find($id);
+    \Log::info('Product Service INFO being edited :', ['item' => $iteminformation]);
+    try {
+        $request->validate([
+            'itemCd' => 'required',
+            'itemClsCd' => 'required',
+            'itemTyCd' => 'required',
+            'itemNm' => 'required',
+            'orgnNatCd' => 'required',
+            'pkgUnitCd' => 'required',
+            'qtyUnitCd' => 'required',
+            'taxTyCd' => 'required',
+            'dftPrc' => 'required',
+            'isrcAplcbYn' => 'required',
+            'useYn' => 'required',
+        ]);
 
-            $data = $request->all();
-            \Log::info('Product Service INFO being edited and posted to the API:', $data);
+        $data = $request->all();
+        \Log::info('Product Service INFO being edited and posted to the API:', $data);
 
-            $reqData = [
-                "itemCode" => $data['itemCd'],
-                "itemClassifiCode" => $data['itemClsCd'],
-                "itemTypeCode" => $data['itemTyCd'],
-                "itemName" => $data['itemNm'],
-                "itemStrdName" => $data['itemStdNm'],
-                "countryCode" => $data['orgnNatCd'],
-                "pkgUnitCode" => $data['pkgUnitCd'],
-                "qtyUnitCode" => $data['qtyUnitCd'],
-                "taxTypeCode" => $data['taxTyCd'],
-                "batchNo" => $data['btchNo'],
-                "barcode" => $data['bcd'],
-                "unitPrice" => $data['dftPrc'],
-                "group1UnitPrice" => $data['grpPrcL1'],
-                "group2UnitPrice" => $data['grpPrcL2'],
-                "group3UnitPrice" => $data['grpPrcL3'],
-                "group4UnitPrice" => $data['grpPrcL4'],
-                "group5UnitPrice" => $data['grpPrcL5'],
-                "additionalInfo" => $data['addInfo'],
-                "saftyQuantity" => $data['saftyQuantity'],
-                "isInrcApplicable" => (boolean) $data['isrcAplcbYn'],
-                "isUsed" => (boolean) $data['useYn'],
-                "packageQuantity" => $data['packageQuantity'],
-            ];
+        $reqData = [
+            "itemCode" => $data['itemCd'],
+            "itemClassifiCode" => $data['itemClsCd'],
+            "itemTypeCode" => $data['itemTyCd'],
+            "itemName" => $data['itemNm'],
+            "itemStrdName" => $data['itemStdNm'],
+            "countryCode" => $data['orgnNatCd'],
+            "pkgUnitCode" => $data['pkgUnitCd'],
+            "qtyUnitCode" => $data['qtyUnitCd'],
+            "taxTypeCode" => $data['taxTyCd'],
+            "batchNo" => $data['btchNo'],
+            "barcode" => $data['bcd'],
+            "unitPrice" => $data['dftPrc'],
+            "group1UnitPrice" => $data['grpPrcL1'],
+            "group2UnitPrice" => $data['grpPrcL2'],
+            "group3UnitPrice" => $data['grpPrcL3'],
+            "group4UnitPrice" => $data['grpPrcL4'],
+            "group5UnitPrice" => $data['grpPrcL5'],
+            "additionalInfo" => $data['addInfo'],
+            "saftyQuantity" => $data['saftyQuantity'],
+            "isInrcApplicable" => (boolean) $data['isrcAplcbYn'],
+            "isUsed" => (boolean) $data['useYn'],
+            "packageQuantity" => $data['packageQuantity'],
+        ];
 
-            $response = Http::withOptions([
-                'verify' => false
-            ])->withHeaders([
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/json',
-                        'key' => '123456'
-                    ])->post('https://etims.your-apps.biz/api/UpdateItem', $reqData);
+        $response = Http::withOptions([
+            'verify' => false
+        ])->withHeaders([
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+            'key' => '123456'
+        ])->post('https://etims.your-apps.biz/api/UpdateItem', $reqData);
 
-            $res = $response->json();
+        $res = $response->json();
 
-            \Log::info('API Request Data: ' . json_encode($reqData));
-            \Log::info('API RESPONSE when posting the Product Details When being Edited: ', ['response' => $res]);
+        \Log::info('API Request Data: ' . json_encode($reqData));
+        \Log::info('API RESPONSE when posting the Product Details When being Edited: ', ['response' => $res]);
 
-            if ($res['statusCode'] != 200) {
-                return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
-            }
+        if ($res['statusCode'] != 200) {
+            return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
+        }
 
-            // Mapping array for taxTypeCode to tax_id
-            $taxTypeMapping = [
-                'A' => 1,
-                'B' => 2,
-                'C' => 3,
-                'D' => 4,
-                'E' => 5,
-                'F' => 6,
-            ];
+        // Mapping array for taxTypeCode to tax_id
+        $taxTypeMapping = [
+            'A' => 1,
+            'B' => 2,
+            'C' => 3,
+            'D' => 4,
+            'E' => 5,
+            'F' => 6,
+        ];
 
-            // Determine the tax_id based on taxTypeCode
-            $taxIdCode = isset($data['taxTyCd']) && array_key_exists($data['taxTyCd'], $taxTypeMapping)
-                ? $taxTypeMapping[$data['taxTyCd']]
-                : null;
+        // Determine the tax_id based on taxTypeCode
+        $taxIdCode = isset($data['taxTyCd']) && array_key_exists($data['taxTyCd'], $taxTypeMapping)
+            ? $taxTypeMapping[$data['taxTyCd']]
+            : null;
 
-            // Handling image upload with storage limit check
-            if (!empty($data['pro_image']) && $data['pro_image']->isValid()) {
-                \Log::info('Image File Object for Item being edited');
-                $image_size = $data['pro_image']->getSize();
-                $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
+        // Handling image upload with storage limit check
+        if (!empty($data['pro_image']) && $data['pro_image']->isValid()) {
+            \Log::info('Image File Object for Item being edited');
+            $image_size = $data['pro_image']->getSize();
+            $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
 
-                if ($result == 1) {
-                    $fileName = $data['pro_image']->getClientOriginalName();
-                    $dir = 'uploads/pro_image';
-                    $path = Utility::upload_file($data, 'pro_image', $fileName, $dir, []);
+            if ($result == 1) {
+                $fileName = $data['pro_image']->getClientOriginalName();
+                $dir = 'uploads/pro_image';
+                $path = Utility::upload_file($data, 'pro_image', $fileName, $dir, []);
 
-                    \Log::info('PATH');
-                    \Log::info($path);
+                \Log::info('PATH');
+                \Log::info($path);
 
-                    // Update the product Service information including the new image name
-                    $iteminformation->update([
-                        'name' => $data['itemNm'],
-                        'sku' => $data['sku'],
-                        'sale_price' => $data['sale_price'],
-                        'purchase_price' => $data['purchase_price'],
-                        'quantity' => $data['quantity'],
-                        'tax_id' => $taxIdCode,
-                        'category_id' => $data['category_id'],
-                        'unit_id' => $data['unit_id'],
-                        'type' => $data['type'],
-                        'sale_chartaccount_id' => $data['sale_chartaccount_id'],
-                        'expense_chartaccount_id' => $data['expense_chartaccount_id'],
-                        'description' => $data['description'],
-                        'pro_image' => $fileName,
-                        'tin' => $data['tin'],
-                        'itemCd' => $data['itemCd'],
-                        'itemClsCd' => $data['itemClsCd'],
-                        'itemTyCd' => $data['itemTyCd'],
-                        'itemNm' => $data['itemNm'],
-                        'itemStdNm' => $data['itemStdNm'],
-                        'orgnNatCd' => $data['orgnNatCd'],
-                        'pkgUnitCd' => $data['pkgUnitCd'],
-                        'qtyUnitCd' => $data['qtyUnitCd'],
-                        'taxTyCd' => $data['taxTyCd'],
-                        'btchNo' => $data['btchNo'],
-                        'regBhfId' => $data['regBhfId'],
-                        'bcd' => $data['bcd'],
-                        'dftPrc' => $data['dftPrc'],
-                        'grpPrcL1' => $data['grpPrcL1'],
-                        'grpPrcL2' => $data['grpPrcL2'],
-                        'grpPrcL3' => $data['grpPrcL3'],
-                        'grpPrcL4' => $data['grpPrcL4'],
-                        'grpPrcL5' => $data['grpPrcL5'],
-                        'addInfo' => $data['addInfo'],
-                        'sftyQty' => $data['sftyQty'],
-                        'isrcAplcbYn' => $data['isrcAplcbYn'],
-                        'rraModYn' => $data['isUsed'],
-                        'packageQuantity' => $data['packageQuantity'],
-                        'useYn' => $data['useYn'],
-                    ]);
-                } else {
-                    \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
-                    return redirect()->back()->with('error', 'Storage limit exceeded.');
-                }
-            } else {
-                // Update the Product Service information without changing the image
+                // Update the product Service information including the new image name
                 $iteminformation->update([
                     'name' => $data['itemNm'],
                     'sku' => $data['sku'],
@@ -636,6 +560,7 @@ class ProductServiceController extends Controller
                     'sale_chartaccount_id' => $data['sale_chartaccount_id'],
                     'expense_chartaccount_id' => $data['expense_chartaccount_id'],
                     'description' => $data['description'],
+                    'pro_image' => $fileName,
                     'tin' => $data['tin'],
                     'itemCd' => $data['itemCd'],
                     'itemClsCd' => $data['itemClsCd'],
@@ -662,14 +587,59 @@ class ProductServiceController extends Controller
                     'packageQuantity' => $data['packageQuantity'],
                     'useYn' => $data['useYn'],
                 ]);
+            } else {
+                \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
+                return redirect()->back()->with('error', 'Storage limit exceeded.');
             }
-
-            return redirect()->route('productservice.index')->with('success', 'Product / Service Updated Successfully');
-        } catch (\Exception $e) {
-            \Log::error('UPDATE PRODUCT SERVICE ERROR', ['exception' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            return redirect()->back()->with('error', 'Something Went Wrong');
+        } else {
+            // Update the Product Service information without changing the image
+            $iteminformation->update([
+                'name' => $data['itemNm'],
+                'sku' => $data['sku'],
+                'sale_price' => $data['sale_price'],
+                'purchase_price' => $data['purchase_price'],
+                'quantity' => $data['quantity'],
+                'tax_id' => $taxIdCode,
+                'category_id' => $data['category_id'],
+                'unit_id' => $data['unit_id'],
+                'type' => $data['type'],
+                'sale_chartaccount_id' => $data['sale_chartaccount_id'],
+                'expense_chartaccount_id' => $data['expense_chartaccount_id'],
+                'description' => $data['description'],
+                'tin' => $data['tin'],
+                'itemCd' => $data['itemCd'],
+                'itemClsCd' => $data['itemClsCd'],
+                'itemTyCd' => $data['itemTyCd'],
+                'itemNm' => $data['itemNm'],
+                'itemStdNm' => $data['itemStdNm'],
+                'orgnNatCd' => $data['orgnNatCd'],
+                'pkgUnitCd' => $data['pkgUnitCd'],
+                'qtyUnitCd' => $data['qtyUnitCd'],
+                'taxTyCd' => $data['taxTyCd'],
+                'btchNo' => $data['btchNo'],
+                'regBhfId' => $data['regBhfId'],
+                'bcd' => $data['bcd'],
+                'dftPrc' => $data['dftPrc'],
+                'grpPrcL1' => $data['grpPrcL1'],
+                'grpPrcL2' => $data['grpPrcL2'],
+                'grpPrcL3' => $data['grpPrcL3'],
+                'grpPrcL4' => $data['grpPrcL4'],
+                'grpPrcL5' => $data['grpPrcL5'],
+                'addInfo' => $data['addInfo'],
+                'sftyQty' => $data['sftyQty'],
+                'isrcAplcbYn' => $data['isrcAplcbYn'],
+                'rraModYn' => $data['isUsed'],
+                'packageQuantity' => $data['packageQuantity'],
+                'useYn' => $data['useYn'],
+            ]);
         }
+
+        return redirect()->route('productservice.index')->with('success', 'Product / Service Updated Successfully');
+    } catch (\Exception $e) {
+        \Log::error('UPDATE PRODUCT SERVICE ERROR', ['exception' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+        return redirect()->back()->with('error', 'Something Went Wrong');
     }
+}
     public function edit($id)
     {
         if (\Auth::user()->can('manage product & service')) {
@@ -970,8 +940,7 @@ class ProductServiceController extends Controller
         return view('productservice.detail', compact('products'));
     }
 
-    public function searchProducts(Request $request)
-    {
+    public function searchProducts(Request $request) {
 
         $lastsegment = $request->session_key;
 
@@ -1021,10 +990,10 @@ class ProductServiceController extends Controller
                     if ($request->session_key == 'purchases') {
                         $productprice = $product->purchase_price != 0 ? $product->purchase_price : 0;
                     } else if ($request->session_key == 'pos') {
-                        $productprice = $product->sale_price != 0 ? $product->sale_price : 0;
+                        $productprice = $product->dftPrc != 0 ? $product->dftPrc : 0;
 
                     } else {
-                        $productprice = $product->sale_price != 0 ? $product->sale_price : $product->purchase_price;
+                        $productprice = $product->dftPrc != 0 ? $product->dftPrc : $product->purchase_price;
                     }
 
                     $output .= '
@@ -1060,123 +1029,195 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function addToCart(Request $request, $id, $session_key)
-    {
+    public function addToCart(Request $request, $id, $session_key) {
 
-        if (Auth::user()->can('manage product & service') && $request->ajax()) {
-            $product = ProductService::find($id);
-            $productquantity = 0;
-
-            if ($product) {
-                $productquantity = $product->getTotalProductQuantity();
-            }
-
-            if (!$product || ($session_key == 'pos' && $productquantity == 0)) {
-                return response()->json(
-                    [
-                        'code' => 404,
-                        'status' => 'Error',
-                        'error' => __('This product is out of stock!'),
-                    ],
-                    404
-                );
-            }
-
-            $productname = $product->name;
-
-            if ($session_key == 'purchases') {
-
-                $productprice = $product->purchase_price != 0 ? $product->purchase_price : 0;
-            } else if ($session_key == 'pos') {
-
-                $productprice = $product->sale_price != 0 ? $product->sale_price : 0;
-            } else {
-
-                $productprice = $product->sale_price != 0 ? $product->sale_price : $product->purchase_price;
-            }
-
-            $originalquantity = (int) $productquantity;
-
-            $taxes = Utility::tax($product->tax_id);
-
-            $totalTaxRate = Utility::totalTaxRate($product->tax_id);
-
-            $product_tax = '';
-            $product_tax_id = [];
-            foreach ($taxes as $tax) {
-                $product_tax .= !empty($tax) ? "<span class='badge badge-primary'>" . $tax->name . ' (' . $tax->rate . '%)' . "</span><br>" : '';
-                $product_tax_id[] = !empty($tax) ? $tax->id : 0;
-            }
-
-            if (empty($product_tax)) {
-                $product_tax = "-";
-            }
-            $producttax = $totalTaxRate;
-
-
-            $tax = ($productprice * $producttax) / 100;
-
-            $subtotal = $productprice + $tax;
-            $cart = session()->get($session_key);
-            $image_url = (!empty($product->pro_image) && Storage::exists($product->pro_image)) ? $product->pro_image : 'uploads/pro_image/' . $product->pro_image;
-
-            $model_delete_id = 'delete-form-' . $id;
-
-            $carthtml = '';
-
-            $carthtml .= '<tr data-product-id="' . $id . '" id="product-id-' . $id . '">
-                            <td class="cart-images">
-                                <img alt="Image placeholder" src="' . asset(Storage::url($image_url)) . '" class="card-image avatar shadow hover-shadow-lg">
-                            </td>
-
-                            <td class="name">' . $productname . '</td>
-
-                            <td class="">
-                                   <span class="quantity buttons_added">
-                                         <input type="button" value="-" class="minus">
-                                         <input type="number" step="1" min="1" max="" name="quantity" title="' . __('Quantity') . '" class="input-number" size="4" data-url="' . url('update-cart/') . '" data-id="' . $id . '">
-                                         <input type="button" value="+" class="plus">
-                                   </span>
-                            </td>
-
-
-                            <td class="tax">' . $product_tax . '</td>
-
-                            <td class="price">' . Auth::user()->priceFormat($productprice) . '</td>
-
-                            <td class="subtotal">' . Auth::user()->priceFormat($subtotal) . '</td>
-
-                            <td class="">
-                                 <a href="#" class="action-btn bg-danger bs-pass-para-pos" data-confirm="' . __("Are You Sure?") . '" data-text="' . __("This action can not be undone. Do you want to continue?") . '" data-confirm-yes=' . $model_delete_id . ' title="' . __('Delete') . '}" data-id="' . $id . '" title="' . __('Delete') . '"   >
-                                   <span class=""><i class="ti ti-trash btn btn-sm text-white"></i></span>
-                                 </a>
-                                 <form method="post" action="' . url('remove-from-cart') . '"  accept-charset="UTF-8" id="' . $model_delete_id . '">
-                                      <input name="_method" type="hidden" value="DELETE">
-                                      <input name="_token" type="hidden" value="' . csrf_token() . '">
-                                      <input type="hidden" name="session_key" value="' . $session_key . '">
-                                      <input type="hidden" name="id" value="' . $id . '">
-                                 </form>
-
-                            </td>
-                        </td>';
-
-            // if cart is empty then this the first product
-            if (!$cart) {
-                $cart = [
-                    $id => [
-                        "name" => $productname,
-                        "quantity" => 1,
-                        "price" => $productprice,
-                        "id" => $id,
-                        "tax" => $producttax,
-                        "subtotal" => $subtotal,
-                        "originalquantity" => $originalquantity,
-                        "product_tax" => $product_tax,
-                        "product_tax_id" => !empty($product_tax_id) ? implode(',', $product_tax_id) : 0,
-                    ],
+        try {
+            if (Auth::user()->can('manage product & service') && $request->ajax()) {
+                $product = WarehouseProduct::where('product_id', $id)->first();
+                $productquantity = 0;
+    
+                if ($product) {
+                    $productquantity = $product->quantity;
+                }
+    
+                if (!$product || ($session_key == 'pos' && $productquantity == 0)) {
+                    return response()->json(
+                        [
+                            'code' => 404,
+                            'status' => 'Error',
+                            'error' => __('This product is out of stock!'),
+                        ],
+                        404
+                    );
+                }
+    
+                $productname = $product->name;
+    
+                if ($session_key == 'purchases') {
+    
+                    $productprice = $product->purchase_price != 0 ? $product->purchase_price : 0;
+                } else if ($session_key == 'pos') {
+    
+                    $productprice = $product->sale_price != 0 ? $product->sale_price : 0;
+                } else {
+    
+                    $productprice = $product->sale_price != 0 ? $product->sale_price : $product->purchase_price;
+                }
+    
+                $originalquantity = (int) $productquantity;
+    
+                $taxes = Utility::tax($product->tax_id);
+    
+                $totalTaxRate = Utility::totalTaxRate($product->tax_id);
+    
+                $product_tax = '';
+                $product_tax_id = [];
+                foreach ($taxes as $tax) {
+                    $product_tax .= !empty($tax) ? "<span class='badge badge-primary'>" . $tax->name . ' (' . $tax->rate . '%)' . "</span><br>" : '';
+                    $product_tax_id[] = !empty($tax) ? $tax->id : 0;
+                }
+    
+                if (empty($product_tax)) {
+                    $product_tax = "-";
+                }
+                $producttax = $totalTaxRate;
+    
+    
+                $tax = ($productprice * $producttax) / 100;
+    
+                $subtotal = $productprice + $tax;
+                $cart = session()->get($session_key);
+                $image_url = (!empty($product->pro_image) && Storage::exists($product->pro_image)) ? $product->pro_image : 'uploads/pro_image/' . $product->pro_image;
+    
+                $model_delete_id = 'delete-form-' . $id;
+    
+                $carthtml = '';
+    
+                $carthtml .= '<tr data-product-id="' . $id . '" id="product-id-' . $id . '">
+                                <td class="cart-images">
+                                    <img alt="Image placeholder" src="' . asset(Storage::url($image_url)) . '" class="card-image avatar shadow hover-shadow-lg">
+                                </td>
+    
+                                <td class="name">' . $productname . '</td>
+    
+                                <td class="">
+                                       <span class="quantity buttons_added">
+                                             <input type="button" value="-" class="minus">
+                                             <input type="number" step="1" min="1" max="" name="quantity" title="' . __('Quantity') . '" class="input-number" size="4" data-url="' . url('update-cart/') . '" data-id="' . $id . '">
+                                             <input type="button" value="+" class="plus">
+                                       </span>
+                                </td>
+    
+    
+                                <td class="tax">' . $product_tax . '</td>
+    
+                                <td class="price">' . Auth::user()->priceFormat($productprice) . '</td>
+    
+                                <td class="subtotal">' . Auth::user()->priceFormat($subtotal) . '</td>
+    
+                                <td class="">
+                                     <a href="#" class="action-btn bg-danger bs-pass-para-pos" data-confirm="' . __("Are You Sure?") . '" data-text="' . __("This action can not be undone. Do you want to continue?") . '" data-confirm-yes=' . $model_delete_id . ' title="' . __('Delete') . '}" data-id="' . $id . '" title="' . __('Delete') . '"   >
+                                       <span class=""><i class="ti ti-trash btn btn-sm text-white"></i></span>
+                                     </a>
+                                     <form method="post" action="' . url('remove-from-cart') . '"  accept-charset="UTF-8" id="' . $model_delete_id . '">
+                                          <input name="_method" type="hidden" value="DELETE">
+                                          <input name="_token" type="hidden" value="' . csrf_token() . '">
+                                          <input type="hidden" name="session_key" value="' . $session_key . '">
+                                          <input type="hidden" name="id" value="' . $id . '">
+                                     </form>
+    
+                                </td>
+                            </td>';
+    
+                // if cart is empty then this the first product
+                if (!$cart) {
+                    $cart = [
+                        $id => [
+                            "name" => $productname,
+                            "quantity" => 1,
+                            "price" => $productprice,
+                            "id" => $id,
+                            "tax" => $producttax,
+                            "subtotal" => $subtotal,
+                            "originalquantity" => $originalquantity,
+                            "product_tax" => $product_tax,
+                            "product_tax_id" => !empty($product_tax_id) ? implode(',', $product_tax_id) : 0,
+                        ],
+                    ];
+    
+    
+                    if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
+                        return response()->json(
+                            [
+                                'code' => 404,
+                                'status' => 'Error',
+                                'error' => __('This product is out of stock!'),
+                            ],
+                            404
+                        );
+                    }
+    
+                    session()->put($session_key, $cart);
+    
+                    return response()->json(
+                        [
+                            'code' => 200,
+                            'status' => 'Success',
+                            'success' => $productname . __(' added to cart successfully!'),
+                            'product' => $cart[$id],
+                            'carthtml' => $carthtml,
+                        ]
+                    );
+                }
+    
+                // if cart not empty then check if this product exist then increment quantity
+                if (isset($cart[$id])) {
+    
+                    $cart[$id]['quantity']++;
+                    $cart[$id]['id'] = $id;
+    
+                    $subtotal = $cart[$id]["price"] * $cart[$id]["quantity"];
+                    $tax = ($subtotal * $cart[$id]["tax"]) / 100;
+    
+                    $cart[$id]["subtotal"] = $subtotal + $tax;
+                    $cart[$id]["originalquantity"] = $originalquantity;
+    
+                    if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
+                        return response()->json(
+                            [
+                                'code' => 404,
+                                'status' => 'Error',
+                                'error' => __('This product is out of stock!'),
+                            ],
+                            404
+                        );
+                    }
+    
+                    session()->put($session_key, $cart);
+    
+                    return response()->json(
+                        [
+                            'code' => 200,
+                            'status' => 'Success',
+                            'success' => $productname . __(' added to cart successfully!'),
+                            'product' => $cart[$id],
+                            'carttotal' => $cart,
+                        ]
+                    );
+                }
+    
+                // if item not exist in cart then add to cart with quantity = 1
+                $cart[$id] = [
+                    "name" => $productname,
+                    "quantity" => 1,
+                    "price" => $productprice,
+                    "tax" => $producttax,
+                    "subtotal" => $subtotal,
+                    "id" => $id,
+                    "originalquantity" => $originalquantity,
+                    "product_tax" => $product_tax,
                 ];
-
-
+    
                 if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
                     return response()->json(
                         [
@@ -1187,9 +1228,9 @@ class ProductServiceController extends Controller
                         404
                     );
                 }
-
+    
                 session()->put($session_key, $cart);
-
+    
                 return response()->json(
                     [
                         'code' => 200,
@@ -1197,87 +1238,28 @@ class ProductServiceController extends Controller
                         'success' => $productname . __(' added to cart successfully!'),
                         'product' => $cart[$id],
                         'carthtml' => $carthtml,
-                    ]
-                );
-            }
-
-            // if cart not empty then check if this product exist then increment quantity
-            if (isset($cart[$id])) {
-
-                $cart[$id]['quantity']++;
-                $cart[$id]['id'] = $id;
-
-                $subtotal = $cart[$id]["price"] * $cart[$id]["quantity"];
-                $tax = ($subtotal * $cart[$id]["tax"]) / 100;
-
-                $cart[$id]["subtotal"] = $subtotal + $tax;
-                $cart[$id]["originalquantity"] = $originalquantity;
-
-                if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
-                    return response()->json(
-                        [
-                            'code' => 404,
-                            'status' => 'Error',
-                            'error' => __('This product is out of stock!'),
-                        ],
-                        404
-                    );
-                }
-
-                session()->put($session_key, $cart);
-
-                return response()->json(
-                    [
-                        'code' => 200,
-                        'status' => 'Success',
-                        'success' => $productname . __(' added to cart successfully!'),
-                        'product' => $cart[$id],
                         'carttotal' => $cart,
                     ]
                 );
-            }
-
-            // if item not exist in cart then add to cart with quantity = 1
-            $cart[$id] = [
-                "name" => $productname,
-                "quantity" => 1,
-                "price" => $productprice,
-                "tax" => $producttax,
-                "subtotal" => $subtotal,
-                "id" => $id,
-                "originalquantity" => $originalquantity,
-                "product_tax" => $product_tax,
-            ];
-
-            if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
+            } else {
                 return response()->json(
                     [
                         'code' => 404,
                         'status' => 'Error',
-                        'error' => __('This product is out of stock!'),
+                        'error' => __('This Product is not found!'),
                     ],
                     404
                 );
             }
+        } catch (\Exception $e) {
+            \Log::info('ADD TO CART ERROR');
+            \Log::info($e);
 
-            session()->put($session_key, $cart);
-
-            return response()->json(
-                [
-                    'code' => 200,
-                    'status' => 'Success',
-                    'success' => $productname . __(' added to cart successfully!'),
-                    'product' => $cart[$id],
-                    'carthtml' => $carthtml,
-                    'carttotal' => $cart,
-                ]
-            );
-        } else {
             return response()->json(
                 [
                     'code' => 404,
                     'status' => 'Error',
-                    'error' => __('This Product is not found!'),
+                    'error' => $e->getMessage(),
                 ],
                 404
             );
