@@ -1233,9 +1233,12 @@ class InvoiceController extends Controller
             $item = new \stdClass();
             $item->name = !empty($product->product) ? $product->product->name : '';
             $item->quantity = $product->quantity;
+            $item->pkgQuantity = $product->pkgQuantity;
             $item->tax = $product->tax;
             $item->unit = !empty($product->product) ? $product->product->unit_id : '';
             $item->discount = $product->discount;
+            $item->unitPrice = $product->quantity * $product->pkgQuantity * $product->unitPrice;
+            $item->taxTypeCode = $product->taxTypeCode;
             $item->price = $product->price;
             $item->description = $product->description;
 
@@ -1245,29 +1248,6 @@ class InvoiceController extends Controller
 
             $taxes = Utility::tax($product->tax);
 
-            $itemTaxes = [];
-            if (!empty($item->tax)) {
-                foreach ($taxes as $tax) {
-                    $taxPrice = Utility::taxRate($tax->rate, $item->price, $item->quantity, $item->discount);
-                    $totalTaxPrice += $taxPrice;
-
-                    $itemTax['name'] = $tax->name;
-                    $itemTax['rate'] = $tax->rate . '%';
-                    $itemTax['price'] = Utility::priceFormat($settings, $taxPrice);
-                    $itemTax['tax_price'] = $taxPrice;
-                    $itemTaxes[] = $itemTax;
-
-                    if (array_key_exists($tax->name, $taxesData)) {
-                        $taxesData[$tax->name] = $taxesData[$tax->name] + $taxPrice;
-                    } else {
-                        $taxesData[$tax->name] = $taxPrice;
-                    }
-
-                }
-                $item->itemTax = $itemTaxes;
-            } else {
-                $item->itemTax = [];
-            }
             $items[] = $item;
         }
 
@@ -1301,7 +1281,10 @@ class InvoiceController extends Controller
             $color = '#' . $settings['invoice_color'];
             $font_color = Utility::getFontColor($color);
 
-            return view('invoice.templates.' . $settings['invoice_template'], compact('invoice', 'color', 'settings', 'customer', 'img', 'font_color', 'customFields'));
+            \Log::info('iteam(item)');
+            \Log::info($items);
+
+            return view('invoice.templates.' . $settings['invoice_template'], compact('items', 'invoice', 'color', 'settings', 'customer', 'img', 'font_color', 'customFields'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -1363,7 +1346,7 @@ class InvoiceController extends Controller
         }
 
         $id = Crypt::decrypt($invoiceId);
-        $invoice = Invoice::with(['creditNote', 'payments.bankAccount', 'items.product.unit'])->find($id);
+        $invoice = Invoice::with(['creditNote', 'payments.bankAccount', 'items.product.unit'])->where('invoice_id', $id)->first();
 
         $settings = Utility::settingsById($invoice->created_by);
 

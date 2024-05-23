@@ -678,14 +678,13 @@ class Utility extends Model
 
     public static function tax($taxes)
     {
-        // if (self::$taxsData == null) {
+        \Log::info('TAXXX');
+        \Log::info($taxes);
         $taxArr = explode(',', $taxes);
         $taxes = [];
         foreach ($taxArr as $tax) {
             $taxes[] = Tax::find($tax);
         }
-        // self::$taxsData = $taxes;
-        // }
         return $taxes;
     }
 
