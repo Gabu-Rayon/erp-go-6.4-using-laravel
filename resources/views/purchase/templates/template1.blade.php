@@ -243,6 +243,8 @@
                 <tr>
                 <td>
                     <strong style="margin-bottom: 10px; display:block;">{{__('Bill To')}}:</strong>
+                    {{ \Log::info('VENDERRR') }}
+                    {{ \Log::info($vendor) }}
                     @if(!empty($vendor->billing_name))
                         <p>
                             {{!empty($vendor->billing_name)?$vendor->billing_name:''}}<br>
@@ -283,48 +285,27 @@
             <tr>
                 <th>{{__('Item')}}</th>
                 <th>{{__('Quantity')}}</th>
-                <th>{{__('Rate')}}</th>
+                <th>{{__('Unit Price')}}</th>
                 <th>{{__('Discount')}}</th>
                 <th>{{__('Tax')}} (%)</th>
                 <th>{{__('Price')}} <small>{{__('after tax & discount')}}</small></th>
             </tr>
             </thead>
             <tbody>
-            @if(isset($purchase->itemData) && count($purchase->itemData) > 0)
-                @foreach($purchase->itemData as $key => $item)
-                    <tr>
-                        <td>{{$item->name}}</td>
-                        <td>{{$item->quantity}}</td>
-                        <td>{{Utility::priceFormat($settings,$item->price)}}</td>
-                        <td>{{($item->discount!=0)?Utility::priceFormat($settings,$item->discount):'-'}}</td>
-                        @php
-                            $itemtax = 0;
-                        @endphp
-                        <td>
-                            @if(!empty($item->itemTax))
-
-                                @foreach($item->itemTax as $taxes)
-                                    @php
-                                        $itemtax += $taxes['tax_price'];
-                                    @endphp
-                                    <p>{{$taxes['name']}} ({{$taxes['rate']}}) {{$taxes['price']}}</p>
-                                @endforeach
-                            @else
-                                <span>-</span>
-                            @endif
-                        </td>
-                        <td>{{Utility::priceFormat($settings,$item->price * $item->quantity -  $item->discount + $itemtax)}}</td>
-                    @if(!empty($item->description))
-                        <tr class="border-0 itm-description ">
-                            <td colspan="6">{{$item->description}}</td>
+                @if(isset($purchase->itemData) && count($purchase->itemData) > 0)
+                    @foreach($purchase->itemData as $key => $item)
+                        <tr>
+                            <td>{{$item->name}}</td>
+                            <td>{{$item->quantity}}</td>
+                            <td>KES {{$item->price}}</td>
+                            <td>KES {{($item->discount!=0)? $item->discount :'-'}}</td>
+                            <td>KES {{$item->tax}}</td>
+                            <td>{{ $item->totAmt }}</td>
                         </tr>
-                        @endif
-                        </tr>
-                        @endforeach
-                    @else
-                    @endif
-
+                    @endforeach
+                @endif
             </tbody>
+
             <tfoot>
             <tr>
                 <td>{{__('Total')}}</td>

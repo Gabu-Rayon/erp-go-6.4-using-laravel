@@ -87,8 +87,7 @@ class Purchase extends Model
 
         $subTotal = 0;
         foreach ($this->items as $product) {
-
-            $subTotal += ($product->price * $product->quantity);
+            $subTotal += ($product->price * $product->quantity * $product->pkg);
         }
 
         return $subTotal;
@@ -117,18 +116,8 @@ class Purchase extends Model
         $taxData = Utility::getTaxData();
         $totalTax = 0;
         foreach ($this->items as $product) {
-            // $taxes = Utility::totalTaxRate($product->tax);
-
-            $taxArr = explode(',', $product->tax);
-            $taxes = 0;
-            foreach ($taxArr as $tax) {
-                // $tax = TaxRate::find($tax);
-                $taxes += !empty($taxData[$tax]['rate']) ? $taxData[$tax]['rate'] : 0;
-            }
-
-            $totalTax += ($taxes / 100) * ($product->price * $product->quantity);
+            $totalTax += $product->taxAmt;
         }
-
         return $totalTax;
     }
 

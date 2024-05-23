@@ -98,7 +98,7 @@ class Invoice extends Model
 
     public function items()
     {
-        return $this->hasMany('App\Models\InvoiceProduct', 'invoice_id', 'id');
+        return $this->hasMany('App\Models\InvoiceProduct', 'invoice_id', 'invoice_id');
     }
 
     public function payments()
@@ -136,8 +136,9 @@ class Invoice extends Model
         $subTotal = 0;
         foreach($this->items as $product)
         {
-
-            $subTotal += ($product->price * $product->quantity);
+            \Log::info('SUB TOTAL ITEM');
+            \Log::info($product);
+            $subTotal += ($product->unitPrice * $product->quantity * $product->pkgQuantity);
         }
 
         return $subTotal;
@@ -164,8 +165,6 @@ class Invoice extends Model
         $totalTax = 0;
         foreach($this->items as $product)
         {
-            // $taxes = Utility::totalTaxRate($product->tax);
-
             $taxArr = explode(',', $product->tax);
             $taxes = 0;
             foreach ($taxArr as $tax) {

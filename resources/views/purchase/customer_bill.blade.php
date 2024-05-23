@@ -112,7 +112,7 @@
     @stack('css-page')
 </head>
 
-<body class="{{ $color }}">
+<body class="{{ $color['invoice_color'] }}">
     <header class="header header-transparent" id="header-main">
 
     </header>
@@ -244,10 +244,10 @@
                                         <div class="table-responsive mt-2">
                                             <table class="table table-striped">
                                                 <tr>
-                                                    <th class="text-dark" data-width="40">#</th>
                                                     <th class="text-dark">{{ __('Product') }}</th>
                                                     <th class="text-dark">{{ __('Quantity') }}</th>
-                                                    <th class="text-dark">{{ __('Rate') }}</th>
+                                                    <th class="text-dark">{{ __('Pkg Quantity') }}</th>
+                                                    <th class="text-dark">{{ __('Unit Price') }}</th>
                                                     <th class="text-dark">{{ __('Tax') }}</th>
                                                     <th class="text-dark">
                                                         {{ __('Discount') }}
@@ -262,100 +262,59 @@
                                                 </tr>
                                                 @php
                                                     $totalQuantity = 0;
+                                                    $totalPkgQuantity = 0;
                                                     $totalRate = 0;
                                                     $totalTaxPrice = 0;
                                                     $totalDiscount = 0;
                                                     $taxesData = [];
+                                                    
+                                                    foreach ($iteams as $key => $iteam) {
+                                                        $totalQuantity += $iteam->quantity;
+                                                        $totalPkgQuantity += $iteam->pkg;
+                                                        $totalTaxPrice += $iteam->tax;
+                                                        $totalDiscount += $iteam->discount;
+                                                    }
                                                 @endphp
 
                                                 @foreach ($iteams as $key => $iteam)
-                                                    @if (!empty($iteam->tax))
-                                                        @php
-                                                            $taxes = \Utility::tax($iteam->tax);
-                                                            $totalQuantity += $iteam->quantity;
-                                                            $totalRate += $iteam->price;
-                                                            $totalDiscount += $iteam->discount;
-                                                            foreach ($taxes as $taxe) {
-                                                                $taxDataPrice = \Utility::taxRate(
-                                                                    $taxe->rate,
-                                                                    $iteam->price,
-                                                                    $iteam->quantity,
-                                                                );
-                                                                if (array_key_exists($taxe->name, $taxesData)) {
-                                                                    $taxesData[$taxe->name] =
-                                                                        $taxesData[$taxe->name] + $taxDataPrice;
-                                                                } else {
-                                                                    $taxesData[$taxe->name] = $taxDataPrice;
-                                                                }
-                                                            }
-                                                        @endphp
-                                                    @endif
+                                                    {{ \Log::info('iteammnm') }}
+                                                    {{ \Log::info($iteam) }}
                                                     <tr>
-                                                        <td>{{ $key + 1 }}</td>
-                                                        <td>{{ !empty($iteam->product()) ? $iteam->product()->name : '' }}
+                                                        <td>{{ !empty($iteam) ? $iteam->itemNm : '' }}
                                                         </td>
                                                         <td>{{ $iteam->quantity }}</td>
-                                                        <td>{{ $user->priceFormat($iteam->price) }}</td>
-                                                        <td>
-                                                            @if (!empty($iteam->tax))
-                                                                <table>
-                                                                    @php $totalTaxRate = 0;@endphp
-                                                                    @foreach ($taxes as $tax)
-                                                                        @php
-                                                                            $taxPrice = \Utility::taxRate(
-                                                                                $tax->rate,
-                                                                                $iteam->price,
-                                                                                $iteam->quantity,
-                                                                            );
-                                                                            $totalTaxPrice += $taxPrice;
-                                                                        @endphp
-                                                                        <tr>
-                                                                            <td>{{ $tax->name . ' (' . $tax->rate . '%)' }}
-                                                                            </td>
-                                                                            <td>{{ $user->priceFormat($taxPrice) }}
-                                                                            </td>
-                                                                        </tr>
-                                                                    @endforeach
-                                                                </table>
-                                                            @else
-                                                                -
-                                                            @endif
-                                                        </td>
-                                                        <td>
-                                                            {{ $user->priceFormat($iteam->discount) }}
-
-                                                        </td>
+                                                        <td>{{ $iteam->pkg }}</td>
+                                                        <td>KES {{ $iteam->price }}</td>
+                                                        <td>KES {{ $iteam->tax }}</td>
+                                                        <td>KES {{ $iteam->discount }}</td>
                                                         <td>{{ !empty($iteam->description) ? $iteam->description : '-' }}
                                                         </td>
-                                                        <td class="text-end">
-                                                            {{ $user->priceFormat($iteam->price * $iteam->quantity) }}
-                                                        </td>
+                                                        <td class="text-end">KES {{ $iteam->price * $iteam->quantity * $iteam->pkg }}</td>
                                                     </tr>
                                                 @endforeach
                                                 <tfoot>
                                                     <tr>
-                                                        <td></td>
                                                         <td><b>{{ __('Total') }}</b></td>
                                                         <td><b>{{ $totalQuantity }}</b></td>
-                                                        <td><b>{{ $user->priceFormat($totalRate) }}</b></td>
-                                                        <td><b>{{ $user->priceFormat($totalTaxPrice) }}</b></td>
+                                                        <td><b>{{ $totalPkgQuantity }}</b></td>
+                                                        <td><b></b></td>
+                                                        <td><b>KES {{ $totalTaxPrice }}</b></td>
                                                         <td>
-                                                            <b>{{ $user->priceFormat($totalDiscount) }}</b>
+                                                            <b>KES {{ ($totalDiscount) }}</b>
 
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="6"></td>
                                                         <td class="text-end"><b>{{ __('Sub Total') }}</b></td>
-                                                        <td class="text-end">
-                                                            {{ $user->priceFormat($purchase->getSubTotal()) }}</td>
+                                                        <td class="text-end">KES {{ ($purchase->getSubTotal()) }}</td>
                                                     </tr>
 
                                                     <tr>
                                                         <td colspan="6"></td>
                                                         <td class="text-end"><b>{{ __('Discount') }}</b></td>
                                                         <td class="text-end">
-                                                            {{ $user->priceFormat($purchase->getTotalDiscount()) }}
+                                                            KES {{ ($purchase->getTotalDiscount()) }}
                                                         </td>
                                                     </tr>
 
@@ -365,29 +324,27 @@
                                                                 <td colspan="6"></td>
                                                                 <td class="text-end"><b>{{ $taxName }}</b></td>
                                                                 <td class="text-end">
-                                                                    {{ $user->priceFormat($taxPrice) }}</td>
+                                                                    KES {{ ($taxPrice) }}</td>
                                                             </tr>
                                                         @endforeach
                                                     @endif
                                                     <tr>
                                                         <td colspan="6"></td>
                                                         <td class="blue-text text-end"><b>{{ __('Total') }}</b></td>
-                                                        <td class="blue-text text-end">
-                                                            {{ $user->priceFormat($purchase->getTotal()) }}</td>
+                                                        <td class="blue-text text-end">KES {{ ($purchase->getTotal()) }}</td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="6"></td>
                                                         <td class="text-end"><b>{{ __('Paid') }}</b></td>
                                                         <td class="text-end">
-                                                            {{ $user->priceFormat($purchase->getTotal() - $purchase->getDue()) }}
+                                                            KES {{ ($purchase->getTotal() - $purchase->getDue()) }}
                                                         </td>
                                                     </tr>
 
                                                     <tr>
                                                         <td colspan="6"></td>
                                                         <td class="text-end"><b>{{ __('Due') }}</b></td>
-                                                        <td class="text-end">
-                                                            {{ $user->priceFormat($purchase->getDue()) }}</td>
+                                                        <td class="text-end">KES {{ ($purchase->getDue()) }}</td>
                                                     </tr>
                                                 </tfoot>
                                             </table>

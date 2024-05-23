@@ -45,7 +45,7 @@
                                     <div class="timeline-icons"><span class="timeline-dots"></span>
                                         <i class="ti ti-plus text-primary"></i>
                                     </div>
-                                    <h6 class="text-primary my-3">{{__('Create Purchase')}}</h6>
+                                    <h6 class="text-primary my-3">{{__('Edit Purchase')}}</h6>
                                     <p class="text-muted text-sm mb-3"><i class="ti ti-clock mr-2"></i>{{__('Created on ')}}{{\Auth::user()->dateFormat($purchase->purchase_date)}}</p>
                                     @can('edit purchase')
                                         <a href="{{ route('purchase.edit',\Crypt::encrypt($purchase->id)) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}"><i class="ti ti-pencil mr-2"></i>{{__('Edit')}}</a>
@@ -154,7 +154,6 @@
                                     <small class="font-style">
                                         <strong>{{ __('Shipped To') }} :</strong><br>
                                         <strong>Company </strong>:
-
                                         <br>
                                     </small>
                                 </div>
@@ -225,13 +224,12 @@
                                     <div class="table-responsive mt-3">
                                         <table class="table ">
                                             <tr>
-                                                <th class="text-dark" data-width="40">#</th>
                                                 <th class="text-dark">{{ __('Product') }}</th>
                                                 <th class="text-dark">{{ __('Quantity') }}</th>
-                                                <th class="text-dark">{{ __('Rate') }}</th>
+                                                <th class="text-dark">{{ __('Pkg Quantity') }}</th>
+                                                <th class="text-dark">{{ __('Unit Price') }}</th>
                                                 <th class="text-dark">{{ __('Discount') }}</th>
                                                 <th class="text-dark">{{ __('Tax') }}</th>
-                                                <th class="text-dark">{{ __('Supply Amount') }}</th>
                                                 <th class="text-end text-dark" width="12%">{{ __('Price') }}<br>
                                                     <small
                                                         class="text-danger font-weight-bold">{{ __('after tax & discount') }}</small>
@@ -239,47 +237,17 @@
                                                 <th></th>
                                             </tr>
 
-                                            {{                \Log::info('ITEAMS')}}
-               {{ \Log::info($iteams)}}
+                                            {{ \Log::info('ITEAMS') }}
+                                            {{ \Log::info($iteams) }}
                                             @foreach ($iteams as $item)
                                                 <tr>
-                                                    <td> {{ !empty($item->id) ? $item->id : '' }}</td>
-                                                    <td>{{ !empty($item->itemNm) ? $item->itemNm : '' }}</td>
-                                                    <td>{{ !empty($item->qty) ? $item->qty : '' }}</td>
-                                                    <td>Kes {{ !empty($item->prc) ? $item->prc : '' }}</td>
-                                                    <td>{{ !empty($item->dcAmt) ? $item->dcAmt : '' }}</td>
-                                                    <td>
-                                                        @php
-                                                            // Map taxTyCd to its corresponding description
-                                                            $taxDescription = '';
-                                                            switch ($item->taxTyCd) {
-                                                                case 'A':
-                                                                    $taxDescription = 'A-Exmpt';
-                                                                    break;
-                                                                case 'B':
-                                                                    $taxDescription = 'B-VAT 16%';
-                                                                    break;
-                                                                case 'C':
-                                                                    $taxDescription = 'C-Zero Rated';
-                                                                    break;
-                                                                case 'D':
-                                                                    $taxDescription = 'D-Non VAT';
-                                                                    break;
-                                                                case 'E':
-                                                                    $taxDescription = 'E-VAT 8%';
-                                                                    break;
-                                                                case 'F':
-                                                                    $taxDescription = 'F-Non Tax';
-                                                                    break;
-                                                                default:
-                                                                    $taxDescription = ''; // Handle unknown tax codes here
-                                                                    break;
-                                                            }
-                                                        @endphp
-                                                        {{ $taxDescription }}
-                                                    </td>
-                                                    <td>Kes {{ !empty($item->splyAmt) ? $item->splyAmt : '' }}</td>
-                                                    <td>Kes {{ !empty($item->totAmt) ? $item->totAmt : '' }}</td>
+                                                    <td>{{ !empty($item->itemNm) ? $item->itemNm : '-' }}</td>
+                                                    <td>{{ !empty($item->qty) ? $item->qty : '-' }}</td>
+                                                    <td>{{ !empty($item->pkg) ? $item->pkg : '-' }}</td>
+                                                    <td>KES {{ !empty($item->prc) ? $item->prc : '-' }}</td>
+                                                    <td>KES {{ !empty($item->discount) ? $item->discount : '-' }}</td>
+                                                    <td>KES {{ $item->tax }}</td>
+                                                    <td>KES {{ !empty($item->totAmt) ? $item->totAmt : '-' }}</td>
                                                 </tr>
                                             @endforeach
                                             <tfoot>
@@ -287,40 +255,47 @@
                                                     <td colspan="6"></td>
                                                     <td class="text-end"><b>{{ __('Sub Total') }}</b></td>
                                                     <td class="text-end">
-                                                     Kes {{ $iteams->sum('prc') }} </td>
+                                                        @php
+                                                            $subTotal = 0;
+                                                            foreach ($iteams as $item) {
+                                                                $subTotal += ($item['pkg'] * $item['quantity'] * $item['prc']);
+                                                            }
+                                                        @endphp
+                                                        KES {{ $subTotal }}
+                                                    </td>
                                                 </tr>
 
                                                 <tr>
                                                     <td colspan="6"></td>
                                                     <td class="text-end"><b>{{ __('Discount') }}</b></td>
                                                     <td class="text-end">
-                                                            Kes {{ $iteams->sum('dcAmt') }}
+                                                        KES {{ $iteams->sum('discount') }}
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="6"></td>
                                                     <td class="text-end"><b>{{ __('Tax Amount') }}</b></td>
                                                     <td class="text-end">
-                                                        Kes {{ $iteams->sum('taxAmt') }} </td>
+                                                        KES {{ $iteams->sum('taxAmt') }} </td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="6"></td>
                                                     <td class="blue-text text-end"><b>{{ __('Total') }}</b></td>
                                                     <td class="blue-text text-end">
-                                                         Kes {{ $iteams->sum('prc') }}</td>
+                                                         KES {{ $iteams->sum('totAmt') }}</td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="6"></td>
                                                     <td class="text-end"><b>{{ __('Paid') }}</b></td>
                                                     <td class="text-end">
-                                                        {{ \Auth::user()->priceFormat($purchase->getTotal() - $purchase->getDue()) }}
+                                                        KES {{ $purchase->getTotal() - $purchase->getDue() }}
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="6"></td>
                                                     <td class="text-end"><b>{{ __('Due') }}</b></td>
                                                     <td class="text-end">
-                                                        {{ \Auth::user()->priceFormat($purchase->getDue()) }}</td>
+                                                        KES {{ $purchase->getDue() }}</td>
                                                 </tr>
                                             </tfoot>
                                         </table>
