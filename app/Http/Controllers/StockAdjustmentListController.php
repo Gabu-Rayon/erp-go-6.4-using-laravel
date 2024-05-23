@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ProductService;
 use App\Models\ReleaseType;
 use Illuminate\Http\Request;
+use App\Models\ProductService;
+use App\Models\StockAdjustment;
+use App\Models\WarehouseProduct;
 use Illuminate\Support\Facades\Http;
+use App\Models\StockAdjustmentProductList;
 
 class StockAdjustmentListController extends Controller
 {
@@ -22,7 +25,7 @@ class StockAdjustmentListController extends Controller
             return view('stockadjustment.index');
         } catch (\Exception $e) {
             \Log::info($e);
-            return redirect()->to('stockinfo.index')->with('error', e.getMessage());
+            return redirect()->to('stockinfo.index')->with('error', $e);
         }
          } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
@@ -55,39 +58,67 @@ class StockAdjustmentListController extends Controller
      * Store a newly created resource in storage.
      * 
      */
+
     public function store(Request $request)
     {
+        if (\Auth::user()->can('show purchase')) {
+            try {
+                $data = $request->all();
+                \Log::info('STOCK ADJUSTMENT data from the Form to adjust the Stock:');
+                \Log::info(json_encode($data));
 
-         if (\Auth::user()->can('show purchase')) {
+                $url = 'https://etims.your-apps.biz/api/StockAdjustment';
 
-        try {
-            $data = $request->all();
-            \Log::info('STOCK ADJ');
-            \lOG::info(json_encode($data));
+                $response = Http::withOptions(['verify' => false])->withHeaders([
+                    'key' => '123456',
+                    'accept' => '*/*',
+                    'Content-Type' => 'application/json'
+                ])->post($url, [
+                            'storeReleaseTypeCode' => $request['storeReleaseTypeCode'],
+                            'remark' => $request['remark'],
+                            'stockItemList' => $request['items']
+                        ]);
 
-            $url = 'https://etims.your-apps.biz/api/StockAdjustment';
+                \Log::info('STOCK ADJ API RESPONSE');
+                \Log::info($response['data']);
 
-            $response = Http::withOptions(['verify' => false])->withHeaders([
-                'key' => '123456',
-                'accept' => '*/*',
-                'Content-Type' => 'application/json'
-            ])->post($url, [
-                'storeReleaseTypeCode' => $request['storeReleaseTypeCode'],
-                'remark' => $request['remark'],
-                'stockItemList' => $request['items']
-            ]);
+                // Parse API response and store relevant data locally
+                $responseData = $response->json();
+                $stockAdjustment = new StockAdjustment();
+                $stockAdjustment->storeReleaseTypeCode = $request['storeReleaseTypeCode'];
+                $stockAdjustment->remark = $request['remark'];
+                $stockAdjustment->save();
 
-            \Log::info('STOCK ADJ API RESPONSE');
-            \lOG::info($response['data']);
+                foreach ($responseData['stockItemList'] as $item) {
+                    // Update ProductService quantity
+                    $productService = ProductService::where('itemCd', $item['itemCode'])->first();
+                    if ($productService) {
+                        $productService->quantity += $item['quantity'];
+                        $productService->save();
+                    }
+                    
+                    // Update WarehouseProduct quantity
+                    $warehouseProduct = WarehouseProduct::where('product_id', $productService->id)->first();
+                    if ($warehouseProduct && $warehouseProduct->quantity !== null) {
+                        $warehouseProduct->quantity += $item['quantity'];
+                        // $warehouseProduct->pkgQuantity  -= $item['pkgQuantity'];
+                        $warehouseProduct->save();
+                    }
 
+                    // Update quantity in warehouse_products
+                    // $warehouseProduct = WarehouseProduct::where('product_id', $productService->id)->first();
+                    // if ($warehouseProduct && $warehouseProduct->quantity !== null) {
+                    //     $warehouseProduct->quantity -= $item['quantity'];
+                    //     // $warehouseProduct->pkgQuantity  -= $item['pkgQuantity'];
+                    //     $warehouseProduct->save();
+                    // }
+                }
 
-            return  redirect()->to('stockadjustment')->with('success', 'Stock Adjustment Added.');
-        } catch(\Exception $e) {
-            return  redirect()->back()->with('error', $e->getMessage());
-        }
-
-    }else
-        {
+                return redirect()->route('stockadjustment.index')->with('success', 'Stock Adjustment Added.');
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', $e->getMessage());
+            }
+        } else {
             return redirect()->back()->with('errors', __('Permission denied.'));
         }
     }
@@ -95,7 +126,7 @@ class StockAdjustmentListController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(StockAdjustmentList $stockAdjustmentList)
+    public function show(StockAdjustment $stockAdjustmentList)
     {
         //
     }
@@ -103,7 +134,7 @@ class StockAdjustmentListController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(StockAdjustmentList $stockAdjustmentList)
+    public function edit(StockAdjustment $stockAdjustmentList)
     {
         //
     }
@@ -111,7 +142,7 @@ class StockAdjustmentListController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, StockAdjustmentList $stockAdjustmentList)
+    public function update(Request $request,StockAdjustment $stockAdjustmentList)
     {
         //
     }
@@ -119,7 +150,7 @@ class StockAdjustmentListController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(StockAdjustmentList $stockAdjustmentList)
+    public function destroy(StockAdjustment $stockAdjustmentList)
     {
         //
     }
