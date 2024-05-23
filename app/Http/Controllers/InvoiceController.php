@@ -87,7 +87,7 @@ class InvoiceController extends Controller
             $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'saleTypeCode');
             $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'code');
             $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusCode', 'invoiceStatusCode');
-            $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
+            $taxationtype = Details::where('cdCls', '04')->pluck('userDfnCd1', 'cd');
 
             return view(
                 'invoice.create',
@@ -128,107 +128,6 @@ class InvoiceController extends Controller
 
         return json_encode($data);
     }
-
-
-    // public function store(Request $request){
-    //     //        dd($request->all());
-    //     if (\Auth::user()->can('create invoice')) {
-    //         $validator = \Validator::make(
-    //             $request->all(),
-    //             [
-    //                 'customer_id' => 'required',
-    //                 'issue_date' => 'required',
-    //                 'due_date' => 'required',
-    //                 'category_id' => 'required',
-    //                 'items' => 'required',
-    //             ]
-    //         );
-    //         if ($validator->fails()) {
-    //             $messages = $validator->getMessageBag();
-    //             return redirect()->back()->with('error', $messages->first());
-    //         }
-    //         $status = Invoice::$statues;
-    //         $invoice = new Invoice();
-    //         $invoice->invoice_id = $this->invoiceNumber();
-    //         $invoice->customer_id = $request->customer_id;
-    //         $invoice->status = 0;
-    //         $invoice->issue_date = $request->issue_date;
-    //         $invoice->due_date = $request->due_date;
-    //         $invoice->category_id = $request->category_id;
-    //         $invoice->ref_number = $request->ref_number;
-    //         //            $invoice->discount_apply = isset($request->discount_apply) ? 1 : 0;
-    //         $invoice->created_by = \Auth::user()->creatorId();
-    //         $invoice->save();
-    //         CustomField::saveData($invoice, $request->customField);
-    //         $products = $request->items;
-
-    //         for ($i = 0; $i < count($products); $i++) {
-
-    //             $invoiceProduct = new InvoiceProduct();
-    //             $invoiceProduct->invoice_id = $invoice->id;
-    //             $invoiceProduct->product_id = $products[$i]['item'];
-    //             $invoiceProduct->quantity = $products[$i]['quantity'];
-    //             $invoiceProduct->tax = $products[$i]['tax'];
-    //             //                $invoiceProduct->discount    = isset($products[$i]['discount']) ? $products[$i]['discount'] : 0;
-    //             $invoiceProduct->discount = $products[$i]['discount'];
-    //             $invoiceProduct->price = $products[$i]['price'];
-    //             $invoiceProduct->description = $products[$i]['description'];
-    //             $invoiceProduct->save();
-
-    //             //inventory management (Quantity)
-    //             Utility::total_quantity('minus', $invoiceProduct->quantity, $invoiceProduct->product_id);
-
-    //             //For Notification
-    //             $setting = Utility::settings(\Auth::user()->creatorId());
-    //             $customer = Customer::find($request->customer_id);
-    //             $invoiceNotificationArr = [
-    //                 'invoice_number' => \Auth::user()->invoiceNumberFormat($invoice->invoice_id),
-    //                 'user_name' => \Auth::user()->name,
-    //                 'invoice_issue_date' => $invoice->issue_date,
-    //                 'invoice_due_date' => $invoice->due_date,
-    //                 'customer_name' => $customer->name,
-    //             ];
-    //             //Slack Notification
-    //             if (isset($setting['invoice_notification']) && $setting['invoice_notification'] == 1) {
-    //                 Utility::send_slack_msg('new_invoice', $invoiceNotificationArr);
-    //             }
-    //             //Telegram Notification
-    //             if (isset($setting['telegram_invoice_notification']) && $setting['telegram_invoice_notification'] == 1) {
-    //                 Utility::send_telegram_msg('new_invoice', $invoiceNotificationArr);
-    //             }
-    //             //Twilio Notification
-    //             if (isset($setting['twilio_invoice_notification']) && $setting['twilio_invoice_notification'] == 1) {
-    //                 Utility::send_twilio_msg($customer->contact, 'new_invoice', $invoiceNotificationArr);
-    //             }
-
-    //         }
-
-    //         //Product Stock Report
-    //         $type = 'invoice';
-    //         $type_id = $invoice->id;
-    //         StockReport::where('type', '=', 'invoice')->where('type_id', '=', $invoice->id)->delete();
-    //         $description = $invoiceProduct->quantity . '  ' . __(' quantity sold in invoice') . ' ' . \Auth::user()->invoiceNumberFormat($invoice->invoice_id);
-    //         Utility::addProductStock($invoiceProduct->product_id, $invoiceProduct->quantity, $type, $description, $type_id);
-
-    //         //webhook
-    //         $module = 'New Invoice';
-    //         $webhook = Utility::webhookSetting($module);
-    //         if ($webhook) {
-    //             $parameter = json_encode($invoice);
-    //             $status = Utility::WebhookCall($webhook['url'], $parameter, $webhook['method']);
-    //             if ($status == true) {
-    //                 return redirect()->route('invoice.index', $invoice->id)->with('success', __('Invoice successfully created.'));
-    //             } else {
-    //                 return redirect()->back()->with('error', __('Webhook call failed.'));
-    //             }
-    //         }
-
-    //         return redirect()->route('invoice.index', $invoice->id)->with('success', __('Invoice successfully created.'));
-    //     } else {
-    //         return redirect()->back()->with('error', __('Permission denied.'));
-    //     }
-    // }
-
 
 
     /****************************************************************
@@ -576,6 +475,8 @@ class InvoiceController extends Controller
                     $productService->quantity -= $item['quantity'];                    
                     $productService->save();
                 }
+                \Log::info('TOTAL AMT');
+                \Log::info($totalAmount);
 
                 // Update quantity in warehouse_products
                 $warehouseProduct = WarehouseProduct::where('product_id', $productService->id)->first();
@@ -587,6 +488,9 @@ class InvoiceController extends Controller
             }
 
                 return redirect()->to('invoice')->with('success', 'Sale Created Successfully');
+
+            } else {
+                return redirect()->back()->with('error', __('Permission denied.'));
             }
         } catch (\Exception $e) {
             \Log::error('ADD INV ERROR', ['exception' => $e]);
@@ -1085,7 +989,7 @@ class InvoiceController extends Controller
 
                 CreditNote::where('invoice', '=', $invoice->id)->delete();
 
-                InvoiceProduct::where('invoice_id', '=', $invoice->id)->delete();
+                InvoiceProduct::where('invoice_id', '=', $invoice->invoice_id)->delete();
                 $invoice->delete();
                 return redirect()->route('invoice.index')->with('success', __('Invoice successfully deleted.'));
             } else {
@@ -1156,7 +1060,7 @@ class InvoiceController extends Controller
             if ($user->type == 'super admin') {
                 return view('invoice.view', compact('invoice', 'customer', 'iteams', 'user'));
             } elseif ($user->type == 'company') {
-                return view('invoice.customer_invoice', compact('invoice', 'customer', 'iteams', 'user'));
+                return view('invoice.customer_invoice', compact('invoice', 'customer', 'iteams', 'user', 'taxationtype'));
             }
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
@@ -1721,9 +1625,12 @@ class InvoiceController extends Controller
             $item = new \stdClass();
             $item->name = !empty($product->product) ? $product->product->name : '';
             $item->quantity = $product->quantity;
+            $item->pkgQuantity = $product->pkgQuantity;
             $item->tax = $product->tax;
             $item->unit = !empty($product->product) ? $product->product->unit_id : '';
             $item->discount = $product->discount;
+            $item->unitPrice = $product->quantity * $product->pkgQuantity * $product->unitPrice;
+            $item->taxTypeCode = $product->taxTypeCode;
             $item->price = $product->price;
             $item->description = $product->description;
 
@@ -1733,29 +1640,6 @@ class InvoiceController extends Controller
 
             $taxes = Utility::tax($product->tax);
 
-            $itemTaxes = [];
-            if (!empty($item->tax)) {
-                foreach ($taxes as $tax) {
-                    $taxPrice = Utility::taxRate($tax->rate, $item->price, $item->quantity, $item->discount);
-                    $totalTaxPrice += $taxPrice;
-
-                    $itemTax['name'] = $tax->name;
-                    $itemTax['rate'] = $tax->rate . '%';
-                    $itemTax['price'] = Utility::priceFormat($settings, $taxPrice);
-                    $itemTax['tax_price'] = $taxPrice;
-                    $itemTaxes[] = $itemTax;
-
-                    if (array_key_exists($tax->name, $taxesData)) {
-                        $taxesData[$tax->name] = $taxesData[$tax->name] + $taxPrice;
-                    } else {
-                        $taxesData[$tax->name] = $taxPrice;
-                    }
-
-                }
-                $item->itemTax = $itemTaxes;
-            } else {
-                $item->itemTax = [];
-            }
             $items[] = $item;
         }
 
@@ -1789,7 +1673,10 @@ class InvoiceController extends Controller
             $color = '#' . $settings['invoice_color'];
             $font_color = Utility::getFontColor($color);
 
-            return view('invoice.templates.' . $settings['invoice_template'], compact('invoice', 'color', 'settings', 'customer', 'img', 'font_color', 'customFields'));
+            \Log::info('iteam(item)');
+            \Log::info($items);
+
+            return view('invoice.templates.' . $settings['invoice_template'], compact('items', 'invoice', 'color', 'settings', 'customer', 'img', 'font_color', 'customFields'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -1851,7 +1738,7 @@ class InvoiceController extends Controller
         }
 
         $id = Crypt::decrypt($invoiceId);
-        $invoice = Invoice::with(['creditNote', 'payments.bankAccount', 'items.product.unit'])->find($id);
+        $invoice = Invoice::with(['creditNote', 'payments.bankAccount', 'items.product.unit'])->where('invoice_id', $id)->first();
 
         $settings = Utility::settingsById($invoice->created_by);
 
