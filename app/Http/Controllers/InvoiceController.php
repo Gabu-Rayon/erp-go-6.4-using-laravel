@@ -158,8 +158,8 @@ class InvoiceController extends Controller
 
                 $data = $request->all();
                 $customer = Customer::find($data['customer_id']);
-                \Log::info('CUSTOMER');
-                \Log::info($customer);
+                \Log::info('ITEMSSSS');
+                \Log::info($data['items']);
 
                 $salesDt = str_replace('-', '', $data['salesDate']);
                 $salesDate = date('Ymd', strtotime($salesDt));
@@ -205,11 +205,12 @@ class InvoiceController extends Controller
                     return $discountAmount;
                 }
 
-                function calculateTotalAmount($packageQuantity, $quantity, $unitPrice)
+                function calculateTotalAmount($packageQuantity, $quantity, $unitPrice, $taxAmt, $discAmt)
                 {
                     $totalItems = $packageQuantity * $quantity;
                     $totalPriceBeforeDiscount = $totalItems * $unitPrice;
-                    return $totalPriceBeforeDiscount;
+                    $totalPrc = ($totalPriceBeforeDiscount - $discAmt) + $taxAmt;
+                    return $totalPrc;
                 }
 
                 foreach ($data['items'] as $item) {
@@ -232,7 +233,8 @@ class InvoiceController extends Controller
                         "quantity" => $item['quantity'],
                         "discountRate" => $item['discount'],
                         "discountAmt" => $item['discountAmount'],
-                        "itemExprDate" => $itemExprDate
+                        "itemExprDate" => $itemExprDate,
+                        "taxAmount" => $item['taxAmount'],
                     ];
 
                     array_push($saleItemList, $itemData);
@@ -260,9 +262,11 @@ class InvoiceController extends Controller
                 \Log::info('INV DEYTA');
                 \Log::info($data);
 
-                foreach ($saleItemList as $item) {
-                    $totalAmount += calculateTotalAmount($item['pkgQuantity'], $item['quantity'], $item['unitPrice']);
+                foreach ($data['items'] as $item) {
+                    $totalAmount += calculateTotalAmount($item['pkgQuantity'], $item['quantity'], $item['price'], $item['taxAmount'], $item['discountAmount']);
                 }
+                \Log::info('TOTAL AMT');
+                \Log::info($totalAmount);
 
                 $inv = Invoice::create([
                     'invoice_id' => $this->invoiceNumber(),
@@ -353,7 +357,10 @@ class InvoiceController extends Controller
                             $item['pkgQuantity'],
                             $item['quantity'],
                             $item['unitPrice'],
+                            $item['taxAmount'], // Assuming this is the tax amount
+                            $item['discountAmt'] // Assuming this is the discount amount
                         ),
+                        
                         'customer_id' => $data['customer_id'],
                         "itemCode" => $itemDetails->itemCd,
                         "itemClassCode" => $itemDetails->itemClsCd,
@@ -590,7 +597,7 @@ class InvoiceController extends Controller
 
                 CreditNote::where('invoice', '=', $invoice->id)->delete();
 
-                InvoiceProduct::where('invoice_id', '=', $invoice->id)->delete();
+                InvoiceProduct::where('invoice_id', '=', $invoice->invoice_id)->delete();
                 $invoice->delete();
                 return redirect()->route('invoice.index')->with('success', __('Invoice successfully deleted.'));
             } else {

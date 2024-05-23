@@ -484,10 +484,10 @@
                                     <div class="table-responsive mt-2">
                                         <table class="table mb-0 table-striped">
                                             <tr>
-                                                <th data-width="40" class="text-dark">#</th>
                                                 <th class="text-dark"><?php echo e(__('Product')); ?></th>
                                                 <th class="text-dark"><?php echo e(__('Quantity')); ?></th>
-                                                <th class="text-dark"><?php echo e(__('Rate')); ?></th>
+                                                <th class="text-dark"><?php echo e(__('Pkg Quantity')); ?></th>
+                                                <th class="text-dark"><?php echo e(__('Unit Price')); ?></th>
                                                 <th class="text-dark"><?php echo e(__('Discount')); ?></th>
                                                 <th class="text-dark"><?php echo e(__('Tax')); ?></th>
                                                 <th class="text-dark"><?php echo e(__('Description')); ?></th>
@@ -504,82 +504,108 @@
                                                 $taxesData = [];
                                             ?>
                                             <?php $__currentLoopData = $iteams; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $iteam): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                <td> <?php echo e(!empty($iteam->id) ? $iteam->id : ''); ?></td>
+                                                <?php echo e(\Log::info('iteam(item)')); ?>
+
+                                                <?php echo e(\Log::info($iteam)); ?>
+
                                                 <td><?php echo e(!empty($iteam->itemName) ? $iteam->itemName : ''); ?></td>
                                                 <td><?php echo e(!empty($iteam->quantity) ? $iteam->quantity : ''); ?></td>
-                                                <td>Kes <?php echo e(!empty($iteam->unitPrice) ? $iteam->unitPrice : ''); ?></td>
+                                                <td><?php echo e(!empty($iteam->pkgQuantity) ? $iteam->pkgQuantity : ''); ?></td>
+                                                <td>Kes <?php echo e($iteam->unitPrice * $iteam->pkgQuantity * $iteam->quantity); ?></td>
                                                 <td><?php echo e(!empty($iteam->discountAmt) ? $iteam->discountAmt : ''); ?></td>
                                                 <td>
                                                     <?php
-                                                        // Map taxTypeCode to its corresponding description
-                                                        $taxDescription = '';
-                                                        switch ($iteam->taxTypeCode) {
-                                                            case 'A':
-                                                                $taxDescription = 'A-Exmpt';
-                                                                break;
-                                                            case 'B':
-                                                                $taxDescription = 'B-VAT 16%';
-                                                                break;
-                                                            case 'C':
-                                                                $taxDescription = 'C-Zero Rated';
-                                                                break;
-                                                            case 'D':
-                                                                $taxDescription = 'D-Non VAT';
-                                                                break;
-                                                            case 'E':
-                                                                $taxDescription = 'E-VAT 8%';
-                                                                break;
-                                                            case 'F':
-                                                                $taxDescription = 'F-Non Tax';
-                                                                break;
-                                                            default:
-                                                                $taxDescription = ''; // Handle unknown tax codes here
-                                                                break;
-                                                        }
+                                                        $taxData = \Utility::getTaxData();
+                                                        $taxRate = floatval($taxData[$iteam->taxTypeCode]);
+                                                        $taxTot = ($iteam->price - $iteam->discount) * ($taxRate / 100);
                                                     ?>
-                                                    <?php echo e($taxDescription); ?>
+                                                    <?php echo e($taxTot); ?>
 
                                                 </td>
                                                 <td><?php echo e(!empty($iteam->description) ? $iteam->description : ''); ?></td>
-                                                <td>Kes <?php echo e(!empty($iteam->price) ? $iteam->price : ''); ?></td>
+                                                <td>Kes <?php echo e($iteam->price); ?></td>
                                                 </tr>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             <tfoot>
                                                 <tr>
-                                                    <td></td>
                                                     <td><b><?php echo e(__('Total')); ?></b></td>
-                                                    <td><b><?php echo e($iteam->sum('quantity')); ?> </b></td>
-                                                    <td><b><?php echo e($iteam->sum('price')); ?> </b></td>
-                                                    <td><b><?php echo e($iteam->sum('discountAmt')); ?></b></td>
+                                                    <td>
+                                                        <b>
+                                                            <?php
+                                                                $qtySum = 0;
+                                                                foreach ($iteams as $iteam) {
+                                                                    $qtySum += $iteam->quantity;
+                                                                }
+                                                            ?>
+                                                            <?php echo e($qtySum); ?>
 
+                                                        </b>
+                                                    </td>
+                                                    <td>
+                                                        <b>
+                                                            <?php
+                                                                $pkgQtySum = 0;
+                                                                foreach ($iteams as $iteam) {
+                                                                    $pkgQtySum += $iteam->pkgQuantity;
+                                                                }
+                                                            ?>
+                                                            <?php echo e($pkgQtySum); ?>
 
-                                                    <?php
-                                                        $totalTaxableAmount = 0;
-                                                    ?>
+                                                        </b>
+                                                    </td>
+                                                    <td>
+                                                        <b>
+                                                            <?php
+                                                                $unitPrcSum = 0;
+                                                                foreach ($iteams as $iteam) {
+                                                                    $prc = $iteam->unitPrice * $iteam->pkgQuantity * $iteam->quantity;
+                                                                    $unitPrcSum += $prc;
+                                                                }
+                                                            ?>
+                                                            <?php echo e($unitPrcSum); ?>
 
-                                                    <?php $__currentLoopData = $invoice->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                        <?php
-                                                            // Get the tax rate based on the taxTypeCode
-                                                            switch ($item->taxTypeCode) {
-                                                                case 'B':
-                                                                    $taxRate = 16 / 100; // 16%
-                                                                    break;
-                                                                case 'E':
-                                                                    $taxRate = 8 / 100; // 8%
-                                                                    break;
-                                                                default:
-                                                                    $taxRate = 0; // No tax
-                                                            }
+                                                        </b>
+                                                    </td>
+                                                    <td>
+                                                        <b>
+                                                            <?php
+                                                                $discountSum = 0;
+                                                                foreach ($iteams as $iteam) {
+                                                                    $discountSum += $iteam->discount;
+                                                                }
+                                                            ?>
+                                                            <?php echo e($discountSum); ?>
 
-                                                            // Calculate the taxable amount for the product
-                                                            $taxableAmount = $item->price * (1 + $taxRate);
+                                                        </b>
+                                                    </td>
+                                                    <td>
+                                                        <b>
+                                                            <?php
+                                                                $taxSum = 0;
+                                                                $taxData = \Utility::getTaxData();
+                                                                $taxRate = floatval($taxData[$iteam->taxTypeCode]);
+                                                                foreach ($iteams as $iteam) {
+                                                                    $tax = ($iteam->price - $iteam->discount) * ($taxRate / 100);
+                                                                    $taxSum += $tax;
+                                                                }
+                                                            ?>
+                                                            <?php echo e($taxSum); ?>
 
-                                                            // Add the taxable amount to the total
-                                                            $totalTaxableAmount += $taxableAmount;
-                                                        ?>
-                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                        </b>
+                                                    </td>
+                                                    <td></td>
+                                                    <td>
+                                                        <b>
+                                                            <?php
+                                                                $tot = 0;
+                                                                foreach ($iteams as $iteam) {
+                                                                    $tot += $iteam->price;
+                                                                }
+                                                            ?>
+                                                            <?php echo e($tot); ?>
 
-                                                    <td><b><?php echo e($totalTaxableAmount); ?></b></td>
+                                                        </b>
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="6"></td>
@@ -587,7 +613,6 @@
                                                     <td class="text-end">
                                                         <?php echo e(\Auth::user()->priceFormat($invoice->getSubTotal())); ?></td>
                                                 </tr>
-
                                                 <tr>
                                                     <td colspan="6"></td>
                                                     <td class="text-end"><b><?php echo e(__('Discount')); ?></b></td>
@@ -596,22 +621,21 @@
 
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                    <td colspan="6"></td>
+                                                    <td class="text-end"><b><?php echo e(__('Tax')); ?></b></td>
+                                                    <td class="text-end">
+                                                        <?php echo e(\Auth::user()->priceFormat($taxSum)); ?>
 
-                                                <?php if(!empty($taxesData)): ?>
-                                                    <?php $__currentLoopData = $taxesData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $taxName => $taxPrice): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                        <tr>
-                                                            <td colspan="6"></td>
-                                                            <td class="text-end"><b><?php echo e($taxName); ?></b></td>
-                                                            <td class="text-end">
-                                                                <?php echo e(\Auth::user()->priceFormat($taxPrice)); ?></td>
-                                                        </tr>
-                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                <?php endif; ?>
+                                                    </td>
+                                                </tr>
                                                 <tr>
                                                     <td colspan="6"></td>
                                                     <td class="blue-text text-end"><b><?php echo e(__('Total')); ?></b></td>
                                                     <td class="blue-text text-end">
-                                                        <?php echo e(\Auth::user()->priceFormat($invoice->getTotal())); ?></td>
+                                                        <?php echo e(\Auth::user()->priceFormat($invoice->getTotal())); ?>
+
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="6"></td>

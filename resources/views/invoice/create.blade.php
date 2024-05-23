@@ -103,16 +103,16 @@
                 var discounts = $(".discountAmount");
                 var totalDiscount = 0;
                 for (var i = 0; i < discounts.length; i++) {
-                    totalDiscount += parseFloat($(discounts[i]).val()) || 0;
+                    totalDiscount += parseFloat($(discounts[i]).val()) || parseFloat(0);
                 }
                 
                 var taxAmounts = $(".taxAmount");
                 var totalTax = 0;
                 for (var i = 0; i < taxAmounts.length; i++) {
-                    totalTax += parseFloat($(taxAmounts[i]).val()) || 0;
+                    totalTax += parseFloat($(taxAmounts[i]).val()) || parseFloat(0);
                 }
                 
-                const stot = (subTotal - totalDiscount) + totalTax;
+                const stot = (subTotal + totalDiscount) - totalTax;
                 $('.subTotal').html(stot.toFixed(2));
                 $('.totalAmount').html(subTotal.toFixed(2));
         }
@@ -122,7 +122,7 @@
         var discounts = $(".discountAmount");
         var totalDiscount = 0;
         for (var i = 0; i < discounts.length; i++) {
-            totalDiscount += parseFloat($(discounts[i]).val()) || 0;
+            totalDiscount += parseFloat($(discounts[i]).val()) || parseFloat(0);
         }
         $('.totalDiscount').html(totalDiscount.toFixed(2));
     }
@@ -132,7 +132,7 @@
         var taxAmounts = $(".taxAmount");
         var totalTax = 0;
         for (var i = 0; i < taxAmounts.length; i++) {
-            totalTax += parseFloat($(taxAmounts[i]).val()) || 0;
+            totalTax += parseFloat($(taxAmounts[i]).val()) || parseFloat(0);
         }
         $('.totalTax').html(totalTax.toFixed(2));
     }
@@ -181,17 +181,17 @@
                 const discountAmount = subtotal * (discountRate / 100);
                 const totalAmount = subtotal - discountAmount;
                 const taxAmount = totalAmount * (taxCode / 100);
-                const finalAmount = totalAmount - taxAmount;
+                const finalAmount = totalAmount + taxAmount;
 
-                $(el).closest('tr').find('.taxAmount').val(taxAmount);
-                $(el).closest('tr').find('.discountAmount').val(discountAmount);
+                $(el).closest('tr').find('.taxAmount').val(parseFloat(taxAmount));
+                $(el).closest('tr').find('.discountAmount').val(parseFloat(discountAmount));
                 $(el).closest('tr').find('.amount').html(parseFloat(finalAmount));
 
             });
 
             $(document).on('keyup change', '.quantity', function() {
                 const el = $(this);
-                const quantity = parseFloat($(this).val()) || 0;
+                const quantity = parseFloat($(this).val()) || parseFloat(0);
                 const unitPrice = parseFloat($(el).closest('tr').find('.unitPrice').val()) || parseFloat(0);
                 const discountRate = parseFloat($(el).closest('tr').find('.discount').val()) || parseFloat(0);
                 const taxCode = parseFloat($(el).closest('tr').find('.taxCode').val()) || parseFloat(0);
@@ -200,16 +200,34 @@
                 const discountAmount = subtotal * (discountRate / 100);
                 const totalAmount = subtotal - discountAmount;
                 const taxAmount = totalAmount * (taxCode / 100);
-                const finalAmount = totalAmount - taxAmount;
+                const finalAmount = totalAmount + taxAmount;
             
-                $(el).closest('tr').find('.taxAmount').val(taxAmount);
-                $(el).closest('tr').find('.discountAmount').val(discountAmount);
+                $(el).closest('tr').find('.taxAmount').val(parseFloat(taxAmount));
+                $(el).closest('tr').find('.discountAmount').val(parseFloat(discountAmount));
+                $(el).closest('tr').find('.amount').html(parseFloat(finalAmount));
+            });
+
+            $(document).on('keyup change', '.taxCode', function() {
+                const el = $(this);
+                const taxCode = parseFloat($(this).val()) || parseFloat(0);
+                const unitPrice = parseFloat($(el).closest('tr').find('.unitPrice').val()) || parseFloat(0);
+                const discountRate = parseFloat($(el).closest('tr').find('.discount').val()) || parseFloat(0);
+                const quantity = parseFloat($(el).closest('tr').find('.quantity').val()) || parseFloat(0);
+                const pkgQuantity = parseFloat($(el).closest('tr').find('.pkgQuantity').val()) || parseFloat(0);
+                const subtotal = quantity * unitPrice * pkgQuantity;
+                const discountAmount = subtotal * (discountRate / 100);
+                const totalAmount = subtotal - discountAmount;
+                const taxAmount = totalAmount * (taxCode / 100);
+                const finalAmount = totalAmount + taxAmount;
+            
+                $(el).closest('tr').find('.taxAmount').val(parseFloat(taxAmount));
+                $(el).closest('tr').find('.discountAmount').val(parseFloat(discountAmount));
                 $(el).closest('tr').find('.amount').html(parseFloat(finalAmount));
             });
 
             $(document).on('keyup change', '.unitPrice', function() {
                 const el = $(this);
-                const unitPrice = parseFloat($(this).val()) || 0;
+                const unitPrice = parseFloat($(this).val()) || parseFloat(0);
                 const quantity = parseFloat($(el).closest('tr').find('.quantity').val()) || parseFloat(0);
                 const discountRate = parseFloat($(el).closest('tr').find('.discount').val()) || parseFloat(0);
                 const taxCode = parseFloat($(el).closest('tr').find('.taxCode').val()) || parseFloat(0);
@@ -218,10 +236,10 @@
                 const discountAmount = subtotal * (discountRate / 100);
                 const totalAmount = subtotal - discountAmount;
                 const taxAmount = totalAmount * (taxCode / 100);
-                const finalAmount = totalAmount - taxAmount;
+                const finalAmount = totalAmount + taxAmount;
             
-                $(el).closest('tr').find('.taxAmount').val(taxAmount);
-                $(el).closest('tr').find('.discountAmount').val(discountAmount);
+                $(el).closest('tr').find('.taxAmount').val(parseFloat(taxAmount));
+                $(el).closest('tr').find('.discountAmount').val(parseFloat(discountAmount));
                 $(el).closest('tr').find('.amount').html(parseFloat(finalAmount));
             });
 
@@ -229,7 +247,7 @@
 
 
                 const el = $(this);
-                const discountRate = parseFloat($(this).val()) || 0;
+                const discountRate = parseFloat($(this).val()) || parseFloat(0);
                 const quantity = parseFloat($(el).closest('tr').find('.quantity').val()) || parseFloat(0);
                 const unitPrice = parseFloat($(el).closest('tr').find('.unitPrice').val()) || parseFloat(0);
                 const taxCode = parseFloat($(el).closest('tr').find('.taxCode').val()) || parseFloat(0);
@@ -238,10 +256,10 @@
                 const discountAmount = subtotal * (discountRate / 100);
                 const totalAmount = subtotal - discountAmount;
                 const taxAmount = totalAmount * (taxCode / 100);
-                const finalAmount = totalAmount - taxAmount;
+                const finalAmount = totalAmount + taxAmount;
             
-                $(el).closest('tr').find('.taxAmount').val(taxAmount);
-                $(el).closest('tr').find('.discountAmount').val(discountAmount);
+                $(el).closest('tr').find('.taxAmount').val(parseFloat(taxAmount));
+                $(el).closest('tr').find('.discountAmount').val(parseFloat(discountAmount));
                 $(el).closest('tr').find('.amount').html(parseFloat(finalAmount));
             });
 
@@ -249,7 +267,7 @@
 
 
                 const el = $(this);
-                const pkgQuantity = parseFloat($(this).val()) || 0;
+                const pkgQuantity = parseFloat($(this).val()) || parseFloat(0);
                 const quantity = parseFloat($(el).closest('tr').find('.quantity').val()) || parseFloat(0);
                 const unitPrice = parseFloat($(el).closest('tr').find('.unitPrice').val()) || parseFloat(0);
                 const taxCode = parseFloat($(el).closest('tr').find('.taxCode').val()) || parseFloat(0);
@@ -258,10 +276,10 @@
                 const discountAmount = subtotal * (discountRate / 100);
                 const totalAmount = subtotal - discountAmount;
                 const taxAmount = totalAmount * (taxCode / 100);
-                const finalAmount = totalAmount - taxAmount;
+                const finalAmount = totalAmount + taxAmount;
 
-                $(el).closest('tr').find('.taxAmount').val(taxAmount);
-                $(el).closest('tr').find('.discountAmount').val(discountAmount);
+                $(el).closest('tr').find('.taxAmount').val(parseFloat(taxAmount));
+                $(el).closest('tr').find('.discountAmount').val(parseFloat(discountAmount));
                 $(el).closest('tr').find('.amount').html(parseFloat(finalAmount));
                 });
 

@@ -138,7 +138,7 @@ class Invoice extends Model
         {
             \Log::info('SUB TOTAL ITEM');
             \Log::info($product);
-            $subTotal += ($product->price * $product->quantity);
+            $subTotal += ($product->unitPrice * $product->quantity * $product->pkgQuantity);
         }
 
         return $subTotal;
@@ -165,8 +165,6 @@ class Invoice extends Model
         $totalTax = 0;
         foreach($this->items as $product)
         {
-            // $taxes = Utility::totalTaxRate($product->tax);
-
             $taxArr = explode(',', $product->tax);
             $taxes = 0;
             foreach ($taxArr as $tax) {
