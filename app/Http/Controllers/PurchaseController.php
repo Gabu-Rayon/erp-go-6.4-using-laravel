@@ -680,7 +680,7 @@ class PurchaseController extends Controller
                     'totAmt' => (($item['quantity'] * $item['price'] * $item['pkgQuantity']) - $item['discountAmount']) + $item['taxAmount'],
                     'itemExprDt' => $item['itemExprDate'],
                 ]);
-                Utility::addWarehouseStock($itemDetails['product_id'], $item['quantity'], $data['warehouse']);
+                Utility::addWarehouseStock($itemDetails->id, $item['quantity'], $data['warehouse']);
             }
 
             return redirect()->to('purchase')->with('success', __('Purchase Added'));

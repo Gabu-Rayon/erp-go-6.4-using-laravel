@@ -146,6 +146,10 @@
                                     </tr>
                                     </thead>
                                     <tbody id="tbody">
+                                        <?php echo e(\Log::info('LAST SEGMENT')); ?>
+
+                                        <?php echo e(\Log::info(session($lastsegment))); ?>
+
                                         <?php if(session($lastsegment) && !empty(session($lastsegment)) && count(session($lastsegment)) > 0): ?>
                                         <?php $__currentLoopData = session($lastsegment); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $id => $details): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <?php
@@ -159,7 +163,7 @@
                                                 <td class="cart-images">
                                                     <img alt="Image placeholder" src="<?php echo e(asset(Storage::url('uploads/pro_image/'.$image_url))); ?>" class="card-image avatar rounded-circle-sale shadow hover-shadow-lg">
                                                 </td>
-                                                <td class="name"><?php echo e($product['name']); ?></td>
+                                                <td class="name"><?php echo e($details['name']); ?></td>
                                                 <td>
                                                     <span class="quantity buttons_added">
                                                         <input type="button" value="-" class="minus">
@@ -411,7 +415,7 @@
                     'session_key': session_key
                 },
                 success: function (data) {
-                    console.log(url)
+                    // console.log(data)
                     $('#product-listing').html(data);
                 }
             });
