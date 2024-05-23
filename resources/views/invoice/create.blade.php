@@ -330,8 +330,8 @@
                                     {{ Form::select('paymentType', $paymentTypeCodes, null, ['class' => 'form-control']) }}
                                 </div>
                                 <div class="form-group col-md-4">
-                                    {{ Form::label('traderInvoiceNo', __('Trader Invoive No (*)'), ['class' => 'form-label']) }}
-                                    {{ Form::text('traderInvoiceNo', $invoice_number, array('class' => 'form-control', 'required' => true, 'readonly' => 'readonly')) }}
+                                    {{ Form::label('traderInvoiceNo', __('Trader Invoice No (*)'), ['class' => 'form-label']) }}
+                                    {{ Form::text('traderInvoiceNo', $invoice_number, array('class' => 'form-control', 'required' =>'required',)) }}
                                 </div>
                                 <div class="form-group col-md-4">
                                     {{ Form::label('confirmDate', __('Confirm Date (*)'),['class'=>'form-label']) }}

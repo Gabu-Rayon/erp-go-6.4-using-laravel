@@ -167,7 +167,7 @@ $(document).ready(function() {
                                         if (taxTyCd === 'B') {
                                             taxRate = 16; // VAT 16%
                                         } else if (taxTyCd === 'E') {
-                                            taxRate = 8; // VAT 8%
+                                            taxRate = 0; // VAT 8%
                                         }
 
                                         // Calculate item tax price based on unit price and tax rate
@@ -402,9 +402,9 @@ $(document).ready(function() {
 
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <?php echo e(Form::label('traderInvoiceNo', __('Trader Invoive No (*)'), ['class' => 'form-label'])); ?>
+                                    <?php echo e(Form::label('traderInvoiceNo', __('Trader Invoice No (*)'), ['class' => 'form-label'])); ?>
 
-                                    <?php echo e(Form::text('traderInvoiceNo', $invoice_number, array('class' => 'form-control', 'required' => true, 'readonly' => 'readonly'))); ?>
+                                    <?php echo e(Form::text('traderInvoiceNo', $invoice_number, array('class' => 'form-control', 'required' =>'required',))); ?>
 
                                 </div>
                                 <div class="form-group col-md-4">

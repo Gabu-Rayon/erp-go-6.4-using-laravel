@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\StockMoveListItem;
 use Illuminate\Support\Facades\Http;
 
-class StockMoveListController extends Controller
+class StockUpdateByInvoiceNoController extends Controller
 {
     /**
      * Display a listing of the resource.

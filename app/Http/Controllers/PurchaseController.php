@@ -1581,9 +1581,9 @@ class PurchaseController extends Controller
                                 'isUpdate' => true
                             ]);
 
-                    \Log::info($secondResponse);
+                    \Log::info('Api Response For Updating the Map Purchase Status: '.$secondResponse);
 
-                    return redirect()->back()->with('success', 'Purchase Mapped Successfully');
+                    return redirect()->back()->with('success', 'Purchase Mapped Successfully And Updated purchase Status Also ');
                 } else {
                     return redirect()->back()->with('error', 'Failed to Map Purchase. Please try again.');
                 }

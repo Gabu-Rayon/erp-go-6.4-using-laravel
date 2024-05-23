@@ -6,7 +6,7 @@
 <?php $__env->startSection('breadcrumb'); ?>
     <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
     <li class="breadcrumb-item"><a href="<?php echo e(route('invoice.index')); ?>"><?php echo e(__('Invoice')); ?></a></li>
-    <li class="breadcrumb-item"><?php echo e(Auth::user()->invoiceNumberFormat($invoice->invoice_id)); ?></li>
+    <li class="breadcrumb-item"><?php echo e(AUth::user()->invoiceNumberFormat($invoice->invoice_id)); ?></li>
 <?php $__env->stopSection(); ?>
 <?php
     $settings = Utility::settings();

@@ -21,6 +21,7 @@ use App\Models\InvoiceProduct;
 use App\Models\ProductService;
 use App\Models\PaymentTypeCodes;
 use App\Models\TransactionLines;
+use App\Models\WarehouseProduct;
 use App\Models\InvoiceStatusCode;
 use App\Models\ItemClassification;
 use Illuminate\Support\Facades\DB;
@@ -88,18 +89,20 @@ class InvoiceController extends Controller
             $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusCode', 'invoiceStatusCode');
             $taxationtype = Details::where('cdCls', '04')->pluck('userDfnCd1', 'cd');
 
-            return view('invoice.create', compact(
-                'customers',
-                'invoice_number',
-                'product_services',
-                'category',
-                'customFields',
-                'customerId',
-                'salesTypeCodes',
-                'paymentTypeCodes',
-                'invoiceStatusCodes',
-                'taxationtype'
-            )
+            return view(
+                'invoice.create',
+                compact(
+                    'customers',
+                    'invoice_number',
+                    'product_services',
+                    'category',
+                    'customFields',
+                    'customerId',
+                    'salesTypeCodes',
+                    'paymentTypeCodes',
+                    'invoiceStatusCodes',
+                    'taxationtype'
+                )
             );
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
@@ -131,270 +134,659 @@ class InvoiceController extends Controller
      * Post the data to api EnPoint
      * 
      ***************************************************************************/
-    public function store (Request $request) {
+    // public function store(Request $request)
+    // {
+
+    //     // Log the entire request data
+    //     \Log::info('Form data received:', $request->all());
+    //     try {
+    //         if (\Auth::user()->can('create invoice')) {
+    //             $validator = \Validator::make(
+    //                 $request->all(),
+    //                 [
+    //                     'customer_id' => 'required',
+    //                     'issue_date' => 'required',
+    //                     'due_date' => 'required',
+    //                     'category_id' => 'required',
+    //                     'traderInvoiceNo' => 'required|max:50|min:1',
+    //                     'items' => 'required'
+    //                 ]
+    //             );
+    //             if ($validator->fails()) {
+    //                 $messages = $validator->getMessageBag();
+    //                 return redirect()->back()->with('error', $messages->first());
+    //             }
+
+
+    //             $data = $request->all();
+    //             $customer = Customer::find($data['customer_id']);
+    //             \Log::info('CUSTOMER');
+    //             \Log::info($customer);
+
+    //             $salesDt = str_replace('-', '', $data['salesDate']);
+    //             $salesDate = date('Ymd', strtotime($salesDt));
+
+    //             $occurredDt = str_replace('-', '', $data['occurredDate']);
+    //             $occurredDate = date('Ymd', strtotime($occurredDt));
+    //             $confirmDate = date('YmdHis', strtotime($request->input('confirmDate')));
+    //             $stockReleseDate = date('YmdHis', strtotime($request->input('stockReleseDate')));
+    //             $receiptPublishDate = date('YmdHis', strtotime($request->input('receiptPublishDate')));
+
+    //             $saleItemList = [];
+
+    //             $apiRequestData = [
+    //                 "customerNo" => $customer->customerNo,
+    //                 "customerTin" => $customer->customerTin,
+    //                 "customerName" => $customer->name,
+    //                 "customerMobileNo" => $customer->contact,
+    //                 "salesType" => $data['salesType'],
+    //                 "paymentType" => $data['paymentType'],
+    //                 "traderInvoiceNo" => $data['traderInvoiceNo'],
+    //                 "confirmDate" => $confirmDate,
+    //                 "salesDate" => $salesDate,
+    //                 "stockReleseDate" => $stockReleseDate,
+    //                 "receiptPublishDate" => $receiptPublishDate,
+    //                 "occurredDate" => $occurredDate,
+    //                 "invoiceStatusCode" => $data['invoiceStatusCode'],
+    //                 "remark" => $data['remark'],
+    //                 "isPurchaseAccept" => $data['isPurchaseAccept'],
+    //                 "isStockIOUpdate" => $data['isStockIOUpdate'],
+    //                 "mapping" => $data['mapping'],
+    //                 "saleItemList" => $saleItemList
+    //             ];
+    //             $totalAmount = 0;
+
+    //             \Log::info('INV REQ DATA');
+    //             \Log::info($apiRequestData);
+
+    //             function calculateDiscountAmount($packageQuantity, $quantity, $unitPrice, $discountRate)
+    //             {
+    //                 $totalItems = $packageQuantity * $quantity;
+    //                 $totalPriceBeforeDiscount = $totalItems * $unitPrice;
+    //                 $discountAmount = ($totalPriceBeforeDiscount * $discountRate) / 100;
+    //                 return $discountAmount;
+    //             }
+
+    //             function calculateTotalAmount($packageQuantity, $quantity, $unitPrice)
+    //             {
+    //                 $totalItems = $packageQuantity * $quantity;
+    //                 $totalPriceBeforeDiscount = $totalItems * $unitPrice;
+    //                 return $totalPriceBeforeDiscount;
+    //             }
+
+    //             foreach ($data['items'] as $item) {
+    //                 $itemDetails =ProductService::where('itemCd', $item['itemCode'])->first();
+    //                 $itemExprDt = str_replace('-', '', $item['itemExprDate']);
+    //                 $itemExprDate = date('Ymd', strtotime($itemExprDt));
+    //                 $itemData = [
+    //                     "itemCode" => $itemDetails->itemCd,
+    //                     "itemClassCode" => $itemDetails->itemClsCd,
+    //                     "itemTypeCode" => $itemDetails->itemTyCd,
+    //                     "itemName" => $itemDetails->itemNm,
+    //                     "orgnNatCd" => $itemDetails->orgnNatCd,
+    //                     "taxTypeCode" => $itemDetails->taxTyCd,
+    //                     "unitPrice" => $item['unitPrice'],
+    //                     "isrcAplcbYn" => $itemDetails->isrcAplcbYn,
+    //                     "pkgUnitCode" => $itemDetails->pkgUnitCd,
+    //                     "pkgQuantity" => $item['pkgQuantity'],
+    //                     "tax" => $item['tax'],
+    //                     "qtyUnitCd" => $itemDetails->qtyUnitCd,
+    //                     "quantity" => $item['quantity'],
+    //                     "discountRate" => $item['discountRate'],
+    //                     "discountAmt" => calculateDiscountAmount(
+    //                         $item['pkgQuantity'],
+    //                         $item['quantity'],
+    //                         $item['unitPrice'],
+    //                         $item['discountRate'],
+    //                     ),
+    //                     "itemExprDate" => $itemExprDate
+    //                 ];
+
+    //                 array_push($saleItemList, $itemData);
+
+
+    //             }
+
+    //             $apiRequestData['saleItemList'] = $saleItemList;
+    //             \Log::info('INV REQ DATA');
+    //             \Log::info($apiRequestData);
+
+    //             // $url = 'https://etims.your-apps.biz/api/AddSale';
+
+    //             // $response = Http::withOptions(['verify' => false])->withHeaders([
+    //             //     'key' => '123456'
+    //             //     ])->post($url, $apiRequestData);
+
+    //             // \Log::info('SALES API RESPONSE');
+    //             // \Log::info($response);
+
+    //             // if ($response['statusCode'] == 400) {
+    //             //     return redirect()->back()->with('error', $response['message']);
+    //             // }
+
+    //             \Log::info('INV DEYTA');
+    //             \Log::info($data);
+
+    //             foreach ($saleItemList as $item) {
+    //                 $totalAmount += calculateTotalAmount($item['pkgQuantity'], $item['quantity'], $item['unitPrice']);
+    //             }
+
+    //             $inv = Invoice::create([
+    //                 'invoice_id' => $this->invoiceNumber(),
+    //                 'customer_id' => $data['customer_id'],
+    //                 'issue_date' => $data['issue_date'],
+    //                 'due_date' => $data['due_date'],
+    //                 'send_date' => $data['send_date'],
+    //                 'category_id' => $data['category_id'],
+    //                 'ref_number' => $data['ref_number'],
+    //                 'status' => 0, // Assuming 'status' is nullable or has a default value
+    //                 'shipping_display' => null, // Assuming 'shipping_display' is nullable or has a default value
+    //                 'discount_apply' => null, // Assuming 'discount_apply' is nullable or has a default value
+    //                 'created_by' => \Auth::user()->creatorId(),
+    //                 'trderInvoiceNo' => $data['traderInvoiceNo'],
+    //                 'invoiceNo' => $data['traderInvoiceNo'],
+    //                 'orgInvoiceNo' => $data['traderInvoiceNo'],
+    //                 'customerTin' => $customer->customerTin,
+    //                 'customerName' => $customer->name,
+    //                 'receptTypeCode' => null, // Assuming 'receptTypeCode' is nullable or has a default value
+    //                 'paymentTypeCode' => null, // Assuming 'paymentTypeCode' is nullable or has a default value
+    //                 'salesSttsCode' => null, // Assuming 'salesSttsCode' is nullable or has a default value
+    //                 'confirmDate' => $data['confirmDate'],
+    //                 'salesDate' => $salesDate,
+    //                 'stockReleaseDate' => $data['stockReleseDate'],
+    //                 'cancelReqDate' => null, // Assuming 'cancelReqDate' is nullable or has a default value
+    //                 'cancelDate' => null, // Assuming 'cancelDate' is nullable or has a default value
+    //                 'refundDate' => null, // Assuming 'refundDate' is nullable or has a default value
+    //                 'refundReasonCd' => null, // Assuming 'refundReasonCd' is nullable or has a default value
+    //                 'totalItemCnt' => null, // Assuming 'totalItemCnt' is nullable or has a default value
+    //                 'taxableAmtA' => null, // Assuming 'taxableAmtA' is nullable or has a default value
+    //                 'taxableAmtB' => null, // Assuming 'taxableAmtB' is nullable or has a default value
+    //                 'taxableAmtC' => null, // Assuming 'taxableAmtC' is nullable or has a default value
+    //                 'taxableAmtD' => null, // Assuming 'taxableAmtD' is nullable or has a default value
+    //                 'taxRateA' => null, // Assuming 'taxRateA' is nullable or has a default value
+    //                 'taxRateB' => null, // Assuming 'taxRateB' is nullable or has a default value
+    //                 'taxRateC' => null, // Assuming 'taxRateC' is nullable or has a default value
+    //                 'taxRateD' => null, // Assuming 'taxRateD' is nullable or has a default value
+    //                 'taxAmtA' => null, // Assuming 'taxAmtA' is nullable or has a default value
+    //                 'taxAmtB' => null, // Assuming 'taxAmtB' is nullable or has a default value
+    //                 'taxAmtC' => null, // Assuming 'taxAmtC' is nullable or has a default value
+    //                 'taxAmtD' => null, // Assuming 'taxAmtD' is nullable or has a default value
+    //                 'totalTaxableAmt' => null, // Assuming 'totalTaxableAmt' is nullable or has a default value
+    //                 'totalTaxAmt' => null, // Assuming 'totalTaxAmt' is nullable or has a default value
+    //                 'totalAmt' => $totalAmount,
+    //                 'prchrAcptcYn' => null, // Assuming 'prchrAcptcYn' is nullable or has a default value
+    //                 'remark' => $data['remark'],
+    //                 'regrNm' => null, // Assuming 'regrNm' is nullable or has a default value
+    //                 'regrId' => null, // Assuming 'regrId' is nullable or has a default value
+    //                 'modrNm' => null, // Assuming 'modrNm' is nullable or has a default value
+    //                 'modrId' => null, // Assuming 'modrId' is nullable or has a default value
+    //                 'receipt_CustomerTin' => null, // Assuming 'receipt_CustomerTin' is nullable or has a default value
+    //                 'receipt_CustomerMblNo' => null, // Assuming 'receipt_CustomerMblNo' is nullable or has a default value
+    //                 'receipt_RptNo' => null, // Assuming 'receipt_RptNo' is nullable or has a default value
+    //                 'receipt_RcptPbctDt' => null, // Assuming 'receipt_RcptPbctDt' is nullable or has a default value
+    //                 'receipt_TrdeNm' => null, // Assuming 'receipt_TrdeNm' is nullable or has a default value
+    //                 'receipt_Adrs' => null, // Assuming 'receipt_Adrs' is nullable or has a default value
+    //                 'receipt_TopMsg' => null, // Assuming 'receipt_TopMsg' is nullable or has a default value
+    //                 'receipt_BtmMsg' => null, // Assuming 'receipt_BtmMsg' is nullable or has a default value
+    //                 'receipt_PrchrAcptcYn' => null, // Assuming 'receipt_PrchrAcptcYn' is nullable or has a default value
+    //                 'createdDate' => null, // Assuming 'createdDate' is nullable or has a default value
+    //                 'isKRASynchronized' => null, // Assuming 'isKRASynchronized' is nullable or has a default value
+    //                 'kraSynchronizedDate' => null, // Assuming 'kraSynchronizedDate' is nullable or has a default value
+    //                 'isStockIOUpdate' => $data['isStockIOUpdate'],
+    //                 'resultCd' => null, // Assuming 'resultCd' is nullable or has a default value
+    //                 'resultMsg' => null, // Assuming 'resultMsg' is nullable or has a default value
+    //                 'resultDt' => null, // Assuming 'resultDt' is nullable or has a default value
+    //                 'response_CurRcptNo' => null, // Assuming 'response_CurRcptNo' is nullable or has a default value
+    //                 'response_TotRcptNo' => null, // Assuming 'response_TotRcptNo' is nullable or has a default value
+    //                 'response_IntrlData' => null, // Assuming 'response_IntrlData' is nullable or has a default value
+    //                 'response_RcptSign' => null, // Assuming 'response_RcptSign' is nullable or has a default value
+    //                 'response_SdcDateTime' => null, // Assuming 'response_SdcDateTime' is nullable or has a default value
+    //                 'response_SdcId' => null, // Assuming 'response_SdcId' is nullable or has a default value
+    //                 'response_MrcNo' => null, // Assuming 'response_MrcNo' is nullable or has a default value
+    //                 'qrCodeURL' => null, // Assuming 'qrCodeURL' is nullable or has a default value
+    //             ]);
+
+    //             foreach ($saleItemList as $item) {
+    //                 InvoiceProduct::create([
+    //                     'product_id' => $item['itemCode'],
+    //                     'invoice_id' => $inv['invoice_id'],
+    //                     'quantity' => $item['quantity'],
+    //                     'tax' => $itemDetails->taxTyCd,
+    //                     'discount' => $item['discountAmt'],
+    //                     'price' => calculateTotalAmount(
+    //                         $item['pkgQuantity'],
+    //                         $item['quantity'],
+    //                         $item['unitPrice'],
+    //                     ),
+    //                     'customer_id' => $data['customer_id'],
+    //                     "itemCode" => $itemDetails->itemCd,
+    //                     "itemClassCode" => $itemDetails->itemClsCd,
+    //                     "itemTypeCode" => $itemDetails->itemTyCd,
+    //                     "itemName" => $itemDetails->itemNm,
+    //                     "orgnNatCd" => $itemDetails->orgnNatCd,
+    //                     "taxTypeCode" => $itemDetails->taxTyCd,
+    //                     "unitPrice" => $item['unitPrice'],
+    //                     "isrcAplcbYn" => $itemDetails->isrcAplcbYn,
+    //                     "pkgUnitCode" => $itemDetails->pkgUnitCd,
+    //                     "pkgQuantity" => $item['pkgQuantity'],
+    //                     "qtyUnitCd" => $itemDetails->qtyUnitCd,
+    //                     "discountRate" => $item['discountRate'],
+    //                     "discountAmt" => calculateDiscountAmount(
+    //                         $item['pkgQuantity'],
+    //                         $item['quantity'],
+    //                         $item['unitPrice'],
+    //                         $item['discountRate'],
+    //                     ),
+    //                     "itemExprDate" => $itemExprDate
+    //                 ]);
+    //             }
+    //             return redirect()->to('invoice')->with('success', 'Sale Created Successfully');
+    //         }
+    //     } catch (\Exception $e) {
+    //         \Log::info('ADD INV ERROR');
+    //         \Log::info($e);
+
+    //         return redirect()->back()->with('error', $e->getMessage());
+    //     }
+    // }
+
+    public function store(Request $request)
+    {
+        // Log the entire request data
+        \Log::info('Invoice Data received From the Form:', $request->all());
+
         try {
             if (\Auth::user()->can('create invoice')) {
-                \Log::info('CREATE INVOICE REQUEST DATA');
-                \Log::info($request);
-
-                $validator = \Validator::make(
-                    $request->all(),
-                    [
-                        'customer_id' => 'required',
-                        'issue_date' => 'required',
-                        'due_date' => 'required',
-                        'category_id' => 'required',
-                        'traderInvoiceNo' => 'required|max:50|min:1',
-                        'items' => 'required'
-                    ]
-                );
-
+                $validator = $this->validateInvoice($request);
                 if ($validator->fails()) {
                     $messages = $validator->getMessageBag();
                     return redirect()->back()->with('error', $messages->first());
                 }
 
-                \Log::info('VALIDATED');
-
                 $data = $request->all();
                 $customer = Customer::find($data['customer_id']);
-                \Log::info('ITEMSSSS');
-                \Log::info($data['items']);
+                \Log::info('Invoice Customer', ['customer' => $customer]);
 
-                $salesDt = str_replace('-', '', $data['salesDate']);
-                $salesDate = date('Ymd', strtotime($salesDt));
+                $apiRequestData = $this->prepareApiRequestData($data, $customer);
+                \Log::info('Invoice Api Data to being Posted :', ['apiRequestData' => $apiRequestData]);
 
-                $occurredDt = str_replace('-', '', $data['occurredDate']);
-                $occurredDate = date('Ymd', strtotime($occurredDt));
-                $confirmDate = date('YmdHis', strtotime($request->input('confirmDate')));
-                $stockReleseDate = date('YmdHis', strtotime($request->input('stockReleseDate')));
-                $receiptPublishDate = date('YmdHis', strtotime($request->input('receiptPublishDate')));
-
-                $saleItemList = [];
-                
-                $apiRequestData = [
-                    "customerNo" => $customer->customerNo,
-                    "customerTin" => $customer->customerTin,
-                    "customerName" => $customer->name,
-                    "customerMobileNo" => $customer->contact,
-                    "salesType" => $data['salesType'],
-                    "paymentType" => $data['paymentType'],
-                    "traderInvoiceNo" => $data['traderInvoiceNo'],
-                    "confirmDate" => $confirmDate,
-                    "salesDate" => $salesDate,
-                    "stockReleseDate" => $stockReleseDate,
-                    "receiptPublishDate" => $receiptPublishDate,
-                    "occurredDate" => $occurredDate,
-                    "invoiceStatusCode" => $data['invoiceStatusCode'],
-                    "remark" => $data['remark'],
-                    "isPurchaseAccept" => $data['isPurchaseAccept'],
-                    "isStockIOUpdate" => $data['isStockIOUpdate'],
-                    "mapping" => $data['mapping'],
-                    "saleItemList" => $saleItemList
-                ];
-                $totalAmount = 0;
-
-                \Log::info('INV REQ DATA');
-                \Log::info($apiRequestData);
-
-                function calculateDiscountAmount($packageQuantity, $quantity, $unitPrice, $discountRate)
-                {
-                    $totalItems = $packageQuantity * $quantity;
-                    $totalPriceBeforeDiscount = $totalItems * $unitPrice;
-                    $discountAmount = ($totalPriceBeforeDiscount * $discountRate) / 100;
-                    return $discountAmount;
-                }
-
-                function calculateTotalAmount($packageQuantity, $quantity, $unitPrice, $taxAmt, $discAmt)
-                {
-                    $totalItems = $packageQuantity * $quantity;
-                    $totalPriceBeforeDiscount = $totalItems * $unitPrice;
-                    $totalPrc = ($totalPriceBeforeDiscount - $discAmt) + $taxAmt;
-                    return $totalPrc;
-                }
-
-                foreach ($data['items'] as $item) {
-                    $itemDetails = ProductService::where('itemCd', $item['item'])->first();
-                    $itemExprDt = str_replace('-', '', $item['itemExprDate']);
-                    $itemExprDate = date('Ymd', strtotime($itemExprDt));
-                    $itemData = [
-                        "itemCode" => $itemDetails->itemCd,
-                        "itemClassCode" => $itemDetails->itemClsCd,
-                        "itemTypeCode" => $itemDetails->itemTyCd,
-                        "itemName" => $itemDetails->itemNm,
-                        "orgnNatCd" => $itemDetails->orgnNatCd,
-                        "taxTypeCode" => $itemDetails->taxTyCd,
-                        "unitPrice" => $item['price'],
-                        "isrcAplcbYn" => $itemDetails->isrcAplcbYn,
-                        "pkgUnitCode" => $itemDetails->pkgUnitCd,
-                        "pkgQuantity" => $item['pkgQuantity'],
-                        "tax" => $item['tax'],
-                        "qtyUnitCd" => $itemDetails->qtyUnitCd,
-                        "quantity" => $item['quantity'],
-                        "discountRate" => $item['discount'],
-                        "discountAmt" => $item['discountAmount'],
-                        "itemExprDate" => $itemExprDate,
-                        "taxAmount" => $item['taxAmount'],
-                    ];
-
-                    array_push($saleItemList, $itemData);
-
-
-                }
-
+                $saleItemList = $this->prepareSaleItemList($data['items']);
                 $apiRequestData['saleItemList'] = $saleItemList;
-                \Log::info('INV REQ DATA');
-                \Log::info($apiRequestData);
+                \Log::info('Invoice  REQ DATA To Be Posted to the Api ', ['apiRequestData' => $apiRequestData]);
 
+                // Send data to AddSale API
                 // $url = 'https://etims.your-apps.biz/api/AddSale';
+                // $response = Http::withOptions(['verify' => false])
+                //     ->withHeaders(['key' => '123456'])
+                //     ->post($url, $apiRequestData);
 
-                // $response = Http::withOptions(['verify' => false])->withHeaders([
-                //     'key' => '123456'
-                //     ])->post($url, $apiRequestData);
 
-                // \Log::info('SALES API RESPONSE');
-                // \Log::info($response);
+                // if ($response->failed()) {
+                //     if ($response->json('statusCode') == 400 && $response->json('message') == 'Trader invoice number is alrady exist') {
+                //         return redirect()->back()->with('error', 'Trader invoice number already exists.');
+                //     }
+                //     return redirect()->back()->with('error', 'Failed to post invoice data.');
+                // }
+                
+                // // Log the response of the AddSale API call
+                // \Log::info('SALES Invoice API RESPONSE', ['response' => $response->json()]);
+                // \Log::info('API Response Status Code For Posting Invoice Data: ' . $response->status());
+                // \Log::info('API Request Invoice Being Posted: ' . json_encode($apiRequestData));
+                // \Log::info('API Response Body For Posting Invoice Data: ' . $response->body());
 
                 // if ($response['statusCode'] == 400) {
                 //     return redirect()->back()->with('error', $response['message']);
                 // }
 
-                \Log::info('INV DEYTA');
-                \Log::info($data);
+                // Prepare data for ItemOpeningStock API
+                // $openingItemsLists = $this->prepareOpeningItemsList($saleItemList);
+                // $itemOpeningStockRequestData = [
+                //     "openingItemsLists" => $openingItemsLists
+                // ];
 
-                foreach ($data['items'] as $item) {
-                    $totalAmount += calculateTotalAmount($item['pkgQuantity'], $item['quantity'], $item['price'], $item['taxAmount'], $item['discountAmount']);
+                // // Send data to ItemOpeningStock API
+                // $url = 'https://etims.your-apps.biz/api/ItemOpeningStock';
+                // $response = Http::withOptions(['verify' => false])
+                //     ->withHeaders([
+                //         'accept' => '*/*',
+                //         'key' => '123456',
+                //         'Content-Type' => 'application/json'
+                //     ])
+                //     ->post($url, $itemOpeningStockRequestData);
+
+                // \Log::info('ITEM OPENING STOCK API RESPONSE', ['response' => $response->json()]);
+                // \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $response->status());
+                // \Log::info('API Request Opening Stock Data Posted: ' . json_encode($itemOpeningStockRequestData));
+                // \Log::info('API Response Body For Posting Opening Stock Data: ' . json_encode($response->body()));
+
+                // if ($response->failed()) {
+                //     return redirect()->back()->with('error', 'Failed to sync item opening stock');
+                // }
+
+                $totalAmount = $this->calculateTotalAmount($saleItemList);
+                $inv = $this->createInvoice($data, $customer, $totalAmount);
+                $this->createInvoiceProducts($saleItemList, $inv, $data['customer_id']);
+
+                 // Update the quantities in product_services and warehouse_products tables
+               foreach ($saleItemList as $item) {
+                // Update quantity in product_services
+                $productService = ProductService::where('itemCd', $item['itemCode'])->first();
+                if ($productService && $productService->quantity !== null) {
+                    $productService->quantity -= $item['quantity'];                    
+                    $productService->save();
                 }
                 \Log::info('TOTAL AMT');
                 \Log::info($totalAmount);
 
-                $inv = Invoice::create([
-                    'invoice_id' => $this->invoiceNumber(),
-                    'customer_id' => $data['customer_id'],
-                    'issue_date' => $data['issue_date'],
-                    'due_date' => $data['due_date'],
-                    'send_date' => $data['send_date'],
-                    'category_id' => $data['category_id'],
-                    'ref_number' => $data['ref_number'],
-                    'status' => 0, // Assuming 'status' is nullable or has a default value
-                    'shipping_display' => null, // Assuming 'shipping_display' is nullable or has a default value
-                    'discount_apply' => null, // Assuming 'discount_apply' is nullable or has a default value
-                    'created_by' => \Auth::user()->creatorId(),
-                    'trderInvoiceNo' => $data['traderInvoiceNo'],
-                    'invoiceNo' => $data['traderInvoiceNo'],
-                    'orgInvoiceNo' => $data['traderInvoiceNo'],
-                    'customerTin' => $customer->customerTin,
-                    'customerName' => $customer->name,
-                    'receptTypeCode' => null, // Assuming 'receptTypeCode' is nullable or has a default value
-                    'paymentTypeCode' => null, // Assuming 'paymentTypeCode' is nullable or has a default value
-                    'salesSttsCode' => null, // Assuming 'salesSttsCode' is nullable or has a default value
-                    'confirmDate' => $data['confirmDate'],
-                    'salesDate' => $salesDate,
-                    'stockReleaseDate' => $data['stockReleseDate'],
-                    'cancelReqDate' => null, // Assuming 'cancelReqDate' is nullable or has a default value
-                    'cancelDate' => null, // Assuming 'cancelDate' is nullable or has a default value
-                    'refundDate' => null, // Assuming 'refundDate' is nullable or has a default value
-                    'refundReasonCd' => null, // Assuming 'refundReasonCd' is nullable or has a default value
-                    'totalItemCnt' => null, // Assuming 'totalItemCnt' is nullable or has a default value
-                    'taxableAmtA' => null, // Assuming 'taxableAmtA' is nullable or has a default value
-                    'taxableAmtB' => null, // Assuming 'taxableAmtB' is nullable or has a default value
-                    'taxableAmtC' => null, // Assuming 'taxableAmtC' is nullable or has a default value
-                    'taxableAmtD' => null, // Assuming 'taxableAmtD' is nullable or has a default value
-                    'taxRateA' => null, // Assuming 'taxRateA' is nullable or has a default value
-                    'taxRateB' => null, // Assuming 'taxRateB' is nullable or has a default value
-                    'taxRateC' => null, // Assuming 'taxRateC' is nullable or has a default value
-                    'taxRateD' => null, // Assuming 'taxRateD' is nullable or has a default value
-                    'taxAmtA' => null, // Assuming 'taxAmtA' is nullable or has a default value
-                    'taxAmtB' => null, // Assuming 'taxAmtB' is nullable or has a default value
-                    'taxAmtC' => null, // Assuming 'taxAmtC' is nullable or has a default value
-                    'taxAmtD' => null, // Assuming 'taxAmtD' is nullable or has a default value
-                    'totalTaxableAmt' => null, // Assuming 'totalTaxableAmt' is nullable or has a default value
-                    'totalTaxAmt' => null, // Assuming 'totalTaxAmt' is nullable or has a default value
-                    'totalAmt' => $totalAmount,
-                    'prchrAcptcYn' => null, // Assuming 'prchrAcptcYn' is nullable or has a default value
-                    'remark' => $data['remark'],
-                    'regrNm' => null, // Assuming 'regrNm' is nullable or has a default value
-                    'regrId' => null, // Assuming 'regrId' is nullable or has a default value
-                    'modrNm' => null, // Assuming 'modrNm' is nullable or has a default value
-                    'modrId' => null, // Assuming 'modrId' is nullable or has a default value
-                    'receipt_CustomerTin' => null, // Assuming 'receipt_CustomerTin' is nullable or has a default value
-                    'receipt_CustomerMblNo' => null, // Assuming 'receipt_CustomerMblNo' is nullable or has a default value
-                    'receipt_RptNo' => null, // Assuming 'receipt_RptNo' is nullable or has a default value
-                    'receipt_RcptPbctDt' => null, // Assuming 'receipt_RcptPbctDt' is nullable or has a default value
-                    'receipt_TrdeNm' => null, // Assuming 'receipt_TrdeNm' is nullable or has a default value
-                    'receipt_Adrs' => null, // Assuming 'receipt_Adrs' is nullable or has a default value
-                    'receipt_TopMsg' => null, // Assuming 'receipt_TopMsg' is nullable or has a default value
-                    'receipt_BtmMsg' => null, // Assuming 'receipt_BtmMsg' is nullable or has a default value
-                    'receipt_PrchrAcptcYn' => null, // Assuming 'receipt_PrchrAcptcYn' is nullable or has a default value
-                    'createdDate' => null, // Assuming 'createdDate' is nullable or has a default value
-                    'isKRASynchronized' => null, // Assuming 'isKRASynchronized' is nullable or has a default value
-                    'kraSynchronizedDate' => null, // Assuming 'kraSynchronizedDate' is nullable or has a default value
-                    'isStockIOUpdate' => $data['isStockIOUpdate'],
-                    'resultCd' => null, // Assuming 'resultCd' is nullable or has a default value
-                    'resultMsg' => null, // Assuming 'resultMsg' is nullable or has a default value
-                    'resultDt' => null, // Assuming 'resultDt' is nullable or has a default value
-                    'response_CurRcptNo' => null, // Assuming 'response_CurRcptNo' is nullable or has a default value
-                    'response_TotRcptNo' => null, // Assuming 'response_TotRcptNo' is nullable or has a default value
-                    'response_IntrlData' => null, // Assuming 'response_IntrlData' is nullable or has a default value
-                    'response_RcptSign' => null, // Assuming 'response_RcptSign' is nullable or has a default value
-                    'response_SdcDateTime' => null, // Assuming 'response_SdcDateTime' is nullable or has a default value
-                    'response_SdcId' => null, // Assuming 'response_SdcId' is nullable or has a default value
-                    'response_MrcNo' => null, // Assuming 'response_MrcNo' is nullable or has a default value
-                    'qrCodeURL' => null, // Assuming 'qrCodeURL' is nullable or has a default value
-                ]);
-
-                foreach ($saleItemList as $item) {
-                    \Log::info('ITEM TO CREATE');
-                    \Log::info($item);
-                    $itemDetails = ProductService::where('itemCd', $item['itemCode'])->first();
-                    InvoiceProduct::create([
-                        'product_id' => $item['itemCode'],
-                        'invoice_id' => $inv['invoice_id'],
-                        'quantity' => $item['quantity'],
-                        'tax' => $itemDetails->taxTyCd,
-                        'discount' => $item['discountAmt'],
-                        'price' => calculateTotalAmount(
-                            $item['pkgQuantity'],
-                            $item['quantity'],
-                            $item['unitPrice'],
-                            $item['taxAmount'], // Assuming this is the tax amount
-                            $item['discountAmt'] // Assuming this is the discount amount
-                        ),
-                        
-                        'customer_id' => $data['customer_id'],
-                        "itemCode" => $itemDetails->itemCd,
-                        "itemClassCode" => $itemDetails->itemClsCd,
-                        "itemTypeCode" => $itemDetails->itemTyCd,
-                        "itemName" => $itemDetails->itemNm,
-                        "orgnNatCd" => $itemDetails->orgnNatCd,
-                        "taxTypeCode" => $itemDetails->taxTyCd,
-                        "unitPrice" => $item['unitPrice'],
-                        "isrcAplcbYn" => $itemDetails->isrcAplcbYn,
-                        "pkgUnitCode" => $itemDetails->pkgUnitCd,
-                        "pkgQuantity" => $item['pkgQuantity'],
-                        "qtyUnitCd" => $itemDetails->qtyUnitCd,
-                        "discountRate" => $item['discountRate'],
-                        "discountAmt" => calculateDiscountAmount(
-                            $item['pkgQuantity'],
-                            $item['quantity'],
-                            $item['unitPrice'],
-                            $item['discountRate'],
-                        ),
-                        "itemExprDate" => $itemExprDate
-                    ]);
+                // Update quantity in warehouse_products
+                $warehouseProduct = WarehouseProduct::where('product_id', $productService->id)->first();
+                if ($warehouseProduct && $warehouseProduct->quantity !== null) {
+                    $warehouseProduct->quantity -= $item['quantity'];
+                    // $warehouseProduct->pkgQuantity  -= $item['pkgQuantity'];
+                    $warehouseProduct->save();
                 }
+            }
+
                 return redirect()->to('invoice')->with('success', 'Sale Created Successfully');
 
             } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
         } catch (\Exception $e) {
-            \Log::info('CREATE INVOICE ERROR');
-            \Log::info($e);
-
+            \Log::error('ADD INV ERROR', ['exception' => $e]);
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
+
+    private function validateInvoice($request)
+    {
+        return \Validator::make($request->all(), [
+            'customer_id' => 'required',
+            'issue_date' => 'required',
+            'due_date' => 'required',
+            'category_id' => 'required',
+            'traderInvoiceNo' => 'required|max:50|min:1',
+            'items' => 'required'
+        ]);
+    }
+
+    private function prepareApiRequestData($data, $customer)
+    {
+        return [
+            "customerNo" => $customer->customerNo,
+            "customerTin" => $customer->customerTin,
+            "customerName" => $customer->name,
+            "customerMobileNo" => $customer->contact,
+            "salesType" => $data['salesType'],
+            "paymentType" => $data['paymentType'],
+            "traderInvoiceNo" => $data['traderInvoiceNo'],
+            "confirmDate" => $this->formatDateTime($data['confirmDate']),
+            "salesDate" => $this->formatDate($data['salesDate']),
+            "stockReleseDate" => $this->formatDateTime($data['stockReleseDate']),
+            "receiptPublishDate" => $this->formatDateTime($data['receiptPublishDate']),
+            "occurredDate" => $this->formatDate($data['occurredDate']),
+            "invoiceStatusCode" => $data['invoiceStatusCode'],
+            "remark" => $data['remark'],
+            "isPurchaseAccept" => $data['isPurchaseAccept'],
+            "isStockIOUpdate" => $data['isStockIOUpdate'],
+            "mapping" => $data['mapping'],
+            "saleItemList" => []
+        ];
+    }
+
+    private function prepareSaleItemList($items)
+    {
+        $saleItemList = [];
+
+        foreach ($items as $item) {
+            $itemDetails = ProductService::where('itemCd', $item['itemCode'])->first();
+            $itemExprDate = $this->formatDate($item['itemExprDate']);
+            $saleItemList[] = [
+                "itemCode" => $itemDetails->itemCd,
+                "itemClassCode" => $itemDetails->itemClsCd,
+                "itemTypeCode" => $itemDetails->itemTyCd,
+                "itemName" => $itemDetails->itemNm,
+                "orgnNatCd" => $itemDetails->orgnNatCd,
+                "taxTypeCode" => $itemDetails->taxTyCd,
+                "unitPrice" => $item['unitPrice'],
+                "isrcAplcbYn" => $itemDetails->isrcAplcbYn,
+                "pkgUnitCode" => $itemDetails->pkgUnitCd,
+                "pkgQuantity" => $item['pkgQuantity'],
+                "tax" => $item['tax'],
+                "qtyUnitCd" => $itemDetails->qtyUnitCd,
+                "quantity" => $item['quantity'],
+                "discountRate" => $item['discountRate'],
+                "discountAmt" => $this->calculateDiscountAmount(
+                    $item['pkgQuantity'],
+                    $item['quantity'],
+                    $item['unitPrice'],
+                    $item['discountRate']
+                ),
+                "itemExprDate" => $itemExprDate
+            ];
+        }
+
+        return $saleItemList;
+    }
+
+    private function prepareOpeningItemsList($saleItemList)
+    {
+        $openingItemsLists = [];
+
+        foreach ($saleItemList as $item) {
+            $openingItemsLists[] = [
+                "itemCode" => $item['itemCode'],
+                "quantity" => $item['quantity'],
+                "packageQuantity" => $item['pkgQuantity']
+            ];
+        }
+
+        return $openingItemsLists;
+    }
+
+    private function formatDate($date)
+    {
+        return date('Ymd', strtotime(str_replace('-', '', $date)));
+    }
+
+    private function formatDateTime($dateTime)
+    {
+        return date('YmdHis', strtotime($dateTime));
+    }
+
+    private function calculateDiscountAmount($packageQuantity, $quantity, $unitPrice, $discountRate)
+    {
+        $totalItems = $packageQuantity * $quantity;
+        $totalPriceBeforeDiscount = $totalItems * $unitPrice;
+        return ($totalPriceBeforeDiscount * $discountRate) / 100;
+    }
+
+    private function calculateTotalAmount($saleItemList)
+    {
+        $totalAmount = 0;
+        foreach ($saleItemList as $item) {
+            $totalAmount += $item['pkgQuantity'] * $item['quantity'] * $item['unitPrice'];
+        }
+        return $totalAmount;
+    }
+
+    private function createInvoice($data, $customer, $totalAmount)
+    {
+        $salesDate = $this->formatDate($data['salesDate']);
+
+        return Invoice::create([
+            'invoice_id' => $this->invoiceNumber(),
+            'customer_id' => $data['customer_id'],
+            'issue_date' => $data['issue_date'],
+            'due_date' => $data['due_date'],
+            'send_date' => $data['send_date'],
+            'category_id' => $data['category_id'],
+            'ref_number' => $data['ref_number'],
+            'status' => 0,
+            'shipping_display' => null,
+            'discount_apply' => null,
+            'created_by' => \Auth::user()->creatorId(),
+            'trderInvoiceNo' => $data['traderInvoiceNo'],
+            'invoiceNo' => $data['traderInvoiceNo'],
+            'orgInvoiceNo' => $data['traderInvoiceNo'],
+            'customerTin' => $customer->customerTin,
+            'customerName' => $customer->name,
+            'receptTypeCode' => null,
+            'paymentTypeCode' => null,
+            'salesSttsCode' => null,
+            'confirmDate' => $data['confirmDate'],
+            'salesDate' => $salesDate,
+            'stockReleaseDate' => $data['stockReleseDate'],
+            'cancelReqDate' => null,
+            'cancelDate' => null,
+            'refundDate' => null,
+            'refundReasonCd' => null,
+            'totalItemCnt' => null,
+            'taxableAmtA' => null,
+            'taxableAmtB' => null,
+            'taxableAmtC' => null,
+            'taxableAmtD' => null,
+            'taxRateA' => null,
+            'taxRateB' => null,
+            'taxRateC' => null,
+            'taxRateD' => null,
+            'taxAmtA' => null,
+            'taxAmtB' => null,
+            'taxAmtC' => null,
+            'taxAmtD' => null,
+            'totalTaxableAmt' => null,
+            'totalTaxAmt' => null,
+            'totalAmt' => $totalAmount,
+            'prchrAcptcYn' => null,
+            'remark' => $data['remark'],
+            'regrNm' => null,
+            'regrId' => null,
+            'modrNm' => null,
+            'modrId' => null,
+            'receipt_CustomerTin' => null,
+            'receipt_CustomerMblNo' => null,
+            'receipt_RptNo' => null,
+            'receipt_RcptPbctDt' => null,
+            'receipt_TrdeNm' => null,
+            'receipt_Adrs' => null,
+            'receipt_TopMsg' => null,
+            'receipt_BtmMsg' => null,
+            'receipt_PrchrAcptcYn' => null,
+            'createdDate' => null,
+            'isKRASynchronized' => null,
+            'kraSynchronizedDate' => null,
+            'isStockIOUpdate' => $data['isStockIOUpdate'],
+            'resultCd' => null,
+            'resultMsg' => null,
+            'resultDt' => null,
+            'response_CurRcptNo' => null,
+            'response_TotRcptNo' => null,
+            'response_IntrlData' => null,
+            'response_RcptSign' => null,
+            'response_SdcDateTime' => null,
+            'response_SdcId' => null,
+            'response_MrcNo' => null,
+            'qrCodeURL' => null,
+        ]);
+    }
+
+    private function createInvoiceProducts($saleItemList, $inv, $customerId)
+    {
+        foreach ($saleItemList as $item) {
+            $itemDetails = ProductService::where('itemCd', $item['itemCode'])->first();
+            $itemExprDate = $this->formatDate($item['itemExprDate']);
+            InvoiceProduct::create([
+                'product_id' => $item['itemCode'],
+                'invoice_id' => $inv['invoice_id'],
+                'quantity' => $item['quantity'],
+                'tax' => $itemDetails->taxTyCd,
+                'discount' => $item['discountAmt'],
+                'price' => $this->calculateTotalAmount([
+                    ['pkgQuantity' => $item['pkgQuantity'], 'quantity' => $item['quantity'], 'unitPrice' => $item['unitPrice']]
+                ]),
+                'customer_id' => $customerId,
+                "itemCode" => $itemDetails->itemCd,
+                "itemClassCode" => $itemDetails->itemClsCd,
+                "itemTypeCode" => $itemDetails->itemTyCd,
+                "itemName" => $itemDetails->itemNm,
+                "orgnNatCd" => $itemDetails->orgnNatCd,
+                "taxTypeCode" => $itemDetails->taxTyCd,
+                "unitPrice" => $item['unitPrice'],
+                "isrcAplcbYn" => $itemDetails->isrcAplcbYn,
+                "pkgUnitCode" => $itemDetails->pkgUnitCd,
+                "pkgQuantity" => $item['pkgQuantity'],
+                "qtyUnitCd" => $itemDetails->qtyUnitCd,
+                "discountRate" => $item['discountRate'],
+                "discountAmt" => $this->calculateDiscountAmount(
+                    $item['pkgQuantity'],
+                    $item['quantity'],
+                    $item['unitPrice'],
+                    $item['discountRate']
+                ),
+                "itemExprDate" => $itemExprDate
+            ]);
+        }
+    }
+
+
+
+    // if (\Auth::user()->can('create invoice')) {
+    //     $validator = \Validator::make(
+    //         $request->all(),
+    //         [
+    //             'customer_id' => 'required',
+    //             'issue_date' => 'required',
+    //             'due_date' => 'required',
+    //             'category_id' => 'required',
+    //             'items' => 'required',
+    //         ]
+    //     );
+    //     if ($validator->fails()) {
+    //         $messages = $validator->getMessageBag();
+    //         return redirect()->back()->with('error', $messages->first());
+    //     }
+
+    //     $invoiceData = [
+    //         'customer_id' => $request->customer_id,
+    //         'issue_date' => $request->issue_date,
+    //         'due_date' => $request->due_date,
+    //         'category_id' => $request->category_id,
+    //         'items' => $request->items,
+    //         // Add other fields as needed
+
+    //         "customerTin" => $request->customer_tin,
+    //         "salesType" => $request->sales_types,
+    //         "paymentType" => $request->payment_type,
+    //         "invoiceStatusCode" => $request->invoice_status_code,
+    //         "remark" => $request->remark,
+    //         "isPurchaseAccept" => $request->is_purchase_accept,
+    //         "itemCode" => $request->item_code,
+    //         "unitPrice" => $request->unit_price,
+    //         "quantity" => $request->quantity,
+    //         "discountRate" => $request->discount_rate,
+    //         "discountAmt" => $request->discount_amount
+    //     ];
+
+    //     // Post data to the API endpoint
+    //     $response = Http::post('https://etims.your-apps.biz/api/SaveSales', $invoiceData);
+    //     // $response = Http::post('https://etims.your-apps.biz/api/AddSale', $invoiceData);           
+
+    //     // Check if the request was successful (status code 2xx)
+    //     if ($response->successful()) {
+    //         // API request was successful, handle response if needed
+    //         $apiResponse = $response->json(); // Convert response to JSON
+    //         // Handle API response here
+    //     } else {
+    //         // API request failed, handle error
+    //         $errorResponse = $response->json(); // Convert error response to JSON
+    //         // Handle error response here
+    //         return redirect()->back()->with('error', 'Failed to post data to API.');
+    //     }
+
+    //     // Rest of your logic...
+    // } else {
+    //     return redirect()->back()->with('error', __('Permission denied.'));
+    // }
 
     public function edit($ids)
     {
@@ -553,7 +945,7 @@ class InvoiceController extends Controller
 
                 $customer = $invoice->customer;
                 // Retrieve associated sales products
-                 $iteams = InvoiceProduct::where('invoice_id', $invoice->invoice_id)->get();
+                $iteams = InvoiceProduct::where('invoice_id', $invoice->invoice_id)->get();
 
                 $user = \Auth::user();
 
@@ -1519,6 +1911,6 @@ class InvoiceController extends Controller
             ]);
         }
     }
-    
+
 
 }
