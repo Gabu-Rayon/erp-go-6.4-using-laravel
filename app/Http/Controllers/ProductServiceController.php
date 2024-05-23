@@ -940,8 +940,7 @@ class ProductServiceController extends Controller
         return view('productservice.detail', compact('products'));
     }
 
-    public function searchProducts(Request $request)
-    {
+    public function searchProducts(Request $request) {
 
         $lastsegment = $request->session_key;
 
@@ -991,10 +990,10 @@ class ProductServiceController extends Controller
                     if ($request->session_key == 'purchases') {
                         $productprice = $product->purchase_price != 0 ? $product->purchase_price : 0;
                     } else if ($request->session_key == 'pos') {
-                        $productprice = $product->sale_price != 0 ? $product->sale_price : 0;
+                        $productprice = $product->dftPrc != 0 ? $product->dftPrc : 0;
 
                     } else {
-                        $productprice = $product->sale_price != 0 ? $product->sale_price : $product->purchase_price;
+                        $productprice = $product->dftPrc != 0 ? $product->dftPrc : $product->purchase_price;
                     }
 
                     $output .= '
@@ -1030,123 +1029,195 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function addToCart(Request $request, $id, $session_key)
-    {
+    public function addToCart(Request $request, $id, $session_key) {
 
-        if (Auth::user()->can('manage product & service') && $request->ajax()) {
-            $product = ProductService::find($id);
-            $productquantity = 0;
-
-            if ($product) {
-                $productquantity = $product->getTotalProductQuantity();
-            }
-
-            if (!$product || ($session_key == 'pos' && $productquantity == 0)) {
-                return response()->json(
-                    [
-                        'code' => 404,
-                        'status' => 'Error',
-                        'error' => __('This product is out of stock!'),
-                    ],
-                    404
-                );
-            }
-
-            $productname = $product->name;
-
-            if ($session_key == 'purchases') {
-
-                $productprice = $product->purchase_price != 0 ? $product->purchase_price : 0;
-            } else if ($session_key == 'pos') {
-
-                $productprice = $product->sale_price != 0 ? $product->sale_price : 0;
-            } else {
-
-                $productprice = $product->sale_price != 0 ? $product->sale_price : $product->purchase_price;
-            }
-
-            $originalquantity = (int) $productquantity;
-
-            $taxes = Utility::tax($product->tax_id);
-
-            $totalTaxRate = Utility::totalTaxRate($product->tax_id);
-
-            $product_tax = '';
-            $product_tax_id = [];
-            foreach ($taxes as $tax) {
-                $product_tax .= !empty($tax) ? "<span class='badge badge-primary'>" . $tax->name . ' (' . $tax->rate . '%)' . "</span><br>" : '';
-                $product_tax_id[] = !empty($tax) ? $tax->id : 0;
-            }
-
-            if (empty($product_tax)) {
-                $product_tax = "-";
-            }
-            $producttax = $totalTaxRate;
-
-
-            $tax = ($productprice * $producttax) / 100;
-
-            $subtotal = $productprice + $tax;
-            $cart = session()->get($session_key);
-            $image_url = (!empty($product->pro_image) && Storage::exists($product->pro_image)) ? $product->pro_image : 'uploads/pro_image/' . $product->pro_image;
-
-            $model_delete_id = 'delete-form-' . $id;
-
-            $carthtml = '';
-
-            $carthtml .= '<tr data-product-id="' . $id . '" id="product-id-' . $id . '">
-                            <td class="cart-images">
-                                <img alt="Image placeholder" src="' . asset(Storage::url($image_url)) . '" class="card-image avatar shadow hover-shadow-lg">
-                            </td>
-
-                            <td class="name">' . $productname . '</td>
-
-                            <td class="">
-                                   <span class="quantity buttons_added">
-                                         <input type="button" value="-" class="minus">
-                                         <input type="number" step="1" min="1" max="" name="quantity" title="' . __('Quantity') . '" class="input-number" size="4" data-url="' . url('update-cart/') . '" data-id="' . $id . '">
-                                         <input type="button" value="+" class="plus">
-                                   </span>
-                            </td>
-
-
-                            <td class="tax">' . $product_tax . '</td>
-
-                            <td class="price">' . Auth::user()->priceFormat($productprice) . '</td>
-
-                            <td class="subtotal">' . Auth::user()->priceFormat($subtotal) . '</td>
-
-                            <td class="">
-                                 <a href="#" class="action-btn bg-danger bs-pass-para-pos" data-confirm="' . __("Are You Sure?") . '" data-text="' . __("This action can not be undone. Do you want to continue?") . '" data-confirm-yes=' . $model_delete_id . ' title="' . __('Delete') . '}" data-id="' . $id . '" title="' . __('Delete') . '"   >
-                                   <span class=""><i class="ti ti-trash btn btn-sm text-white"></i></span>
-                                 </a>
-                                 <form method="post" action="' . url('remove-from-cart') . '"  accept-charset="UTF-8" id="' . $model_delete_id . '">
-                                      <input name="_method" type="hidden" value="DELETE">
-                                      <input name="_token" type="hidden" value="' . csrf_token() . '">
-                                      <input type="hidden" name="session_key" value="' . $session_key . '">
-                                      <input type="hidden" name="id" value="' . $id . '">
-                                 </form>
-
-                            </td>
-                        </td>';
-
-            // if cart is empty then this the first product
-            if (!$cart) {
-                $cart = [
-                    $id => [
-                        "name" => $productname,
-                        "quantity" => 1,
-                        "price" => $productprice,
-                        "id" => $id,
-                        "tax" => $producttax,
-                        "subtotal" => $subtotal,
-                        "originalquantity" => $originalquantity,
-                        "product_tax" => $product_tax,
-                        "product_tax_id" => !empty($product_tax_id) ? implode(',', $product_tax_id) : 0,
-                    ],
+        try {
+            if (Auth::user()->can('manage product & service') && $request->ajax()) {
+                $product = WarehouseProduct::where('product_id', $id)->first();
+                $productquantity = 0;
+    
+                if ($product) {
+                    $productquantity = $product->quantity;
+                }
+    
+                if (!$product || ($session_key == 'pos' && $productquantity == 0)) {
+                    return response()->json(
+                        [
+                            'code' => 404,
+                            'status' => 'Error',
+                            'error' => __('This product is out of stock!'),
+                        ],
+                        404
+                    );
+                }
+    
+                $productname = $product->name;
+    
+                if ($session_key == 'purchases') {
+    
+                    $productprice = $product->purchase_price != 0 ? $product->purchase_price : 0;
+                } else if ($session_key == 'pos') {
+    
+                    $productprice = $product->sale_price != 0 ? $product->sale_price : 0;
+                } else {
+    
+                    $productprice = $product->sale_price != 0 ? $product->sale_price : $product->purchase_price;
+                }
+    
+                $originalquantity = (int) $productquantity;
+    
+                $taxes = Utility::tax($product->tax_id);
+    
+                $totalTaxRate = Utility::totalTaxRate($product->tax_id);
+    
+                $product_tax = '';
+                $product_tax_id = [];
+                foreach ($taxes as $tax) {
+                    $product_tax .= !empty($tax) ? "<span class='badge badge-primary'>" . $tax->name . ' (' . $tax->rate . '%)' . "</span><br>" : '';
+                    $product_tax_id[] = !empty($tax) ? $tax->id : 0;
+                }
+    
+                if (empty($product_tax)) {
+                    $product_tax = "-";
+                }
+                $producttax = $totalTaxRate;
+    
+    
+                $tax = ($productprice * $producttax) / 100;
+    
+                $subtotal = $productprice + $tax;
+                $cart = session()->get($session_key);
+                $image_url = (!empty($product->pro_image) && Storage::exists($product->pro_image)) ? $product->pro_image : 'uploads/pro_image/' . $product->pro_image;
+    
+                $model_delete_id = 'delete-form-' . $id;
+    
+                $carthtml = '';
+    
+                $carthtml .= '<tr data-product-id="' . $id . '" id="product-id-' . $id . '">
+                                <td class="cart-images">
+                                    <img alt="Image placeholder" src="' . asset(Storage::url($image_url)) . '" class="card-image avatar shadow hover-shadow-lg">
+                                </td>
+    
+                                <td class="name">' . $productname . '</td>
+    
+                                <td class="">
+                                       <span class="quantity buttons_added">
+                                             <input type="button" value="-" class="minus">
+                                             <input type="number" step="1" min="1" max="" name="quantity" title="' . __('Quantity') . '" class="input-number" size="4" data-url="' . url('update-cart/') . '" data-id="' . $id . '">
+                                             <input type="button" value="+" class="plus">
+                                       </span>
+                                </td>
+    
+    
+                                <td class="tax">' . $product_tax . '</td>
+    
+                                <td class="price">' . Auth::user()->priceFormat($productprice) . '</td>
+    
+                                <td class="subtotal">' . Auth::user()->priceFormat($subtotal) . '</td>
+    
+                                <td class="">
+                                     <a href="#" class="action-btn bg-danger bs-pass-para-pos" data-confirm="' . __("Are You Sure?") . '" data-text="' . __("This action can not be undone. Do you want to continue?") . '" data-confirm-yes=' . $model_delete_id . ' title="' . __('Delete') . '}" data-id="' . $id . '" title="' . __('Delete') . '"   >
+                                       <span class=""><i class="ti ti-trash btn btn-sm text-white"></i></span>
+                                     </a>
+                                     <form method="post" action="' . url('remove-from-cart') . '"  accept-charset="UTF-8" id="' . $model_delete_id . '">
+                                          <input name="_method" type="hidden" value="DELETE">
+                                          <input name="_token" type="hidden" value="' . csrf_token() . '">
+                                          <input type="hidden" name="session_key" value="' . $session_key . '">
+                                          <input type="hidden" name="id" value="' . $id . '">
+                                     </form>
+    
+                                </td>
+                            </td>';
+    
+                // if cart is empty then this the first product
+                if (!$cart) {
+                    $cart = [
+                        $id => [
+                            "name" => $productname,
+                            "quantity" => 1,
+                            "price" => $productprice,
+                            "id" => $id,
+                            "tax" => $producttax,
+                            "subtotal" => $subtotal,
+                            "originalquantity" => $originalquantity,
+                            "product_tax" => $product_tax,
+                            "product_tax_id" => !empty($product_tax_id) ? implode(',', $product_tax_id) : 0,
+                        ],
+                    ];
+    
+    
+                    if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
+                        return response()->json(
+                            [
+                                'code' => 404,
+                                'status' => 'Error',
+                                'error' => __('This product is out of stock!'),
+                            ],
+                            404
+                        );
+                    }
+    
+                    session()->put($session_key, $cart);
+    
+                    return response()->json(
+                        [
+                            'code' => 200,
+                            'status' => 'Success',
+                            'success' => $productname . __(' added to cart successfully!'),
+                            'product' => $cart[$id],
+                            'carthtml' => $carthtml,
+                        ]
+                    );
+                }
+    
+                // if cart not empty then check if this product exist then increment quantity
+                if (isset($cart[$id])) {
+    
+                    $cart[$id]['quantity']++;
+                    $cart[$id]['id'] = $id;
+    
+                    $subtotal = $cart[$id]["price"] * $cart[$id]["quantity"];
+                    $tax = ($subtotal * $cart[$id]["tax"]) / 100;
+    
+                    $cart[$id]["subtotal"] = $subtotal + $tax;
+                    $cart[$id]["originalquantity"] = $originalquantity;
+    
+                    if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
+                        return response()->json(
+                            [
+                                'code' => 404,
+                                'status' => 'Error',
+                                'error' => __('This product is out of stock!'),
+                            ],
+                            404
+                        );
+                    }
+    
+                    session()->put($session_key, $cart);
+    
+                    return response()->json(
+                        [
+                            'code' => 200,
+                            'status' => 'Success',
+                            'success' => $productname . __(' added to cart successfully!'),
+                            'product' => $cart[$id],
+                            'carttotal' => $cart,
+                        ]
+                    );
+                }
+    
+                // if item not exist in cart then add to cart with quantity = 1
+                $cart[$id] = [
+                    "name" => $productname,
+                    "quantity" => 1,
+                    "price" => $productprice,
+                    "tax" => $producttax,
+                    "subtotal" => $subtotal,
+                    "id" => $id,
+                    "originalquantity" => $originalquantity,
+                    "product_tax" => $product_tax,
                 ];
-
-
+    
                 if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
                     return response()->json(
                         [
@@ -1157,9 +1228,9 @@ class ProductServiceController extends Controller
                         404
                     );
                 }
-
+    
                 session()->put($session_key, $cart);
-
+    
                 return response()->json(
                     [
                         'code' => 200,
@@ -1167,87 +1238,28 @@ class ProductServiceController extends Controller
                         'success' => $productname . __(' added to cart successfully!'),
                         'product' => $cart[$id],
                         'carthtml' => $carthtml,
-                    ]
-                );
-            }
-
-            // if cart not empty then check if this product exist then increment quantity
-            if (isset($cart[$id])) {
-
-                $cart[$id]['quantity']++;
-                $cart[$id]['id'] = $id;
-
-                $subtotal = $cart[$id]["price"] * $cart[$id]["quantity"];
-                $tax = ($subtotal * $cart[$id]["tax"]) / 100;
-
-                $cart[$id]["subtotal"] = $subtotal + $tax;
-                $cart[$id]["originalquantity"] = $originalquantity;
-
-                if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
-                    return response()->json(
-                        [
-                            'code' => 404,
-                            'status' => 'Error',
-                            'error' => __('This product is out of stock!'),
-                        ],
-                        404
-                    );
-                }
-
-                session()->put($session_key, $cart);
-
-                return response()->json(
-                    [
-                        'code' => 200,
-                        'status' => 'Success',
-                        'success' => $productname . __(' added to cart successfully!'),
-                        'product' => $cart[$id],
                         'carttotal' => $cart,
                     ]
                 );
-            }
-
-            // if item not exist in cart then add to cart with quantity = 1
-            $cart[$id] = [
-                "name" => $productname,
-                "quantity" => 1,
-                "price" => $productprice,
-                "tax" => $producttax,
-                "subtotal" => $subtotal,
-                "id" => $id,
-                "originalquantity" => $originalquantity,
-                "product_tax" => $product_tax,
-            ];
-
-            if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
+            } else {
                 return response()->json(
                     [
                         'code' => 404,
                         'status' => 'Error',
-                        'error' => __('This product is out of stock!'),
+                        'error' => __('This Product is not found!'),
                     ],
                     404
                 );
             }
+        } catch (\Exception $e) {
+            \Log::info('ADD TO CART ERROR');
+            \Log::info($e);
 
-            session()->put($session_key, $cart);
-
-            return response()->json(
-                [
-                    'code' => 200,
-                    'status' => 'Success',
-                    'success' => $productname . __(' added to cart successfully!'),
-                    'product' => $cart[$id],
-                    'carthtml' => $carthtml,
-                    'carttotal' => $cart,
-                ]
-            );
-        } else {
             return response()->json(
                 [
                     'code' => 404,
                     'status' => 'Error',
-                    'error' => __('This Product is not found!'),
+                    'error' => $e->getMessage(),
                 ],
                 404
             );

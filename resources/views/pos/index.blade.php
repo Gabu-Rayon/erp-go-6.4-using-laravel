@@ -397,7 +397,7 @@
                     'session_key': session_key
                 },
                 success: function (data) {
-                    // console.log(data)
+                    console.log(url)
                     $('#product-listing').html(data);
                 }
             });

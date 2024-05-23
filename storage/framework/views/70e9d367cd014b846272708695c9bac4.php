@@ -159,7 +159,7 @@
                                                 <td class="cart-images">
                                                     <img alt="Image placeholder" src="<?php echo e(asset(Storage::url('uploads/pro_image/'.$image_url))); ?>" class="card-image avatar rounded-circle-sale shadow hover-shadow-lg">
                                                 </td>
-                                                <td class="name"><?php echo e($details['name']); ?></td>
+                                                <td class="name"><?php echo e($product['name']); ?></td>
                                                 <td>
                                                     <span class="quantity buttons_added">
                                                         <input type="button" value="-" class="minus">
@@ -411,7 +411,7 @@
                     'session_key': session_key
                 },
                 success: function (data) {
-                    // console.log(data)
+                    console.log(url)
                     $('#product-listing').html(data);
                 }
             });

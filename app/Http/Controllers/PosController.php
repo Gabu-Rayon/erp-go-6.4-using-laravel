@@ -29,42 +29,51 @@ class PosController extends Controller
      */
     public function index($id = 0)
     {
-        if (Auth::user()->can('manage pos')) {
-            session()->forget('pos');
-            $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'name');
-            $customers->prepend('Walk-in-customer', '');
-            $warehouses = warehouse::select('*', \DB::raw("CONCAT(name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $user = Auth::user();
-            $details = [
-                'pos_id' => $user->posNumberFormat($this->invoicePosNumber()),
-                'customer' => $customers != null ? $customers->toArray() : [],
-                'user' => $user != null ? $user->toArray() : [],
-                'date' => date('Y-m-d'),
-                'pay' => 'show',
-            ];
-
-            if ($id != 0) {
-
-                $quotation = Quotation::find($id);
-
-                $customerId = $quotation->customer_id;
-                $customerId = Customer::find($customerId);
-                $customer = $customerId->name;
-
-                $warehouseId = $quotation->warehouse_id;
-
-                $quotationProduct = QuotationProduct::where('quotation_id', $id)->get();
-
-                foreach ($quotationProduct as $value) {
-                    $products = Quotation::quotationProduct($value);
+        try {
+            if (Auth::user()->can('manage pos')) {
+                session()->forget('pos');
+                $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'name');
+                $customers->prepend('Walk-in-customer', '');
+                $warehouses = warehouse::select('*', \DB::raw("CONCAT(name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+                $user = Auth::user();
+                $details = [
+                    'pos_id' => $user->posNumberFormat($this->invoicePosNumber()),
+                    'customer' => $customers != null ? $customers->toArray() : [],
+                    'user' => $user != null ? $user->toArray() : [],
+                    'date' => date('Y-m-d'),
+                    'pay' => 'show',
+                ];
+    
+                if ($id != 0) {
+    
+                    $quotation = Quotation::find($id);
+                    $customerId = $quotation->customer_id;
+                    $customerId = Customer::find($customerId);
+                    $customer = $customerId->name;
+                    $warehouseId = $quotation->warehouse_id;
+                    $quotationProduct = QuotationProduct::where('quotation_id', $id)->get();
+                    foreach ($quotationProduct as $value) {
+                        $products = Quotation::quotationProduct($value);
+                    }
+                } else {
+                    $customer = '';
+                    $warehouseId = '';
                 }
+                return view('pos.index', compact(
+                    'customers',
+                    'warehouses',
+                    'details',
+                    'customer',
+                    'warehouseId',
+                    'id'));
             } else {
-                $customer = '';
-                $warehouseId = '';
+                return redirect()->back()->with('error', __('Permission denied.'));
             }
-            return view('pos.index', compact('customers', 'warehouses', 'details', 'customer', 'warehouseId', 'id'));
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
+        } catch (\Exception $e) {
+            \Log::info('ERROR RENDERING POS INDEX');
+            \Log::info($e);
+
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
