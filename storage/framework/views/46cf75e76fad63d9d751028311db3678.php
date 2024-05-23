@@ -46,7 +46,7 @@
                                     <div class="timeline-icons"><span class="timeline-dots"></span>
                                         <i class="ti ti-plus text-primary"></i>
                                     </div>
-                                    <h6 class="text-primary my-3"><?php echo e(__('Create Purchase')); ?></h6>
+                                    <h6 class="text-primary my-3"><?php echo e(__('Edit Purchase')); ?></h6>
                                     <p class="text-muted text-sm mb-3"><i class="ti ti-clock mr-2"></i><?php echo e(__('Created on ')); ?><?php echo e(\Auth::user()->dateFormat($purchase->purchase_date)); ?></p>
                                     <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit purchase')): ?>
                                         <a href="<?php echo e(route('purchase.edit',\Crypt::encrypt($purchase->id))); ?>" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" data-original-title="<?php echo e(__('Edit')); ?>"><i class="ti ti-pencil mr-2"></i><?php echo e(__('Edit')); ?></a>
@@ -158,7 +158,6 @@
                                     <small class="font-style">
                                         <strong><?php echo e(__('Shipped To')); ?> :</strong><br>
                                         <strong>Company </strong>:
-
                                         <br>
                                     </small>
                                 </div>
@@ -236,13 +235,12 @@
                                     <div class="table-responsive mt-3">
                                         <table class="table ">
                                             <tr>
-                                                <th class="text-dark" data-width="40">#</th>
                                                 <th class="text-dark"><?php echo e(__('Product')); ?></th>
                                                 <th class="text-dark"><?php echo e(__('Quantity')); ?></th>
-                                                <th class="text-dark"><?php echo e(__('Rate')); ?></th>
+                                                <th class="text-dark"><?php echo e(__('Pkg Quantity')); ?></th>
+                                                <th class="text-dark"><?php echo e(__('Unit Price')); ?></th>
                                                 <th class="text-dark"><?php echo e(__('Discount')); ?></th>
                                                 <th class="text-dark"><?php echo e(__('Tax')); ?></th>
-                                                <th class="text-dark"><?php echo e(__('Supply Amount')); ?></th>
                                                 <th class="text-end text-dark" width="12%"><?php echo e(__('Price')); ?><br>
                                                     <small
                                                         class="text-danger font-weight-bold"><?php echo e(__('after tax & discount')); ?></small>
@@ -252,48 +250,17 @@
 
                                             <?php echo e(\Log::info('ITEAMS')); ?>
 
-               <?php echo e(\Log::info($iteams)); ?>
+                                            <?php echo e(\Log::info($iteams)); ?>
 
                                             <?php $__currentLoopData = $iteams; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <tr>
-                                                    <td> <?php echo e(!empty($item->id) ? $item->id : ''); ?></td>
-                                                    <td><?php echo e(!empty($item->itemNm) ? $item->itemNm : ''); ?></td>
-                                                    <td><?php echo e(!empty($item->qty) ? $item->qty : ''); ?></td>
-                                                    <td>Kes <?php echo e(!empty($item->prc) ? $item->prc : ''); ?></td>
-                                                    <td><?php echo e(!empty($item->dcAmt) ? $item->dcAmt : ''); ?></td>
-                                                    <td>
-                                                        <?php
-                                                            // Map taxTyCd to its corresponding description
-                                                            $taxDescription = '';
-                                                            switch ($item->taxTyCd) {
-                                                                case 'A':
-                                                                    $taxDescription = 'A-Exmpt';
-                                                                    break;
-                                                                case 'B':
-                                                                    $taxDescription = 'B-VAT 16%';
-                                                                    break;
-                                                                case 'C':
-                                                                    $taxDescription = 'C-Zero Rated';
-                                                                    break;
-                                                                case 'D':
-                                                                    $taxDescription = 'D-Non VAT';
-                                                                    break;
-                                                                case 'E':
-                                                                    $taxDescription = 'E-VAT 8%';
-                                                                    break;
-                                                                case 'F':
-                                                                    $taxDescription = 'F-Non Tax';
-                                                                    break;
-                                                                default:
-                                                                    $taxDescription = ''; // Handle unknown tax codes here
-                                                                    break;
-                                                            }
-                                                        ?>
-                                                        <?php echo e($taxDescription); ?>
-
-                                                    </td>
-                                                    <td>Kes <?php echo e(!empty($item->splyAmt) ? $item->splyAmt : ''); ?></td>
-                                                    <td>Kes <?php echo e(!empty($item->totAmt) ? $item->totAmt : ''); ?></td>
+                                                    <td><?php echo e(!empty($item->itemNm) ? $item->itemNm : '-'); ?></td>
+                                                    <td><?php echo e(!empty($item->qty) ? $item->qty : '-'); ?></td>
+                                                    <td><?php echo e(!empty($item->pkg) ? $item->pkg : '-'); ?></td>
+                                                    <td>KES <?php echo e(!empty($item->prc) ? $item->prc : '-'); ?></td>
+                                                    <td>KES <?php echo e(!empty($item->discount) ? $item->discount : '-'); ?></td>
+                                                    <td>KES <?php echo e($item->tax); ?></td>
+                                                    <td>KES <?php echo e(!empty($item->totAmt) ? $item->totAmt : '-'); ?></td>
                                                 </tr>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             <tfoot>
@@ -301,14 +268,22 @@
                                                     <td colspan="6"></td>
                                                     <td class="text-end"><b><?php echo e(__('Sub Total')); ?></b></td>
                                                     <td class="text-end">
-                                                     Kes <?php echo e($iteams->sum('prc')); ?> </td>
+                                                        <?php
+                                                            $subTotal = 0;
+                                                            foreach ($iteams as $item) {
+                                                                $subTotal += ($item['pkg'] * $item['quantity'] * $item['prc']);
+                                                            }
+                                                        ?>
+                                                        KES <?php echo e($subTotal); ?>
+
+                                                    </td>
                                                 </tr>
 
                                                 <tr>
                                                     <td colspan="6"></td>
                                                     <td class="text-end"><b><?php echo e(__('Discount')); ?></b></td>
                                                     <td class="text-end">
-                                                            Kes <?php echo e($iteams->sum('dcAmt')); ?>
+                                                        KES <?php echo e($iteams->sum('discount')); ?>
 
                                                     </td>
                                                 </tr>
@@ -316,19 +291,19 @@
                                                     <td colspan="6"></td>
                                                     <td class="text-end"><b><?php echo e(__('Tax Amount')); ?></b></td>
                                                     <td class="text-end">
-                                                        Kes <?php echo e($iteams->sum('taxAmt')); ?> </td>
+                                                        KES <?php echo e($iteams->sum('taxAmt')); ?> </td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="6"></td>
                                                     <td class="blue-text text-end"><b><?php echo e(__('Total')); ?></b></td>
                                                     <td class="blue-text text-end">
-                                                         Kes <?php echo e($iteams->sum('prc')); ?></td>
+                                                         KES <?php echo e($iteams->sum('totAmt')); ?></td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="6"></td>
                                                     <td class="text-end"><b><?php echo e(__('Paid')); ?></b></td>
                                                     <td class="text-end">
-                                                        <?php echo e(\Auth::user()->priceFormat($purchase->getTotal() - $purchase->getDue())); ?>
+                                                        KES <?php echo e($purchase->getTotal() - $purchase->getDue()); ?>
 
                                                     </td>
                                                 </tr>
@@ -336,7 +311,7 @@
                                                     <td colspan="6"></td>
                                                     <td class="text-end"><b><?php echo e(__('Due')); ?></b></td>
                                                     <td class="text-end">
-                                                        <?php echo e(\Auth::user()->priceFormat($purchase->getDue())); ?></td>
+                                                        KES <?php echo e($purchase->getDue()); ?></td>
                                                 </tr>
                                             </tfoot>
                                         </table>
