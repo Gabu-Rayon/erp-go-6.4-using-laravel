@@ -62,258 +62,194 @@
         }
 
         $(document).ready(function() {
-            $(document).on('change', '.itemCode', function() {
-                var item_id = $(this).val();
-                var url = $(this).data('url');
-                var el = $(this).closest('[data-clone]');
-
-                if (el.length) {
-                    console.log("Change event triggered for.itemCode[data-clone]");
-
-                    console.log("item_id:", item_id);
-                    console.log("url:", url);
-                    console.log("el:", el);
-
-                    $.ajax({
-                        url: url,
-                        type: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': jQuery('#token').val()
-                        },
-                        data: {
-                            'itemCode': item_id
-                        },
-                        cache: false,
-                        success: function(data) {
-                            try {
-                                console.log("Item information:", data.data);
-
-                                if (!data.data) {
-                                    console.log("Item information is empty.");
-                                } else {
-                                    console.log("Item information is not empty. Processing...");
-
-                                    var item = data.data;
-
-                                    console.log("Item object:", item);
-
-                                    if (Object.keys(item).length === 0) {
-                                        console.log("Item object is empty.");
-                                    } else {
-                                        console.log(
-                                            "Item object is not empty. Populating fields..."
-                                        );
-
-                                        // Populate fields only for the current cloned form
-                                        console.log("Populating unitPrice:", item.dftPrc);
-                                        el.find('.unitPrice').val(item.dftPrc);
-
-
-                                        console.log("Populating tax:", item.taxTyCd);
-                                        el.find('.tax').val(item.taxTyCd);
-
-                                        console.log("Populating itemClsCd:", item
-                                            .itemClsCd);
-                                        el.find('.itemClsCd').val(item.itemClsCd);
-
-                                        console.log("Populating itemNm:", item
-                                            .itemNm);
-                                        el.find('.itemNm').val(item.itemNm);
-
-                                        console.log("Populating Bcd:", item
-                                            .bcd);
-                                        el.find('.bcd').val(item.bcd);
-
-                                        console.log("Populating PkgUnitCd:", item
-                                            .pkgUnitCd);
-                                        el.find('.pkgUnitCd').val(item.pkgUnitCd);
-
-                                        console.log("Populating item Id:", item
-                                            .id);
-                                        el.find('.id').val(item.id);
-
-                                        // Calculate tax based on taxTyCd
-                                        var taxTyCd = item.taxTyCd;
-                                        var taxRate = 0;
-
-                                        if (taxTyCd === 'B') {
-                                            taxRate = 16; // VAT 16%
-                                        } else if (taxTyCd === 'E') {
-                                            taxRate = 0; // VAT 8%
-                                        }
-
-                                        // Calculate item tax price based on unit price and tax rate
-                                        var itemTaxPrice = parseFloat((taxRate / 100) * (item
-                                            .dftPrc * 1));
-                                        el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
-
-                                        // Update total tax rate and display
-                                        el.find('.itemTaxRate').val(taxRate.toFixed(2));
-
-                                        // Trigger change event for affected fields
-                                        el.find(
-                                                '.itemTaxRate,.discount,.itemTaxPrice,.taxes,.amount'
-                                            )
-                                            .trigger('change');
-
-
-                                        // Calculate item tax price based on unit price and tax rate
-                                        var itemTaxPrice = parseFloat((taxRate / 100) * (item
-                                            .dftPrc * 1));
-                                        el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
-
-                                        // Update total tax rate and display
-                                        el.find('.itemTaxRate').val(taxRate.toFixed(2));
-
-                                        // Trigger change event for affected fields
-                                        $('.itemTaxRate, .discount, .itemTaxPrice,.taxes,.amount')
-                                            .trigger(
-                                                'change');
-
-                                        // Calculate amount
-                                        var amount = parseFloat(item.dftPrc);
-                                        // Update total tax rate and display
-                                        el.find('.amount').val(taxRate.toFixed(2));
-
-                                        // Calculate subtotal
-                                        var subtotal = parseFloat(item.dftPrc);
-                                        // Update subtotal field
-                                        el.find('.subTotal').val(subtotal.toFixed(2));
-
-                                        // Calculate total amount
-                                        var totalAmount = subtotal + parseFloat(itemTaxPrice);
-                                        // Update total amount field
-                                        el.find('.totalAmount').val(totalAmount.toFixed(2));
-
-                                        // Update total tax field
-                                        el.find('.totalTax').val(itemTaxPrice.toFixed(2));
-                                    }
-                                }
-                            } catch (error) {
-                                console.error("Error processing item information:", error);
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error("Error retrieving item information:", error);
-                        }
-                    });
+            function calculateSubtotal() {
+                var inputs = $(".amount");
+                var subTotal = 0;
+                for (var i = 0; i < inputs.length; i++) {
+                    subTotal += parseFloat($(inputs[i]).text());
                 }
+                
+                var discounts = $(".discountAmount");
+                var totalDiscount = 0;
+                for (var i = 0; i < discounts.length; i++) {
+                    totalDiscount += parseFloat($(discounts[i]).val()) || parseFloat(0);
+                }
+                
+                var taxAmounts = $(".taxAmount");
+                var totalTax = 0;
+                for (var i = 0; i < taxAmounts.length; i++) {
+                    totalTax += parseFloat($(taxAmounts[i]).val()) || parseFloat(0);
+                }
+                
+                const stot = (subTotal + totalDiscount) - totalTax;
+                $('.subTotal').html(stot.toFixed(2));
+                $('.totalAmount').html(subTotal.toFixed(2));
+            }
+            
+            function calculateTotalDiscount() {
+                var discounts = $(".discountAmount");
+                var totalDiscount = 0;
+                for (var i = 0; i < discounts.length; i++) {
+                    totalDiscount += parseFloat($(discounts[i]).val()) || parseFloat(0);
+                }
+                $('.totalDiscount').html(totalDiscount.toFixed(2));
+            }
+            
+            function calculateTotalTax() {
+                var taxAmounts = $(".taxAmount");
+                var totalTax = 0;
+                for (var i = 0; i < taxAmounts.length; i++) {
+                    totalTax += parseFloat($(taxAmounts[i]).val()) || parseFloat(0);
+                }
+                $('.totalTax').html(totalTax.toFixed(2));
+            }
+            
+            calculateSubtotal();
+            calculateTotalDiscount();
+            calculateTotalTax();
+            
+            $(document).on('change', '.quantity, .unitPrice, .pkgQuantity, .discount, .taxCode', function() {
+                calculateSubtotal();
+                calculateTotalDiscount();
+                calculateTotalTax();
             });
+            
+            $(document).on('click', '[data-repeater-delete]', function () {
+                calculateSubtotal();
+                calculateTotalDiscount();
+                calculateTotalTax();
+            });
+            
+            $(document).on('change', '.itemCode', async function() {
+                const el = $(this);
+                const id = $(this).val();
+                console.log('ITEM CD: ', id);
+                const url = `http://localhost:8000/getitem/${id}`;
+
+                const response = await fetch(url);
+                const { data } = await response.json();
+
+                const { dftPrc, taxTyCd } = data;
+
+
+                $(el).closest('tr').find('.unitPrice').val(dftPrc);
+
+                const taxationtypes= <?php echo json_encode($taxationtype); ?>;
+                console.log(taxationtypes);
+                $(el).closest('tr').find('.taxCode').val(taxationtypes[taxTyCd]);
+
+                const quantity = parseFloat($(el).closest('tr').find('.quantity').val()) || parseFloat(0);
+                const unitPrice = parseFloat($(el).closest('tr').find('.unitPrice').val()) || parseFloat(0);
+                const discountRate = parseFloat($(el).closest('tr').find('.discount').val()) || parseFloat(0);
+                const taxCode = parseFloat($(el).closest('tr').find('.taxCode').val()) || parseFloat(0);
+                const pkgQuantity = parseFloat($(el).closest('tr').find('.pkgQuantity').val()) || parseFloat(0);
+                const subtotal = quantity * unitPrice * pkgQuantity;
+                const discountAmount = subtotal * (discountRate / 100);
+                const totalAmount = subtotal - discountAmount;
+                const taxAmount = totalAmount * (taxCode / 100);
+                const finalAmount = totalAmount + taxAmount;
+
+                $(el).closest('tr').find('.taxAmount').val(parseFloat(taxAmount));
+                $(el).closest('tr').find('.discountAmount').val(parseFloat(discountAmount));
+                $(el).closest('tr').find('.amount').html(parseFloat(finalAmount));
+
+            });
+
             $(document).on('keyup change', '.quantity', function() {
-                // var el = $(this).closest('.row');
-                var el = $(this).closest('[data-clone]');
-                var quantity = parseFloat($(this).val());
-                var price = parseFloat($(el.find('.unitPrice')).val());
-                var discount = parseFloat($(el.find('.discount')).val()) ||
-                    0; // Use default value if discount is not provided
-                var totalItemPrice = (quantity * price) - discount;
-                var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
-                var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
-                $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
+                const el = $(this);
+                const quantity = parseFloat($(this).val()) || parseFloat(0);
+                const unitPrice = parseFloat($(el).closest('tr').find('.unitPrice').val()) || parseFloat(0);
+                const discountRate = parseFloat($(el).closest('tr').find('.discount').val()) || parseFloat(0);
+                const taxCode = parseFloat($(el).closest('tr').find('.taxCode').val()) || parseFloat(0);
+                const pkgQuantity = parseFloat($(el).closest('tr').find('.pkgQuantity').val()) || parseFloat(0);
+                const subtotal = quantity * unitPrice * pkgQuantity;
+                const discountAmount = subtotal * (discountRate / 100);
+                const totalAmount = subtotal - discountAmount;
+                const taxAmount = totalAmount * (taxCode / 100);
+                const finalAmount = totalAmount + taxAmount;
+            
+                $(el).closest('tr').find('.taxAmount').val(parseFloat(taxAmount));
+                $(el).closest('tr').find('.discountAmount').val(parseFloat(discountAmount));
+                $(el).closest('tr').find('.amount').html(parseFloat(finalAmount));
+            });
 
-                // Calculate total amount including tax
-                var totalAmount = itemTaxPrice + totalItemPrice;
-                $(el.find('.amount')).html(totalAmount.toFixed(2));
-
-                // Update total tax price
-                var totalItemTaxPrice = 0;
-                el.siblings().find('.itemTaxPrice').each(function() {
-                    totalItemTaxPrice += parseFloat($(this).val());
-                });
-                el.parent().find('.totalTax').html(totalItemTaxPrice.toFixed(2));
-
-                // Update subtotal and total amount
-                var totalItemPrice = 0;
-                el.siblings().find('.quantity').each(function(index) {
-                    totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(
-                        this).val());
-                });
-                el.parent().find('.subTotal').html(totalItemPrice.toFixed(2));
-                var totalAmount = totalItemPrice + totalItemTaxPrice;
-                el.parent().find('.totalAmount').html(totalAmount.toFixed(2));
+            $(document).on('keyup change', '.taxCode', function() {
+                const el = $(this);
+                const taxCode = parseFloat($(this).val()) || parseFloat(0);
+                const unitPrice = parseFloat($(el).closest('tr').find('.unitPrice').val()) || parseFloat(0);
+                const discountRate = parseFloat($(el).closest('tr').find('.discount').val()) || parseFloat(0);
+                const quantity = parseFloat($(el).closest('tr').find('.quantity').val()) || parseFloat(0);
+                const pkgQuantity = parseFloat($(el).closest('tr').find('.pkgQuantity').val()) || parseFloat(0);
+                const subtotal = quantity * unitPrice * pkgQuantity;
+                const discountAmount = subtotal * (discountRate / 100);
+                const totalAmount = subtotal - discountAmount;
+                const taxAmount = totalAmount * (taxCode / 100);
+                const finalAmount = totalAmount + taxAmount;
+            
+                $(el).closest('tr').find('.taxAmount').val(parseFloat(taxAmount));
+                $(el).closest('tr').find('.discountAmount').val(parseFloat(discountAmount));
+                $(el).closest('tr').find('.amount').html(parseFloat(finalAmount));
             });
 
             $(document).on('keyup change', '.unitPrice', function() {
-                // var el = $(this).closest('.row'); 
-                var el = $(this).closest('[data-clone]');
-                var price = parseFloat($(this).val());
-                var quantity = parseFloat($(el.find('.quantity')).val());
-                var discount = parseFloat($(el.find('.discount')).val()) || 0;
-                var totalItemPrice = (quantity * price) - discount;
-
-                var itemTaxRate = parseFloat($(el.find('.itemTaxRate')).val());
-                var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
-                $(el.find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
-
-                // Calculate total amount including tax
-                var totalAmount = itemTaxPrice + totalItemPrice;
-                $(el.find('.amount')).html(totalAmount.toFixed(2));
-
-                // Update subtotal and total amount
-                var totalItemPrice = 0;
-                el.siblings().find('.quantity').each(function(index) {
-                    totalItemPrice += parseFloat($('.unitPrice').eq(index).val()) * parseFloat($(
-                        this).val());
-                });
-                el.parent().find('.subTotal').html(totalItemPrice.toFixed(2));
-                var totalItemTaxPrice = 0;
-                el.siblings().find('.itemTaxPrice').each(function() {
-                    totalItemTaxPrice += parseFloat($(this).val());
-                });
-                var totalAmount = totalItemPrice + totalItemTaxPrice;
-                el.parent().find('.totalAmount').html(totalAmount.toFixed(2));
+                const el = $(this);
+                const unitPrice = parseFloat($(this).val()) || parseFloat(0);
+                const quantity = parseFloat($(el).closest('tr').find('.quantity').val()) || parseFloat(0);
+                const discountRate = parseFloat($(el).closest('tr').find('.discount').val()) || parseFloat(0);
+                const taxCode = parseFloat($(el).closest('tr').find('.taxCode').val()) || parseFloat(0);
+                const pkgQuantity = parseFloat($(el).closest('tr').find('.pkgQuantity').val()) || parseFloat(0);
+                const subtotal = quantity * unitPrice * pkgQuantity;
+                const discountAmount = subtotal * (discountRate / 100);
+                const totalAmount = subtotal - discountAmount;
+                const taxAmount = totalAmount * (taxCode / 100);
+                const finalAmount = totalAmount + taxAmount;
+            
+                $(el).closest('tr').find('.taxAmount').val(parseFloat(taxAmount));
+                $(el).closest('tr').find('.discountAmount').val(parseFloat(discountAmount));
+                $(el).closest('tr').find('.amount').html(parseFloat(finalAmount));
             });
 
             $(document).on('keyup change', '.discount', function() {
-                var el = $(this).closest('[data-clone]'); // Find the closest clone form
-                var discountRate = parseFloat($(this).val()) || 0;
 
-                var price = parseFloat(el.find('.unitPrice').val());
-                var quantity = parseFloat(el.find('.quantity').val());
 
-                var totalItemPrice = (price * quantity) * (1 - discountRate / 100);
-                var itemTaxRate = parseFloat(el.find('.itemTaxRate').val());
-                var itemTaxPrice = parseFloat((itemTaxRate / 100) * totalItemPrice);
-                el.find('.itemTaxPrice').val(itemTaxPrice.toFixed(2));
-
-                var totalAmount = itemTaxPrice + totalItemPrice;
-                el.find('.amount').html(totalAmount.toFixed(2));
-
-                // Update total tax price
-                var totalItemTaxPrice = 0;
-                el.siblings().find('.itemTaxPrice').each(function() { // Find itemTaxPrice only in siblings
-                    totalItemTaxPrice += parseFloat($(this).val());
-                });
-                el.parent().find('.totalTax').html(totalItemTaxPrice.toFixed(2));
-
-                // Update subtotal and total amount
-                var totalItemPrice = 0;
-                el.siblings().find('.quantity').each(function(index) {
-                    totalItemPrice += parseFloat(el.siblings().find('.unitPrice').eq(index).val()) *
-                        parseFloat($(this).val());
-                });
-                el.parent().find('.subTotal').html(totalItemPrice.toFixed(2));
-
-                // Calculate total discount amount
-                var totalDiscountAmount = 0;
-                el.closest('[data-clone]').find('.quantity').each(function(index) {
-                    var discountRate = parseFloat($(this).closest('[data-clone]').find('.discount')
-                        .eq(index).val()) || 0;
-                    totalDiscountAmount += (parseFloat($(this).closest('[data-clone]').find(
-                            '.unitPrice').eq(index).val()) *
-                        parseFloat($(this).val())) * (discountRate / 100);
-                });
-
-                // Update total discount and Discount Amount input field for the closest cloned form
-                el.parent().find('.totalDiscount').html(totalDiscountAmount.toFixed(2) || 0);
-                el.closest('[data-clone]').find('.discountAmt').val(totalDiscountAmount.toFixed(2) || 0);
-
-                // Update total amount
-                var totalAmount = totalItemPrice + totalItemTaxPrice;
-                el.parent().find('.totalAmount').html(totalAmount.toFixed(2));
+                const el = $(this);
+                const discountRate = parseFloat($(this).val()) || parseFloat(0);
+                const quantity = parseFloat($(el).closest('tr').find('.quantity').val()) || parseFloat(0);
+                const unitPrice = parseFloat($(el).closest('tr').find('.unitPrice').val()) || parseFloat(0);
+                const taxCode = parseFloat($(el).closest('tr').find('.taxCode').val()) || parseFloat(0);
+                const pkgQuantity = parseFloat($(el).closest('tr').find('.pkgQuantity').val()) || parseFloat(0);
+                const subtotal = quantity * unitPrice * pkgQuantity;
+                const discountAmount = subtotal * (discountRate / 100);
+                const totalAmount = subtotal - discountAmount;
+                const taxAmount = totalAmount * (taxCode / 100);
+                const finalAmount = totalAmount + taxAmount;
+            
+                $(el).closest('tr').find('.taxAmount').val(parseFloat(taxAmount));
+                $(el).closest('tr').find('.discountAmount').val(parseFloat(discountAmount));
+                $(el).closest('tr').find('.amount').html(parseFloat(finalAmount));
             });
 
-            // Initialize Select2 for all select elements with the class 'select2'
+            $(document).on('keyup change', '.pkgQuantity', function() {
+
+
+                const el = $(this);
+                const pkgQuantity = parseFloat($(this).val()) || parseFloat(0);
+                const quantity = parseFloat($(el).closest('tr').find('.quantity').val()) || parseFloat(0);
+                const unitPrice = parseFloat($(el).closest('tr').find('.unitPrice').val()) || parseFloat(0);
+                const taxCode = parseFloat($(el).closest('tr').find('.taxCode').val()) || parseFloat(0);
+                const discountRate = parseFloat($(el).closest('tr').find('.discount').val()) || parseFloat(0);
+                const subtotal = quantity * unitPrice * pkgQuantity;
+                const discountAmount = subtotal * (discountRate / 100);
+                const totalAmount = subtotal - discountAmount;
+                const taxAmount = totalAmount * (taxCode / 100);
+                const finalAmount = totalAmount + taxAmount;
+
+                $(el).closest('tr').find('.taxAmount').val(parseFloat(taxAmount));
+                $(el).closest('tr').find('.discountAmount').val(parseFloat(discountAmount));
+                $(el).closest('tr').find('.amount').html(parseFloat(finalAmount));
+                });
+
+                
             $('.select2').select2({
                 templateResult: function(data) {
                     var $option = $(data.element);
@@ -375,6 +311,12 @@
                                         .spplrInvcNo);
                                     el.find('.supplierInvcNo').val(supplier
                                         .spplrInvcNo);
+
+                                        el.find('.spplrSdcId').val(supplier
+                                        .spplrSdcId);
+
+                                        el.find('.spplrMrcNo').val(supplier
+                                        .spplrMrcNo);
 
                                     console.log("Populating supplier Id:", supplier.id);
                                     el.find('.id').val(supplier.id);
@@ -440,6 +382,18 @@
 
                         </div>
                         <div class="form-group col-md-4" id="vender-box">
+                            <?php echo e(Form::label('spplrSdcId', __('Supplier SDC ID'), ['class' => 'form-label'])); ?>
+
+                            <?php echo e(Form::text('spplrSdcId', null, ['class' => 'form-control spplrSdcId', 'required' => 'required'])); ?>
+
+                        </div>
+                        <div class="form-group col-md-4" id="vender-box">
+                            <?php echo e(Form::label('spplrMrcNo', __('Supplier MRC No'), ['class' => 'form-label'])); ?>
+
+                            <?php echo e(Form::text('spplrMrcNo', null, ['class' => 'form-control spplrMrcNo', 'required' => 'required'])); ?>
+
+                        </div>
+                        <div class="form-group col-md-4" id="vender-box">
                             <?php echo e(Form::label('purchTypeCode', __('Purchase Type Code'), ['class' => 'form-label'])); ?>
 
                             <?php echo e(Form::select('purchTypeCode', $purchaseTypeCodes, null, ['class' => 'form-control select2 purchTypeCode', 'required' => 'required'])); ?>
@@ -455,6 +409,12 @@
                             <?php echo e(Form::label('pmtTypeCode', __('Payment Type Code'), ['class' => 'form-label'])); ?>
 
                             <?php echo e(Form::select('pmtTypeCode', $paymentTypeCodes, null, ['class' => 'form-control select2 pmtTypeCode', 'required' => 'required'])); ?>
+
+                        </div>
+                        <div class="form-group col-md-4" id="vender-box">
+                            <?php echo e(Form::label('rcptTyCd', __('Receipt Type Code'), ['class' => 'form-label'])); ?>
+
+                            <?php echo e(Form::select('rcptTyCd', $ReceiptTypesCodes, null, ['class' => 'form-control select2 pmtTypeCode', 'required' => 'required'])); ?>
 
                         </div>
                         <div class="form-group col-md-4" id="vender-box">
@@ -517,8 +477,7 @@
                     <div class="row justify-content-between align-items-center">
                         <div class="col-md-12 d-flex align-items-center justify-content-between justify-content-md-end">
                             <div class="all-button-box me-2">
-                                <a href="#" data-repeater-create="" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-target="#add-bank">
+                                <a href="#" data-repeater-create="" class="btn btn-primary" data-bs-toggle="modal" data-target="#add-bank">
                                     <i class="ti ti-plus"></i> <?php echo e(__('Add item')); ?>
 
                                 </a>
@@ -526,140 +485,149 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-body table-border-style">
+                <div class="card-body table-border-style mt-2">
                     <div class="table-responsive">
-                        <table class="table mb-0">
+                        <table class="table  mb-0 table-custom-style" data-repeater-list="items" id="sortable-table">
                             <thead>
+                                <tr>
+                                    <th><?php echo e(__('Items')); ?></th>
+                                    <th><?php echo e(__('Quantity')); ?></th>
+                                    <th><?php echo e(__('Price')); ?> </th>
+                                    <th><?php echo e(__('Discount')); ?></th>
+                                    <th><?php echo e(__('Tax')); ?> (%)</th>
+                                    <th class="text-end">
+                                        <?php echo e(__('Amount')); ?>
+
+                                        <br>
+                                        <small class="text-danger font-weight-bold"><?php echo e(__('after tax & discount')); ?></small>
+                                    </th>
+                                    <th></th>
+                                </tr>
                             </thead>
-                            <tbody data-repeater-list="items" id="sortable-table">
-                                <tr class="ui-sortable" data-repeater-item data-clone>
-                                    <td class="row">
-                                        <div class="form-group col-4">
-                                            <?php echo e(Form::label('itemCode', __('Item Code'), ['class' => 'form-label'])); ?>
+                            
+                            <tbody class="ui-sortable" data-repeater-item>
+                                <tr>
+                                    <td width="25%" class="form-group pt-0">
+                                        <?php echo e(Form::select('item', $product_services,'', array('class' => 'form-control select2 itemCode','data-url'=>route('invoice.product'),'required'=>'required'))); ?>
 
-                                            <?php echo e(Form::select('itemCode', $product_services_Codes, '', ['class' => 'form-control select2 itemCode', 'data-url' => route('productservice.getiteminformation'), 'required' => 'required'])); ?>
+                                    </td>
+                                    <td>
+                                        <div class="form-group price-input input-group search-form">
+                                            <?php echo e(Form::text('quantity','', array('class' => 'form-control quantity','required'=>'required','placeholder'=>__('Qty'),'required'=>'required'))); ?>
 
-                                        </div>
-                                        <div class="form-group col-4">
-                                            <?php echo e(Form::label('supplritemClsCode', __('Supplier Item Cls Code'), ['class' => 'form-label'])); ?>
-
-                                            <?php echo e(Form::text('supplrItemClsCode', null, ['class' => 'form-control', 'required' => 'required'])); ?>
-
-                                        </div>
-                                        <div class="form-group col-4">
-                                            <?php echo e(Form::label('supplierItemCode', __('Supplier Item Code'), ['class' => 'form-label'])); ?>
-
-                                            <?php echo e(Form::text('supplrItemCode', null, ['class' => 'form-control supplierItemCode', 'required' => 'required'])); ?>
+                                            <?php echo e(Form::text('pkgQuantity','', array('class' => 'form-control pkgQuantity','required'=>'required','placeholder'=>__('Pkg Qty'),'required'=>'required'))); ?>
 
                                         </div>
-                                        <div class="form-group col-4">
-                                            <?php echo e(Form::label('supplrItemName', __('Supplier Item Name'), ['class' => 'form-label'])); ?>
-
-                                            <?php echo e(Form::text('supplrItemName', null, ['class' => 'form-control supplrItemName', 'required' => 'required'])); ?>
-
-                                        </div>
-                                        <div class="form-group col-4">
-                                            <?php echo e(Form::label('quantity', __('Quantity'), ['class' => 'form-label'])); ?>
-
-                                            <?php echo e(Form::number('quantity', null, ['class' => 'form-control quantity', 'required' => 'required', 'placeholder' => __('Quantity'), 'required' => 'required'])); ?>
+                                    </td>
+                                    <td>
+                                        <div class="form-group price-input input-group search-form">
+                                            <?php echo e(Form::text('price','', array('class' => 'form-control unitPrice','required'=>'required','placeholder'=>__('Price'),'required'=>'required'))); ?>
 
                                         </div>
-                                        <div class="form-group col-4">
-                                            <?php echo e(Form::label('unitPrice', __('Unit Price'), ['class' => 'form-label'])); ?>
+                                    </td>
+                                    <td>
+                                        <div class="form-group price-input input-group search-form">
+                                            <?php echo e(Form::text('discount','', array('class' => 'form-control discount','required'=>'required','placeholder'=>__('Discount')))); ?>
 
-                                            <?php echo e(Form::number('unitPrice', null, ['class' => 'form-control unitPrice', 'required' => 'required', 'placeholder' => __('unitPrice'), 'required' => 'required'])); ?>
-
-                                        </div>
-                                        <div class="form-group col-4">
-                                            <?php echo e(Form::label('pkgQuantity', __('Pkg Quantity'), ['class' => 'form-label'])); ?>
-
-                                            <?php echo e(Form::number('pkgQuantity', null, ['class' => 'form-control pkgQuantity', 'required' => 'required'])); ?>
+                                            <?php echo e(Form::text('discountAmount','', array('class' => 'form-control discountAmount','required'=>'required','placeholder'=>__('Discount')))); ?>
 
                                         </div>
-                                        <div class="form-group col-4">
-                                            <?php echo e(Form::label('discount', __('Discount Rate (%)'), ['class' => 'form-label'])); ?>
+                                    </td>
+                                    <td>
+                                        <div class="form-group price-input input-group search-form">
+                                        <?php echo e(Form::text('tax', '', array('class' => 'form-control taxCode', 'required' => 'required','placeholder' => __('Tax')))); ?>
 
-                                            <?php echo e(Form::number('discount', null, ['class' => 'form-control discount', 'required' => 'required'])); ?>
-
-                                        </div>
-                                        <div class="form-group col-4">
-                                            <?php echo e(Form::label('discountAmt', __('Discount Amount'), ['class' => 'form-label'])); ?>
-
-                                            <?php echo e(Form::text('discountAmt', null, ['class' => 'form-control discountAmt', 'required' => 'required'])); ?>
+                                        <?php echo e(Form::text('taxAmount', '', array('class' => 'form-control taxAmount', 'required' => 'required','placeholder' => __('Tax Amt')))); ?>
 
                                         </div>
-                                        <div class="form-group col-4">
-                                            <?php echo e(Form::label('itemExprDt', __('item Expire Date'), ['class' => 'form-label'])); ?>
-
-                                            <?php echo e(Form::date('itemExprDt', null, ['class' => 'form-control itemExprDt', 'required' => 'required'])); ?>
+                                    </td>
+                                    <td class="text-end amount">0.00</td>
+                                    <td>
+                                        <a href="#" class="ti ti-trash text-white repeater-action-btn bg-danger ms-2 bs-pass-para" data-repeater-delete></a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <div class="form-group">
+                                            <?php echo e(Form::textarea('description', null, ['class'=>'form-control pro_description','rows'=>'2','placeholder'=>__('Description')])); ?>
 
                                         </div>
-                                        <div>
-                                            <a href="#"
-                                                class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2"
-                                                data-repeater-delete></a>
+                                    </td>
+                                    <td colspan="2">
+                                        <div class="form-group">
+                                        <?php echo e(Form::label('itemExprDate', __('item Expire Date'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::date('itemExprDate', null, ['class' => 'form-control itemExprDt', 'required' => 'required'])); ?>
+
                                         </div>
+                                    </td>
+                                    <td colspan="5"></td>
+                                </tr>
+                                <tr>
+                                    <td class="form-group col-4">
+                                        <?php echo e(Form::label('supplrItemName', __('Supplier Item Name'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::text('supplrItemName', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+
+                                    </td>
+                                    <td class="form-group col-4">
+                                        <?php echo e(Form::label('supplrItemCode', __('Supplier Item Code'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::text('supplrItemCode', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+
+                                    </td>
+                                    <td class="form-group col-4">
+                                        <?php echo e(Form::label('supplrItemClsCode', __('Supplier Item Class Code'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::text('supplrItemClsCode', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+
                                     </td>
                                 </tr>
                             </tbody>
                             <tfoot>
-                                <tr>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td></td>
-                                    <td><strong><?php echo e(__('Amount')); ?> <br><small
-                                                class="text-danger font-weight-bold"><?php echo e(__('after  Tax & discount')); ?></small>
-                                            (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
-                                    <td class="text-end amount">0.00</td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td></td>
-                                    <td><strong><?php echo e(__('Sub Total')); ?> (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong>
-                                    </td>
-                                    <td class="text-end subTotal">0.00</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td></td>
-                                    <td><strong><?php echo e(__('Discount')); ?> (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
-                                    <td class="text-end totalDiscount">0.00</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td></td>
-                                    <td><strong><?php echo e(__('Tax')); ?> (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
-                                    <td class="text-end totalTax">0.00</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td class="blue-text"><strong><?php echo e(__('Total Amount')); ?>
-
-                                            (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
-                                    <td class="blue-text text-end totalAmount">0.00</td>
-                                    <td></td>
-                                </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td></td>
+                                <td><strong><?php echo e(__('Sub Total')); ?> (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
+                                <td class="text-end subTotal">0.00</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td></td>
+                                <td><strong><?php echo e(__('Discount')); ?> (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
+                                <td class="text-end totalDiscount">0.00</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td></td>
+                                <td><strong><?php echo e(__('Tax')); ?> (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
+                                <td class="text-end totalTax">0.00</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td class="blue-text"><strong><?php echo e(__('Total Amount')); ?> (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
+                                <td class="text-end totalAmount blue-text"></td>
+                                <td></td>
+                            </tr>
                             </tfoot>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
+
 
         <div class="modal-footer">
             <input type="button" value="<?php echo e(__('Cancel')); ?>" onclick="location.href = '<?php echo e(route('purchase.index')); ?>';"
