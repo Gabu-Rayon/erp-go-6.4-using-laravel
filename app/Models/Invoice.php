@@ -128,7 +128,12 @@ class Invoice extends Model
 
     public function getTotal()
     {
-        return $this->totalAmt;
+        $total = 0;
+        $subTotal = $this->getSubTotal();
+        $totalTax = $this->getTotalTax();
+        $totalDiscount = $this->getTotalDiscount();
+        $total = ($subTotal - $totalDiscount) + $totalTax;
+        return $total;
     }
 
     public function getSubTotal()
