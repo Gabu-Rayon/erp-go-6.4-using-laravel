@@ -130,7 +130,7 @@
         </div>
 
         <div class="modal-footer">
-            <input type="button" value="<?php echo e(__('Cancel')); ?>" onclick="location.href = '<?php echo e(route('purchase.index')); ?>';"
+            <input type="button" value="<?php echo e(__('Cancel')); ?>" onclick="location.href = '<?php echo e(route('compositionlist.index')); ?>';"
                 class="btn btn-light">
             <input type="submit" value="<?php echo e(__('Create')); ?>" class="btn  btn-primary">
         </div>

@@ -15,7 +15,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <h5>{{ __('Main Item: ') }} {{ \App\Models\ItemInformation::where('itemCd', $compositionList->mainItemCode)->first()->itemNm }}</h5>
+                <h5>{{ __('Main Item: ') }} {{ \App\Models\ProductService::where('itemCd', $compositionList->mainItemCode)->first()->itemNm }}</h5>
             </div>
             <div class="card-body table-border-style">
                 <div class="table-responsive">
@@ -31,7 +31,7 @@
                         @foreach ($compositionItems as $item)
                             <tr>
                                 <td>{{ $item->compoItemCode }}</td>
-                              <td>{{ optional(\App\Models\ItemInformation::where('itemCd', $item->mainItemCode)->first())->itemNm }}</td>
+                              <td>{{ optional(\App\Models\ProductService::where('itemCd', $item->mainItemCode)->first())->name }}</td>
                                 <td>{{ $item->compoItemQty }}</td>
                             </tr>
                         @endforeach

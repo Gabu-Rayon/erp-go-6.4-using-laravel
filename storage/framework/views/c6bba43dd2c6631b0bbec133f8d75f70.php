@@ -474,7 +474,7 @@
                             <tbody class="ui-sortable" data-repeater-item>
                                 <tr>
                                     <td width="25%" class="form-group pt-0">
-                                        <?php echo e(Form::select('itemCode', $product_services,'', array('class' => 'form-control select2 itemCode','data-url'=>route('invoice.product'),'required'=>'required'))); ?>
+                                        <?php echo e(Form::select('item', $product_services,'', array('class' => 'form-control select2 itemCode','data-url'=>route('invoice.product'),'required'=>'required'))); ?>
 
                                     </td>
                                     <td>

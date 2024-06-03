@@ -39,7 +39,7 @@
                         <tbody class="list">
                         @foreach ($compositionslistitems as $compositionlistitem)
                             <tr>
-                                <td>{{ \App\Models\ItemInformation::where('itemCd', $compositionlistitem->mainItemCode)->first()->itemNm }}</td>
+                                <td>{{ \App\Models\ProductService::where('itemCd', $compositionlistitem->mainItemCode)->first()->itemNm }}</td>
                                 <td>{{ $compositionlistitem->compositionItems_count }}</td>
 
                                  @if(Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase'))

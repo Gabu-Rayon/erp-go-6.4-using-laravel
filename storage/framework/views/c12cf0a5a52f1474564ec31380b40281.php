@@ -16,7 +16,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <h5><?php echo e(__('Main Item: ')); ?> <?php echo e(\App\Models\ItemInformation::where('itemCd', $compositionList->mainItemCode)->first()->itemNm); ?></h5>
+                <h5><?php echo e(__('Main Item: ')); ?> <?php echo e(\App\Models\ProductService::where('itemCd', $compositionList->mainItemCode)->first()->itemNm); ?></h5>
             </div>
             <div class="card-body table-border-style">
                 <div class="table-responsive">
@@ -32,7 +32,7 @@
                         <?php $__currentLoopData = $compositionItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <tr>
                                 <td><?php echo e($item->compoItemCode); ?></td>
-                              <td><?php echo e(optional(\App\Models\ItemInformation::where('itemCd', $item->mainItemCode)->first())->itemNm); ?></td>
+                              <td><?php echo e(optional(\App\Models\ProductService::where('itemCd', $item->mainItemCode)->first())->name); ?></td>
                                 <td><?php echo e($item->compoItemQty); ?></td>
                             </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

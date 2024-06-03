@@ -40,7 +40,7 @@
                         <tbody class="list">
                         <?php $__currentLoopData = $compositionslistitems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $compositionlistitem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <tr>
-                                <td><?php echo e(\App\Models\ItemInformation::where('itemCd', $compositionlistitem->mainItemCode)->first()->itemNm); ?></td>
+                                <td><?php echo e(\App\Models\ProductService::where('itemCd', $compositionlistitem->mainItemCode)->first()->itemNm); ?></td>
                                 <td><?php echo e($compositionlistitem->compositionItems_count); ?></td>
 
                                  <?php if(Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase')): ?>

@@ -786,7 +786,7 @@ class PurchaseController extends Controller
             \Log::info($purchase);
             $category = ProductServiceCategory::all()->pluck('name', 'id');
             $warehouse = warehouse::all()->pluck('name', 'id');
-            $purchase_number = $purchase->purchase_id;
+            $purchase_number = $purchase->id;
             $venders = Vender::all()->pluck('name', 'id');
             $product_services = ProductService::all()->pluck('itemNm', 'id');
 

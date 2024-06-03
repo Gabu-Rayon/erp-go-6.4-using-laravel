@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use App\Models\CompositionList;
-use App\Models\ItemInformation;
+use App\Models\ProductService;
 use App\Models\ItemType;
 
 class CompositionListController extends Controller
@@ -40,7 +40,7 @@ class CompositionListController extends Controller
         if (\Auth::user()->can('manage purchase')) {
             try {
                 if (\Auth::user()->type == 'company') {
-                    $mainItemCode = ItemInformation::all()->pluck('itemNm', 'itemCd');
+                    $mainItemCode = ProductService::all()->pluck('itemNm', 'itemCd');
                     $compoItemCode = ItemType::all()->pluck('item_type_name', 'item_type_code');
                     return view('compositionlist.create', compact('mainItemCode', 'compoItemCode'));
                 } else {
@@ -156,6 +156,10 @@ class CompositionListController extends Controller
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
+
+     public function  updateStockIO(){
+    
+     }
 
 
 
