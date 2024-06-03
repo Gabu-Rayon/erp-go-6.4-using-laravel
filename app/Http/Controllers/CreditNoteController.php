@@ -9,7 +9,7 @@ use App\Models\CreditNote;
 use App\Models\CreditNoteItem;
 use Illuminate\Http\Request;
 use App\Models\SalesTypeCode;
-use App\Models\ItemInformation;
+use App\Models\ProductService;
 use App\Models\CreditNoteReason;
 use App\Models\PaymentTypeCodes;
 use App\Models\InvoiceStatusCode;
@@ -43,7 +43,7 @@ class CreditNoteController extends Controller
             $invoiceDue = Invoice::where('id', $invoice_id)->first();
             $customer = Customer::find($invoiceDue->customer_id);
             $customers = Customer::all()->pluck('name', 'name');
-            $itemsToAdd = ItemInformation::all()->pluck('itemNm', 'itemCd');
+            $itemsToAdd = ProductService::all()->pluck('itemNm', 'itemCd');
             $creditNoteReasons = CreditNoteReason::all()->pluck('reason', 'reason');
             $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeValue', 'saleTypeCode');
             $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'id');
@@ -115,7 +115,7 @@ class CreditNoteController extends Controller
                 $totalAmount = 0;
 
                 foreach ($data['items'] as $item) {
-                    $givenItem = ItemInformation::where('itemCd', $item['item'])->first();
+                    $givenItem = ProductService::where('itemCd', $item['item'])->first();
 
                     $itemExprDate = str_replace('-', '', $item['itemExprDate']);
                     $itemExprDate = date('Ymd', strtotime($itemExprDate));
@@ -345,8 +345,8 @@ class CreditNoteController extends Controller
             $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'saleTypeCode');
             $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'payment_type_code');
             $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusCode', 'invoiceStatusCode');
-            $product_services = ItemInformation::get()->pluck('itemNm', 'id');
-            $product_services_Codes = ItemInformation::get()->pluck('itemNm', 'itemCd');
+            $product_services = ProductService::get()->pluck('itemNm', 'id');
+            $product_services_Codes = ProductService::get()->pluck('itemNm', 'itemCd');
             $product_services_Codes->prepend('--', '');
             $product_services->prepend('--', '');
 
@@ -488,7 +488,7 @@ class CreditNoteController extends Controller
 
                 foreach ($data['items'] as $item) {
                     // Use $item['item'] to access the 'item' key within each item
-                    $givenItem = ItemInformation::where('itemCd', $item['itemCode'])->first();
+                    $givenItem = ProductService::where('itemCd', $item['itemCode'])->first();
 
                     $itemExprDate = str_replace('-', '', $item['itemExprDate']);
                     $itemExprDate = date('Ymd', strtotime($itemExprDate));
@@ -647,7 +647,7 @@ class CreditNoteController extends Controller
     {
         // Fetch item information based on the item code
         $itemCd = $request->input('itemCode');
-        $itemInfo['data'] = ItemInformation::where('itemCd', $itemCd)->first();
+        $itemInfo['data'] = ProductService::where('itemCd', $itemCd)->first();
 
         if ($itemInfo['data']) {
             // Return item information as JSON response

@@ -277,7 +277,7 @@
                                             {{ \Auth::user()->dateFormat($invoice->send_date) }}
                                         @else
                                             @can('send invoice')
-                                                <small>{{ _('Status') }} : {{ _('Not Sent') }}</small>
+                                                <small>{{ __('Status') }} : {{__('Not Sent') }}</small>
                                             @endcan
                                         @endif
                                     </p>
@@ -295,7 +295,7 @@
                                         <i class="ti ti-report-money text-info"></i>
                                     </div>
                                     <h6 class="text-info my-3">{{ __('Get Paid') }}</h6>
-                                    <p class="text-muted text-sm mb-3">{{ _('Status') }} : {{ _('Awaiting payment') }} </p>
+                                    <p class="text-muted text-sm mb-3">{{__('Status') }} : {{__('Awaiting payment') }} </p>
                                     @if ($invoice->status != 0)
                                         @can('create payment invoice')
                                             <a href="#" data-url="{{ route('invoice.payment', $invoice->id) }}"
@@ -512,7 +512,15 @@
                                                     {{ $taxTot }}
                                                 </td>
                                                 <td>{{ !empty($iteam->description) ? $iteam->description : '' }}</td>
-                                                <td>Kes {{ $iteam->price }}</td>
+                                                <td>
+                                                    @php
+                                                        $taxData = \Utility::getTaxData();
+                                                        $taxRate = floatval($taxData[$iteam->taxTypeCode]);
+                                                        $taxTot = ($iteam->price - $iteam->discount) * ($taxRate / 100);
+                                                        $totAfterTaxAndDiscount = ($iteam->price - $iteam->discount) + $taxTot;
+                                                    @endphp
+                                                    KES {{ $totAfterTaxAndDiscount }}
+                                                </td>
                                                 </tr>
                                             @endforeach
                                             <tfoot>
@@ -582,8 +590,18 @@
                                                         <b>
                                                             @php
                                                                 $tot = 0;
+                                                                $taxSum = 0;
+                                                                $taxData = \Utility::getTaxData();
+                                                                $taxRate = floatval($taxData[$iteam->taxTypeCode]);
                                                                 foreach ($iteams as $iteam) {
-                                                                    $tot += $iteam->price;
+                                                                    $tax = ($iteam->price - $iteam->discount) * ($taxRate / 100);
+                                                                    $taxSum += $tax;
+                                                                }
+                                                                foreach ($iteams as $iteam) {
+                                                                    \Log::info('iteam(item)');
+                                                                    \Log::info($iteam);
+                                                                    $totAfterTaxAndDiscount = ($iteam->price - $iteam->discount) + $taxSum;
+                                                                    $tot += $totAfterTaxAndDiscount;
                                                                 }
                                                             @endphp
                                                             {{ $tot }}
@@ -732,7 +750,7 @@
                                                     <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para"
                                                         data-bs-toggle="tooltip" title="Delete"
                                                         data-original-title="{{ __('Delete') }}"
-                                                        data-confirm="{{ _('Are You Sure?') . '|' . _('This action can not be undone. Do you want to continue?') }}"
+                                                        data-confirm="{{ __('Are You Sure?') . '|' .__('This action can not be undone. Do you want to continue?') }}"
                                                         data-confirm-yes="document.getElementById('delete-form-{{ $payment->id }}').submit();">
                                                         <i class="ti ti-trash text-white"></i>
                                                     </a>
@@ -794,7 +812,7 @@
                                                     <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para"
                                                         data-bs-toggle="tooltip" title="Delete"
                                                         data-original-title="{{ __('Delete') }}"
-                                                        data-confirm="{{ _('Are You Sure?') . '|' . _('This action can not be undone. Do you want to continue?') }}"
+                                                        data-confirm="{{__('Are You Sure?') . '|' .__('This action can not be undone. Do you want to continue?') }}"
                                                         data-confirm-yes="document.getElementById('delete-form-{{ $bankPayment->id }}').submit();">
                                                         <i class="ti ti-trash text-white"></i>
                                                     </a>
@@ -863,7 +881,7 @@
                                                 <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para "
                                                     data-bs-toggle="tooltip" title="Delete"
                                                     data-original-title="{{ __('Delete') }}"
-                                                    data-confirm="{{ _('Are You Sure?') . '|' . _('This action can not be undone. Do you want to continue?') }}"
+                                                    data-confirm="{{__('Are You Sure?') . '|' .__('This action can not be undone. Do you want to continue?') }}"
                                                     data-confirm-yes="document.getElementById('delete-form-{{ $creditNote->id }}').submit();">
                                                     <i class="ti ti-trash text-white"></i>
                                                 </a>

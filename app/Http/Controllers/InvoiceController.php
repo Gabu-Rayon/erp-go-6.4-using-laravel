@@ -541,7 +541,7 @@ class InvoiceController extends Controller
         foreach ($items as $item) {
             \Log::info('MAVITU');
             \Log::info($item);
-            $itemDetails = ProductService::where('itemCd', $item['item'])->first();
+            $itemDetails = ProductService::where('itemCd', $item['itemCode'])->first();
             $itemExprDate = $this->formatDate($item['itemExprDate']);
             $saleItemList[] = [
                 "itemCode" => $itemDetails->itemCd,
