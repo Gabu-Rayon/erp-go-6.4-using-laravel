@@ -16,13 +16,9 @@ class CreateStockAdjustmentProductListsTable extends Migration
         Schema::create('stock_adjustment_product_lists', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('stock_adjustments_id');
-            
-            $table->string('itemCode');
-            
-            $table->integer('packageQuantity');
-            
-            $table->integer('quantity');
-            
+            $table->string('itemCode');            
+            $table->integer('packageQuantity');            
+            $table->integer('quantity');            
             $table->timestamps();
         });
     }
