@@ -281,7 +281,7 @@
 
                                         <?php else: ?>
                                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('send invoice')): ?>
-                                                <small><?php echo e(_('Status')); ?> : <?php echo e(_('Not Sent')); ?></small>
+                                                <small><?php echo e(__('Status')); ?> : <?php echo e(__('Not Sent')); ?></small>
                                             <?php endif; ?>
                                         <?php endif; ?>
                                     </p>
@@ -299,7 +299,7 @@
                                         <i class="ti ti-report-money text-info"></i>
                                     </div>
                                     <h6 class="text-info my-3"><?php echo e(__('Get Paid')); ?></h6>
-                                    <p class="text-muted text-sm mb-3"><?php echo e(_('Status')); ?> : <?php echo e(_('Awaiting payment')); ?> </p>
+                                    <p class="text-muted text-sm mb-3"><?php echo e(__('Status')); ?> : <?php echo e(__('Awaiting payment')); ?> </p>
                                     <?php if($invoice->status != 0): ?>
                                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create payment invoice')): ?>
                                             <a href="#" data-url="<?php echo e(route('invoice.payment', $invoice->id)); ?>"
@@ -523,7 +523,16 @@
 
                                                 </td>
                                                 <td><?php echo e(!empty($iteam->description) ? $iteam->description : ''); ?></td>
-                                                <td>Kes <?php echo e($iteam->price); ?></td>
+                                                <td>
+                                                    <?php
+                                                        $taxData = \Utility::getTaxData();
+                                                        $taxRate = floatval($taxData[$iteam->taxTypeCode]);
+                                                        $taxTot = ($iteam->price - $iteam->discount) * ($taxRate / 100);
+                                                        $totAfterTaxAndDiscount = ($iteam->price - $iteam->discount) + $taxTot;
+                                                    ?>
+                                                    KES <?php echo e($totAfterTaxAndDiscount); ?>
+
+                                                </td>
                                                 </tr>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             <tfoot>
@@ -598,8 +607,18 @@
                                                         <b>
                                                             <?php
                                                                 $tot = 0;
+                                                                $taxSum = 0;
+                                                                $taxData = \Utility::getTaxData();
+                                                                $taxRate = floatval($taxData[$iteam->taxTypeCode]);
                                                                 foreach ($iteams as $iteam) {
-                                                                    $tot += $iteam->price;
+                                                                    $tax = ($iteam->price - $iteam->discount) * ($taxRate / 100);
+                                                                    $taxSum += $tax;
+                                                                }
+                                                                foreach ($iteams as $iteam) {
+                                                                    \Log::info('iteam(item)');
+                                                                    \Log::info($iteam);
+                                                                    $totAfterTaxAndDiscount = ($iteam->price - $iteam->discount) + $taxSum;
+                                                                    $tot += $totAfterTaxAndDiscount;
                                                                 }
                                                             ?>
                                                             <?php echo e($tot); ?>
@@ -756,7 +775,7 @@
                                                     <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para"
                                                         data-bs-toggle="tooltip" title="Delete"
                                                         data-original-title="<?php echo e(__('Delete')); ?>"
-                                                        data-confirm="<?php echo e(_('Are You Sure?') . '|' . _('This action can not be undone. Do you want to continue?')); ?>"
+                                                        data-confirm="<?php echo e(__('Are You Sure?') . '|' .__('This action can not be undone. Do you want to continue?')); ?>"
                                                         data-confirm-yes="document.getElementById('delete-form-<?php echo e($payment->id); ?>').submit();">
                                                         <i class="ti ti-trash text-white"></i>
                                                     </a>
@@ -821,7 +840,7 @@
                                                     <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para"
                                                         data-bs-toggle="tooltip" title="Delete"
                                                         data-original-title="<?php echo e(__('Delete')); ?>"
-                                                        data-confirm="<?php echo e(_('Are You Sure?') . '|' . _('This action can not be undone. Do you want to continue?')); ?>"
+                                                        data-confirm="<?php echo e(__('Are You Sure?') . '|' .__('This action can not be undone. Do you want to continue?')); ?>"
                                                         data-confirm-yes="document.getElementById('delete-form-<?php echo e($bankPayment->id); ?>').submit();">
                                                         <i class="ti ti-trash text-white"></i>
                                                     </a>
@@ -892,7 +911,7 @@
                                                 <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para "
                                                     data-bs-toggle="tooltip" title="Delete"
                                                     data-original-title="<?php echo e(__('Delete')); ?>"
-                                                    data-confirm="<?php echo e(_('Are You Sure?') . '|' . _('This action can not be undone. Do you want to continue?')); ?>"
+                                                    data-confirm="<?php echo e(__('Are You Sure?') . '|' .__('This action can not be undone. Do you want to continue?')); ?>"
                                                     data-confirm-yes="document.getElementById('delete-form-<?php echo e($creditNote->id); ?>').submit();">
                                                     <i class="ti ti-trash text-white"></i>
                                                 </a>

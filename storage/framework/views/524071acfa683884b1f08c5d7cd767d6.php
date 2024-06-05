@@ -281,6 +281,8 @@
 
                                         </div>
                                         <div class="form-group col-md-4">
+                                            <?php echo e(Form::label('mappingProduct', __('Mapp Purchase Product To Your Product Stock'), ['class' => 'form-label'])); ?>
+
                                             <?php echo e(Form::select('productItem', $ProductService, null, ['class' => 'form-control select2 productItem', 'required' => 'required'])); ?>
 
                                         </div>
