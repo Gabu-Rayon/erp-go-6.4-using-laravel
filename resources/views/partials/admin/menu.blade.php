@@ -1373,15 +1373,28 @@
                         @can('manage purchase')
                             <li
                                 class="dash-item {{ Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : '' }}">
-                                <a class="dash-link" href="{{ route('purchase.index') }}">{{ __('Purchase') }}</a>
+                                <a class="dash-link" href="{{ route('purchase.index') }}">{{ __('Get Purchase/Sale List ') }}</a>
                             </li>
                         @endcan
-                         @can('manage purchase')
+
+                        @can('manage purchase')
+                            <li
+                                class="dash-item {{ Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : '' }}">
+                                <a class="dash-link" href="{{ route('purchase.create', 0) }}">{{ __('Purchase') }}</a>
+                            </li>
+                        @endcan
+                          @can('manage purchase')
+                            <li
+                                class="dash-item {{ Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : '' }}">
+                                <a class="dash-link" href="{{ route('purchase.mappedPurchases') }}">{{ __('Purchase List') }}</a>
+                            </li>
+                        @endcan
+                         <!-- @can('manage purchase')
                             <li
                                 class="dash-item {{ Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : '' }}">
                                 <a class="dash-link" href="{{ route('purchase.mappedPurchases') }}">{{ __('Mapped Purchase') }}</a>
                             </li>
-                        @endcan
+                        @endcan -->
                         @can('manage quotation')
                         <li
                             class="dash-item {{ Request::route()->getName() == 'quotation.index' || Request::route()->getName() == 'quotations.create' || Request::route()->getName() == 'quotation.edit' || Request::route()->getName() == 'quotation.show' ? ' active' : '' }}">

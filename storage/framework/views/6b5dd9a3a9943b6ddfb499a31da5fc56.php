@@ -1,11 +1,13 @@
 
 <?php $__env->startSection('page-title'); ?>
-    <?php echo e(__('Manage Purchase')); ?>
+    <?php echo e(__('Purchase Transaction Information')); ?>
 
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('breadcrumb'); ?>
     <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
-    <li class="breadcrumb-item"><?php echo e(__('Purchase')); ?></li>
+    <li class="breadcrumb-item"><?php echo e(__('Admin')); ?></li>
+    <li class="breadcrumb-item"><?php echo e(__('Purchase Transaction Information')); ?></li>
+    <li class="breadcrumb-item"><?php echo e(__('Add')); ?></li>
 <?php $__env->stopSection(); ?>
 <?php $__env->startPush('script-page'); ?>
     <script>
@@ -23,22 +25,13 @@
         });
     </script>
 <?php $__env->stopPush(); ?>
-
-
-
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
-        <!-- Add the form for date search -->
-        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create purchase')): ?>
-            <a href="<?php echo e(route('purchase.create', 0)); ?>" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
-                title="<?php echo e(__('Add Purchase')); ?>">
-                <i class="ti ti-plus"></i>
-            </a>
-        <?php endif; ?>
+        <a href="<?php echo e(route('purchase.synchronize')); ?>" class="btn btn-sm btn-primary">
+            Get Purchase/Sale List 
+        </a>
     </div>
 <?php $__env->stopSection(); ?>
-
-
 <?php $__env->startSection('content'); ?>
     <div class="row">
         <div class="col-md-12">
@@ -111,13 +104,13 @@
                                                                 <i class="ti ti-list text-white"></i></a>
                                                         </div>
                                                     <?php endif; ?>
-                                                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit purchase')): ?>
+                                                <!-- <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit purchase')): ?>
                                                     <div class="action-btn bg-primary ms-2">
                                                         <a href="<?php echo e(route('purchase.edit',\Crypt::encrypt($purchase->id))); ?>" class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip" title="Edit" data-original-title="<?php echo e(__('Edit')); ?>">
                                                             <i class="ti ti-pencil text-white"></i>
                                                         </a>
                                                     </div>
-                                                <?php endif; ?>
+                                                <?php endif; ?> -->
                                                 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete purchase')): ?>
                                                     <div class="action-btn bg-danger ms-2">
                                                         <?php echo Form::open(['method' => 'DELETE', 'route' => ['purchase.destroy', $purchase->id],'class'=>'delete-form-btn','id'=>'delete-form-'.$purchase->id]); ?>

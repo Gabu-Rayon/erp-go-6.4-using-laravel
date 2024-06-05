@@ -1,11 +1,13 @@
 
 <?php $__env->startSection('page-title'); ?>
-    <?php echo e(__('Manage Mapped Purchase')); ?>
+    <?php echo e(__('Purchase List')); ?>
 
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('breadcrumb'); ?>
     <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
-    <li class="breadcrumb-item"><?php echo e(__('Mapped Purchases')); ?></li>
+    <li class="breadcrumb-item"><?php echo e(__('Admin')); ?></li>
+     <li class="breadcrumb-item"><?php echo e(__('Purchases')); ?></li>
+      <li class="breadcrumb-item"><?php echo e(__('List')); ?></li>
 <?php $__env->stopSection(); ?>
 <?php $__env->startPush('script-page'); ?>
     <script>
@@ -44,12 +46,13 @@
 
             </div>
             <a href="<?php echo e(route('purchase.create', 0)); ?>" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
-                title="<?php echo e(__('Create')); ?>">
+                title="<?php echo e(__('Add New Purchase')); ?>">
                 <i class="ti ti-plus"></i>
             </a>
         <?php endif; ?>
     </div>
 <?php $__env->stopSection(); ?>
+
 <?php $__env->startSection('content'); ?>
     <div class="row">
         <div class="col-md-12">

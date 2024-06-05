@@ -1,10 +1,12 @@
 @extends('layouts.admin')
 @section('page-title')
-    {{ __('Manage Purchase') }}
+    {{ __('Purchase Transaction Information') }}
 @endsection
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-    <li class="breadcrumb-item">{{ __('Purchase') }}</li>
+    <li class="breadcrumb-item">{{ __('Admin') }}</li>
+    <li class="breadcrumb-item">{{ __('Purchase Transaction Information') }}</li>
+    <li class="breadcrumb-item">{{ __('Add') }}</li>
 @endsection
 @push('script-page')
     <script>
@@ -22,22 +24,13 @@
         });
     </script>
 @endpush
-
-
-
 @section('action-btn')
     <div class="float-end">
-        <!-- Add the form for date search -->
-        @can('create purchase')
-            <a href="{{ route('purchase.create', 0) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
-                title="{{ __('Add Purchase') }}">
-                <i class="ti ti-plus"></i>
-            </a>
-        @endcan
+        <a href="{{ route('purchase.synchronize') }}" class="btn btn-sm btn-primary">
+            Get Purchase/Sale List 
+        </a>
     </div>
 @endsection
-
-
 @section('content')
     <div class="row">
         <div class="col-md-12">
@@ -110,13 +103,13 @@
                                                                 <i class="ti ti-list text-white"></i></a>
                                                         </div>
                                                     @endcan
-                                                @can('edit purchase')
+                                                <!-- @can('edit purchase')
                                                     <div class="action-btn bg-primary ms-2">
                                                         <a href="{{ route('purchase.edit',\Crypt::encrypt($purchase->id)) }}" class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip" title="Edit" data-original-title="{{__('Edit')}}">
                                                             <i class="ti ti-pencil text-white"></i>
                                                         </a>
                                                     </div>
-                                                @endcan
+                                                @endcan -->
                                                 @can('delete purchase')
                                                     <div class="action-btn bg-danger ms-2">
                                                         {!! Form::open(['method' => 'DELETE', 'route' => ['purchase.destroy', $purchase->id],'class'=>'delete-form-btn','id'=>'delete-form-'.$purchase->id]) !!}

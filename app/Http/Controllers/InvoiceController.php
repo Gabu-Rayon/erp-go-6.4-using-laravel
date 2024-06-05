@@ -415,53 +415,53 @@ class InvoiceController extends Controller
                 \Log::info('Invoice  REQ DATA To Be Posted to the Api ', ['apiRequestData' => $apiRequestData]);
 
                 // Send data to AddSale API
-                // $url = 'https://etims.your-apps.biz/api/AddSale';
-                // $response = Http::withOptions(['verify' => false])
-                //     ->withHeaders(['key' => '123456'])
-                //     ->post($url, $apiRequestData);
+                $url = 'https://etims.your-apps.biz/api/AddSale';
+                $response = Http::withOptions(['verify' => false])
+                    ->withHeaders(['key' => '123456'])
+                    ->post($url, $apiRequestData);
 
 
-                // if ($response->failed()) {
-                //     if ($response->json('statusCode') == 400 && $response->json('message') == 'Trader invoice number is alrady exist') {
-                //         return redirect()->back()->with('error', 'Trader invoice number already exists.');
-                //     }
-                //     return redirect()->back()->with('error', 'Failed to post invoice data.');
-                // }
+                if ($response->failed()) {
+                    if ($response->json('statusCode') == 400 && $response->json('message') == 'Trader invoice number is alrady exist') {
+                        return redirect()->back()->with('error', 'Trader invoice number already exists.');
+                    }
+                    return redirect()->back()->with('error', 'Failed to post invoice data.');
+                }
                 
-                // // Log the response of the AddSale API call
-                // \Log::info('SALES Invoice API RESPONSE', ['response' => $response->json()]);
-                // \Log::info('API Response Status Code For Posting Invoice Data: ' . $response->status());
-                // \Log::info('API Request Invoice Being Posted: ' . json_encode($apiRequestData));
-                // \Log::info('API Response Body For Posting Invoice Data: ' . $response->body());
+                // Log the response of the AddSale API call
+                \Log::info('SALES Invoice API RESPONSE', ['response' => $response->json()]);
+                \Log::info('API Response Status Code For Posting Invoice Data: ' . $response->status());
+                \Log::info('API Request Invoice Being Posted: ' . json_encode($apiRequestData));
+                \Log::info('API Response Body For Posting Invoice Data: ' . $response->body());
 
-                // if ($response['statusCode'] == 400) {
-                //     return redirect()->back()->with('error', $response['message']);
-                // }
+                if ($response['statusCode'] == 400) {
+                    return redirect()->back()->with('error', $response['message']);
+                }
 
                 // Prepare data for ItemOpeningStock API
-                // $openingItemsLists = $this->prepareOpeningItemsList($saleItemList);
-                // $itemOpeningStockRequestData = [
-                //     "openingItemsLists" => $openingItemsLists
-                // ];
+                $openingItemsLists = $this->prepareOpeningItemsList($saleItemList);
+                $itemOpeningStockRequestData = [
+                    "openingItemsLists" => $openingItemsLists
+                ];
 
-                // // Send data to ItemOpeningStock API
-                // $url = 'https://etims.your-apps.biz/api/ItemOpeningStock';
-                // $response = Http::withOptions(['verify' => false])
-                //     ->withHeaders([
-                //         'accept' => '*/*',
-                //         'key' => '123456',
-                //         'Content-Type' => 'application/json'
-                //     ])
-                //     ->post($url, $itemOpeningStockRequestData);
+                // Send data to ItemOpeningStock API
+                $url = 'https://etims.your-apps.biz/api/ItemOpeningStock';
+                $response = Http::withOptions(['verify' => false])
+                    ->withHeaders([
+                        'accept' => '*/*',
+                        'key' => '123456',
+                        'Content-Type' => 'application/json'
+                    ])
+                    ->post($url, $itemOpeningStockRequestData);
 
-                // \Log::info('ITEM OPENING STOCK API RESPONSE', ['response' => $response->json()]);
-                // \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $response->status());
-                // \Log::info('API Request Opening Stock Data Posted: ' . json_encode($itemOpeningStockRequestData));
-                // \Log::info('API Response Body For Posting Opening Stock Data: ' . json_encode($response->body()));
+                \Log::info('ITEM OPENING STOCK API RESPONSE', ['response' => $response->json()]);
+                \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $response->status());
+                \Log::info('API Request Opening Stock Data Posted: ' . json_encode($itemOpeningStockRequestData));
+                \Log::info('API Response Body For Posting Opening Stock Data: ' . json_encode($response->body()));
 
-                // if ($response->failed()) {
-                //     return redirect()->back()->with('error', 'Failed to sync item opening stock');
-                // }
+                if ($response->failed()) {
+                    return redirect()->back()->with('error', 'Failed to sync item opening stock');
+                }
 
                 $totalAmount = $this->calculateTotalAmount($saleItemList);
                 $inv = $this->createInvoice($data, $customer, $totalAmount);

@@ -1579,6 +1579,10 @@ Route::group(['middleware' => ['verified']], function () {
     Route::get('quotation/pdf/{id}', [QuotationController::class, 'quotation'])->name('quotation.pdf')->middleware(['auth', 'XSS', 'revalidate']);
 
     Route::resource('warehouse', WarehouseController::class)->middleware(['auth', 'XSS', 'revalidate']);
+
+
+     //Get All the Purchase Lists From The Apis 
+     Route::get('purchase/synchronize', [PurchaseController::class, 'synchronize'])->name('purchase.synchronize');
     Route::group(
         [
             'middleware' => [
@@ -1590,7 +1594,9 @@ Route::group(['middleware' => ['verified']], function () {
         function () {
             Route::get('purchase/items', [PurchaseController::class, 'items'])->name('purchase.items');
             Route::resource('purchase', PurchaseController::class);
-            Route::get('purchase/{id}/show', [PurchaseController::class, 'show'])->name('purchase.show');
+            Route::get('purchase/{id}/show', [PurchaseController::class, 'show'])->name('purchase.show');        
+
+            
             Route::get('purchase/{spplrInvcNo}/details', [PurchaseController::class, 'details'])->name('purchase.details');
             Route::get('purchase/{id}/payment', [PurchaseController::class, 'payment'])->name('purchase.payment');
             Route::post('purchase/{id}/payment', [PurchaseController::class, 'createPayment'])->name('purchase.payment');
@@ -1607,6 +1613,8 @@ Route::group(['middleware' => ['verified']], function () {
         }
 
     );
+
+   
     // purchase.mapPurchase
     Route::any('map-purchase', [PurchaseController::class, 'mapPurchase'])->name('purchase.mapPurchase');
     //  purchase.SearchByDate
@@ -1878,10 +1886,14 @@ Route::group(
 // );
 
 
-Route::get('importeditems/index', [ImportedItemsController::class, 'index'])->name('importeditems.index')->middleware(['auth', 'XSS']);;
-Route::get('importeditems/map', [ImportedItemsController::class, 'create'])->name('importeditems.mapImportedItem')->middleware(['auth', 'XSS']);;
-Route::post('mapimporteditem', [ImportedItemsController::class, 'store'])->name('importeditems.mapimporteditem')->middleware(['auth', 'XSS']);;
-Route::get('importeditems/show/{id}', [ImportedItemsController::class, 'show'])->name('importeditems.show')->middleware(['auth', 'XSS']);;
+Route::get('importeditems/index', [ImportedItemsController::class, 'index'])->name('importeditems.index')->middleware(['auth', 'XSS']);
+;
+Route::get('importeditems/map', [ImportedItemsController::class, 'create'])->name('importeditems.mapImportedItem')->middleware(['auth', 'XSS']);
+;
+Route::post('mapimporteditem', [ImportedItemsController::class, 'store'])->name('importeditems.mapimporteditem')->middleware(['auth', 'XSS']);
+;
+Route::get('importeditems/show/{id}', [ImportedItemsController::class, 'show'])->name('importeditems.show')->middleware(['auth', 'XSS']);
+;
 
 
 
@@ -1962,6 +1974,9 @@ Route::get('sales/creditnote', [SalesController::class, 'creditNote'])->name('sa
 Route::get('/getPurchaseSalesItemsFromApi', [PurchaseController::class, 'getPurchaseSalesItemsFromApi']);
 
 Route::get('/getpurchasesalesdetailsforsuppliers', [PurchaseController::class, 'getSuppliersDetailsForPurchaseSalesFromApi']);
+
+Route::get('purchase/synchronize', [PurchaseController::class, 'synchronize'])->name('purchase.synchronize');
+
 Route::get('/getsupplier/{id}', [PurchaseController::class, 'getSupplier']);
 Route::get('/getitem/{id}', [PurchaseController::class, 'getItem']);
 Route::get('/getcustomer/{id}', [CustomerController::class, 'getCustomer']);

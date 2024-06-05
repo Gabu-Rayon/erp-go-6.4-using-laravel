@@ -1,10 +1,12 @@
 @extends('layouts.admin')
 @section('page-title')
-    {{ __('Manage Mapped Purchase') }}
+    {{ __('Purchase List') }}
 @endsection
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-    <li class="breadcrumb-item">{{ __('Mapped Purchases') }}</li>
+    <li class="breadcrumb-item">{{ __('Admin') }}</li>
+     <li class="breadcrumb-item">{{ __('Purchases') }}</li>
+      <li class="breadcrumb-item">{{ __('List') }}</li>
 @endsection
 @push('script-page')
     <script>
@@ -39,12 +41,13 @@
                 {{ Form::close() }}
             </div>
             <a href="{{ route('purchase.create', 0) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
-                title="{{ __('Create') }}">
+                title="{{ __('Add New Purchase') }}">
                 <i class="ti ti-plus"></i>
             </a>
         @endcan
     </div>
 @endsection
+
 @section('content')
     <div class="row">
         <div class="col-md-12">

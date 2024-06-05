@@ -1384,15 +1384,28 @@
                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage purchase')): ?>
                             <li
                                 class="dash-item <?php echo e(Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('purchase.index')); ?>"><?php echo e(__('Purchase')); ?></a>
+                                <a class="dash-link" href="<?php echo e(route('purchase.index')); ?>"><?php echo e(__('Get Purchase/Sale List ')); ?></a>
                             </li>
                         <?php endif; ?>
-                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage purchase')): ?>
+
+                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage purchase')): ?>
+                            <li
+                                class="dash-item <?php echo e(Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : ''); ?>">
+                                <a class="dash-link" href="<?php echo e(route('purchase.create', 0)); ?>"><?php echo e(__('Purchase')); ?></a>
+                            </li>
+                        <?php endif; ?>
+                          <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage purchase')): ?>
+                            <li
+                                class="dash-item <?php echo e(Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : ''); ?>">
+                                <a class="dash-link" href="<?php echo e(route('purchase.mappedPurchases')); ?>"><?php echo e(__('Purchase List')); ?></a>
+                            </li>
+                        <?php endif; ?>
+                         <!-- <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage purchase')): ?>
                             <li
                                 class="dash-item <?php echo e(Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : ''); ?>">
                                 <a class="dash-link" href="<?php echo e(route('purchase.mappedPurchases')); ?>"><?php echo e(__('Mapped Purchase')); ?></a>
                             </li>
-                        <?php endif; ?>
+                        <?php endif; ?> -->
                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage quotation')): ?>
                         <li
                             class="dash-item <?php echo e(Request::route()->getName() == 'quotation.index' || Request::route()->getName() == 'quotations.create' || Request::route()->getName() == 'quotation.edit' || Request::route()->getName() == 'quotation.show' ? ' active' : ''); ?>">
