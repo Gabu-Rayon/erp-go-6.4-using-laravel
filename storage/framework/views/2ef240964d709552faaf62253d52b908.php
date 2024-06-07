@@ -377,7 +377,7 @@
                     <?php endif; ?>
                     <?php if(Gate::check('manage product & service')): ?>
                         <li class="dash-item <?php echo e(Request::segment(1) == 'customerbypin' ? 'active' : ''); ?>">
-                            <a href="#"
+                            <a href="<?php echo e(route('customer.customerbypin')); ?>"
                                 class="dash-link"><?php echo e(__('Get Customer By Pin')); ?>
 
                             </a>
@@ -1387,7 +1387,6 @@
                                 <a class="dash-link" href="<?php echo e(route('purchase.index')); ?>"><?php echo e(__('Get Purchase/Sale List ')); ?></a>
                             </li>
                         <?php endif; ?>
-
                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage purchase')): ?>
                             <li
                                 class="dash-item <?php echo e(Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : ''); ?>">

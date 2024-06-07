@@ -374,7 +374,7 @@
                     @endif
                     @if (Gate::check('manage product & service'))
                         <li class="dash-item {{ Request::segment(1) == 'customerbypin' ? 'active' : '' }}">
-                            <a href="#"
+                            <a href="{{ route('customer.customerbypin') }}"
                                 class="dash-link">{{ __('Get Customer By Pin') }}
                             </a>
                         </li>
@@ -1376,7 +1376,6 @@
                                 <a class="dash-link" href="{{ route('purchase.index') }}">{{ __('Get Purchase/Sale List ') }}</a>
                             </li>
                         @endcan
-
                         @can('manage purchase')
                             <li
                                 class="dash-item {{ Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : '' }}">

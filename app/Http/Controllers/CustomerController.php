@@ -524,8 +524,6 @@ class CustomerController extends Controller
             'Profile successfully updated.'
         );
     }
-
-
     public function changeLanquage($lang)
     {
 
@@ -554,6 +552,8 @@ class CustomerController extends Controller
 
     public function import(Request $request)
     {
+
+        if (\Auth::user()->can('manage customer')) {
 
         $rules = [
             'file' => 'required|mimes:csv,txt',
@@ -640,11 +640,16 @@ class CustomerController extends Controller
         }
 
         return redirect()->back()->with($data['status'], $data['msg']);
+
+            // return $customers;
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
     }
 
     public function searchCustomers(Request $request)
     {
-        if (\Illuminate\Support\Facades\Auth::user()->can('manage customer')) {
+        if (\Auth::user()->can('manage customer')) {
             $customers = [];
             $search = $request->search;
             if ($request->ajax() && isset($search) && !empty($search)) {
@@ -661,6 +666,7 @@ class CustomerController extends Controller
 
     public function getCustomer($id)
     {
+       if (\Auth::user()->can('manage customer')) {
         try {
             $customerInfo = Customer::where('customer_id', $id)->first();
             \Log::info('CUSTOMER');
@@ -677,10 +683,15 @@ class CustomerController extends Controller
                 'error' => $e->getMessage()
             ]);
         }
+
+         } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
     }
 
     public function getCustomerByName($name)
     {
+         if (\Auth::user()->can('manage customer')) {
         try {
             $customerInfo = Customer::where('name', $name)->first();
             \Log::info('CUSTOMER');
@@ -696,6 +707,20 @@ class CustomerController extends Controller
                 'message' => 'error',
                 'error' => $e->getMessage()
             ]);
+        }
+       } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
+
+
+    public function getCustomerByTin(){
+        if (\Auth::user()->can('manage customer')) {
+            $customers = Customer::where('created_by', \Auth::user()->creatorId())->get();
+
+            return view('customer.customerbypin', compact('customers'));
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
 }

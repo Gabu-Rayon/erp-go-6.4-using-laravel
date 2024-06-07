@@ -1485,12 +1485,12 @@ Route::group(['middleware' => ['verified']], function () {
             ],
         ],
         function () {
-            Route::resource('stockinfo', StockMoveListController::class);
+            Route::resource('stockinfo', StockMoveController::class);
         },
     );
 
-    Route::get('stockinfo/stockadjustment', [StockMoveListController::class, 'stockAdjustment'])->name('stockinfo.stockadjustment');
-    Route::get('stockinfo/getstockmovelistfromapi', [StockMoveListController::class, 'getStockMoveListFromApi']);
+    Route::get('stockinfo/stockadjustment', [StockMoveController::class, 'stockAdjustment'])->name('stockinfo.stockadjustment');
+    Route::get('stockinfo/getstockmovelistfromapi', [StockMoveController::class, 'getStockMoveListFromApi']);
 
     Route::resource('competencies', CompetenciesController::class)->middleware(['auth', 'XSS']);
 
@@ -1981,7 +1981,11 @@ Route::get('/getsupplier/{id}', [PurchaseController::class, 'getSupplier']);
 Route::get('/getitem/{id}', [PurchaseController::class, 'getItem']);
 Route::get('/getcustomer/{id}', [CustomerController::class, 'getCustomer']);
 Route::get('/getcustomerbyname/{name}', [CustomerController::class, 'getCustomerByName']);
-Route::get('stockinfoo/getstockmovelistfromapi', [StockMoveListController::class, 'getStockMoveListFromApi']);
-Route::get('stockinfo/cancel', [StockMoveListController::class, 'cancel'])->name('stockinfo.cancel');
-Route::get('stockinfo/stockmove', [StockMoveListController::class, 'stockmove'])->name('stockinfo.stockmove');
+
+//Get Customer By Tin
+Route::get('/getcustomerbypin', [CustomerController::class, 'getCustomerByTin'])->name('customer.customerbypin');  
+
+Route::get('stockinfoo/getstockmovelistfromapi', [StockMoveController::class, 'getStockMoveListFromApi']);
+Route::get('stockinfo/cancel', [StockMoveController::class, 'cancel'])->name('stockinfo.cancel');
+Route::get('stockinfo/stockmove', [StockMoveController::class, 'stockmove'])->name('stockinfo.stockmove');
 Route::any('/getItemInformationForPurchasing', [PurchaseController::class, 'getItemToPurchase'])->name('productservice.getiteminformation');

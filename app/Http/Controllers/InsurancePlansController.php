@@ -41,7 +41,7 @@ class InsurancePlansController extends Controller
      */
      public function store(Request $request)
     {
-        if (\Auth::user()->can('create plan')) {
+        if (\Auth::user()->can('create purchase')) {
             // Validate the incoming request data
             $request->validate([
                 'insurancecode' => 'required|string',
@@ -85,7 +85,9 @@ class InsurancePlansController extends Controller
                 if ($response['data']['resultCd'] == 910) {
                     return redirect()->back()->with('error', __('Invalid Credentials'));
                 }
-                $insurance = Insurance::create($requestData);
+                $insurance = Insurance::create($requestData);                
+                $insurance->save();
+                
                 return redirect()->back()->with('success', __('Insurance Plan Successfully created.'));
             } else {
                 // API call failed, log the error and return an error response
@@ -130,7 +132,7 @@ class InsurancePlansController extends Controller
      */
     public function update(Request $request, Insurance $Insurance)
     {
-        if (\Auth::user()->can('edit plan')) {
+        if (\Auth::user()->can('edit purchase')) {
             //method code here  //method code here
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
@@ -142,7 +144,7 @@ class InsurancePlansController extends Controller
      */
     public function destroy(Insurance $Insurance)
     {
-        if (\Auth::user()->can('edit plan')) {
+        if (\Auth::user()->can('edit purchase')) {
             //method code here
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));

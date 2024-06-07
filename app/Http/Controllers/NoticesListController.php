@@ -13,11 +13,8 @@ class NoticesListController extends Controller
     {
         $notices = Notice::all();
         return view('noticelist.index', compact('notices'));
-    }
-
+    } 
     
-
-
     public function getNoticeList()
     {
         $url = 'https://etims.your-apps.biz/api/GetNoticeList?date=20210101120000';
@@ -50,8 +47,6 @@ class NoticesListController extends Controller
     }
 
      //to show the  show blade page 
-
-
     public function show(){
         
      }
@@ -88,8 +83,7 @@ class NoticesListController extends Controller
                 array_push($noticesToSync, $notice);
             }
 
-            \Log::info('NOTICES TO SYNC');
-            \Log::info($noticesToSync);
+            \Log::info('NOTICES RECENT TO SYNC', $noticesToSync);
 
             $syncedNotices = 0;
 
