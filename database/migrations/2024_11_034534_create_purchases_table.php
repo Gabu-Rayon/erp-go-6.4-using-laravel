@@ -20,7 +20,6 @@ return new class extends Migration
             $table->foreignId('vender_id')->nullable();
             $table->foreignId('warehouse_id')->nullable();
             $table->date('purchase_date')->nullable();
-            $table->date('purchase_date')->nullable();
             $table->string('purchase_number')->nullable();
             $table->integer('status')->nullable();
             $table->integer('shipping_display')->nullable();
