@@ -276,88 +276,56 @@
 
 @push('script-page')
 <script>
-    const sync = document.querySelector('.sync');
+  const sync = document.querySelector('.sync');
 
-    sync.addEventListener('click', async function(event) {
-        event.preventDefault();
+sync.addEventListener('click', async function(event) {
+    event.preventDefault();
 
-        const inputValue = document.querySelector('input[name="getSalesByTraderInvoiceNo"]').value;
+    const inputValue = document.querySelector('input[name="getSalesByTraderInvoiceNo"]').value;
 
-        if (!inputValue) {
-            alert('{{ __('Please enter Invoice No to search by e.g. 10') }}');
-            return;
+    if (!inputValue) {
+        alert('{{ __('Please enter Invoice No to search by e.g. 10') }}');
+        return;
+    }
+
+    try {
+        showLoadingSpinner(sync);
+
+        const response = await fetch(
+            `{{ route('invoice.no.getSalesByTraderInvoiceNo') }}?getSalesByTraderInvoiceNo=${inputValue}`, {
+                method: 'POST', // Change to POST since we're sending data
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Include CSRF token
+                },
+                body: JSON.stringify({ getSalesByTraderInvoiceNo: inputValue }) // Send the invoice number in the body
+            });
+
+        if (!response.ok) {
+            throw new Error('{{ __('An error occurred while syncing the data Sales Invoices') }}');
         }
 
-        try {
-            showLoadingSpinner(sync);
+        const data = await response.json();
 
-            const response = await fetch(
-                `{{ route('invoice.no.getSalesByTraderInvoiceNo') }}?getSalesByTraderInvoiceNo=${inputValue}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
-
-            if (!response.ok) {
-                throw new Error('{{ __('An error occurred while syncing the data Sales Invoices') }}');
-            }
-
-            const data = await response.json();
-
-            if (data.error) {
-                showErrorPopup(data.error);
-            } else if (data.newData) {
-                showSuccessPopup(data.message); 
-                if (data.newData.length > 0) {
-                    // If newData is not empty, perform further actions
-                    // For example, show additional information or reload the page
-                }
-                setTimeout(location.reload, 3000);
+        if (data.error) {
+            showErrorPopup(data.error);
+        } else if (data.newData) {
+            showSuccessPopup(data.message);
+            if (data.newData.length > 0) {
+                setTimeout(() => {
+                    location.reload();
+                }, 3000);
             } else {
                 showErrorPopup('{{ __('Invoice Already existing. No New Invoices data added.') }}');
             }
-        } catch (error) {
-            showErrorPopup(error.message);
-        } finally {
-            removeLoadingSpinner(sync);
         }
-    });
-
-    function showLoadingSpinner(element) {
-        const loader = document.createElement('div');
-        loader.classList.add('spinner-border', 'text-light', 'spinner-border-sm');
-        loader.role = 'status';
-        element.appendChild(loader);
+    } catch (error) {
+        showErrorPopup(error.message);
+    } finally {
+        removeLoadingSpinner(sync);
     }
+});
 
-    function removeLoadingSpinner(element) {
-        element.removeChild(element.querySelector('.spinner-border'));
-    }
-
-    function showSuccessPopup(message) {
-        const popup = createPopup('alert-success', message);
-        document.body.appendChild(popup);
-        setTimeout(() => document.body.removeChild(popup), 3000);
-    }
-
-    function showErrorPopup(message) {
-        const popup = createPopup('alert-danger', message);
-        document.body.appendChild(popup);
-        setTimeout(() => document.body.removeChild(popup), 3000);
-    }
-
-    function createPopup(type, message) {
-        const popup = document.createElement('div');
-        popup.classList.add('alert', type);
-        popup.innerHTML = message;
-        popup.style.position = 'absolute';
-        popup.style.top = '50%';
-        popup.style.left = '50%';
-        popup.style.transform = 'translate(-50%, -50%)';
-        popup.style.zIndex = '9999';
-        return popup;
-    }
 </script>
 @endpush

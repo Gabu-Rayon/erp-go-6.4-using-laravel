@@ -84,6 +84,7 @@ use App\Http\Controllers\TimesheetController;
 use App\Http\Controllers\ToyyibpayController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\AiTemplateController;
+use App\Http\Controllers\BranchUserController;
 use App\Http\Controllers\CommissionController;
 use App\Http\Controllers\CreditNoteController;
 use App\Http\Controllers\DepartmentController;
@@ -865,8 +866,8 @@ Route::group(['middleware' => ['verified']], function () {
 
     Route::resource('leads', LeadController::class)->middleware(['auth', 'XSS']);
 
-    // end Leads Module
-
+    // end Leads Module 
+    
     Route::get('user/{id}/plan', [UserController::class, 'upgradePlan'])->name('plan.upgrade')->middleware(['auth', 'XSS']);
     Route::get('user/{id}/plan/{pid}', [UserController::class, 'activePlan'])->name('plan.active')->middleware(['auth', 'XSS']);
     Route::get('/{uid}/notification/seen', [UserController::class, 'notificationSeen'])->name('notification.seen');
@@ -1803,7 +1804,7 @@ Route::group(['middleware' => ['verified']], function () {
 });
 Route::any('/cookie-consent', [SystemController::class, 'CookieConsent'])->name('cookie-consent');
 Route::get('/code', [CodeController::class, 'getCodesList']);
-Route::get('/getItemClassifications', [ItemClassificationController::class, 'addCategories']);
+Route::get('/getItemClassifications', [ProductServiceClassificationController::class, 'addCategories']);
 Route::get('/details/sync', [DetailsController::class, 'synchronize'])->name('details.sync');
 Route::get('/details/countries', [DetailsController::class, 'countries'])->name('details.countries');
 Route::get('/details/refundreasons', [DetailsController::class, 'refundreasons'])->name('details.refundreasons');
@@ -1896,7 +1897,6 @@ Route::get('importeditems/show/{id}', [ImportedItemsController::class, 'show'])-
 ;
 
 
-
 Route::group(
     [
         'middleware' => [
@@ -1983,7 +1983,7 @@ Route::get('/getcustomer/{id}', [CustomerController::class, 'getCustomer']);
 Route::get('/getcustomerbyname/{name}', [CustomerController::class, 'getCustomerByName']);
 
 //Get Customer By Tin
-Route::get('/getcustomerbypin', [CustomerController::class, 'getCustomerByTin'])->name('customer.customerbypin');  
+Route::any('/getcustomerbypin', [CustomerController::class, 'getCustomerByTin'])->name('customer.customerbypin');  
 
 Route::get('stockinfoo/getstockmovelistfromapi', [StockMoveController::class, 'getStockMoveListFromApi']);
 Route::get('stockinfo/cancel', [StockMoveController::class, 'cancel'])->name('stockinfo.cancel');

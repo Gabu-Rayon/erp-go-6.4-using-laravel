@@ -415,77 +415,77 @@ class InvoiceController extends Controller
                 \Log::info('Invoice  REQ DATA To Be Posted to the Api ', ['apiRequestData' => $apiRequestData]);
 
                 // Send data to AddSale API
-                $url = 'https://etims.your-apps.biz/api/AddSale';
-                $response = Http::withOptions(['verify' => false])
-                    ->withHeaders(['key' => '123456'])
-                    ->post($url, $apiRequestData);
+                // $url = 'https://etims.your-apps.biz/api/AddSale';
+                // $response = Http::withOptions(['verify' => false])
+                //     ->withHeaders(['key' => '123456'])
+                //     ->post($url, $apiRequestData);
 
 
-                if ($response->failed()) {
-                    if ($response->json('statusCode') == 400 && $response->json('message') == 'Trader invoice number is alrady exist') {
-                        return redirect()->back()->with('error', 'Trader invoice number already exists.');
-                    }
-                    return redirect()->back()->with('error', 'Failed to post invoice data.');
-                }
-                
-                // Log the response of the AddSale API call
-                \Log::info('SALES Invoice API RESPONSE', ['response' => $response->json()]);
-                \Log::info('API Response Status Code For Posting Invoice Data: ' . $response->status());
-                \Log::info('API Request Invoice Being Posted: ' . json_encode($apiRequestData));
-                \Log::info('API Response Body For Posting Invoice Data: ' . $response->body());
+                // if ($response->failed()) {
+                //     if ($response->json('statusCode') == 400 && $response->json('message') == 'Trader invoice number is alrady exist') {
+                //         return redirect()->back()->with('error', 'Trader invoice number already exists.');
+                //     }
+                //     return redirect()->back()->with('error', 'Failed to post invoice data.');
+                // }
 
-                if ($response['statusCode'] == 400) {
-                    return redirect()->back()->with('error', $response['message']);
-                }
+                // // Log the response of the AddSale API call
+                // \Log::info('SALES Invoice API RESPONSE', ['response' => $response->json()]);
+                // \Log::info('API Response Status Code For Posting Invoice Data: ' . $response->status());
+                // \Log::info('API Request Invoice Being Posted: ' . json_encode($apiRequestData));
+                // \Log::info('API Response Body For Posting Invoice Data: ' . $response->body());
 
-                // Prepare data for ItemOpeningStock API
-                $openingItemsLists = $this->prepareOpeningItemsList($saleItemList);
-                $itemOpeningStockRequestData = [
-                    "openingItemsLists" => $openingItemsLists
-                ];
+                // if ($response['statusCode'] == 400) {
+                //     return redirect()->back()->with('error', $response['message']);
+                // }
 
-                // Send data to ItemOpeningStock API
-                $url = 'https://etims.your-apps.biz/api/ItemOpeningStock';
-                $response = Http::withOptions(['verify' => false])
-                    ->withHeaders([
-                        'accept' => '*/*',
-                        'key' => '123456',
-                        'Content-Type' => 'application/json'
-                    ])
-                    ->post($url, $itemOpeningStockRequestData);
+                // // Prepare data for ItemOpeningStock API
+                // $openingItemsLists = $this->prepareOpeningItemsList($saleItemList);
+                // $itemOpeningStockRequestData = [
+                //     "openingItemsLists" => $openingItemsLists
+                // ];
 
-                \Log::info('ITEM OPENING STOCK API RESPONSE', ['response' => $response->json()]);
-                \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $response->status());
-                \Log::info('API Request Opening Stock Data Posted: ' . json_encode($itemOpeningStockRequestData));
-                \Log::info('API Response Body For Posting Opening Stock Data: ' . json_encode($response->body()));
+                // // Send data to ItemOpeningStock API
+                // $url = 'https://etims.your-apps.biz/api/ItemOpeningStock';
+                // $response = Http::withOptions(['verify' => false])
+                //     ->withHeaders([
+                //         'accept' => '*/*',
+                //         'key' => '123456',
+                //         'Content-Type' => 'application/json'
+                //     ])
+                //     ->post($url, $itemOpeningStockRequestData);
 
-                if ($response->failed()) {
-                    return redirect()->back()->with('error', 'Failed to sync item opening stock');
-                }
+                // \Log::info('ITEM OPENING STOCK API RESPONSE', ['response' => $response->json()]);
+                // \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $response->status());
+                // \Log::info('API Request Opening Stock Data Posted: ' . json_encode($itemOpeningStockRequestData));
+                // \Log::info('API Response Body For Posting Opening Stock Data: ' . json_encode($response->body()));
+
+                // if ($response->failed()) {
+                //     return redirect()->back()->with('error', 'Failed to sync item opening stock');
+                // }
 
                 $totalAmount = $this->calculateTotalAmount($saleItemList);
                 $inv = $this->createInvoice($data, $customer, $totalAmount);
                 $this->createInvoiceProducts($saleItemList, $inv, $data['customer_id']);
 
-                 // Update the quantities in product_services and warehouse_products tables
-               foreach ($saleItemList as $item) {
-                // Update quantity in product_services
-                $productService = ProductService::where('itemCd', $item['itemCode'])->first();
-                if ($productService && $productService->quantity !== null) {
-                    $productService->quantity -= $item['quantity'];                    
-                    $productService->save();
-                }
-                \Log::info('TOTAL AMT');
-                \Log::info($totalAmount);
+                // Update the quantities in product_services and warehouse_products tables
+                foreach ($saleItemList as $item) {
+                    // Update quantity in product_services
+                    $productService = ProductService::where('itemCd', $item['itemCode'])->first();
+                    if ($productService && $productService->quantity !== null) {
+                        $productService->quantity -= $item['quantity'];
+                        $productService->save();
+                    }
+                    \Log::info('TOTAL AMT');
+                    \Log::info($totalAmount);
 
-                // Update quantity in warehouse_products
-                $warehouseProduct = WarehouseProduct::where('product_id', $productService->id)->first();
-                if ($warehouseProduct && $warehouseProduct->quantity !== null) {
-                    $warehouseProduct->quantity -= $item['quantity'];
-                    // $warehouseProduct->pkgQuantity  -= $item['pkgQuantity'];
-                    $warehouseProduct->save();
+                    // Update quantity in warehouse_products
+                    $warehouseProduct = WarehouseProduct::where('product_id', $productService->id)->first();
+                    if ($warehouseProduct && $warehouseProduct->quantity !== null) {
+                        $warehouseProduct->quantity -= $item['quantity'];
+                        // $warehouseProduct->pkgQuantity  -= $item['pkgQuantity'];
+                        $warehouseProduct->save();
+                    }
                 }
-            }
 
                 return redirect()->to('invoice')->with('success', 'Sale Created Successfully');
 
@@ -1658,7 +1658,7 @@ class InvoiceController extends Controller
 
         $logo = asset(Storage::url('uploads/logo/'));
         $company_logo = Utility::getValByName('company_logo_dark');
-        $settings_data = \App\Models\Utility::settingsById($invoice->created_by);
+        $settings_data = Utility::settingsById($invoice->created_by);
         $invoice_logo = $settings_data['invoice_logo'];
         if (isset($invoice_logo) && !empty($invoice_logo)) {
             $img = Utility::get_file('invoice_logo/') . $invoice_logo;
@@ -1772,35 +1772,155 @@ class InvoiceController extends Controller
 
 
 
+    // public function getSalesByTraderInvoiceNo(Request $request)
+    // {
+    //      \Log::info('Search Request To Get Sales Trader Invoice API RESPONSE From Front Office :', ['response' => $request->json()]);
+    //     // Validate the request
+    //     $request->validate([
+    //         'getSalesByTraderInvoiceNo' => 'required|numeric',
+    //     ]);
+
+    //     // Get the input value
+    //     $traderInvoiceNo = $request->getSalesByTraderInvoiceNo;
+
+    //     // Check if the invoice exists in the local database
+    //     $invoice = Invoice::where('trderInvoiceNo', $traderInvoiceNo)->first();
+
+    //     if (!$invoice) {
+    //         // If the invoice does not exist in the local database, fetch it from the API
+    //         $response = Http::withHeaders([
+    //             'accept' => '*/*',
+    //             'key' => '123456'
+    //         ])->get('https://etims.your-apps.biz/api/GetSalesByTraderInvoiceNo', [
+    //                     'traderInvoiceNo' => $traderInvoiceNo
+    //                 ]);
+
+    //         $data = $response->json();
+
+    //         \Log::info('Get Sales Trader Invoice API RESPONSE', ['response' => $response->json()]);
+    //         \Log::info('API Response Status Code For Get Sales Trader Invoice API  Data: ' . $response->status());
+    //         \Log::info('API Request Get Sales Trader Invoice API : ' . json_encode($data));
+    //         \Log::info('API Response Body For Get Sales Trader Invoice API  Data: ' . $response->body());
+
+    //         // Check if the response is successful
+    //         if ($response->ok()) {
+    //             // Map the API response data to local database columns
+    //             $mappedData = [
+    //                 'invoice_id' => $data['id'],
+    //                 'customer_id' => null,
+    //                 'issue_date' => $data['salesDate'],
+    //                 'due_date' => $data['salesDate'],
+    //                 'send_date' => null,
+    //                 'category_id' => null,
+    //                 'ref_number' => $data['invoiceNo'],
+    //                 'status' => $data['salesSttsCode'],
+    //                 'shipping_display' => null,
+    //                 'discount_apply' => null,
+    //                 'created_by' => \Auth::user()->creatorId(),
+    //                 'trderInvoiceNo' => $data['trderInvoiceNo'],
+    //                 'invoiceNo' => $data['invoiceNo'],
+    //                 'orgInvoiceNo' => $data['orgInvoiceNo'],
+    //                 'customerTin' => $data['customerTin'],
+    //                 'customerName' => $data['customerName'],
+    //                 'receptTypeCode' => $data['receptTypeCode'],
+    //                 'paymentTypeCode' => $data['paymentTypeCode'],
+    //                 'salesSttsCode' => $data['salesSttsCode'],
+    //                 'confirmDate' => $data['confirmDate'],
+    //                 'salesDate' => $data['salesDate'],
+    //                 'stockReleaseDate' => $data['stockReleaseDate'],
+    //                 'cancelReqDate' => $data['cancelReqDate'],
+    //                 'cancelDate' => $data['cancelDate'],
+    //                 'refundDate' => $data['refundDate'],
+    //                 'refundReasonCd' => $data['refundReasonCd'],
+    //                 'totalItemCnt' => $data['totalItemCnt'],
+    //                 'taxableAmtA' => $data['taxableAmtA'],
+    //                 'taxableAmtB' => $data['taxableAmtB'],
+    //                 'taxableAmtC' => $data['taxableAmtC'],
+    //                 'taxableAmtD' => $data['taxableAmtB'],
+    //                 'taxRateA' => $data['taxRateA'],
+    //                 'taxRateB' => $data['taxRateB'],
+    //                 'taxRateC' => $data['taxRateC'],
+    //                 'taxRateD' => $data['taxRateD'],
+    //                 'taxAmtA' => $data['taxAmtA'],
+    //                 'taxAmtB' => $data['taxAmtB'],
+    //                 'taxAmtC' => $data['taxAmtC'],
+    //                 'taxAmtD' => $data['taxAmtD'],
+    //                 'totalTaxableAmt' => $data['totalTaxableAmt'],
+    //                 'totalTaxAmt' => $data['totalTaxAmt'],
+    //                 'totalAmt' => $data['totalAmt'],
+    //                 'prchrAcptcYn' => $data['prchrAcptcYn'],
+    //                 'remark' => $data['remark'],
+    //                 'regrNm' => $data['regrNm'],
+    //                 'regrId' => $data['regrId'],
+    //                 'modrNm' => $data['modrNm'],
+    //                 'modrId' => $data['modrId'],
+    //                 'receipt_CustomerTin' => $data['receipt_CustomerTin'],
+    //                 'receipt_CustomerMblNo' => $data['receipt_CustomerMblNo'],
+    //                 'receipt_RptNo' => $data['receipt_RptNo'],
+    //                 'receipt_RcptPbctDt' => $data['receipt_RcptPbctDt'],
+    //                 'receipt_TrdeNm' => $data['receipt_TrdeNm'],
+    //                 'receipt_Adrs' => $data['receipt_Adrs'],
+    //                 'receipt_TopMsg' => $data['receipt_TopMsg'],
+    //                 'receipt_BtmMsg' => $data['receipt_BtmMsg'],
+    //                 'receipt_PrchrAcptcYn' => $data['receipt_PrchrAcptcYn'],
+    //                 'createdDate' => $data['createdDate'],
+    //                 'isKRASynchronized' => $data['isKRASynchronized'],
+    //                 'kraSynchronizedDate' => $data['kraSynchronizedDate'],
+    //                 'isStockIOUpdate' => $data['isStockIOUpdate'],
+    //                 'resultCd' => $data['resultCd'],
+    //                 'resultMsg' => $data['resultMsg'],
+    //                 'resultDt' => $data['resultDt'],
+    //                 'response_CurRcptNo' => $data['response_CurRcptNo'],
+    //                 'response_TotRcptNo' => $data['response_TotRcptNo'],
+    //                 'response_IntrlData' => $data['response_IntrlData'],
+    //                 'response_RcptSign' => $data['response_RcptSign'],
+    //                 'response_SdcDateTime' => $data['response_SdcDateTime'],
+    //                 'response_SdcId' => $data['response_SdcId'],
+    //                 'response_MrcNo' => $data['response_MrcNo'],
+    //                 'qrCodeURL' => $data['qrCodeURL'],
+    //             ];
+    //             // Save the mapped data to the local database
+    //             $invoices = Invoice::create($mappedData);
+
+    //             // Return success message along with newData property
+    //             return response()->json([
+    //                 'message' => 'New invoices added successfully.',
+    //                 'newData' => $invoices
+    //             ])->header('Refresh', '3;url=' . route('invoice.index'));
+
+    //         } else {
+    //             // Handle the error if the API request fails
+    //             return redirect()->back()->with('error', 'An error occurred while fetching the invoice data from the API');
+    //         }
+    //     } else {
+    //         return redirect()->back()->with('error', __('Invoice Already existing.'));
+    //     }
+    // }
+
+
     public function getSalesByTraderInvoiceNo(Request $request)
     {
-        // Validate the request
         $request->validate([
             'getSalesByTraderInvoiceNo' => 'required|numeric',
         ]);
 
-        // Get the input value
         $traderInvoiceNo = $request->getSalesByTraderInvoiceNo;
 
-        // Check if the invoice exists in the local database
         $invoice = Invoice::where('trderInvoiceNo', $traderInvoiceNo)->first();
 
         if (!$invoice) {
-            // If the invoice does not exist in the local database, fetch it from the API
             $response = Http::withHeaders([
                 'accept' => '*/*',
                 'key' => '123456'
-            ])->get('https://etims.your-apps.biz/api/GetSalesByTraderInvoiceNo', [
+            ])->post('https://etims.your-apps.biz/api/GetSalesByTraderInvoiceNo', [
                         'traderInvoiceNo' => $traderInvoiceNo
                     ]);
 
-            $data = $response->json();
+            if ($response->successful()) {
+                $data = $response->json();
 
-            // Check if the response is successful
-            if ($response->ok()) {
-                // Map the API response data to local database columns
                 $mappedData = [
-                    'invoice_id' => $data['id'],
+                     'invoice_id' => $data['id'],
                     'customer_id' => null,
                     'issue_date' => $data['salesDate'],
                     'due_date' => $data['salesDate'],
@@ -1810,7 +1930,7 @@ class InvoiceController extends Controller
                     'status' => $data['salesSttsCode'],
                     'shipping_display' => null,
                     'discount_apply' => null,
-                    'created_by' => $data['regrId'],
+                    'created_by' => \Auth::user()->creatorId(),
                     'trderInvoiceNo' => $data['trderInvoiceNo'],
                     'invoiceNo' => $data['invoiceNo'],
                     'orgInvoiceNo' => $data['orgInvoiceNo'],
@@ -1873,24 +1993,21 @@ class InvoiceController extends Controller
                     'response_MrcNo' => $data['response_MrcNo'],
                     'qrCodeURL' => $data['qrCodeURL'],
                 ];
-                // Save the mapped data to the local database
-                $invoice = Invoice::create($mappedData);
 
-                // Return success message along with newData property
+                $invoices = Invoice::create($mappedData);
+
                 return response()->json([
                     'message' => 'New invoices added successfully.',
-                    'newData' => $invoice
-                ])->header('Refresh', '3;url=' . route('invoice.index'));
-
+                    'newData' => $invoices
+                ]);
             } else {
-                // Handle the error if the API request fails
                 return redirect()->back()->with('error', 'An error occurred while fetching the invoice data from the API');
             }
         } else {
-
             return redirect()->back()->with('error', __('Invoice Already existing.'));
         }
     }
+
     public function getItem($itemCd)
     {
         try {
