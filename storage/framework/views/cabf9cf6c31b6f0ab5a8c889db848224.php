@@ -1,1 +1,0 @@
-<?php /**PATH /home/chrisdroid/Desktop/projects/php/erp-go-6.4-using-laravel/resources/views/stockinfo/show.blade.php ENDPATH**/ ?>
