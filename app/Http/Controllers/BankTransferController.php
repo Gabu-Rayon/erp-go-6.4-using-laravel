@@ -13,7 +13,7 @@ class BankTransferController extends Controller
     public function index(Request $request)
     {
 
-        if(\Auth::user()->can('manage bank transfer'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $account = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('holder_name', 'id');
             $account->prepend('Select Account', '');
@@ -58,7 +58,7 @@ class BankTransferController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create bank transfer'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $bankAccount = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
@@ -72,7 +72,7 @@ class BankTransferController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create bank transfer'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -119,7 +119,7 @@ class BankTransferController extends Controller
 
     public function edit(BankTransfer $transfer,$id)
     {
-        if(\Auth::user()->can('edit bank transfer'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $transfer = BankTransfer::where('id',$id)->first();
             $bankAccount = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -134,7 +134,7 @@ class BankTransferController extends Controller
 
     public function update(Request $request, BankTransfer $transfer,$id)
     {
-        if(\Auth::user()->can('edit bank transfer'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $transfer = BankTransfer::find($id);
             $validator = \Validator::make(
@@ -180,7 +180,7 @@ class BankTransferController extends Controller
     public function destroy(BankTransfer $transfer)
     {
 
-        if(\Auth::user()->can('delete bank transfer'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             if($transfer->created_by == \Auth::user()->creatorId())
             {

@@ -18,7 +18,12 @@ class AttendanceEmployeeController extends Controller
     public function index(Request $request)
     {
 
-        if (\Auth::user()->can('manage attendance')) {
+        if (
+            \Auth::user()->type == 'company' ||
+            \Auth::user()->type == 'Employee' ||
+            \Auth::user()->type == 'client'
+        )
+        {
 
             $branch = BranchesList::all()->pluck('bhfNm', 'bhfId');
             $branch->prepend('Select Branch', '');
@@ -119,8 +124,8 @@ class AttendanceEmployeeController extends Controller
 
     public function create()
     {
-        if (\Auth::user()->can('create attendance')) {
-            $employees = User::where('created_by', '=', Auth::user()->creatorId())->where('type', '=', "employee")->get()->pluck('name', 'id');
+        if (\Auth::user()->type == 'company'){
+            $employees = User::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', "employee")->get()->pluck('name', 'id');
 
             return view('attendance.create', compact('employees'));
         } else {
@@ -131,7 +136,7 @@ class AttendanceEmployeeController extends Controller
 
     public function store(Request $request)
     {
-        if (\Auth::user()->can('create attendance')) {
+        if (\Auth::user()->type == 'company') {
             $validator = \Validator::make(
                 $request->all(), [
                     'employee_id' => 'required',
@@ -207,7 +212,7 @@ class AttendanceEmployeeController extends Controller
 
     public function edit($id)
     {
-        if (\Auth::user()->can('edit attendance')) {
+        if (\Auth::user()->type == 'company') {
             $attendanceEmployee = AttendanceEmployee::where('id', $id)->first();
             $employees = Employee::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
@@ -377,7 +382,7 @@ class AttendanceEmployeeController extends Controller
 
     public function destroy($id)
     {
-        if (\Auth::user()->can('delete attendance')) {
+        if (\Auth::user()->type == 'company') {
             $attendance = AttendanceEmployee::where('id', $id)->first();
 
             $attendance->delete();
@@ -479,7 +484,7 @@ class AttendanceEmployeeController extends Controller
 
     public function bulkAttendance(Request $request)
     {
-        if (\Auth::user()->can('create attendance')) {
+        if (\Auth::user()->type == 'company') {
 
             $branch = BranchesList::all()->pluck('bhfNm', 'bhfId');
             $branch->prepend('Select Branch', '');
@@ -504,7 +509,7 @@ class AttendanceEmployeeController extends Controller
     public function bulkAttendanceData(Request $request)
     {
 
-        if (\Auth::user()->can('create attendance')) {
+        if (\Auth::user()->type == 'company') {
             if (!empty($request->branch) && !empty($request->department)) {
                 $startTime = Utility::getValByName('company_start_time');
                 $endTime = Utility::getValByName('company_end_time');

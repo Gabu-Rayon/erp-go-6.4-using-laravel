@@ -23,7 +23,7 @@ class BudgetController extends Controller
      */
     public function index()
     {
-        if(\Auth::user()->can('manage budget plan'))
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $budgets = Budget::where('created_by', '=', \Auth::user()->creatorId())->get();
             $periods = Budget::$period;
@@ -44,17 +44,17 @@ class BudgetController extends Controller
     public function create()
     {
 
-        if(\Auth::user()->can('create budget plan'))
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $periods = Budget::$period;
 
             $data['monthList'] = $month = $this->yearMonth();          //Monthly
 
             $data['quarterly_monthlist'] = [                          //Quarterly
-                                                                      'Jan-Mar',
-                                                                      'Apr-Jun',
-                                                                      'Jul-Sep',
-                                                                      'Oct-Dec',
+                'Jan-Mar',
+                'Apr-Jun',
+                'Jul-Sep',
+                'Oct-Dec',
             ];
 
             $data['half_yearly_monthlist'] = [                     // Half - Yearly
@@ -94,7 +94,7 @@ class BudgetController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create budget plan'))
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $validator = \Validator::make($request->all(), [
                 'name' => 'required',
@@ -178,7 +178,7 @@ class BudgetController extends Controller
     public function show($ids)
     {
 
-        if(\Auth::user()->can('view budget plan'))
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             try {
                 $id       = Crypt::decrypt($ids);
@@ -552,7 +552,7 @@ class BudgetController extends Controller
     public function edit($ids)
     {
 
-        if(\Auth::user()->can('edit budget plan'))
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             try {
                 $id       = Crypt::decrypt($ids);
@@ -615,7 +615,7 @@ class BudgetController extends Controller
     public function update(Request $request, Budget $budget)
     {
 
-        if(\Auth::user()->can('edit budget plan'))
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             if($budget->created_by == \Auth::user()->creatorId())
             {
@@ -664,7 +664,7 @@ class BudgetController extends Controller
      */
     public function destroy(Budget $budget)
     {
-        if(\Auth::user()->can('delete budget plan'))
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             if($budget->created_by == \Auth::user()->creatorId())
             {

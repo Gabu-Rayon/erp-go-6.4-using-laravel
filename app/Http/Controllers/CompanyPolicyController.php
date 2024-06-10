@@ -12,7 +12,7 @@ class CompanyPolicyController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage company policy'))
+        if(\Auth::user()->type == 'company')
         {
             $companyPolicy = CompanyPolicy::where('created_by', '=', \Auth::user()->creatorId())->with('branches')->get();
 
@@ -27,7 +27,7 @@ class CompanyPolicyController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create company policy'))
+        if(\Auth::user()->type == 'company')
         {
             $branch = BranchesList::all()->pluck('bhfNm', 'id');
             $branch->prepend('Select Branch','');
@@ -44,7 +44,7 @@ class CompanyPolicyController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create company policy'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -153,7 +153,7 @@ class CompanyPolicyController extends Controller
     public function edit(CompanyPolicy $companyPolicy)
     {
 
-        if(\Auth::user()->can('edit company policy'))
+        if(\Auth::user()->type == 'company')
         {
             $branch = BranchesList::all()->pluck('bhfNm', 'id');
             $branch->prepend('Select Branch','');
@@ -169,7 +169,7 @@ class CompanyPolicyController extends Controller
 
     public function update(Request $request, CompanyPolicy $companyPolicy)
     {
-        if(\Auth::user()->can('create company policy'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -236,7 +236,7 @@ class CompanyPolicyController extends Controller
     public function destroy(CompanyPolicy $companyPolicy)
     {
 
-        if(\Auth::user()->can('delete document'))
+        if(\Auth::user()->type == 'company')
         {
             if($companyPolicy->created_by == \Auth::user()->creatorId())
             {

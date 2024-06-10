@@ -13,7 +13,7 @@ class ComplaintController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage complaint'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'Employee')
             {
@@ -35,7 +35,7 @@ class ComplaintController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create complaint'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'Employee')
             {
@@ -61,7 +61,7 @@ class ComplaintController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create complaint'))
+        if(\Auth::user()->type == 'company')
         {
             if(\Auth::user()->type != 'Employee')
             {
@@ -145,7 +145,7 @@ class ComplaintController extends Controller
     public function edit($complaint)
     {
         $complaint = Complaint::find($complaint);
-        if(\Auth::user()->can('edit complaint'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'Employee')
             {
@@ -176,7 +176,7 @@ class ComplaintController extends Controller
 
     public function update(Request $request, Complaint $complaint)
     {
-        if(\Auth::user()->can('edit complaint'))
+        if(\Auth::user()->type == 'company')
         {
             if($complaint->created_by == \Auth::user()->creatorId())
             {
@@ -235,7 +235,7 @@ class ComplaintController extends Controller
 
     public function destroy(Complaint $complaint)
     {
-        if(\Auth::user()->can('delete complaint'))
+        if(\Auth::user()->type == 'company')
         {
             if($complaint->created_by == \Auth::user()->creatorId())
             {

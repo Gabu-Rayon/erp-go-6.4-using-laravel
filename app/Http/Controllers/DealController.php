@@ -38,7 +38,7 @@ class DealController extends Controller
     {
         $usr      = \Auth::user();
 
-        if($usr->can('manage deal'))
+        if($usr->type == 'client' || $usr->type == 'company')
         {
             if($usr->default_pipeline)
             {
@@ -91,7 +91,7 @@ class DealController extends Controller
     public function deal_list()
     {
         $usr = \Auth::user();
-        if($usr->can('manage deal'))
+        if($usr->type == 'client' || $usr->type == 'company')
         {
             if($usr->default_pipeline)
             {
@@ -159,9 +159,8 @@ class DealController extends Controller
      */
     public function create()
     {
-        \Log::info('USER');
-        \Log::info(\Auth::user()->getAllPermissions());
-        if(\Auth::user()->can('create deal'))
+        $usr = \Auth::user();
+        if($usr->type == 'company')
         {
             $clients      = User::where('created_by', '=', \Auth::user()->ownerId())->where('type', 'client')->get()->pluck('name', 'id');
             $customFields = CustomField::where('module', '=', 'deal')->get();
@@ -184,7 +183,7 @@ class DealController extends Controller
     public function store(Request $request)
     {
         $usr = \Auth::user();
-        if($usr->can('create deal'))
+        if($usr->type == 'company')
         {
             $countDeal = Deal::where('created_by', '=', $usr->ownerId())->count();
             $validator = \Validator::make(
@@ -361,8 +360,8 @@ class DealController extends Controller
     {
         if($deal->is_active)
         {
-            $calenderTasks = [];
-            if(\Auth::user()->can('view task'))
+            $usr = \Auth::user();
+            if($usr->type == 'company' || $usr->type == 'client')
             {
                 foreach($deal->tasks as $task)
                 {
@@ -401,7 +400,7 @@ class DealController extends Controller
      */
     public function edit(Deal $deal)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             if($deal->created_by == \Auth::user()->ownerId())
             {
@@ -437,7 +436,7 @@ class DealController extends Controller
      */
     public function update(Request $request, Deal $deal)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             if($deal->created_by == \Auth::user()->ownerId())
             {
@@ -496,7 +495,7 @@ class DealController extends Controller
      */
     public function destroy(Deal $deal)
     {
-        if(\Auth::user()->can('delete deal'))
+        if(\Auth::user()->type == 'company')
         {
             if($deal->created_by == \Auth::user()->ownerId())
             {
@@ -527,7 +526,7 @@ class DealController extends Controller
     {
         $usr = \Auth::user();
 
-        if($usr->can('move deal'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
         {
             $post       = $request->all();
             $deal       = $this->deal($post['deal_id']);
@@ -602,7 +601,7 @@ class DealController extends Controller
 
     public function labels($id)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -633,7 +632,7 @@ class DealController extends Controller
 
     public function labelStore($id, Request $request)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -663,7 +662,7 @@ class DealController extends Controller
 
     public function userEdit($id)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -676,7 +675,7 @@ class DealController extends Controller
 
                 foreach($users as $key => $user)
                 {
-                    if(!$user->can('manage deal'))
+                    if($user->type == 'client' || $user->type == 'company')
                     {
                         $users->forget($key);
                     }
@@ -701,7 +700,7 @@ class DealController extends Controller
     public function userUpdate($id, Request $request)
     {
         $usr = \Auth::user();
-        if($usr->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             $resp = '';
@@ -762,7 +761,7 @@ class DealController extends Controller
 
     public function userDestroy($id, $user_id)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -784,7 +783,7 @@ class DealController extends Controller
 
     public function clientEdit($id)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -810,7 +809,7 @@ class DealController extends Controller
 
     public function clientUpdate($id, Request $request)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -851,7 +850,7 @@ class DealController extends Controller
 
     public function clientDestroy($id, $client_id)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -873,7 +872,7 @@ class DealController extends Controller
 
     public function productEdit($id)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -896,7 +895,7 @@ class DealController extends Controller
     public function productUpdate($id, Request $request)
     {
         $usr = \Auth::user();
-        if($usr->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal       = Deal::find($id);
             $clients    = ClientDeal::select('client_id')->where('deal_id', '=', $id)->get()->pluck('client_id')->toArray();
@@ -951,7 +950,7 @@ class DealController extends Controller
 
     public function productDestroy($id, $product_id)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -982,7 +981,7 @@ class DealController extends Controller
 
     public function fileUpload($id, Request $request)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1063,7 +1062,7 @@ class DealController extends Controller
 
     public function fileDownload($id, $file_id)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1098,7 +1097,7 @@ class DealController extends Controller
 
     public function fileDelete($id, $file_id)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1153,7 +1152,7 @@ class DealController extends Controller
 
     public function noteStore($id, Request $request)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1191,7 +1190,7 @@ class DealController extends Controller
 
     public function taskCreate($id)
     {
-        if(\Auth::user()->can('create task'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1225,7 +1224,7 @@ class DealController extends Controller
     public function taskStore($id, Request $request)
     {
         $usr = \Auth::user();
-        if($usr->can('create task'))
+        if(\Auth::user()->type == 'company')
         {
             $deal       = Deal::find($id);
             $clients    = ClientDeal::select('client_id')->where('deal_id', '=', $id)->get()->pluck('client_id')->toArray();
@@ -1305,7 +1304,8 @@ class DealController extends Controller
 
     public function taskShow($id, $task_id)
     {
-        if(\Auth::user()->can('view task'))
+        $usr = \Auth::user();
+        if($usr->type == 'company' || $usr->type == 'client')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1337,7 +1337,7 @@ class DealController extends Controller
 
     public function taskEdit($id, $task_id)
     {
-        if(\Auth::user()->can('edit task'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1371,7 +1371,7 @@ class DealController extends Controller
 
     public function taskUpdate($id, $task_id, Request $request)
     {
-        if(\Auth::user()->can('edit task'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1421,7 +1421,7 @@ class DealController extends Controller
 
     public function taskUpdateStatus($id, $task_id, Request $request)
     {
-        if(\Auth::user()->can('edit task'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1488,7 +1488,7 @@ class DealController extends Controller
 
     public function taskDestroy($id, $task_id)
     {
-        if(\Auth::user()->can('delete task'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1511,7 +1511,7 @@ class DealController extends Controller
 
     public function sourceEdit($id)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1541,7 +1541,7 @@ class DealController extends Controller
     {
         $usr = \Auth::user();
 
-        if($usr->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal       = Deal::find($id);
             $clients    = ClientDeal::select('client_id')->where('deal_id', '=', $id)->get()->pluck('client_id')->toArray();
@@ -1589,7 +1589,7 @@ class DealController extends Controller
 
     public function sourceDestroy($id, $source_id)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1620,7 +1620,7 @@ class DealController extends Controller
 
     public function permission($id, $clientId)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal     = Deal::find($id);
             $client   = User::find($clientId);
@@ -1645,7 +1645,7 @@ class DealController extends Controller
 
     public function permissionStore($id, $clientId, Request $request)
     {
-        if(\Auth::user()->can('edit deal'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1769,7 +1769,7 @@ class DealController extends Controller
     // Deal Calls
     public function callCreate($id)
     {
-        if(\Auth::user()->can('create deal call'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1803,7 +1803,7 @@ class DealController extends Controller
     {
         $usr = \Auth::user();
 
-        if($usr->can('create deal call'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == $usr->ownerId())
@@ -1865,7 +1865,7 @@ class DealController extends Controller
 
     public function callEdit($id, $call_id)
     {
-        if(\Auth::user()->can('edit deal call'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1898,7 +1898,7 @@ class DealController extends Controller
 
     public function callUpdate($id, $call_id, Request $request)
     {
-        if(\Auth::user()->can('edit deal call'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1946,7 +1946,7 @@ class DealController extends Controller
 
     public function callDestroy($id, $call_id)
     {
-        if(\Auth::user()->can('delete deal call'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -1970,7 +1970,7 @@ class DealController extends Controller
     // Deal email
     public function emailCreate($id)
     {
-        if(\Auth::user()->can('create deal email'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
             if($deal->created_by == \Auth::user()->ownerId())
@@ -2000,7 +2000,7 @@ class DealController extends Controller
 
     public function emailStore($id, Request $request)
     {
-        if(\Auth::user()->can('create deal email'))
+        if(\Auth::user()->type == 'company')
         {
             $deal = Deal::find($id);
 

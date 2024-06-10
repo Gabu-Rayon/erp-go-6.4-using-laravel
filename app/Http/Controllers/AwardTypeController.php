@@ -9,7 +9,7 @@ class AwardTypeController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage award type'))
+        if(\Auth::user()->type == 'company')
         {
             $awardtypes = AwardType::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -23,7 +23,7 @@ class AwardTypeController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create award type'))
+        if(\Auth::user()->type == 'company')
         {
             return view('awardtype.create');
         }
@@ -35,7 +35,7 @@ class AwardTypeController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create award type'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -71,7 +71,7 @@ class AwardTypeController extends Controller
 
     public function edit(AwardType $awardtype)
     {
-        if(\Auth::user()->can('edit award type'))
+        if(\Auth::user()->type == 'company')
         {
             if($awardtype->created_by == \Auth::user()->creatorId())
             {
@@ -91,7 +91,7 @@ class AwardTypeController extends Controller
 
     public function update(Request $request, AwardType $awardtype)
     {
-        if(\Auth::user()->can('edit award type'))
+        if(\Auth::user()->type == 'company')
         {
             if($awardtype->created_by == \Auth::user()->creatorId())
             {
@@ -126,7 +126,7 @@ class AwardTypeController extends Controller
 
     public function destroy(AwardType $awardtype)
     {
-        if(\Auth::user()->can('delete award type'))
+        if(\Auth::user()->type == 'company')
         {
             if($awardtype->created_by == \Auth::user()->creatorId())
             {

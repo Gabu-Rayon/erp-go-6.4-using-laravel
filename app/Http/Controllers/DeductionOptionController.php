@@ -9,7 +9,7 @@ class DeductionOptionController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage deduction option'))
+        if(\Auth::user()->type == 'company')
         {
             $deductionoptions = DeductionOption::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -23,7 +23,7 @@ class DeductionOptionController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create deduction option'))
+        if(\Auth::user()->type == 'company')
         {
             return view('deductionoption.create');
         }
@@ -35,7 +35,7 @@ class DeductionOptionController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create deduction option'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -71,7 +71,7 @@ class DeductionOptionController extends Controller
     public function edit($deductionoption)
     {
         $deductionoption = DeductionOption::find($deductionoption);
-        if(\Auth::user()->can('edit deduction option'))
+        if(\Auth::user()->type == 'company')
         {
             if($deductionoption->created_by == \Auth::user()->creatorId())
             {
@@ -91,7 +91,7 @@ class DeductionOptionController extends Controller
 
     public function update(Request $request, DeductionOption $deductionoption)
     {
-        if(\Auth::user()->can('edit deduction option'))
+        if(\Auth::user()->type == 'company')
         {
             if($deductionoption->created_by == \Auth::user()->creatorId())
             {
@@ -126,7 +126,7 @@ class DeductionOptionController extends Controller
 
     public function destroy(DeductionOption $deductionoption)
     {
-        if(\Auth::user()->can('delete deduction option'))
+        if(\Auth::user()->type == 'company')
         {
             if($deductionoption->created_by == \Auth::user()->creatorId())
             {

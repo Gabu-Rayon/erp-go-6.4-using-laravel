@@ -17,7 +17,7 @@ class ChartOfAccountController extends Controller
     public function index(Request $request)
     {
 
-        if(\Auth::user()->can('manage chart of account'))
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             if (!empty($request->start_date) && !empty($request->end_date)) {
                 $start = $request->start_date;
@@ -79,7 +79,7 @@ class ChartOfAccountController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create chart of account'))
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -134,7 +134,7 @@ class ChartOfAccountController extends Controller
 
     public function show(ChartOfAccount $chartOfAccount,Request $request)
     {
-        if(\Auth::user()->can('ledger report'))
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             if(!empty($request->start_date) && !empty($request->end_date))
             {
@@ -222,7 +222,7 @@ class ChartOfAccountController extends Controller
     public function update(Request $request, ChartOfAccount $chartOfAccount)
     {
 
-        if(\Auth::user()->can('edit chart of account'))
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -254,7 +254,7 @@ class ChartOfAccountController extends Controller
 
     public function destroy(ChartOfAccount $chartOfAccount)
     {
-        if(\Auth::user()->can('delete chart of account'))
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $chartOfAccount->delete();
 

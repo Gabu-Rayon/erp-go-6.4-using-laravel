@@ -15,7 +15,8 @@ class BranchController extends Controller
     public function index()
     {
         try {
-            if (\Auth::user()->can('manage branch')) {
+            if (\Auth::user()->type == 'company')
+            {
                 $branches = BranchesList::all();
                 return view('branch.index', compact('branches'));
             } else {
@@ -30,49 +31,19 @@ class BranchController extends Controller
 
     public function create()
     {
-        if (\Auth::user()->can('create branch')) {
+        if (\Auth::user()->type == 'company')
+        {
             return view('branch.create');
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
     }
-     /******
-      * creating a new Branch for both Local and Api EndPoint 
-      */
-
-
-      
-    //   public function store(Request $request)
-    // {
-    //     if (\Auth::user()->can('create branch')) {
-
-    //         $validator = \Validator::make(
-    //             $request->all(),
-    //             [
-    //                 'name' => 'required',
-    //             ]
-    //         );
-    //         if ($validator->fails()) {
-    //             $messages = $validator->getMessageBag();
-
-    //             return redirect()->back()->with('error', $messages->first());
-    //         }
-
-    //         $branch = new Branch();
-    //         $branch->name = $request->name;
-    //         $branch->created_by = \Auth::user()->creatorId();
-    //         $branch->save();
-
-    //         return redirect()->route('branch.index')->with('success', __('Branch  successfully created.'));
-    //     } else {
-    //         return redirect()->back()->with('error', __('Permission denied.'));
-    //     }
-    // }
 
     public function store(Request $request)
     {
         try {
-            if (\Auth::user()->can('edit branch')) {
+            if (\Auth::user()->type == 'company')
+            {
                     $data = $request->all();
                     BranchesList::create([
                         'bhfNm' => $data["bhfNm"],
@@ -107,7 +78,8 @@ class BranchController extends Controller
     public function edit(BranchesList $branch)
     {
         try {
-            if (\Auth::user()->can('edit branch')) {
+            if (\Auth::user()->type == 'company')
+            {
                 \Log::info('Render Edit Branch Success');
                 \Log::info($branch);
                 return view('branch.edit', compact('branch'));
@@ -124,7 +96,8 @@ class BranchController extends Controller
     public function update(Request $request, BranchesList $branch)
 {
     try {
-        if (\Auth::user()->can('edit branch')) {
+        if (\Auth::user()->type == 'company')
+        {
                 $validator = \Validator::make($request->all(), [
                     'bhfNm' => 'required',
                     'tin' => 'required',
@@ -150,7 +123,8 @@ class BranchController extends Controller
 
     public function destroy(BranchesList $branch)
     {
-        if (\Auth::user()->can('delete branch')) {
+        if (\Auth::user()->type == 'company')
+        {
                 $branch->delete();
 
                 return redirect()->route('branch.index')->with('success', __('Branch successfully deleted.'));

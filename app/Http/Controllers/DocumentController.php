@@ -10,7 +10,7 @@ class DocumentController extends Controller
     public function index()
     {
 
-        if(\Auth::user()->can('manage document type'))
+        if(\Auth::user()->type == 'company')
         {
             $documents = Document::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -24,7 +24,7 @@ class DocumentController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create document type'))
+        if(\Auth::user()->type == 'company')
         {
             return view('document.create');
         }
@@ -36,7 +36,7 @@ class DocumentController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create document type'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -71,7 +71,7 @@ class DocumentController extends Controller
 
     public function edit(Document $document)
     {
-        if(\Auth::user()->can('edit document type'))
+        if(\Auth::user()->type == 'company')
         {
             if($document->created_by == \Auth::user()->creatorId())
             {
@@ -92,7 +92,7 @@ class DocumentController extends Controller
     public function update(Request $request, Document $document)
     {
 
-        if(\Auth::user()->can('edit document type'))
+        if(\Auth::user()->type == 'company')
         {
             if($document->created_by == \Auth::user()->creatorId())
             {
@@ -128,7 +128,7 @@ class DocumentController extends Controller
 
     public function destroy(Document $document)
     {
-        if(\Auth::user()->can('delete document type'))
+        if(\Auth::user()->type == 'company')
         {
             if($document->created_by == \Auth::user()->creatorId())
             {
