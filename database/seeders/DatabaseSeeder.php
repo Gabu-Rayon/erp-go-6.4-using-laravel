@@ -1,5 +1,4 @@
 <?php
-
 namespace Database\Seeders;
 
 use App\Models\Utility;
@@ -32,3 +31,4 @@ class DatabaseSeeder extends Seeder
 
     }
 }
+

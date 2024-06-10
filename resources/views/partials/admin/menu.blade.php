@@ -8,6 +8,8 @@
     $company_small_logo = $setting['company_small_logo'] ?? '';
 
     $emailTemplate = \App\Models\EmailTemplate::emailTemplateData();
+    Log::info('EMAIL TEMPLATE');
+    Log::info($emailTemplate);
     $lang = Auth::user()->lang;
 
     $userPlan = \App\Models\Plan::getPlan(\Auth::user()->show_dashboard());
@@ -1662,19 +1664,18 @@
                 </li>
             </ul>
         @endif
+        {{ \Log::info('USER PERMISSIONS'); }}
+        {{ \Log::info(\Auth::user()->getAllPermissions()); }}
         @if (\Auth::user()->type == 'super admin')
             <ul class="dash-navbar">
-                @if (Gate::check('manage super admin dashboard'))
                     <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'dashboard' ? ' active' : '' }}">
                         <a href="{{ route('client.dashboard.view') }}" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-home"></i></span><span
                                 class="dash-mtext">{{ __('Dashboard') }}</span>
                         </a>
                     </li>
-                @endif
 
 
-                @can('manage user')
                     <li
                         class="dash-item dash-hasmenu {{ Request::route()->getName() == 'users.index' || Request::route()->getName() == 'users.create' || Request::route()->getName() == 'users.edit' ? ' active' : '' }}">
                         <a href="{{ route('users.index') }}" class="dash-link">
@@ -1682,16 +1683,13 @@
                                 class="dash-mtext">{{ __('Companies') }}</span>
                         </a>
                     </li>
-                @endcan
 
-                @if (Gate::check('manage plan'))
                     <li class="dash-item dash-hasmenu  {{ Request::segment(1) == 'plans' ? 'active' : '' }}">
                         <a href="{{ route('plans.index') }}" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-trophy"></i></span><span
                                 class="dash-mtext">{{ __('Plan') }}</span>
                         </a>
                     </li>
-                @endif
                 @if (\Auth::user()->type == 'super admin')
                     <li class="dash-item dash-hasmenu {{ request()->is('plan_request*') ? 'active' : '' }}">
                         <a href="{{ route('plan_request.index') }}" class="dash-link">
@@ -1700,22 +1698,18 @@
                         </a>
                     </li>
                 @endif
-                @if (Gate::check('manage coupon'))
                     <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'coupons' ? 'active' : '' }}">
                         <a href="{{ route('coupons.index') }}" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-gift"></i></span><span
                                 class="dash-mtext">{{ __('Coupon') }}</span>
                         </a>
                     </li>
-                @endif
-                @if (Gate::check('manage order'))
                     <li class="dash-item dash-hasmenu  {{ Request::segment(1) == 'orders' ? 'active' : '' }}">
                         <a href="{{ route('order.index') }}" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-shopping-cart-plus"></i></span><span
                                 class="dash-mtext">{{ __('Order') }}</span>
                         </a>
                     </li>
-                @endif
                 <li
                     class="dash-item dash-hasmenu {{ Request::segment(1) == 'email_template' || Request::route()->getName() == 'manage.email.language' ? ' active dash-trigger' : 'collapsed' }}">
                     <a href="{{ route('manage.email.language', [$emailTemplate->id, \Auth::user()->lang]) }}"

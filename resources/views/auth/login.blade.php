@@ -26,7 +26,7 @@
 
 @endsection --}}
 @php
-    $languages = App\Models\Utility::languages();
+    $languages = App\Models\Utility::langlist();
 @endphp
 @section('language-bar')
     <div class="lang-dropdown-only-desk">

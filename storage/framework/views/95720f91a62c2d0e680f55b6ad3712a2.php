@@ -23,13 +23,11 @@
                     class="ti ti-user-check"></i>
             </a>
         <?php endif; ?>
-        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create user')): ?>
             <!--For creating new user for companies !-->
             <a href="#" data-size="lg" data-url="<?php echo e(route('users.create')); ?>" data-ajax-popup="true"
                 data-bs-toggle="tooltip" title="<?php echo e(__('Create')); ?>" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-        <?php endif; ?>
     </div>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('content'); ?>

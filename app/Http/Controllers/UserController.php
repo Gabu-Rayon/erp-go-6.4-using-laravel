@@ -32,7 +32,6 @@ class UserController extends Controller
     public function index()
     {
         $user = \Auth::user();
-        if (\Auth::user()->can('manage user')) {
             if (\Auth::user()->type == 'super admin') {
                 $users = User::where('created_by', '=', $user->creatorId())->where('type', '=', 'company')->with(['currentPlan'])->get();
             } else {
@@ -40,29 +39,26 @@ class UserController extends Controller
             }
 
             return view('user.index')->with('users', $users);
-        } else {
-            return redirect()->back();
-        }
 
     }
 
     public function create()
     {
 
-        $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'user')->get();
-        $user = \Auth::user();
-        $roles = Role::where('created_by', '=', $user->creatorId())->where('name', '!=', 'client')->get()->pluck('name', 'id');
-        if (\Auth::user()->can('create user')) {
+        if (\Auth::user()->type == 'super admin') {
+            $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'user')->get();
+            $user = \Auth::user();
+            $roles = Role::where('created_by', '=', $user->creatorId())->where('name', '!=', 'client')->get()->pluck('name', 'id');
             return view('user.create', compact('roles', 'customFields'));
         } else {
-            return redirect()->back();
+            return redirect()->back()->with('error', 'Unauthorized');
         }
     }
 
     public function store(Request $request)
     {
 
-        if (\Auth::user()->can('create user')) {
+        if (\Auth::user()->type == 'super admin' || 'company') {
             $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->where('created_by', '=', \Auth::user()->creatorId())->first();
             $objUser = \Auth::user()->creatorId();
 
@@ -175,7 +171,7 @@ class UserController extends Controller
             return redirect()->route('users.index')->with('success', __('User successfully created.'));
 
         } else {
-            return redirect()->back();
+            return redirect()->back()->with('error', 'Unauthorized');
         }
 
     }
@@ -188,7 +184,7 @@ class UserController extends Controller
     {
         $user = \Auth::user();
         $roles = Role::where('created_by', '=', $user->creatorId())->where('name', '!=', 'client')->get()->pluck('name', 'id');
-        if (\Auth::user()->can('edit user')) {
+        if (\Auth::user()->type == 'company' || 'super admin') {
             $user = User::findOrFail($id);
             $user->customField = CustomField::getData($user, 'user');
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'user')->get();
