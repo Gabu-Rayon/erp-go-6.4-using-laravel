@@ -37,14 +37,9 @@
         <?php if(\Auth::user()->type != 'client'): ?>
             <ul class="dash-navbar">
 
-                            <!--------------------- Start Products System ----------------------------------->
-
-        
-        <!--------------------- End Products System ----------------------------------->
-
-
-
-                <!--------------------- Start Dashboard ----------------------------------->
+                        <!--------------------- Start Products System ----------------------------------->        
+                        <!--------------------- End Products System ----------------------------------->
+                        <!--------------------- Start Dashboard ----------------------------------->
                 <?php if(Gate::check('show hrm dashboard') ||
                         Gate::check('show project dashboard') ||
                         Gate::check('show account dashboard') ||
@@ -1676,7 +1671,7 @@
         <?php endif; ?>
         <?php if(\Auth::user()->type == 'super admin'): ?>
             <ul class="dash-navbar">
-                <?php if(Gate::check('manage super admin dashboard')): ?>
+                <?php if(\Auth::user()->can('manage super admin dashboard')): ?>
                     <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'dashboard' ? ' active' : ''); ?>">
                         <a href="<?php echo e(route('client.dashboard.view')); ?>" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-home"></i></span><span
@@ -1685,8 +1680,7 @@
                     </li>
                 <?php endif; ?>
 
-
-                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage user')): ?>
+                 <?php if(\Auth::user()->can('manage user')): ?>
                     <li
                         class="dash-item dash-hasmenu <?php echo e(Request::route()->getName() == 'users.index' || Request::route()->getName() == 'users.create' || Request::route()->getName() == 'users.edit' ? ' active' : ''); ?>">
                         <a href="<?php echo e(route('users.index')); ?>" class="dash-link">
@@ -1696,7 +1690,7 @@
                     </li>
                 <?php endif; ?>
 
-                <?php if(Gate::check('manage plan')): ?>
+                 <?php if(\Auth::user()->can('manage plan')): ?>
                     <li class="dash-item dash-hasmenu  <?php echo e(Request::segment(1) == 'plans' ? 'active' : ''); ?>">
                         <a href="<?php echo e(route('plans.index')); ?>" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-trophy"></i></span><span
@@ -1712,7 +1706,7 @@
                         </a>
                     </li>
                 <?php endif; ?>
-                <?php if(Gate::check('manage coupon')): ?>
+                  <?php if(\Auth::user()->can('manage coupon')): ?>
                     <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'coupons' ? 'active' : ''); ?>">
                         <a href="<?php echo e(route('coupons.index')); ?>" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-gift"></i></span><span
@@ -1720,7 +1714,7 @@
                         </a>
                     </li>
                 <?php endif; ?>
-                <?php if(Gate::check('manage order')): ?>
+                 <?php if(\Auth::user()->can('manage order')): ?>
                     <li class="dash-item dash-hasmenu  <?php echo e(Request::segment(1) == 'orders' ? 'active' : ''); ?>">
                         <a href="<?php echo e(route('order.index')); ?>" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-shopping-cart-plus"></i></span><span
@@ -1741,15 +1735,16 @@
                     <?php echo $__env->make('landingpage::menu.landingpage', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
                 <?php endif; ?>
 
-                <?php if(Gate::check('manage system settings')): ?>
-                    <li
-                        class="dash-item dash-hasmenu <?php echo e(Request::route()->getName() == 'systems.index' ? ' active' : ''); ?>">
-                        <a href="<?php echo e(route('systems.index')); ?>" class="dash-link">
-                            <span class="dash-micon"><i class="ti ti-settings"></i></span><span
-                                class="dash-mtext"><?php echo e(__('Settings')); ?></span>
-                        </a>
-                    </li>
-                <?php endif; ?>
+
+                 <?php if(\Auth::user()->can('manage system settings')): ?>
+    <li class="dash-item dash-hasmenu <?php echo e(Request::route()->getName() == 'systems.index' ? ' active' : ''); ?>">
+        <a href="<?php echo e(route('systems.index')); ?>" class="dash-link">
+            <span class="dash-micon"><i class="ti ti-settings"></i></span>
+            <span class="dash-mtext"><?php echo e(__('Settings')); ?></span>
+        </a>
+    </li>
+<?php endif; ?>
+
 
             </ul>
         <?php endif; ?>

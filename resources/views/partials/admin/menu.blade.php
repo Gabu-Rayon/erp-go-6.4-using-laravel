@@ -37,14 +37,9 @@
         @if (\Auth::user()->type != 'client')
             <ul class="dash-navbar">
 
-                            <!--------------------- Start Products System ----------------------------------->
-
-        
-        <!--------------------- End Products System ----------------------------------->
-
-
-
-                <!--------------------- Start Dashboard ----------------------------------->
+                        <!--------------------- Start Products System ----------------------------------->        
+                        <!--------------------- End Products System ----------------------------------->
+                        <!--------------------- Start Dashboard ----------------------------------->
                 @if (Gate::check('show hrm dashboard') ||
                         Gate::check('show project dashboard') ||
                         Gate::check('show account dashboard') ||
@@ -1571,6 +1566,7 @@
         <!--------------------- End System Setup ----------------------------------->
         </ul>
         @endif
+        
         @if (\Auth::user()->type == 'client')
             <ul class="dash-navbar">
                 @if (Gate::check('manage client dashboard'))
@@ -1662,9 +1658,12 @@
                 </li>
             </ul>
         @endif
+
+
+
         @if (\Auth::user()->type == 'super admin')
             <ul class="dash-navbar">
-                @if (Gate::check('manage super admin dashboard'))
+                @if(\Auth::user()->can('manage super admin dashboard'))
                     <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'dashboard' ? ' active' : '' }}">
                         <a href="{{ route('client.dashboard.view') }}" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-home"></i></span><span
@@ -1672,9 +1671,7 @@
                         </a>
                     </li>
                 @endif
-
-
-                @can('manage user')
+                 @if(\Auth::user()->can('manage user'))
                     <li
                         class="dash-item dash-hasmenu {{ Request::route()->getName() == 'users.index' || Request::route()->getName() == 'users.create' || Request::route()->getName() == 'users.edit' ? ' active' : '' }}">
                         <a href="{{ route('users.index') }}" class="dash-link">
@@ -1684,7 +1681,7 @@
                     </li>
                 @endcan
 
-                @if (Gate::check('manage plan'))
+                 @if(\Auth::user()->can('manage plan'))
                     <li class="dash-item dash-hasmenu  {{ Request::segment(1) == 'plans' ? 'active' : '' }}">
                         <a href="{{ route('plans.index') }}" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-trophy"></i></span><span
@@ -1700,7 +1697,7 @@
                         </a>
                     </li>
                 @endif
-                @if (Gate::check('manage coupon'))
+                  @if(\Auth::user()->can('manage coupon'))
                     <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'coupons' ? 'active' : '' }}">
                         <a href="{{ route('coupons.index') }}" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-gift"></i></span><span
@@ -1708,7 +1705,7 @@
                         </a>
                     </li>
                 @endif
-                @if (Gate::check('manage order'))
+                 @if(\Auth::user()->can('manage order'))
                     <li class="dash-item dash-hasmenu  {{ Request::segment(1) == 'orders' ? 'active' : '' }}">
                         <a href="{{ route('order.index') }}" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-shopping-cart-plus"></i></span><span
@@ -1729,15 +1726,16 @@
                     @include('landingpage::menu.landingpage')
                 @endif
 
-                @if (Gate::check('manage system settings'))
-                    <li
-                        class="dash-item dash-hasmenu {{ Request::route()->getName() == 'systems.index' ? ' active' : '' }}">
-                        <a href="{{ route('systems.index') }}" class="dash-link">
-                            <span class="dash-micon"><i class="ti ti-settings"></i></span><span
-                                class="dash-mtext">{{ __('Settings') }}</span>
-                        </a>
-                    </li>
-                @endif
+
+                 @if(\Auth::user()->can('manage system settings'))
+    <li class="dash-item dash-hasmenu {{ Request::route()->getName() == 'systems.index' ? ' active' : '' }}">
+        <a href="{{ route('systems.index') }}" class="dash-link">
+            <span class="dash-micon"><i class="ti ti-settings"></i></span>
+            <span class="dash-mtext">{{ __('Settings') }}</span>
+        </a>
+    </li>
+@endif
+
 
             </ul>
         @endif
