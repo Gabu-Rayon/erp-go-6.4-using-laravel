@@ -44,4 +44,5 @@ class CreatePlansTable extends Migration
     {
         Schema::dropIfExists('plans');
     }
+
 }
