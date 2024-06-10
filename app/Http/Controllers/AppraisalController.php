@@ -16,7 +16,8 @@ class AppraisalController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage appraisal'))
+        try {
+            if(\Auth::user()->type == 'company' || \Auth::user()->type == 'employee')
         {
             $user = \Auth::user();
             if($user->type == 'Employee')
@@ -38,12 +39,17 @@ class AppraisalController extends Controller
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+        } catch (\Exception $e) {
+            \Log::info('GET APPRAISAL ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function create()
     {
         try {
-            if(\Auth::user()->can('create appraisal'))
+            if(\Auth::user()->type == 'company')
             {
 
                 $performance = PerformanceType::where('created_by', '=', \Auth::user()->creatorId())->get();
@@ -65,8 +71,9 @@ class AppraisalController extends Controller
 
     public function store(Request $request)
     {
-
-        if(\Auth::user()->can('create appraisal'))
+        try {
+            
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -92,11 +99,17 @@ class AppraisalController extends Controller
 
             return redirect()->route('appraisal.index')->with('success', __('Appraisal successfully created.'));
         }
+        } catch (\Exception $e) {
+            \Log::info('STORE APPRAISAL ERROR');
+            \Log::info($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function show(Appraisal $appraisal)
     {
-        $rating = json_decode($appraisal->rating, true);
+        try {
+            $rating = json_decode($appraisal->rating, true);
         $performance_types     = PerformanceType::where('created_by', '=', \Auth::user()->creatorId())->get();
         $employee = Employee::find($appraisal->employee);
 
@@ -108,62 +121,80 @@ class AppraisalController extends Controller
         }
 
         return view('appraisal.show', compact('appraisal', 'performance_types', 'ratings','rating'));
+        } catch (\Exception $e) {
+            \Log::info('SHOW APPRAISAL ERROR');
+            \Log::info($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function edit(Appraisal $appraisal)
     {
         try {
-            if(\Auth::user()->can('edit appraisal'))
-            {
-
-                $performance_types     = PerformanceType::where('created_by', '=', \Auth::user()->creatorId())->get();
-                $brances = BranchesList::all()->pluck('bhfNm', 'id');
-                $ratings = json_decode($appraisal->rating,true);
-
-
-                return view('appraisal.edit', compact( 'brances', 'appraisal', 'performance_types','ratings'));
-            }
-            else
-            {
-                return redirect()->back()->with('error', __('Permission denied.'));
+            try {
+                if(\Auth::user()->type == 'company')
+                {
+    
+                    $performance_types     = PerformanceType::where('created_by', '=', \Auth::user()->creatorId())->get();
+                    $brances = BranchesList::all()->pluck('bhfNm', 'id');
+                    $ratings = json_decode($appraisal->rating,true);
+    
+    
+                    return view('appraisal.edit', compact( 'brances', 'appraisal', 'performance_types','ratings'));
+                }
+                else
+                {
+                    return redirect()->back()->with('error', __('Permission denied.'));
+                }
+            } catch (\Exception $e) {
+                \Log::info('RENDER EDIT APPRAISAL ERROR');
+                \Log::info($e);
             }
         } catch (\Exception $e) {
-            \Log::info('RENDER EDIT APPRAISAL ERROR');
+            \Log::info('EDIT APPRAISAL ERROR');
             \Log::info($e);
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
     public function update(Request $request, Appraisal $appraisal)
     {
-        if(\Auth::user()->can('edit appraisal'))
-        {
-            $validator = \Validator::make(
-                $request->all(), [
-                                   'branch' => 'required',
-                                   'employee' => 'required',
-                               ]
-            );
-            if($validator->fails())
+        try {
+            if(\Auth::user()->type == 'company')
             {
-                $messages = $validator->getMessageBag();
-
-                return redirect()->back()->with('error', $messages->first());
+                $validator = \Validator::make(
+                    $request->all(), [
+                                       'branch' => 'required',
+                                       'employee' => 'required',
+                                   ]
+                );
+                if($validator->fails())
+                {
+                    $messages = $validator->getMessageBag();
+    
+                    return redirect()->back()->with('error', $messages->first());
+                }
+    
+                $appraisal->branch         = $request->branch;
+                $appraisal->employee       = $request->employee;
+                $appraisal->appraisal_date = $request->appraisal_date;
+                $appraisal->rating         = json_encode($request->rating, true);
+                $appraisal->remark         = $request->remark;
+                $appraisal->save();
+    
+                return redirect()->route('appraisal.index')->with('success', __('Appraisal successfully updated.'));
             }
-
-            $appraisal->branch         = $request->branch;
-            $appraisal->employee       = $request->employee;
-            $appraisal->appraisal_date = $request->appraisal_date;
-            $appraisal->rating         = json_encode($request->rating, true);
-            $appraisal->remark         = $request->remark;
-            $appraisal->save();
-
-            return redirect()->route('appraisal.index')->with('success', __('Appraisal successfully updated.'));
+        } catch (\Exception $e) {
+            \Log::info('UPDATE APPRAISAL ERROR');
+            \Log::info($e);
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
     public function destroy(Appraisal $appraisal)
     {
-        if(\Auth::user()->can('delete appraisal'))
+        try {
+            if(\Auth::user()->type == 'company')
         {
             if($appraisal->created_by == \Auth::user()->creatorId())
             {
@@ -180,11 +211,17 @@ class AppraisalController extends Controller
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+        } catch (\Exception $e) {
+            \Log::info('DESTROY APPRAISAL ERROR');
+            \Log::info($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function empByStar(Request $request)
     {
-        $employee = Employee::find($request->employee);
+        try {
+            $employee = Employee::find($request->employee);
 
         $indicator = Indicator::where('branch',$employee->branch_id)->where('department',$employee->department_id)->where('designation',$employee->designation_id)->first();
 
@@ -195,12 +232,17 @@ class AppraisalController extends Controller
         $viewRender = view('appraisal.star', compact('ratings','performance_types'))->render();
         // dd($viewRender);
         return response()->json(array('success' => true, 'html'=>$viewRender));
-
+        } catch (\Exception $e) {
+            \Log::info('EMPLOYEE BY STAR ERROR');
+            \Log::info($e);
+            return response()->json($e->getMessage());
+        }
     }
 
     public function empByStar1(Request $request)
     {
-        $employee = Employee::find($request->employee);
+        try {
+            $employee = Employee::find($request->employee);
 
         $appraisal = Appraisal::find($request->appraisal);
 
@@ -216,12 +258,22 @@ class AppraisalController extends Controller
         $viewRender = view('appraisal.staredit', compact('ratings','rating','performance_types'))->render();
         // dd($viewRender);
         return response()->json(array('success' => true, 'html'=>$viewRender));
-
+        } catch (\Exception $e) {
+            \Log::info('EMPLOYEE BY STAR1 ERROR');
+            \Log::info($e);
+            return response()->json($e->getMessage());
+        }
     }
 
     public function getemployee(Request $request)
     {
-        $data['employee'] = Employee::where('branch_id',$request->branch_id)->get();
+        try {
+            $data['employee'] = Employee::where('branch_id',$request->branch_id)->get();
         return response()->json($data);
+        } catch (\Exception $e) {
+            \Log::info('GET EMPLOYEE ERROR');
+            \Log::info($e);
+            return response()->json($e->getMessage());
+        }
     }
 }

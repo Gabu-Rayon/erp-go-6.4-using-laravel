@@ -22,13 +22,11 @@
                     class="ti ti-user-check"></i>
             </a>
         @endif
-        @can('create user')
             <!--For creating new user for companies !-->
             <a href="#" data-size="lg" data-url="{{ route('users.create') }}" data-ajax-popup="true"
                 data-bs-toggle="tooltip" title="{{ __('Create') }}" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-        @endcan
     </div>
 @endsection
 @section('content')

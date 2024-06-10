@@ -19,7 +19,7 @@
 
 
 <?php
-    $languages = App\Models\Utility::languages();
+    $languages = App\Models\Utility::langlist();
 ?>
 <?php $__env->startSection('language-bar'); ?>
     <div class="lang-dropdown-only-desk">

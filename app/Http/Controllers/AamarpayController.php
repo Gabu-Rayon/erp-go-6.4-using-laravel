@@ -19,9 +19,9 @@ use PhpParser\Node\Stmt\TryCatch;
 class AamarpayController extends Controller
 {
 
-    public function pay(Request $request)
-    {
-        $url = 'https://sandbox.aamarpay.com/request.php';
+    public function pay(Request $request){
+        try {
+            $url = 'https://sandbox.aamarpay.com/request.php';
         $payment_setting = Utility::getAdminPaymentSetting();
         $aamarpay_store_id = $payment_setting['aamarpay_store_id'];
         $aamarpay_signature_key = $payment_setting['aamarpay_signature_key'];
@@ -156,11 +156,17 @@ class AamarpayController extends Controller
         } else {
             return redirect()->route('plans.index')->with('error', __('Plan is deleted.'));
         }
-
+        } catch (\Exception $e) {
+            \Log::info('Aamarpay Error');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     function redirect_to_merchant($url)
     {
+        try {
+            
 
         $token = csrf_token();
         ?>
@@ -182,73 +188,83 @@ class AamarpayController extends Controller
         </html>
         <?php
         exit;
+        } catch (\Exception $e) {
+            \Log::info('Redirect to Merchant Error');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function aamarpaysuccess($data, Request $request)
     {
-        $data = Crypt::decrypt($data);
-        $user = \Auth::user();
-
-        if ($data['response'] == "success")
-        {
-            $plan = Plan::find($data['plan_id']);
-            $couponCode = $data['coupon'];
-            $getAmount = $data['price'];
-            $orderID = $data['order_id'];
-            if ($couponCode != 0) {
-                $coupons = Coupon::where('code', strtoupper($couponCode))->where('is_active', '1')->first();
-                $request['coupon_id'] = $coupons->id;
-            } else {
-                $coupons = null;
-            }
-
-            $order = new Order();
-            $order->order_id = $orderID;
-            $order->name = $user->name;
-            $order->card_number = '';
-            $order->card_exp_month = '';
-            $order->card_exp_year = '';
-            $order->plan_name = $plan->name;
-            $order->plan_id = $plan->id;
-            $order->price = $getAmount;
-            $order->price_currency = !empty($payment_setting['currency']) ? $payment_setting['currency'] : 'BDT';
-            $order->payment_type = __('Aamarpay');
-            $order->payment_status = 'success';
-            $order->txn_id = '';
-            $order->receipt = '';
-            $order->user_id = $user->id;
-            $order->save();
-            $assignPlan = $user->assignPlan($plan->id);
-            $coupons = Coupon::find($request->coupon_id);
-            if (!empty($request->coupon_id)) {
-                if (!empty($coupons)) {
-                    $userCoupon = new UserCoupon();
-                    $userCoupon->user = $user->id;
-                    $userCoupon->coupon = $coupons->id;
-                    $userCoupon->order = $orderID;
-                    $userCoupon->save();
-                    $usedCoupun = $coupons->used_coupon();
-                    if ($coupons->limit <= $usedCoupun) {
-                        $coupons->is_active = 0;
-                        $coupons->save();
+        try {
+            $data = Crypt::decrypt($data);
+            $user = \Auth::user();
+    
+            if ($data['response'] == "success")
+            {
+                $plan = Plan::find($data['plan_id']);
+                $couponCode = $data['coupon'];
+                $getAmount = $data['price'];
+                $orderID = $data['order_id'];
+                if ($couponCode != 0) {
+                    $coupons = Coupon::where('code', strtoupper($couponCode))->where('is_active', '1')->first();
+                    $request['coupon_id'] = $coupons->id;
+                } else {
+                    $coupons = null;
+                }
+    
+                $order = new Order();
+                $order->order_id = $orderID;
+                $order->name = $user->name;
+                $order->card_number = '';
+                $order->card_exp_month = '';
+                $order->card_exp_year = '';
+                $order->plan_name = $plan->name;
+                $order->plan_id = $plan->id;
+                $order->price = $getAmount;
+                $order->price_currency = !empty($payment_setting['currency']) ? $payment_setting['currency'] : 'BDT';
+                $order->payment_type = __('Aamarpay');
+                $order->payment_status = 'success';
+                $order->txn_id = '';
+                $order->receipt = '';
+                $order->user_id = $user->id;
+                $order->save();
+                $assignPlan = $user->assignPlan($plan->id);
+                $coupons = Coupon::find($request->coupon_id);
+                if (!empty($request->coupon_id)) {
+                    if (!empty($coupons)) {
+                        $userCoupon = new UserCoupon();
+                        $userCoupon->user = $user->id;
+                        $userCoupon->coupon = $coupons->id;
+                        $userCoupon->order = $orderID;
+                        $userCoupon->save();
+                        $usedCoupun = $coupons->used_coupon();
+                        if ($coupons->limit <= $usedCoupun) {
+                            $coupons->is_active = 0;
+                            $coupons->save();
+                        }
                     }
                 }
+    
+                if ($assignPlan['is_success']) {
+                    return redirect()->route('plans.index')->with('success', __('Plan activated Successfully.'));
+                } else {
+                    return redirect()->route('plans.index')->with('error', __($assignPlan['error']));
+                }
             }
-
-            if ($assignPlan['is_success']) {
-                return redirect()->route('plans.index')->with('success', __('Plan activated Successfully.'));
-            } else {
-                return redirect()->route('plans.index')->with('error', __($assignPlan['error']));
+            elseif ($data['response'] == "cancel")
+            {
+                return redirect()->route('plans.index')->with('error', __('Your payment is cancel'));
             }
+            else {
+                return redirect()->route('plans.index')->with('error', __('Your Transaction is fail please try again'));
+            }
+        } catch (\Exception $e) {
+            \Log::info('Aamarpay Success Error');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
         }
-        elseif ($data['response'] == "cancel")
-        {
-            return redirect()->route('plans.index')->with('error', __('Your payment is cancel'));
-        }
-        else {
-            return redirect()->route('plans.index')->with('error', __('Your Transaction is fail please try again'));
-        }
-
     }
 
     public function invoicepaywithaamarpay(Request $request)
