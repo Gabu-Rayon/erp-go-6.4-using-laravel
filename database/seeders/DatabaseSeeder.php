@@ -1,4 +1,8 @@
 <?php
+<<<<<<< HEAD
+
+=======
+>>>>>>> dbbf8106dac659f88cd267969f17db174d77eee6
 namespace Database\Seeders;
 
 use App\Models\Utility;
@@ -31,4 +35,7 @@ class DatabaseSeeder extends Seeder
 
     }
 }
+<<<<<<< HEAD
+=======
 
+>>>>>>> dbbf8106dac659f88cd267969f17db174d77eee6

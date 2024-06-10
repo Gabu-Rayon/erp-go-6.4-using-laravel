@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+
+=======
+>>>>>>> dbbf8106dac659f88cd267969f17db174d77eee6
 <?php $__env->startPush('script-page'); ?>
     <script>
         $(document).on('click', '.code', function () {
