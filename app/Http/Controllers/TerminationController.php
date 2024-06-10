@@ -14,7 +14,7 @@ class TerminationController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage termination'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'Employee')
             {
@@ -36,7 +36,7 @@ class TerminationController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create termination'))
+        if(\Auth::user()->type == 'company')
         {
             $employees        = Employee::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $terminationtypes = TerminationType::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -51,7 +51,7 @@ class TerminationController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create termination'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -118,7 +118,7 @@ class TerminationController extends Controller
 
     public function edit(Termination $termination)
     {
-        if(\Auth::user()->can('edit termination'))
+        if(\Auth::user()->type == 'company')
         {
             $employees        = Employee::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $terminationtypes = TerminationType::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -140,7 +140,7 @@ class TerminationController extends Controller
 
     public function update(Request $request, Termination $termination)
     {
-        if(\Auth::user()->can('edit termination'))
+        if(\Auth::user()->type == 'company')
         {
             if($termination->created_by == \Auth::user()->creatorId())
             {
@@ -183,7 +183,7 @@ class TerminationController extends Controller
 
     public function destroy(Termination $termination)
     {
-        if(\Auth::user()->can('delete termination'))
+        if(\Auth::user()->type == 'company')
         {
             if($termination->created_by == \Auth::user()->creatorId())
             {

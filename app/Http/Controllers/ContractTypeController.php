@@ -11,7 +11,7 @@ class ContractTypeController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage contract type'))
+        if(\Auth::user()->type == 'company')
         {
             if(\Auth::user()->type == 'company')
             {
@@ -38,7 +38,7 @@ class ContractTypeController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create contract type'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -80,7 +80,7 @@ class ContractTypeController extends Controller
 
     public function update(Request $request, ContractType $contractType)
     {
-        if(\Auth::user()->can('edit contract type'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -109,7 +109,7 @@ class ContractTypeController extends Controller
 
     public function destroy(ContractType $contractType)
     {
-        if(\Auth::user()->can('delete contract type'))
+        if(\Auth::user()->type == 'company')
         {
             $data = Contract::where('type', $contractType->id)->first();
             if(!empty($data))

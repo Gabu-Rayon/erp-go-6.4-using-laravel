@@ -33,7 +33,7 @@ class ClientController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage client'))
+        if(\Auth::user()->type == 'company')
         {
             $user    = \Auth::user();
             $clients = User::where('created_by', '=', $user->creatorId())->where('type', '=', 'client')->get();
@@ -50,7 +50,7 @@ class ClientController extends Controller
     public function create(Request $request)
     {
 
-        if(\Auth::user()->can('create client'))
+        if(\Auth::user()->type == 'company')
         {
             if($request->ajax)
             {
@@ -71,7 +71,7 @@ class ClientController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create client'))
+        if(\Auth::user()->type == 'company')
         {
             $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->where('created_by', '=', \Auth::user()->creatorId())->first();
 
@@ -213,7 +213,7 @@ class ClientController extends Controller
 
     public function edit(User $client)
     {
-        if(\Auth::user()->can('edit client'))
+        if(\Auth::user()->type == 'company')
         {
             $user = \Auth::user();
             if($client->created_by == $user->creatorId())
@@ -236,7 +236,7 @@ class ClientController extends Controller
 
     public function update(User $client, Request $request)
     {
-        if(\Auth::user()->can('edit client'))
+        if(\Auth::user()->type == 'company')
         {
             $user = \Auth::user();
             if($client->created_by == $user->creatorId())

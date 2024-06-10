@@ -15,7 +15,7 @@ class AwardController extends Controller
     public function index()
     {
         $usr = \Auth::user();
-        if($usr->can('manage award'))
+        if($usr->type == 'company' || $usr->type == 'accountant' || $usr->type == 'Employee')
         {
             $employees  = Employee::where('created_by', '=', \Auth::user()->creatorId())->get();
             $awardtypes = AwardType::where('created_by', '=', \Auth::user()->creatorId())->get();
@@ -40,7 +40,7 @@ class AwardController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create award'))
+        if(\Auth::user()->type == 'company')
         {
             $employees  = Employee::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $awardtypes = AwardType::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -55,7 +55,7 @@ class AwardController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create award'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -153,7 +153,7 @@ class AwardController extends Controller
 
     public function edit(Award $award)
     {
-        if(\Auth::user()->can('edit award'))
+        if(\Auth::user()->type == 'company')
         {
             if($award->created_by == \Auth::user()->creatorId())
             {
@@ -175,7 +175,7 @@ class AwardController extends Controller
 
     public function update(Request $request, Award $award)
     {
-        if(\Auth::user()->can('edit award'))
+        if(\Auth::user()->type == 'company')
         {
             if($award->created_by == \Auth::user()->creatorId())
             {
@@ -216,7 +216,7 @@ class AwardController extends Controller
 
     public function destroy(Award $award)
     {
-        if(\Auth::user()->can('delete award'))
+        if(\Auth::user()->type == 'company')
         {
             if($award->created_by == \Auth::user()->creatorId())
             {

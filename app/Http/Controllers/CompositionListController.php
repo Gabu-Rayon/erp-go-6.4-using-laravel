@@ -16,7 +16,8 @@ class CompositionListController extends Controller
     //
     public function index()
     {
-        if (\Auth::user()->can('manage purchase')) {
+        if(\Auth::user()->type == 'company')
+        {
         try {
             if (\Auth::user()->type == 'company') {
                 $compositionslistitems = CompositionList::all();
@@ -37,7 +38,8 @@ class CompositionListController extends Controller
 
     public function create()
     {
-        if (\Auth::user()->can('manage purchase')) {
+        if(\Auth::user()->type == 'company')
+        {
             try {
                 if (\Auth::user()->type == 'company') {
                     $mainItemCode = ProductService::all()->pluck('itemNm', 'itemCd');
@@ -59,7 +61,8 @@ class CompositionListController extends Controller
 
     public function store(Request $request)
     {
-        if (\Auth::user()->can('manage purchase')) {
+        if(\Auth::user()->type == 'company')
+        {
             try {
                 // Validation code 
                 $validator = \Validator::make(
@@ -140,7 +143,8 @@ class CompositionListController extends Controller
 
     public function show($id)
     {
-        if (\Auth::user()->can('manage purchase')) {
+        if(\Auth::user()->type == 'company')
+        {
             try {
                 // Retrieve the composition list by ID
                 $compositionList = CompositionList::findOrFail($id);

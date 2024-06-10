@@ -21,7 +21,7 @@ class LoanController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create loan'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -67,7 +67,7 @@ class LoanController extends Controller
     public function edit($loan)
     {
         $loan = Loan::find($loan);
-        if(\Auth::user()->can('edit loan'))
+        if(\Auth::user()->type == 'company')
         {
             if($loan->created_by == \Auth::user()->creatorId())
             {
@@ -88,7 +88,7 @@ class LoanController extends Controller
 
     public function update(Request $request, Loan $loan)
     {
-        if(\Auth::user()->can('edit loan'))
+        if(\Auth::user()->type == 'company')
         {
             if($loan->created_by == \Auth::user()->creatorId())
             {
@@ -131,7 +131,7 @@ class LoanController extends Controller
 
     public function destroy(Loan $loan)
     {
-        if(\Auth::user()->can('delete loan'))
+        if(\Auth::user()->type == 'company')
         {
             if($loan->created_by == \Auth::user()->creatorId())
             {

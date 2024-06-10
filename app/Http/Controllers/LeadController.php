@@ -42,7 +42,7 @@ class LeadController extends Controller
      */
     public function index()
     {
-        if(\Auth::user()->can('manage lead'))
+        if(\Auth::user()->type == 'company')
         {
             if(\Auth::user()->default_pipeline)
             {
@@ -71,7 +71,7 @@ class LeadController extends Controller
     {
         $usr = \Auth::user();
 
-        if($usr->can('manage lead'))
+        if(\Auth::user()->type == 'company')
         {
             if($usr->default_pipeline)
             {
@@ -105,7 +105,7 @@ class LeadController extends Controller
     public function create()
     {
 
-        if(\Auth::user()->can('create lead'))
+        if(\Auth::user()->type == 'company')
         {
             $users = User::where('created_by', '=', \Auth::user()->creatorId())->where('type', '!=', 'client')->where('type', '!=', 'company')->where('id', '!=', \Auth::user()->id)->get()->pluck('name', 'id');
             $users->prepend(__('Select User'), '');
@@ -129,7 +129,7 @@ class LeadController extends Controller
     {
 
         $usr = \Auth::user();
-        if($usr->can('create lead'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -328,7 +328,7 @@ class LeadController extends Controller
      */
     public function edit(Lead $lead)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             if($lead->created_by == \Auth::user()->creatorId())
             {
@@ -363,7 +363,7 @@ class LeadController extends Controller
      */
     public function update(Request $request, Lead $lead)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             if($lead->created_by == \Auth::user()->creatorId())
             {
@@ -421,7 +421,7 @@ class LeadController extends Controller
      */
     public function destroy(Lead $lead)
     {
-        if(\Auth::user()->can('delete lead'))
+        if(\Auth::user()->type == 'company')
         {
             if($lead->created_by == \Auth::user()->creatorId())
             {
@@ -464,7 +464,7 @@ class LeadController extends Controller
 
     public function fileUpload($id, Request $request)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -541,7 +541,7 @@ class LeadController extends Controller
 
     public function fileDownload($id, $file_id)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -576,7 +576,7 @@ class LeadController extends Controller
 
     public function fileDelete($id, $file_id)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -631,7 +631,7 @@ class LeadController extends Controller
 
     public function noteStore($id, Request $request)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -669,7 +669,7 @@ class LeadController extends Controller
 
     public function labels($id)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -700,7 +700,7 @@ class LeadController extends Controller
 
     public function labelStore($id, Request $request)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $leads = Lead::find($id);
             if($leads->created_by == \Auth::user()->creatorId())
@@ -730,7 +730,7 @@ class LeadController extends Controller
 
     public function userEdit($id)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
 
@@ -760,7 +760,7 @@ class LeadController extends Controller
 
     public function userUpdate($id, Request $request)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $usr  = \Auth::user();
             $lead = Lead::find($id);
@@ -809,7 +809,7 @@ class LeadController extends Controller
 
     public function userDestroy($id, $user_id)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -831,7 +831,7 @@ class LeadController extends Controller
 
     public function productEdit($id)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -853,7 +853,7 @@ class LeadController extends Controller
 
     public function productUpdate($id, Request $request)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $usr        = \Auth::user();
             $lead       = Lead::find($id);
@@ -909,7 +909,7 @@ class LeadController extends Controller
 
     public function productDestroy($id, $product_id)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -940,7 +940,7 @@ class LeadController extends Controller
 
     public function sourceEdit($id)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -968,7 +968,7 @@ class LeadController extends Controller
 
     public function sourceUpdate($id, Request $request)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $usr        = \Auth::user();
             $lead       = Lead::find($id);
@@ -1017,7 +1017,7 @@ class LeadController extends Controller
 
     public function sourceDestroy($id, $source_id)
     {
-        if(\Auth::user()->can('edit lead'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -1089,7 +1089,7 @@ class LeadController extends Controller
 
     public function order(Request $request)
     {
-        if(\Auth::user()->can('move lead'))
+        if(\Auth::user()->type == 'company')
         {
             $usr        = \Auth::user();
             $post       = $request->all();
@@ -1440,7 +1440,7 @@ class LeadController extends Controller
     // Lead Calls
     public function callCreate($id)
     {
-        if(\Auth::user()->can('create lead call'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -1472,7 +1472,7 @@ class LeadController extends Controller
 
     public function callStore($id, Request $request)
     {
-        if(\Auth::user()->can('create lead call'))
+        if(\Auth::user()->type == 'company')
         {
             $usr  = \Auth::user();
             $lead = Lead::find($id);
@@ -1535,7 +1535,7 @@ class LeadController extends Controller
 
     public function callEdit($id, $call_id)
     {
-        if(\Auth::user()->can('edit lead call'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -1568,7 +1568,7 @@ class LeadController extends Controller
 
     public function callUpdate($id, $call_id, Request $request)
     {
-        if(\Auth::user()->can('edit lead call'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -1616,7 +1616,7 @@ class LeadController extends Controller
 
     public function callDestroy($id, $call_id)
     {
-        if(\Auth::user()->can('delete lead call'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -1640,7 +1640,7 @@ class LeadController extends Controller
     // Lead email
     public function emailCreate($id)
     {
-        if(\Auth::user()->can('create lead email'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
             if($lead->created_by == \Auth::user()->creatorId())
@@ -1671,7 +1671,7 @@ class LeadController extends Controller
     public function emailStore($id, Request $request)
     {
 
-        if(\Auth::user()->can('create lead email'))
+        if(\Auth::user()->type == 'company')
         {
             $lead = Lead::find($id);
 

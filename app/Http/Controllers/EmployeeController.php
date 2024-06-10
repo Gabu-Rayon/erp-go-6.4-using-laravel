@@ -37,7 +37,7 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        if(\Auth::user()->can('manage employee'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'Employee')
             {
@@ -64,7 +64,7 @@ class EmployeeController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create employee'))
+        if(\Auth::user()->type == 'company')
         {
             $company_settings = Utility::settings();
             $documents        = Document::where('created_by', \Auth::user()->creatorId())->get();
@@ -84,7 +84,7 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create employee'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -231,7 +231,7 @@ class EmployeeController extends Controller
     public function edit($id)
     {
         $id = Crypt::decrypt($id);
-        if(\Auth::user()->can('edit employee'))
+        if(\Auth::user()->type == 'company')
         {
             $documents    = Document::where('created_by', \Auth::user()->creatorId())->get();
             $branches     = BranchesList::all()->pluck('bhfNm', 'bhfId');
@@ -256,7 +256,7 @@ class EmployeeController extends Controller
     public function update(Request $request, $id)
     {
 
-        if(\Auth::user()->can('edit employee'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -365,7 +365,7 @@ class EmployeeController extends Controller
     public function destroy($id)
     {
 
-        if(Auth::user()->can('delete employee'))
+        if(\Auth::user()->type == 'company')
         {
             $employee      = Employee::findOrFail($id);
             $user          = User::where('id', '=', $employee->user_id)->first();
@@ -395,7 +395,7 @@ class EmployeeController extends Controller
     public function show($id)
     {
 
-        if(\Auth::user()->can('view employee'))
+        if(\Auth::user()->type == 'company')
         {
             try {
                 $empId       = Crypt::decrypt($id);
@@ -442,7 +442,7 @@ class EmployeeController extends Controller
 
     public function profile(Request $request)
     {
-        if(\Auth::user()->can('manage employee profile'))
+        if(\Auth::user()->type == 'company')
         {
             $employees = Employee::where('created_by', \Auth::user()->creatorId());
             if(!empty($request->branch))
@@ -479,7 +479,7 @@ class EmployeeController extends Controller
 
     public function profileShow($id)
     {
-        if(\Auth::user()->can('show employee profile'))
+        if(\Auth::user()->type == 'company')
         {
             $empId        = Crypt::decrypt($id);
             $documents    = Document::where('created_by', \Auth::user()->creatorId())->get();

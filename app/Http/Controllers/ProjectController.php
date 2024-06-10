@@ -36,7 +36,10 @@ class ProjectController extends Controller
     public function index($view = 'grid')
     {
 
-        if(\Auth::user()->can('manage project'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        )
         {
             return view('projects.index', compact('view'));
         }
@@ -53,7 +56,7 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        if(\Auth::user()->can('create project'))
+        if(\Auth::user()->type == 'company')
         {
           $users   = User::where('created_by', '=', \Auth::user()->creatorId())->where('type', '!=', 'client')->get()->pluck('name', 'id');
           $clients = User::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'client')->get()->pluck('name', 'id');
@@ -77,7 +80,7 @@ class ProjectController extends Controller
     {
 
 
-        if(\Auth::user()->can('create project'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -217,7 +220,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        if(\Auth::user()->can('view project'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
         {
 
             $usr           = Auth::user();
@@ -374,7 +377,7 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        if(\Auth::user()->can('edit project'))
+        if(\Auth::user()->type == 'company')
         {
           $clients = User::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'client')->get()->pluck('name', 'id');
           $project = Project::findOrfail($project->id);
@@ -403,7 +406,7 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        if(\Auth::user()->can('edit project'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -458,7 +461,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        if(\Auth::user()->can('delete project'))
+        if(\Auth::user()->type == 'company')
         {
             if(!empty($project->project_image))
             {
@@ -562,7 +565,7 @@ class ProjectController extends Controller
 
     public function milestone($project_id)
     {
-        if(\Auth::user()->can('create milestone'))
+        if(\Auth::user()->type == 'company')
         {
             $project = Project::find($project_id);
 
@@ -576,7 +579,7 @@ class ProjectController extends Controller
 
     public function milestoneStore(Request $request, $project_id)
     {
-        if(\Auth::user()->can('create milestone'))
+        if(\Auth::user()->type == 'company')
         {
             $project   = Project::find($project_id);
             $validator = Validator::make(
@@ -623,7 +626,7 @@ class ProjectController extends Controller
 
     public function milestoneEdit($id)
     {
-        if(\Auth::user()->can('edit milestone'))
+        if(\Auth::user()->type == 'company')
         {
             $milestone = Milestone::find($id);
 
@@ -637,7 +640,7 @@ class ProjectController extends Controller
 
     public function milestoneUpdate($id, Request $request)
     {
-        if(\Auth::user()->can('edit milestone'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = Validator::make(
                 $request->all(), [
@@ -674,7 +677,7 @@ class ProjectController extends Controller
 
     public function milestoneDestroy($id)
     {
-        if(\Auth::user()->can('delete milestone'))
+        if(\Auth::user()->type == 'company')
         {
             $milestone = Milestone::find($id);
             $milestone->delete();
@@ -689,7 +692,7 @@ class ProjectController extends Controller
 
     public function milestoneShow($id)
     {
-        if(\Auth::user()->can('view milestone'))
+        if(\Auth::user()->type == 'company')
         {
             $milestone = Milestone::find($id);
 
@@ -704,7 +707,7 @@ class ProjectController extends Controller
     public function filterProjectView(Request $request)
     {
 
-        if(\Auth::user()->can('manage project'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
         {
             $usr           = Auth::user();
             if(\Auth::user()->type == 'client'){
@@ -747,7 +750,7 @@ class ProjectController extends Controller
     // Project Gantt Chart
     public function gantt($projectID, $duration = 'Week')
     {
-        if(\Auth::user()->can('view grant chart'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
         {
             $project = Project::find($projectID);
             $tasks   = [];
@@ -789,7 +792,7 @@ class ProjectController extends Controller
 
         if($project)
         {
-            if(\Auth::user()->can('view project task'))
+            if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
             {
                 $id               = trim($request->task_id, 'task_');
                 $task             = ProjectTask::find($id);
@@ -830,7 +833,7 @@ class ProjectController extends Controller
 
 
         $user = Auth::user();
-        if($user->can('manage bug report'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
         {
             $project = Project::find($project_id);
 
@@ -866,7 +869,7 @@ class ProjectController extends Controller
 
     public function bugCreate($project_id)
     {
-        if(\Auth::user()->can('create bug report'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
         {
 
             $priority     = Bug::$priority;
@@ -905,7 +908,7 @@ class ProjectController extends Controller
 
     public function bugStore(Request $request, $project_id)
     {
-        if(\Auth::user()->can('create bug report'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -967,7 +970,7 @@ class ProjectController extends Controller
 
     public function bugEdit($project_id, $bug_id)
     {
-        if(\Auth::user()->can('edit bug report'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
         {
             $bug          = Bug::find($bug_id);
             $priority     = Bug::$priority;
@@ -996,7 +999,7 @@ class ProjectController extends Controller
     {
 
 
-        if(\Auth::user()->can('edit bug report'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -1036,7 +1039,7 @@ class ProjectController extends Controller
     {
 
 
-        if(\Auth::user()->can('delete bug report'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
         {
             $bug = Bug::find($bug_id);
             $bug->delete();
@@ -1053,7 +1056,7 @@ class ProjectController extends Controller
     {
 
         $user = Auth::user();
-        if($user->can('move bug report'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
         {
 
             $project = Project::find($project_id);
@@ -1086,7 +1089,7 @@ class ProjectController extends Controller
     public function bugKanbanOrder(Request $request)
     {
 //        dd($request->all());
-        if(\Auth::user()->can('move bug report'))
+if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
         {
             $post   = $request->all();
             $bug    = Bug::find($post['bug_id']);
@@ -1235,7 +1238,7 @@ class ProjectController extends Controller
     //project duplicate module
     public function copyproject($id)
     {
-        if(Auth::user()->can('create project'))
+        if(\Auth::user()->type == 'company')
         {
             $project = Project::find($id);
 
@@ -1250,7 +1253,7 @@ class ProjectController extends Controller
     public function copyprojectstore(Request $request,$id)
     {
 
-        if(Auth::user()->can('create project'))
+        if(\Auth::user()->type == 'company')
         {
             $project                            = Project::find($id);
             $duplicate                          = new Project();

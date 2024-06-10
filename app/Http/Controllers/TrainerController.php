@@ -11,7 +11,7 @@ class TrainerController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage trainer'))
+        if(\Auth::user()->type == 'company')
         {
             $trainers = Trainer::where('created_by', '=', \Auth::user()->creatorId())->with('branches')->get();
 
@@ -26,7 +26,7 @@ class TrainerController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create trainer'))
+        if(\Auth::user()->type == 'company')
         {
             $branches = BranchesList::all()->pluck('bhfNm', 'id');
 
@@ -41,7 +41,7 @@ class TrainerController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create trainer'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -88,7 +88,7 @@ class TrainerController extends Controller
 
     public function edit(Trainer $trainer)
     {
-        if(\Auth::user()->can('edit trainer'))
+        if(\Auth::user()->type == 'company')
         {
             $branches = BranchesList::all()->pluck('bhfNm', 'id');
 
@@ -103,7 +103,7 @@ class TrainerController extends Controller
 
     public function update(Request $request, Trainer $trainer)
     {
-        if(\Auth::user()->can('edit trainer'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -142,7 +142,7 @@ class TrainerController extends Controller
 
     public function destroy(Trainer $trainer)
     {
-        if(\Auth::user()->can('delete trainer'))
+        if(\Auth::user()->type == 'company')
         {
             if($trainer->created_by == \Auth::user()->creatorId())
             {

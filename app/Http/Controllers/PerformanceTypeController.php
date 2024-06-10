@@ -10,7 +10,7 @@ class PerformanceTypeController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage performance type'))
+        if(\Auth::user()->type == 'company')
         {
             if(\Auth::user()->type == 'company')
             {
@@ -32,7 +32,7 @@ class PerformanceTypeController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create performance type'))
+        if(\Auth::user()->type == 'company')
         {
             if(\Auth::user()->type == 'company')
             {
@@ -79,7 +79,7 @@ class PerformanceTypeController extends Controller
     public function update(Request $request, PerformanceType $performanceType)
     {
 
-        if(\Auth::user()->can('edit performance type'))
+        if(\Auth::user()->type == 'company')
         {
             if(\Auth::user()->type == 'company')
             {
@@ -115,7 +115,7 @@ class PerformanceTypeController extends Controller
     public function destroy(PerformanceType $performanceType)
     {
 
-        if(\Auth::user()->can('delete performance type'))
+        if(\Auth::user()->type == 'company')
         {
             if(\Auth::user()->type == 'company')
             {

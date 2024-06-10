@@ -10,7 +10,10 @@ class ProductServiceUnitController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage constant unit'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $units = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -24,7 +27,10 @@ class ProductServiceUnitController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create constant unit'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             return view('productServiceUnit.create');
         }
@@ -37,7 +43,10 @@ class ProductServiceUnitController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create constant unit'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -67,7 +76,10 @@ class ProductServiceUnitController extends Controller
 
     public function edit($id)
     {
-        if(\Auth::user()->can('edit constant unit'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $unit = ProductServiceUnit::find($id);
 
@@ -82,7 +94,10 @@ class ProductServiceUnitController extends Controller
 
     public function update(Request $request, $id)
     {
-        if(\Auth::user()->can('edit constant unit'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $unit = ProductServiceUnit::find($id);
             if($unit->created_by == \Auth::user()->creatorId())
@@ -117,7 +132,10 @@ class ProductServiceUnitController extends Controller
 
     public function destroy($id)
     {
-        if(\Auth::user()->can('delete constant unit'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $unit = ProductServiceUnit::find($id);
             if($unit->created_by == \Auth::user()->creatorId())

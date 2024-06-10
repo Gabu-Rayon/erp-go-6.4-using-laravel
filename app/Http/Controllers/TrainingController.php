@@ -15,7 +15,7 @@ class TrainingController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage training'))
+        if(\Auth::user()->type == 'company')
         {
             $trainings = Training::where('created_by', '=', \Auth::user()->creatorId())->with(['branches','types'])->get();
             $status    = Training::$Status;
@@ -31,7 +31,7 @@ class TrainingController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create training'))
+        if(\Auth::user()->type == 'company')
         {
             $branches      = BranchesList::all()->pluck('bhfNm', 'id');
             $trainingTypes = TrainingType::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -50,7 +50,7 @@ class TrainingController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create training'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -110,7 +110,7 @@ class TrainingController extends Controller
 
     public function edit(Training $training)
     {
-        if(\Auth::user()->can('create training'))
+        if(\Auth::user()->type == 'company')
         {
             $branches      = BranchesList::all()->pluck('bhfNm', 'id');
             $trainingTypes = TrainingType::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -129,7 +129,7 @@ class TrainingController extends Controller
 
     public function update(Request $request, Training $training)
     {
-        if(\Auth::user()->can('edit training'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -171,7 +171,7 @@ class TrainingController extends Controller
 
     public function destroy(Training $training)
     {
-        if(\Auth::user()->can('delete training'))
+        if(\Auth::user()->type == 'company')
         {
             if($training->created_by == \Auth::user()->creatorId())
             {

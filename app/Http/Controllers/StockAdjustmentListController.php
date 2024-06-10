@@ -18,7 +18,7 @@ class StockAdjustmentListController extends Controller
     public function index()
     {
 
-        if (\Auth::user()->can('show purchase')) {
+        if(\Auth::user()->type == 'company') {
 
        
         try {
@@ -38,7 +38,7 @@ class StockAdjustmentListController extends Controller
     public function create()
     {
 
-         if (\Auth::user()->can('show purchase')) {
+        if(\Auth::user()->type == 'company'){
 
         try {
             $items = ProductService::all()->pluck('itemNm', 'itemCd');
@@ -61,7 +61,7 @@ class StockAdjustmentListController extends Controller
 
     public function store(Request $request)
     {
-        if (\Auth::user()->can('show purchase')) {
+        if(\Auth::user()->type == 'company'){
             try {
                 $data = $request->all();
                 \Log::info('STOCK ADJUSTMENT data from the Form to adjust the Stock:');

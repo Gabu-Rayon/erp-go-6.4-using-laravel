@@ -45,7 +45,7 @@ class WarehouseController extends Controller
      */
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create warehouse'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -87,7 +87,7 @@ class WarehouseController extends Controller
 
         $id = WarehouseProduct::where('warehouse_id' , $warehouse->id)->first();
 
-        if(\Auth::user()->can('show warehouse'))
+        if(\Auth::user()->type == 'company')
         {
 
             if(WarehouseProduct::where('warehouse_id' , $warehouse->id)->exists())
@@ -116,7 +116,7 @@ class WarehouseController extends Controller
     public function edit(warehouse $warehouse)
     {
 
-        if(\Auth::user()->can('edit warehouse'))
+        if(\Auth::user()->type == 'company')
         {
             if($warehouse->created_by == \Auth::user()->creatorId())
             {
@@ -142,7 +142,7 @@ class WarehouseController extends Controller
     public function update(Request $request, warehouse $warehouse)
     {
 
-        if(\Auth::user()->can('edit warehouse'))
+        if(\Auth::user()->type == 'company')
         {
             if($warehouse->created_by == \Auth::user()->creatorId())
             {
@@ -185,7 +185,7 @@ class WarehouseController extends Controller
      */
     public function destroy(warehouse $warehouse)
     {
-        if(\Auth::user()->can('delete warehouse'))
+        if(\Auth::user()->type == 'company')
         {
             if($warehouse->created_by == \Auth::user()->creatorId())
             {

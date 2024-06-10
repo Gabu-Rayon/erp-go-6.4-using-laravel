@@ -18,7 +18,7 @@ class OtherPaymentController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create other payment'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -58,7 +58,7 @@ class OtherPaymentController extends Controller
     public function edit($otherpayment)
     {
         $otherpayment = OtherPayment::find($otherpayment);
-        if(\Auth::user()->can('edit other payment'))
+        if(\Auth::user()->type == 'company')
         {
             if($otherpayment->created_by == \Auth::user()->creatorId())
             {
@@ -79,7 +79,7 @@ class OtherPaymentController extends Controller
 
     public function update(Request $request, OtherPayment $otherpayment)
     {
-        if(\Auth::user()->can('edit other payment'))
+        if(\Auth::user()->type == 'company')
         {
             if($otherpayment->created_by == \Auth::user()->creatorId())
             {
@@ -117,7 +117,7 @@ class OtherPaymentController extends Controller
 
     public function destroy(OtherPayment $otherpayment)
     {
-        if(\Auth::user()->can('delete other payment'))
+        if(\Auth::user()->type == 'company')
         {
             if($otherpayment->created_by == \Auth::user()->creatorId())
             {

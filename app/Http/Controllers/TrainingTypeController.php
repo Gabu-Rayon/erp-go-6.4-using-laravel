@@ -10,7 +10,7 @@ class TrainingTypeController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage training type'))
+        if(\Auth::user()->type == 'company')
         {
             $trainingtypes = TrainingType::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -25,7 +25,7 @@ class TrainingTypeController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create training type'))
+        if(\Auth::user()->type == 'company')
         {
             return view('trainingtype.create');
         }
@@ -38,7 +38,7 @@ class TrainingTypeController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create training type'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -76,7 +76,7 @@ class TrainingTypeController extends Controller
     public function edit($id)
     {
 
-        if(\Auth::user()->can('edit training type'))
+        if(\Auth::user()->type == 'company')
         {
             $trainingType = TrainingType::find($id);
             if($trainingType->created_by == \Auth::user()->creatorId())
@@ -98,7 +98,7 @@ class TrainingTypeController extends Controller
 
     public function update(Request $request, $id)
     {
-        if(\Auth::user()->can('edit training type'))
+        if(\Auth::user()->type == 'company')
         {
             $trainingType = TrainingType::find($id);
             if($trainingType->created_by == \Auth::user()->creatorId())
@@ -129,7 +129,7 @@ class TrainingTypeController extends Controller
 
     public function destroy($id)
     {
-        if(\Auth::user()->can('delete training type'))
+        if(\Auth::user()->type == 'company')
         {
 
             $trainingType = TrainingType::find($id);

@@ -16,7 +16,7 @@ class DebitNoteController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage debit note'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $bills = Bill::where('created_by', \Auth::user()->creatorId())->get();
 
@@ -30,7 +30,7 @@ class DebitNoteController extends Controller
 
     public function create($bill_id)
     {
-        if(\Auth::user()->can('create debit note'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
 
             $billDue = Bill::where('id', $bill_id)->first();
@@ -46,7 +46,7 @@ class DebitNoteController extends Controller
     public function store(Request $request, $bill_id)
     {
 
-        if(\Auth::user()->can('create debit note'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
 
             $validator = \Validator::make(
@@ -90,7 +90,7 @@ class DebitNoteController extends Controller
 
     public function edit($bill_id, $debitNote_id)
     {
-        if(\Auth::user()->can('edit debit note'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
 
             $debitNote = DebitNote::find($debitNote_id);
@@ -107,7 +107,7 @@ class DebitNoteController extends Controller
     public function update(Request $request, $bill_id, $debitNote_id)
     {
 
-        if(\Auth::user()->can('edit debit note'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
 
             $validator = \Validator::make(
@@ -154,7 +154,7 @@ class DebitNoteController extends Controller
 
     public function destroy($bill_id, $debitNote_id)
     {
-        if(\Auth::user()->can('delete debit note'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $debitNote = DebitNote::find($debitNote_id);
             $debitNote->delete();
@@ -169,7 +169,7 @@ class DebitNoteController extends Controller
 
     public function customCreate()
     {
-        if(\Auth::user()->can('create debit note'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $bills = Bill::where('created_by', \Auth::user()->creatorId())->where('type','Bill')->get()->pluck('bill_id', 'id');
 
@@ -183,7 +183,7 @@ class DebitNoteController extends Controller
 
     public function customStore(Request $request)
     {
-        if(\Auth::user()->can('create debit note'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $validator = \Validator::make(
                 $request->all(), [

@@ -13,7 +13,7 @@ class GoalTrackingController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage goal tracking'))
+        if(\Auth::user()->type == 'company')
         {
             $user = \Auth::user();
             if($user->type == 'Employee')
@@ -37,7 +37,7 @@ class GoalTrackingController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create goal tracking'))
+        if(\Auth::user()->type == 'company')
         {
 
             $brances = BranchesList::all()->pluck('bhfNm', 'id');
@@ -57,7 +57,7 @@ class GoalTrackingController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create goal tracking'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -105,7 +105,7 @@ class GoalTrackingController extends Controller
     public function edit($id)
     {
 
-        if(\Auth::user()->can('edit goal tracking'))
+        if(\Auth::user()->type == 'company')
         {
             $goalTracking = GoalTracking::find($id);
             $brances      = BranchesList::all()->pluck('name', 'id');
@@ -127,7 +127,7 @@ class GoalTrackingController extends Controller
 
     public function update(Request $request, $id)
     {
-        if(\Auth::user()->can('edit goal tracking'))
+        if(\Auth::user()->type == 'company')
         {
             $goalTracking = GoalTracking::find($id);
             $validator    = \Validator::make(
@@ -172,7 +172,7 @@ class GoalTrackingController extends Controller
     public function destroy($id)
     {
 
-        if(\Auth::user()->can('delete goal tracking'))
+        if(\Auth::user()->type == 'company')
         {
             $goalTracking = GoalTracking::find($id);
             if($goalTracking->created_by == \Auth::user()->creatorId())

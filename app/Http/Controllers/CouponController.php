@@ -13,7 +13,7 @@ class CouponController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage coupon'))
+        if(\Auth::user()->type == 'super admin')
         {
             $coupons = Coupon::get();
 
@@ -28,7 +28,7 @@ class CouponController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create coupon'))
+        if(\Auth::user()->type == 'super admin')
         {
             return view('coupon.create');
         }
@@ -41,7 +41,7 @@ class CouponController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create coupon'))
+        if(\Auth::user()->type == 'super admin')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -97,7 +97,7 @@ class CouponController extends Controller
 
     public function edit(Coupon $coupon)
     {
-        if(\Auth::user()->can('edit coupon'))
+        if(\Auth::user()->type == 'super admin')
         {
             return view('coupon.edit', compact('coupon'));
         }
@@ -110,7 +110,7 @@ class CouponController extends Controller
 
     public function update(Request $request, Coupon $coupon)
     {
-        if(\Auth::user()->can('edit coupon'))
+        if(\Auth::user()->type == 'super admin')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -146,7 +146,7 @@ class CouponController extends Controller
 
     public function destroy(Coupon $coupon)
     {
-        if(\Auth::user()->can('delete coupon'))
+        if(\Auth::user()->type == 'super admin')
         {
             $coupon->delete();
 

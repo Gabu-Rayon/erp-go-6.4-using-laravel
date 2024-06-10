@@ -10,7 +10,7 @@ class JobCategoryController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage job category'))
+        if(\Auth::user()->type == 'company')
         {
             $categories = JobCategory::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -31,7 +31,7 @@ class JobCategoryController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create job category'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -74,7 +74,7 @@ class JobCategoryController extends Controller
 
     public function update(Request $request, JobCategory $jobCategory)
     {
-        if(\Auth::user()->can('edit job category'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -104,7 +104,7 @@ class JobCategoryController extends Controller
 
     public function destroy(JobCategory $jobCategory)
     {
-        if(\Auth::user()->can('delete job category'))
+        if(\Auth::user()->type == 'company')
         {
             if($jobCategory->created_by == \Auth::user()->creatorId())
             {

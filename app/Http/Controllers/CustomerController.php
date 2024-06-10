@@ -35,7 +35,10 @@ class CustomerController extends Controller
 
     public function index()
     {
-        if (\Auth::user()->can('manage customer')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ){
             $customers = Customer::where('created_by', \Auth::user()->creatorId())->get();
 
             return view('customer.index', compact('customers'));
@@ -45,7 +48,10 @@ class CustomerController extends Controller
     }
     public function create()
     {
-        if (\Auth::user()->can('create customer')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ) {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'customer')->get();
 
             return view('customer.create', compact('customFields'));
@@ -148,7 +154,10 @@ class CustomerController extends Controller
 ****/
     public function store(Request $request)
     {
-        if (\Auth::user()->can('create customer')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ){
 
             $rules = [
                 'customertin' => 'required|between:9,15',
@@ -267,7 +276,10 @@ class CustomerController extends Controller
 
     public function edit($id)
     {
-        if (\Auth::user()->can('edit customer')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ) {
             $customer = Customer::find($id);
             $customer->customField = CustomField::getData($customer, 'customer');
 
@@ -283,7 +295,10 @@ class CustomerController extends Controller
     public function update(Request $request, Customer $customer)
     {
 
-        if (\Auth::user()->can('edit customer')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ){
 
             $rules = [
                 'name' => 'required',
@@ -330,7 +345,10 @@ class CustomerController extends Controller
 
     public function destroy(Customer $customer)
     {
-        if (\Auth::user()->can('delete customer')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ) {
             if ($customer->created_by == \Auth::user()->creatorId()) {
                 $customer->delete();
 
@@ -365,7 +383,7 @@ class CustomerController extends Controller
     public function payment(Request $request)
     {
 
-        if (\Auth::user()->can('manage customer payment')) {
+        if(\Auth::user()->type == 'customer') {
             $category = [
                 'Invoice' => 'Invoice',
                 'Deposit' => 'Deposit',
@@ -391,7 +409,9 @@ class CustomerController extends Controller
 
     public function transaction(Request $request)
     {
-        if (\Auth::user()->can('manage customer payment')) {
+        if(
+            \Auth::user()->type == 'customer'
+        ) {
             $category = [
                 'Invoice' => 'Invoice',
                 'Deposit' => 'Deposit',
@@ -553,7 +573,10 @@ class CustomerController extends Controller
     public function import(Request $request)
     {
 
-        if (\Auth::user()->can('manage customer')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ) {
 
         $rules = [
             'file' => 'required|mimes:csv,txt',
@@ -649,7 +672,10 @@ class CustomerController extends Controller
 
     public function searchCustomers(Request $request)
     {
-        if (\Auth::user()->can('manage customer')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ) {
             $customers = [];
             $search = $request->search;
             if ($request->ajax() && isset($search) && !empty($search)) {
@@ -666,7 +692,10 @@ class CustomerController extends Controller
 
     public function getCustomer($id)
     {
-       if (\Auth::user()->can('manage customer')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ) {
         try {
             $customerInfo = Customer::where('customer_id', $id)->first();
             \Log::info('CUSTOMER');
@@ -691,7 +720,10 @@ class CustomerController extends Controller
 
     public function getCustomerByName($name)
     {
-         if (\Auth::user()->can('manage customer')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ){
         try {
             $customerInfo = Customer::where('name', $name)->first();
             \Log::info('CUSTOMER');
@@ -715,7 +747,10 @@ class CustomerController extends Controller
 
 
     public function getCustomerByTin(){
-        if (\Auth::user()->can('manage customer')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ) {
             $customers = Customer::where('created_by', \Auth::user()->creatorId())->get();
 
             return view('customer.customerbypin', compact('customers'));

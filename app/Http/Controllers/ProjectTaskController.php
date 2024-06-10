@@ -26,7 +26,10 @@ class ProjectTaskController extends Controller
     {
 
         $usr = \Auth::user();
-        if (\Auth::user()->can('manage project task')) {
+        if(
+            \Auth::user()->type == 'client'
+            || \Auth::user()->type == 'company'
+        ){
             $project = Project::where('id', $project_id)->where('created_by', \Auth::user()->creatorId())->first();
 
             if ($project != null) {
@@ -54,7 +57,10 @@ class ProjectTaskController extends Controller
 
     public function create($project_id, $stage_id)
     {
-        if (\Auth::user()->can('create project task')) {
+        if(
+            \Auth::user()->type == 'client'
+            || \Auth::user()->type == 'company'
+        ){
             $project = Project::find($project_id);
             $hrs = Project::projectHrs($project_id);
             $settings = Utility::settings();
@@ -67,7 +73,10 @@ class ProjectTaskController extends Controller
 
     public function store(Request $request, $project_id, $stage_id)
     {
-        if (\Auth::user()->can('create project task')) {
+        if(
+            \Auth::user()->type == 'client'
+            || \Auth::user()->type == 'company'
+        ){
             $validator = Validator::make(
                 $request->all(), [
                     'name' => 'required',
@@ -304,7 +313,10 @@ class ProjectTaskController extends Controller
     public function show($project_id, $task_id)
     {
 
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ){
             $allow_progress = Project::find($project_id)->task_progress;
             $task = ProjectTask::find($task_id);
 
@@ -316,7 +328,10 @@ class ProjectTaskController extends Controller
 
     public function edit($project_id, $task_id)
     {
-        if (\Auth::user()->can('edit project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ){
             $project = Project::find($project_id);
             $task = ProjectTask::find($task_id);
             $hrs = Project::projectHrs($project_id);
@@ -330,7 +345,10 @@ class ProjectTaskController extends Controller
     public function update(Request $request, $project_id, $task_id)
     {
 
-        if (\Auth::user()->can('edit project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ){
             $validator = Validator::make(
                 $request->all(), [
                     'name' => 'required',
@@ -356,7 +374,10 @@ class ProjectTaskController extends Controller
     public function destroy($project_id, $task_id)
     {
 
-        if (\Auth::user()->can('delete project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ){
             ProjectTask::deleteTask([$task_id]);
 
             return redirect()->back()->with('success', __('Task Deleted successfully.'));
@@ -370,7 +391,10 @@ class ProjectTaskController extends Controller
     public function getStageTasks(Request $request, $stage_id)
     {
 
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ){
             $count = ProjectTask::where('stage_id', $stage_id)->count();
             echo json_encode($count);
         } else {
@@ -381,7 +405,10 @@ class ProjectTaskController extends Controller
     public function changeCom($projectID, $taskId)
     {
 
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ){
             $project = Project::find($projectID);
             $task = ProjectTask::find($taskId);
 
@@ -411,7 +438,10 @@ class ProjectTaskController extends Controller
 
     public function changeFav($projectID, $taskId)
     {
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ){
             $task = ProjectTask::find($taskId);
             if ($task->is_favourite == 0) {
                 $task->is_favourite = 1;
@@ -431,7 +461,10 @@ class ProjectTaskController extends Controller
 
     public function changeProg(Request $request, $projectID, $taskId)
     {
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ){
             $task = ProjectTask::find($taskId);
             $task->progress = $request->progress;
             $task->save();
@@ -445,7 +478,10 @@ class ProjectTaskController extends Controller
     public function checklistStore(Request $request, $projectID, $taskID)
     {
 
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ){
             $request->validate(
                 ['name' => 'required']
             );
@@ -481,7 +517,10 @@ class ProjectTaskController extends Controller
     public function checklistUpdate($projectID, $checklistID)
     {
 
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ){
             $checkList = TaskChecklist::find($checklistID);
             if ($checkList->status == 0) {
                 $checkList->status = 1;
@@ -498,7 +537,10 @@ class ProjectTaskController extends Controller
 
     public function checklistDestroy($projectID, $checklistID)
     {
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ){
             $checkList = TaskChecklist::find($checklistID);
             $checkList->delete();
 
@@ -511,7 +553,10 @@ class ProjectTaskController extends Controller
     public function commentStoreFile(Request $request, $projectID, $taskID)
     {
 
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ){
             $request->validate(
                 ['file' => 'required']
             );
@@ -543,7 +588,10 @@ class ProjectTaskController extends Controller
 
     public function commentDestroyFile(Request $request, $projectID, $taskID, $fileID)
     {
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ){
             $commentFile = TaskFile::find($fileID);
             $path = storage_path('tasks/' . $commentFile->file);
             if (file_exists($path)) {
@@ -560,7 +608,10 @@ class ProjectTaskController extends Controller
     public function commentDestroy(Request $request, $projectID, $taskID, $commentID)
     {
 
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ){
             $comment = TaskComment::find($commentID);
             $comment->delete();
 
@@ -573,7 +624,10 @@ class ProjectTaskController extends Controller
     public function commentStore(Request $request, $projectID, $taskID)
     {
 
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ) {
             $post = [];
             $post['task_id'] = $taskID;
             $post['user_id'] = \Auth::user()->id;
@@ -638,7 +692,10 @@ class ProjectTaskController extends Controller
 
     public function updateTaskPriorityColor(Request $request)
     {
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ) {
             $task_id = $request->input('task_id');
             $color = $request->input('color');
 
@@ -657,7 +714,10 @@ class ProjectTaskController extends Controller
     public function taskOrderUpdate(Request $request, $project_id)
     {
 
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ) {
 
             $user = \Auth::user();
             $project = Project::find($project_id);
@@ -757,7 +817,10 @@ class ProjectTaskController extends Controller
 
     public function taskGet($task_id)
     {
-        if (\Auth::user()->can('view project task')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ) {
             $task = ProjectTask::find($task_id);
 //            dd($task->taskProgress()['color']);
 
@@ -774,11 +837,17 @@ class ProjectTaskController extends Controller
 //                                                         style="width: {{ $task->taskProgress()['percentage'] }};"></div>
 //                                                </div>';
 //            }
-            if (\Auth::user()->can('view project task') || \Auth::user()->can('edit project task') || \Auth::user()->can('delete project task')) {
+            if (
+                \Auth::user()->type == 'company'
+                || \Auth::user()->type == 'client'
+                ) {
                 $html .= '<div class="dropdown action-item">
                                                             <a href="#" class="action-item" data-toggle="dropdown"><i class="ti ti-ellipsis-h"></i></a>
                                                             <div class="dropdown-menu dropdown-menu-right">';
-                if (\Auth::user()->can('view project task')) {
+                if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ) {
                     $html .= '<a href="#" data-url="' . route(
                             'projects.tasks.show', [
                                 $task->project_id,
@@ -786,7 +855,10 @@ class ProjectTaskController extends Controller
                             ]
                         ) . '" data-ajax-popup="true" class="dropdown-item">' . __('View') . '</a>';
                 }
-                if (\Auth::user()->can('edit project task')) {
+                if(
+                    \Auth::user()->type == 'company'
+                    || \Auth::user()->type == 'client'
+                ){
                     $html .= '<a href="#" data-url="' . route(
                             "projects.tasks.edit", [
                                 $task->project_id,
@@ -794,7 +866,10 @@ class ProjectTaskController extends Controller
                             ]
                         ) . '" data-ajax-popup="true" data-size="lg" data-title="' . __("Edit ") . $task->name . '" class="dropdown-item">' . __('Edit') . '</a>';
                 }
-                if (\Auth::user()->can('delete project task')) {
+                if(
+                    \Auth::user()->type == 'company'
+                    || \Auth::user()->type == 'client'
+                ){
                     $html .= '<a href="#" class="dropdown-item del_task" data-url="' . route(
                             'projects.tasks.destroy', [
                                 $task->project_id,
@@ -864,7 +939,10 @@ class ProjectTaskController extends Controller
     {
 
         if (\Auth::check()) {
-            if (\Auth::user()->can('view project task')) {
+            if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        ) {
                 $response = [];
                 $task = ProjectTask::find($task_id);
                 if ($task) {

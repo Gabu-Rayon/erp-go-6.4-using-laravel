@@ -25,7 +25,11 @@ class CreditNoteController extends Controller
     public function index()
     {
 
-        if (\Auth::user()->can('manage credit note')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        )
+        {
             $invoices = Invoice::where('created_by', \Auth::user()->creatorId())->get();
 
             return view('creditNote.index', compact('invoices'));
@@ -37,7 +41,10 @@ class CreditNoteController extends Controller
     public function create($invoice_id)
     {
 
-        if (\Auth::user()->can('create credit note')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ) {
 
 
             $invoiceDue = Invoice::where('id', $invoice_id)->first();
@@ -71,7 +78,10 @@ class CreditNoteController extends Controller
     public function store(Request $request, $id)
     {
         try {
-            if (\Auth::user()->can('create credit note')) {
+            if(
+                \Auth::user()->type == 'accountant'
+                || \Auth::user()->type == 'company'
+            ) {
 
                 $data = $request->all();
                 $invoice = Invoice::find($id);
@@ -262,7 +272,10 @@ class CreditNoteController extends Controller
 
     public function edit($invoice_id, $creditNote_id)
     {
-        if (\Auth::user()->can('edit credit note')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ){
 
             $creditNote = CreditNote::find($creditNote_id);
 
@@ -276,7 +289,10 @@ class CreditNoteController extends Controller
     public function update(Request $request, $invoice_id, $creditNote_id)
     {
 
-        if (\Auth::user()->can('edit credit note')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ){
 
             $validator = \Validator::make(
                 $request->all(),
@@ -318,7 +334,10 @@ class CreditNoteController extends Controller
 
     public function destroy($invoice_id, $creditNote_id)
     {
-        if (\Auth::user()->can('delete credit note')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ){
 
             $creditNote = CreditNote::find($creditNote_id);
             $creditNote->delete();
@@ -334,7 +353,10 @@ class CreditNoteController extends Controller
 
     public function customCreate()
     {
-        if (\Auth::user()->can('create credit note')) {
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ){
 
             $invoices = Invoice::where('created_by', \Auth::user()->creatorId())->get()->pluck('invoice_id', 'id');
 
@@ -414,7 +436,10 @@ class CreditNoteController extends Controller
         try {
             \Log::info('Raw Data from the Add Direct Credit Note form:', $request->all());
             
-            if (\Auth::user()->can('create credit note')) {
+            if(
+                \Auth::user()->type == 'accountant'
+                || \Auth::user()->type == 'company'
+            ) {
 
                 $data = $request->all();
 

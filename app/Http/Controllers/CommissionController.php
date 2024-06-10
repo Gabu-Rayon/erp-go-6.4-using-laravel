@@ -18,7 +18,7 @@ class CommissionController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create commission'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -58,7 +58,7 @@ class CommissionController extends Controller
     public function edit($commission)
     {
         $commission = Commission::find($commission);
-        if(\Auth::user()->can('edit commission'))
+        if(\Auth::user()->type == 'company')
         {
             $commissions =Commission::$commissiontype;
 
@@ -80,7 +80,7 @@ class CommissionController extends Controller
 
     public function update(Request $request, Commission $commission)
     {
-        if(\Auth::user()->can('edit commission'))
+        if(\Auth::user()->type == 'company')
         {
             if($commission->created_by == \Auth::user()->creatorId())
             {
@@ -119,7 +119,7 @@ class CommissionController extends Controller
     public function destroy(Commission $commission)
     {
 
-        if(\Auth::user()->can('delete commission'))
+        if(\Auth::user()->type == 'company')
         {
             if($commission->created_by == \Auth::user()->creatorId())
             {

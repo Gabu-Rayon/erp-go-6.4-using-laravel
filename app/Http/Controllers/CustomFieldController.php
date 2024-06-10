@@ -14,7 +14,10 @@ class CustomFieldController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage constant custom field'))
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        )
         {
             $custom_fields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -29,7 +32,10 @@ class CustomFieldController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create constant custom field'))
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        )
         {
             $types   = CustomField::$fieldTypes;
             $modules = CustomField::$modules;
@@ -45,7 +51,10 @@ class CustomFieldController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create constant custom field'))
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        )
         {
 
             $validator = \Validator::make(
@@ -86,7 +95,10 @@ class CustomFieldController extends Controller
 
     public function edit(CustomField $customField)
     {
-        if(\Auth::user()->can('edit constant custom field'))
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        )
         {
             if($customField->created_by == \Auth::user()->creatorId())
             {
@@ -109,7 +121,10 @@ class CustomFieldController extends Controller
 
     public function update(Request $request, CustomField $customField)
     {
-        if(\Auth::user()->can('edit constant custom field'))
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        )
         {
 
             if($customField->created_by == \Auth::user()->creatorId())
@@ -147,7 +162,10 @@ class CustomFieldController extends Controller
 
     public function destroy(CustomField $customField)
     {
-        if(\Auth::user()->can('delete constant custom field'))
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        )
         {
             if($customField->created_by == \Auth::user()->creatorId())
             {

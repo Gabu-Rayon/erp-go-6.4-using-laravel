@@ -35,7 +35,10 @@ class ProposalController extends Controller
 
     public function index(Request $request)
     {
-        if(\Auth::user()->can('manage proposal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
 
             $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -71,7 +74,10 @@ class ProposalController extends Controller
 
     public function create($customerId)
     {
-        if(\Auth::user()->can('create proposal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $customFields    = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'proposal')->get();
             $proposal_number = \Auth::user()->proposalNumberFormat($this->proposalNumber());
@@ -118,7 +124,10 @@ class ProposalController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create proposal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -192,7 +201,10 @@ class ProposalController extends Controller
     public function edit($ids)
     {
 
-        if(\Auth::user()->can('edit proposal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             try {
                 $id              = Crypt::decrypt($ids);
@@ -229,7 +241,10 @@ class ProposalController extends Controller
 
     public function update(Request $request, Proposal $proposal)
     {
-        if(\Auth::user()->can('edit proposal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             if($proposal->created_by == \Auth::user()->creatorId())
             {
@@ -306,7 +321,11 @@ class ProposalController extends Controller
 
     public function show($ids)
     {
-        if(\Auth::user()->can('show proposal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'customer'
+        )
         {
             try {
                 $id       = Crypt::decrypt($ids);
@@ -340,7 +359,10 @@ class ProposalController extends Controller
 
     public function destroy(Proposal $proposal)
     {
-        if(\Auth::user()->can('delete proposal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             if($proposal->created_by == \Auth::user()->creatorId())
             {
@@ -363,7 +385,10 @@ class ProposalController extends Controller
     public function productDestroy(Request $request)
     {
 
-        if(\Auth::user()->can('delete proposal product'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             ProposalProduct::where('id', '=', $request->id)->delete();
 
@@ -377,7 +402,7 @@ class ProposalController extends Controller
 
     public function customerProposal(Request $request)
     {
-        if(\Auth::user()->can('manage customer proposal'))
+        if(\Auth::user()->type == 'customer')
         {
 
             $status = Proposal::$statues;
@@ -406,7 +431,11 @@ class ProposalController extends Controller
 
     public function customerProposalShow($ids)
     {
-        if(\Auth::user()->can('show proposal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'customer'
+        )
         {
             $proposal_id = \Crypt::decrypt($ids);
             $proposal    = Proposal::where('id', $proposal_id)->first();
@@ -430,7 +459,10 @@ class ProposalController extends Controller
 
     public function sent($id)
     {
-        if(\Auth::user()->can('send proposal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $proposal            = Proposal::where('id', $id)->first();
             $proposal->send_date = date('Y-m-d');
@@ -477,7 +509,10 @@ class ProposalController extends Controller
 
     public function resent($id)
     {
-        if(\Auth::user()->can('send proposal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $proposal = Proposal::where('id', $id)->first();
 
@@ -539,7 +574,10 @@ class ProposalController extends Controller
 
     public function duplicate($proposal_id)
     {
-        if(\Auth::user()->can('duplicate proposal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $proposal                       = Proposal::where('id', $proposal_id)->first();
             $duplicateProposal              = new Proposal();
@@ -578,7 +616,10 @@ class ProposalController extends Controller
 
     public function convert($proposal_id)
     {
-        if(\Auth::user()->can('convert invoice'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $proposal             = Proposal::where('id', $proposal_id)->first();
             $proposal->is_convert = 1;

@@ -19,7 +19,10 @@ class PaymentController extends Controller
 
     public function index(Request $request)
     {
-        if (\Auth::user()->can('manage payment')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $vender->prepend('Select Vendor', '');
 
@@ -65,7 +68,10 @@ class PaymentController extends Controller
 
     public function create()
     {
-        if (\Auth::user()->can('create payment')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $venders = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $venders->prepend('--', 0);
 
@@ -89,7 +95,10 @@ class PaymentController extends Controller
 
     public function store(Request $request)
     {
-        if (\Auth::user()->can('create payment')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
 
             $validator = \Validator::make(
                 $request->all(), [
@@ -210,7 +219,10 @@ class PaymentController extends Controller
     public function edit(Payment $payment)
     {
 
-        if (\Auth::user()->can('edit payment')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $venders = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $venders->prepend('--', 0);
 
@@ -234,7 +246,10 @@ class PaymentController extends Controller
 
     public function update(Request $request, Payment $payment)
     {
-        if (\Auth::user()->can('edit payment')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
 
             $validator = \Validator::make(
                 $request->all(), [
@@ -327,7 +342,10 @@ class PaymentController extends Controller
 
     public function destroy(Payment $payment)
     {
-        if (\Auth::user()->can('delete payment')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             if ($payment->created_by == \Auth::user()->creatorId()) {
                 if (!empty($payment->add_receipt)) {
                     //storage limit

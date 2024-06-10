@@ -20,7 +20,7 @@ class ContractController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage contract'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
         {
 
             if(\Auth::user()->type=='company')
@@ -92,7 +92,7 @@ class ContractController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create contract'))
+        if(\Auth::user()->type == 'company')
         {
             $rules = [
                 'client_name' => 'required',
@@ -194,7 +194,7 @@ class ContractController extends Controller
 
     public function show($id)
     {
-        if(\Auth::user()->can('show contract'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'client')
         {
             $contract =Contract::find($id);
 
@@ -228,7 +228,7 @@ class ContractController extends Controller
 
     public function update(Request $request, Contract $contract)
     {
-        if(\Auth::user()->can('edit contract'))
+        if(\Auth::user()->type == 'company')
         {
             $rules = [
                 'client_name' => 'required',
@@ -270,7 +270,7 @@ class ContractController extends Controller
 
     public function destroy(Contract $contract)
     {
-        if(\Auth::user()->can('delete contract'))
+        if(\Auth::user()->type == 'company')
         {
             $contract->delete();
 

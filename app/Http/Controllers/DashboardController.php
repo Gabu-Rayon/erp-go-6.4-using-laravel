@@ -87,7 +87,10 @@ class DashboardController extends Controller
             } elseif (Auth::user()->type == 'client') {
                 return redirect()->route('client.dashboard.view');
             } else {
-                if (\Auth::user()->can('show account dashboard')) {
+                if(
+                    \Auth::user()->type == 'company'
+                    || \Auth::user()->type == 'accountant'
+                ) {
                     $data['latestIncome'] = Revenue::with(['customer'])->where('created_by', '=', \Auth::user()->creatorId())->orderBy('id', 'desc')->limit(5)->get();
                     $data['latestExpense'] = Payment::with(['vender'])->where('created_by', '=', \Auth::user()->creatorId())->orderBy('id', 'desc')->limit(5)->get();
                     $currentYer = date('Y');
@@ -183,7 +186,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        if (\Auth::user()->can('show project dashboard')) {
+        if (\Auth::user()->type == 'company') {
             if ($user->type == 'admin') {
                 return view('admin.dashboard');
             } else {
@@ -275,7 +278,7 @@ class DashboardController extends Controller
 
         if (Auth::check()) {
 
-            if (\Auth::user()->can('show hrm dashboard')) {
+            if (\Auth::user()->type == 'company'){
 
                 $user = Auth::user();
 
@@ -396,7 +399,7 @@ class DashboardController extends Controller
     public function crm_dashboard_index()
     {
         $user = Auth::user();
-        if (\Auth::user()->can('show crm dashboard')) {
+        if (\Auth::user()->type == 'company') {
             if ($user->type == 'admin') {
                 return view('admin.dashboard');
             } else {
@@ -457,7 +460,7 @@ class DashboardController extends Controller
     public function pos_dashboard_index()
     {
         $user = Auth::user();
-        if (\Auth::user()->can('show pos dashboard')) {
+        if (\Auth::user()->type == 'company') {
             if ($user->type == 'admin') {
                 return view('admin.dashboard');
             } else {
@@ -528,7 +531,10 @@ class DashboardController extends Controller
                 $y = date("Y");
                 $format = 'Y-m-d';
                 $user = \Auth::user();
-                if (\Auth::user()->can('View Task')) {
+                if (
+                    \Auth::user()->type == 'company'
+                    || \Auth::user()->type == 'client'
+                ) {
                     $company_setting = Utility::settings();
                 }
                 $arrTemp = [];

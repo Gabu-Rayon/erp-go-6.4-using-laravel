@@ -16,7 +16,10 @@ class TimesheetController extends Controller
     public function timesheetView(Request $request, $project_id)
     {
         $authuser = Auth::user();
-        if(\Auth::user()->can('manage timesheet'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        )
         {
             $project_ids = $authuser->projects()->pluck('project_id')->toArray();
 
@@ -185,7 +188,7 @@ class TimesheetController extends Controller
 
     public function timesheetCreate(Request $request)
     {
-        if(\Auth::user()->can('create timesheet'))
+        if(\Auth::user()->type == 'company')
         {
             $parseArray = [];
 
@@ -257,7 +260,7 @@ class TimesheetController extends Controller
 
     public function timesheetStore(Request $request)
     {
-        if(\Auth::user()->can('create timesheet'))
+        if(\Auth::user()->type == 'company')
         {
             $authuser = Auth::user();
             $project  = Project::find($request->project_id);
@@ -299,7 +302,7 @@ class TimesheetController extends Controller
 
     public function timesheetEdit(Request $request, $project_id, $timesheet_id)
     {
-        if(\Auth::user()->can('edit timesheet'))
+        if(\Auth::user()->type == 'company')
         {
             $authuser = Auth::user();
 
@@ -374,7 +377,7 @@ class TimesheetController extends Controller
 
     public function timesheetUpdate(Request $request, $timesheet_id)
     {
-        if(\Auth::user()->can('edit timesheet'))
+        if(\Auth::user()->type == 'company')
         {
             $project = Project::find($request->project_id);
 
@@ -414,7 +417,7 @@ class TimesheetController extends Controller
 
     public function timesheetDestroy($timesheet_id)
     {
-        if(\Auth::user()->can('delete timesheet'))
+        if(\Auth::user()->type == 'company')
         {
             $timesheet = Timesheet::find($timesheet_id);
 

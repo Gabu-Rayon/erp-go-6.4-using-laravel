@@ -442,7 +442,7 @@ class PurchaseController extends Controller
     {
         \Log::info('Purchase synchronize button clicked to get all  the purchase lists from the Etims  ');
         
-        if(\Auth::user()->can('manage purchase')){
+        if(\Auth::user()->type == 'company'){
         try {
             // Check if the user is a company type
             if (\Auth::user()->type == 'company') {
@@ -985,7 +985,7 @@ class PurchaseController extends Controller
     public function show($ids)
     {
 
-        if (\Auth::user()->can('show purchase')) {
+        if(\Auth::user()->type == 'company'){
             try {
                 \Log::info('The Ecrypt when user click  show kids :');
                 
@@ -1041,7 +1041,7 @@ class PurchaseController extends Controller
 
     public function details($spplrInvcNo)
     {
-        if (\Auth::user()->can('show purchase')) {
+        if(\Auth::user()->type == 'company'){
             try {
                 $purchase = Purchase::where('spplrInvcNo', $spplrInvcNo)->first();
                 if ($purchase) {
@@ -1066,7 +1066,7 @@ class PurchaseController extends Controller
 
     public function edit($id)
     {
-        if (\Auth::user()->can('edit purchase')) {
+        if(\Auth::user()->type == 'company'){
             \Log::info('EDIT ID');
             \Log::info($id);
             $purchase = PurchaseProduct::find($id);
@@ -1087,7 +1087,7 @@ class PurchaseController extends Controller
     public function update(Request $request, PurchaseProduct $purchase)
     {
         try {
-            if (\Auth::user()->can('edit purchase')) {
+            if(\Auth::user()->type == 'company'){
                 \Log::info('Permitted');
                 \Log::info('Request: ');
                 \Log::info($request->all());
@@ -1109,7 +1109,7 @@ class PurchaseController extends Controller
      */
     public function destroy(Purchase $purchase)
     {
-        if (\Auth::user()->can('delete purchase')) {
+        if(\Auth::user()->type == 'company'){
             if ($purchase->created_by == \Auth::user()->creatorId()) {
                 $purchase_products = PurchaseProduct::where('purchase_id', $purchase->id)->get();
 
@@ -1177,7 +1177,7 @@ class PurchaseController extends Controller
     }
     public function sent($id)
     {
-        if (\Auth::user()->can('send purchase')) {
+        if(\Auth::user()->type == 'company'){
             $purchase = Purchase::where('id', $id)->first();
             $purchase->send_date = date('Y-m-d');
             $purchase->status = 1;
@@ -1210,7 +1210,7 @@ class PurchaseController extends Controller
     public function resent($id)
     {
 
-        if (\Auth::user()->can('send purchase')) {
+        if(\Auth::user()->type == 'company'){
             $purchase = Purchase::where('id', $id)->first();
 
             $vender = Vender::where('id', $purchase->vender_id)->first();
@@ -1557,7 +1557,7 @@ class PurchaseController extends Controller
     //Show the create Payment Form 
     public function payment($purchase_id)
     {
-        if (\Auth::user()->can('create payment purchase')) {
+        if(\Auth::user()->type == 'company'){
             $purchase = Purchase::where('id', $purchase_id)->first();
             $venders = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
@@ -1575,7 +1575,7 @@ class PurchaseController extends Controller
 
     public function createPayment(Request $request, $purchase_id)
     {
-        if (\Auth::user()->can('create payment purchase')) {
+        if(\Auth::user()->type == 'company'){
             $validator = \Validator::make(
                 $request->all(),
                 [
@@ -1676,7 +1676,7 @@ class PurchaseController extends Controller
     public function paymentDestroy(Request $request, $purchase_id, $payment_id)
     {
 
-        if (\Auth::user()->can('delete payment purchase')) {
+        if(\Auth::user()->type == 'company'){
             $payment = PurchasePayment::find($payment_id);
             PurchasePayment::where('id', '=', $payment_id)->delete();
 
@@ -1729,7 +1729,7 @@ class PurchaseController extends Controller
     public function productDestroy(Request $request)
     {
 
-        if (\Auth::user()->can('delete purchase')) {
+        if(\Auth::user()->type == 'company'){
 
             $res = PurchaseProduct::where('id', '=', $request->id)->first();
             //            $res1 = PurchaseProduct::where('purchase_id', '=', $res->purchase_id)->where('product_id', '=', $res->product_id)->get();
@@ -1798,7 +1798,7 @@ class PurchaseController extends Controller
             // Log received request data
             \Log::info('Received request data From Mapping Purchases:', $request->all());
 
-            if (\Auth::user()->can('create purchase')) {
+            if(\Auth::user()->type == 'company'){
                 $rules = [
                     'supplierInvcNo' => 'required',
                     'purchaseTypeCode' => 'required',
@@ -1909,7 +1909,7 @@ class PurchaseController extends Controller
 
     public function MapPurchasesDetails($mappedPurchaseId)
     {
-        if (\Auth::user()->can('show purchase')) {
+        if(\Auth::user()->type == 'company'){
             try {
                 $mappedpurchase = mappedPurchases::where('mappedPurchaseId', $mappedPurchaseId)->first();
                 if ($mappedpurchase) {

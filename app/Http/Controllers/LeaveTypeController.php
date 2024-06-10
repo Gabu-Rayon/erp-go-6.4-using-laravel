@@ -9,7 +9,7 @@ class LeaveTypeController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage leave type'))
+        if(\Auth::user()->type == 'company')
         {
             $leavetypes = LeaveType::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -24,7 +24,7 @@ class LeaveTypeController extends Controller
     public function create()
     {
 
-        if(\Auth::user()->can('create leave type'))
+        if(\Auth::user()->type == 'company')
         {
             return view('leavetype.create');
         }
@@ -37,7 +37,7 @@ class LeaveTypeController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create leave type'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -75,7 +75,7 @@ class LeaveTypeController extends Controller
 
     public function edit(LeaveType $leavetype)
     {
-        if(\Auth::user()->can('edit leave type'))
+        if(\Auth::user()->type == 'company')
         {
             if($leavetype->created_by == \Auth::user()->creatorId())
             {
@@ -95,7 +95,7 @@ class LeaveTypeController extends Controller
 
     public function update(Request $request, LeaveType $leavetype)
     {
-        if(\Auth::user()->can('edit leave type'))
+        if(\Auth::user()->type == 'company')
         {
             if($leavetype->created_by == \Auth::user()->creatorId())
             {
@@ -132,7 +132,7 @@ class LeaveTypeController extends Controller
 
     public function destroy(LeaveType $leavetype)
     {
-        if(\Auth::user()->can('delete leave type'))
+        if(\Auth::user()->type == 'company')
         {
             if($leavetype->created_by == \Auth::user()->creatorId())
             {

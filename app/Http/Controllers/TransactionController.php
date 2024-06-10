@@ -15,7 +15,10 @@ class TransactionController extends Controller
     public function index(Request $request)
     {
 
-        if(\Auth::user()->can('manage transaction'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
 
             $filter['account']  = __('All');

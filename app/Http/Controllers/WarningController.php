@@ -14,7 +14,7 @@ class WarningController extends Controller
     public function index()
     
     {
-        if(\Auth::user()->can('manage warning'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'Employee')
             {
@@ -36,7 +36,7 @@ class WarningController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create warning'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'Employee')
             {
@@ -61,7 +61,7 @@ class WarningController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create warning'))
+        if(\Auth::user()->type == 'company')
         {
             if(\Auth::user()->type != 'employee')
             {
@@ -138,7 +138,7 @@ class WarningController extends Controller
     public function edit(Warning $warning)
     {
 
-        if(\Auth::user()->can('edit warning'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'Employee')
             {
@@ -169,7 +169,7 @@ class WarningController extends Controller
 
     public function update(Request $request, Warning $warning)
     {
-        if(\Auth::user()->can('edit warning'))
+        if(\Auth::user()->type == 'company')
         {
             if($warning->created_by == \Auth::user()->creatorId())
             {
@@ -228,7 +228,7 @@ class WarningController extends Controller
 
     public function destroy(Warning $warning)
     {
-        if(\Auth::user()->can('delete warning'))
+        if(\Auth::user()->type == 'company')
         {
             if($warning->created_by == \Auth::user()->creatorId())
             {

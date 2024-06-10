@@ -15,7 +15,7 @@ class ProjectExpenseController extends Controller
      */
     public function index($project_id)
     {
-        if(\Auth::user()->can('manage project expense'))
+        if(\Auth::user()->type == 'company')
         {
             $project     = Project::find($project_id);
             $amount      = $project->expense->sum('amount');
@@ -34,7 +34,7 @@ class ProjectExpenseController extends Controller
      */
     public function create($project_id)
     {
-        if(\Auth::user()->can('create project expense'))
+        if(\Auth::user()->type == 'company')
         {
             $project = Project::find($project_id);
 
@@ -51,7 +51,7 @@ class ProjectExpenseController extends Controller
      */
     public function store(Request $request, $project_id)
     {
-        if(\Auth::user()->can('create project expense'))
+        if(\Auth::user()->type == 'company')
         {
             $usr       = \Auth::user();
             $validator = Validator::make(
@@ -111,7 +111,7 @@ class ProjectExpenseController extends Controller
      */
     public function edit($project_id, $expense_id)
     {
-        if(\Auth::user()->can('edit expense'))
+        if(\Auth::user()->type == 'company')
         {
             $project = Project::find($project_id);
             $expense = ProjectExpense::find($expense_id);
@@ -129,7 +129,7 @@ class ProjectExpenseController extends Controller
      */
     public function update(Request $request, $project_id, $expense_id)
     {
-        if(\Auth::user()->can('edit project expense'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = Validator::make(
                 $request->all(), [
@@ -174,7 +174,7 @@ class ProjectExpenseController extends Controller
      */
     public function destroy($expense_id)
     {
-        if(\Auth::user()->can('delete project expense'))
+        if(\Auth::user()->type == 'company')
         {
             $expense = ProjectExpense::find($expense_id);
             Utility::checkFileExistsnDelete([$expense->attachment]);

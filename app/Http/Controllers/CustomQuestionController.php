@@ -10,7 +10,7 @@ class CustomQuestionController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage custom question'))
+        if(\Auth::user()->type == 'company')
         {
             $questions = CustomQuestion::where('created_by', \Auth::user()->creatorId())->get();
 
@@ -31,7 +31,7 @@ class CustomQuestionController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create custom question'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -72,7 +72,7 @@ class CustomQuestionController extends Controller
 
     public function update(Request $request, CustomQuestion $customQuestion)
     {
-        if(\Auth::user()->can('edit custom question'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -100,7 +100,7 @@ class CustomQuestionController extends Controller
 
     public function destroy(CustomQuestion $customQuestion)
     {
-        if(\Auth::user()->can('delete custom question'))
+        if(\Auth::user()->type == 'company')
         {
             $customQuestion->delete();
 

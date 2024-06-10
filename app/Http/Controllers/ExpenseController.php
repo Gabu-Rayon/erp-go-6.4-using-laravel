@@ -82,7 +82,11 @@ class ExpenseController extends Controller
     public function index(Request $request)
     {
 
-        if (\Auth::user()->can('manage bill')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
+        {
 
             $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $vender->prepend('Select Vendor', '');
@@ -121,7 +125,10 @@ class ExpenseController extends Controller
 
     public function create($Id)
     {
-        if (\Auth::user()->can('create bill')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'bill')->get();
             $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())
                 ->whereNotIn('type', ['product & service', 'income'])
@@ -166,7 +173,10 @@ class ExpenseController extends Controller
     public function store(Request $request)
     {
 
-        if (\Auth::user()->can('create bill')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
 
             $validator = \Validator::make(
                 $request->all(), [
@@ -413,7 +423,10 @@ class ExpenseController extends Controller
     public function show($ids)
     {
 
-        if (\Auth::user()->can('show bill')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             try {
                 $id = Crypt::decrypt($ids);
             } catch (\Throwable $th) {
@@ -476,7 +489,10 @@ class ExpenseController extends Controller
     public function edit($ids)
     {
 
-        if (\Auth::user()->can('edit bill')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             try {
                 $id = Crypt::decrypt($ids);
             } catch (\Throwable $th) {
@@ -559,7 +575,10 @@ class ExpenseController extends Controller
 
     public function update(Request $request, $id)
     {
-        if (\Auth::user()->can('edit bill')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $expense = Bill::find($id);
 
             if ($expense->created_by == \Auth::user()->creatorId()) {
@@ -862,7 +881,10 @@ class ExpenseController extends Controller
     public function productDestroy(Request $request)
     {
 
-        if (\Auth::user()->can('delete bill product')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $expenseProduct = BillProduct::find($request->id);
             $expense = Bill::find($expenseProduct->bill_id);
 

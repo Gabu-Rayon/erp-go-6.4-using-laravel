@@ -14,7 +14,10 @@ class ProductServiceCategoryController extends Controller
 {
     public function index()
     {
-        if (\Auth::user()->can('manage constant category')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->get();
 
             return view('productServiceCategory.index', compact('categories'));
@@ -24,7 +27,10 @@ class ProductServiceCategoryController extends Controller
     }
     public function create()
     {
-        if (\Auth::user()->can('create constant category')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){{
             $types = ProductServiceCategory::$catTypes;
             $type = ['' => 'Select Category Type'];
 
@@ -44,7 +50,10 @@ class ProductServiceCategoryController extends Controller
     public function store(Request $request)
     {
 
-        if (\Auth::user()->can('create constant category')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){{
 
             $validator = \Validator::make(
                 $request->all(),
@@ -77,7 +86,10 @@ class ProductServiceCategoryController extends Controller
     public function edit($id)
     {
 
-        if (\Auth::user()->can('edit constant category')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){{
             $types = ProductServiceCategory::$catTypes;
             $category = ProductServiceCategory::find($id);
 
@@ -90,7 +102,10 @@ class ProductServiceCategoryController extends Controller
     public function update(Request $request, $id)
     {
 
-        if (\Auth::user()->can('edit constant category')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){{
             $category = ProductServiceCategory::find($id);
             if ($category->created_by == \Auth::user()->creatorId()) {
                 $validator = \Validator::make(
@@ -124,7 +139,10 @@ class ProductServiceCategoryController extends Controller
 
     public function destroy($id)
     {
-        if (\Auth::user()->can('delete constant category')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){{
             $category = ProductServiceCategory::find($id);
             if ($category->created_by == \Auth::user()->creatorId()) {
 

@@ -58,7 +58,10 @@ class ReportController extends Controller
 
     public function incomeSummary(Request $request)
     {
-        if (\Auth::user()->can('income report')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $account = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('holder_name', 'id');
             $account->prepend('All', '');
             $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -290,7 +293,10 @@ class ReportController extends Controller
 
     public function expenseSummary(Request $request)
     {
-        if (\Auth::user()->can('expense report')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $account = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('holder_name', 'id');
             $account->prepend('Select Account', '');
             $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -510,7 +516,10 @@ class ReportController extends Controller
 
     public function incomeVsExpenseSummary(Request $request)
     {
-        if (\Auth::user()->can('income vs expense report')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $account = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('holder_name', 'id');
             $account->prepend('Select Account', '');
             $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -780,7 +789,10 @@ class ReportController extends Controller
     public function taxSummary(Request $request)
     {
 
-        if (\Auth::user()->can('tax report')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $data['monthList'] = $month = $this->yearMonth();
             $data['yearList'] = $this->yearList();
             $data['taxList'] = $taxList = Tax::where('created_by', \Auth::user()->creatorId())->get();
@@ -977,7 +989,10 @@ class ReportController extends Controller
     public function invoiceSummary(Request $request)
     {
 
-        if (\Auth::user()->can('invoice report')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $filter['customer'] = __('All');
             $filter['status'] = __('All');
 
@@ -1045,7 +1060,10 @@ class ReportController extends Controller
     public function billSummary(Request $request)
     {
 //        dd($request->all());
-        if (\Auth::user()->can('bill report')) {
+if(
+    \Auth::user()->type == 'company'
+    || \Auth::user()->type == 'accountant'
+){
 
             $filter['vender'] = __('All');
             $filter['status'] = __('All');
@@ -1113,7 +1131,10 @@ class ReportController extends Controller
 
     public function accountStatement(Request $request)
     {
-        if (\Auth::user()->can('statement report')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
 
             $filter['account'] = __('All');
             $filter['type'] = __('Revenue');
@@ -1315,7 +1336,10 @@ class ReportController extends Controller
 
     public function balanceSheet(Request $request, $view = '', $collapseview = 'expand')
     {
-        if (\Auth::user()->can('bill report')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             if (!empty($request->start_date) && !empty($request->end_date)) {
                 $start = $request->start_date;
                 $end = $request->end_date;
@@ -1619,7 +1643,10 @@ class ReportController extends Controller
     public function ledgerSummary(Request $request, $account = '')
     {
 
-        if (\Auth::user()->can('ledger report')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
 
             if (!empty($request->start_date) && !empty($request->end_date)) {
                 $start = $request->start_date;
@@ -1791,7 +1818,10 @@ class ReportController extends Controller
 
     public function trialBalanceSummary(Request $request, $view = "expand")
     {
-        if (\Auth::user()->can('trial balance report')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
 
             if (!empty($request->start_date) && !empty($request->end_date)) {
                 $start = $request->start_date;
@@ -1982,7 +2012,7 @@ class ReportController extends Controller
     public function leave(Request $request)
     {
 
-        if (\Auth::user()->can('manage report')) {
+        if(\Auth::user()->type == 'company'){
 
             $branch = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $branch->prepend('Select Branch', '');
@@ -2084,7 +2114,7 @@ class ReportController extends Controller
 
     public function employeeLeave(Request $request, $employee_id, $status, $type, $month, $year)
     {
-        if (\Auth::user()->can('manage report')) {
+        if (\Auth::user()->type == 'company') {
             $leaveTypes = LeaveType::where('created_by', \Auth::user()->creatorId())->get();
             $leaves = [];
             foreach ($leaveTypes as $leaveType) {
@@ -2126,7 +2156,7 @@ class ReportController extends Controller
 
     public function monthlyAttendance(Request $request)
     {
-        if (\Auth::user()->can('manage report')) {
+        if (\Auth::user()->type == 'company') {
             $branch = Branch::where('created_by', '=', \Auth::user()->creatorId())->get();
             $department = Department::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -2235,7 +2265,7 @@ class ReportController extends Controller
     public function payroll(Request $request)
     {
 
-        if (\Auth::user()->can('manage report')) {
+        if (\Auth::user()->type == 'company') {
             $branch = Branch::where('created_by', '=', \Auth::user()->creatorId())->get();
             $department = Department::where('created_by', '=', \Auth::user()->creatorId())->get();
             $employees = Employee::select('id', 'name');
@@ -2469,7 +2499,10 @@ class ReportController extends Controller
 
     public function productStock(Request $request)
     {
-        if (\Auth::user()->can('stock report')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $stocks = StockReport::with(['product'])->where('created_by', '=', \Auth::user()->creatorId())->get();
             return view('report.product_stock_report', compact('stocks'));
         } else {
@@ -2833,7 +2866,7 @@ class ReportController extends Controller
 
     public function warehouseReport()
     {
-        if (\Auth::user()->can('manage pos')) {
+        if (\Auth::user()->type == 'company') {
             $warehouse = warehouse::where('created_by', \Auth::user()->id)->get();
             $totalWarehouse = warehouse::where('created_by', \Auth::user()->id)->count();
             $totalProduct = WarehouseProduct::where('created_by', '=', \Auth::user()->creatorId())->count();
@@ -2855,7 +2888,7 @@ class ReportController extends Controller
 
     public function purchaseDailyReport(Request $request)
     {
-        if (\Auth::user()->can('manage pos')) {
+        if (\Auth::user()->type == 'company') {
             //        dd($request->all());
             $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $warehouse->prepend('All Warehouse', 0);
@@ -2917,7 +2950,7 @@ class ReportController extends Controller
 
     public function purchaseMonthlyReport(Request $request)
     {
-        if (\Auth::user()->can('manage pos')) {
+        if (\Auth::user()->type == 'company') {
             $monthList = $this->yearMonth();
             $yearList = $this->yearList();
             $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -2975,7 +3008,7 @@ class ReportController extends Controller
 
     public function posDailyReport(Request $request)
     {
-        if (\Auth::user()->can('manage pos')) {
+        if (\Auth::user()->type == 'company') {
             $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $warehouse->prepend('All Warehouse', 0);
 
@@ -3039,7 +3072,7 @@ class ReportController extends Controller
 
     public function posMonthlyReport(Request $request)
     {
-        if (\Auth::user()->can('manage pos')) {
+        if (\Auth::user()->type == 'company') {
             $monthList = $this->yearMonth();
             $yearList = $this->yearList();
 
@@ -3098,7 +3131,7 @@ class ReportController extends Controller
 
     public function posVsPurchaseReport(Request $request)
     {
-        if (\Auth::user()->can('manage pos')) {
+        if (\Auth::user()->type == 'company') {
             $data['monthList'] = $month = $this->yearMonth();
             $data['yearList'] = $this->yearList();
 
@@ -3250,7 +3283,10 @@ class ReportController extends Controller
 
     public function profitLoss(Request $request, $view = '', $collapseView = 'expand')
     {
-        if (\Auth::user()->can('income vs expense report')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             if (!empty($request->start_date) && !empty($request->end_date)) {
                 $start = $request->start_date;
                 $end = $request->end_date;
@@ -3476,7 +3512,10 @@ class ReportController extends Controller
     }
     public function monthlyCashflow(Request $request)
     {
-        if (\Auth::user()->can('loss & profit report')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
 
             $data['monthList'] = $month = $this->yearMonth();
             $data['yearList'] = $this->yearList();
@@ -3723,7 +3762,10 @@ class ReportController extends Controller
     public function quarterlyCashflow(Request $request)
     {
 
-        if (\Auth::user()->can('loss & profit report')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $data['month'] = [
                 'Jan-Mar',
                 'Apr-Jun',
@@ -4494,7 +4536,10 @@ class ReportController extends Controller
     public function profitLossExport(Request $request)
     {
 
-        if (\Auth::user()->can('income vs expense report')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
 
             if (!empty($request->start_date) && !empty($request->end_date)) {
                 $start = $request->start_date;

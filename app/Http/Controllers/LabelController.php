@@ -25,7 +25,10 @@ class LabelController extends Controller
      */
     public function index()
     {
-        if(\Auth::user()->can('manage label'))
+        if(
+            \Auth::user()->type == 'client'
+            || \Auth::user()->type == 'company'
+        )
         {
             $labels   = Label::select('labels.*', 'pipelines.name as pipeline')->join('pipelines', 'pipelines.id', '=', 'labels.pipeline_id')->where('pipelines.created_by', '=', \Auth::user()->ownerId())->where('labels.created_by', '=', \Auth::user()->ownerId())->orderBy('labels.pipeline_id')->get();
             $label = Label::where('created_by',\Auth::user()->ownerId())->get();
@@ -57,7 +60,7 @@ class LabelController extends Controller
      */
     public function create()
     {
-        if(\Auth::user()->can('create label'))
+        if(\Auth::user()->type == 'company')
         {
             $pipelines = Pipeline::where('created_by', '=', \Auth::user()->ownerId())->get()->pluck('name', 'id');
             $colors = Label::$colors;
@@ -79,7 +82,7 @@ class LabelController extends Controller
      */
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create label'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -133,7 +136,7 @@ class LabelController extends Controller
      */
     public function edit(Label $label)
     {
-        if(\Auth::user()->can('edit label'))
+        if(\Auth::user()->type == 'company')
         {
             if($label->created_by == \Auth::user()->ownerId())
             {
@@ -163,7 +166,7 @@ class LabelController extends Controller
      */
     public function update(Request $request, Label $label)
     {
-        if(\Auth::user()->can('edit label'))
+        if(\Auth::user()->type == 'company')
         {
 
             if($label->created_by == \Auth::user()->ownerId())
@@ -211,7 +214,7 @@ class LabelController extends Controller
      */
     public function destroy(Label $label)
     {
-        if(\Auth::user()->can('delete label'))
+        if(\Auth::user()->type == 'company')
         {
             if($label->created_by == \Auth::user()->ownerId())
             {

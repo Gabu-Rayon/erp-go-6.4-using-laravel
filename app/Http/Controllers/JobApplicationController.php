@@ -32,7 +32,7 @@ class JobApplicationController extends Controller
     public function index(Request $request)
     {
 
-        if(\Auth::user()->can('manage job application'))
+        if(\Auth::user()->type == 'company')
         {
             $stages = JobStage::where('created_by', '=', \Auth::user()->creatorId())->orderBy('order', 'asc')->get();
 
@@ -88,7 +88,7 @@ class JobApplicationController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create job application'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -220,7 +220,7 @@ class JobApplicationController extends Controller
     public function show($ids)
     {
 
-        if(\Auth::user()->can('show job application'))
+        if(\Auth::user()->type == 'company')
         {
             $id             = Crypt::decrypt($ids);
             $jobApplication = JobApplication::find($id);
@@ -239,7 +239,7 @@ class JobApplicationController extends Controller
 
     public function destroy(JobApplication $jobApplication)
     {
-        if(\Auth::user()->can('delete job application'))
+        if(\Auth::user()->type == 'company')
         {
             $jobApplication->delete();
 
@@ -267,7 +267,7 @@ class JobApplicationController extends Controller
 
     public function order(Request $request)
     {
-        if(\Auth::user()->can('move job application'))
+        if(\Auth::user()->type == 'company')
         {
             $post = $request->all();
             foreach($post['order'] as $key => $item)
@@ -287,7 +287,7 @@ class JobApplicationController extends Controller
 
     public function addSkill(Request $request, $id)
     {
-        if(\Auth::user()->can('add job application skill'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -318,7 +318,7 @@ class JobApplicationController extends Controller
 
     public function addNote(Request $request, $id)
     {
-        if(\Auth::user()->can('add job application note'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -352,7 +352,7 @@ class JobApplicationController extends Controller
 
     public function destroyNote($id)
     {
-        if(\Auth::user()->can('delete job application note'))
+        if(\Auth::user()->type == 'company')
         {
             $note = JobApplicationNote::find($id);
             $note->delete();
@@ -396,7 +396,7 @@ class JobApplicationController extends Controller
 
     public function candidate()
     {
-        if(\Auth::user()->can('manage job onBoard'))
+        if(\Auth::user()->type == 'company')
         {
             $archive_application = JobApplication::where('created_by', \Auth::user()->creatorId())->where('is_archive', 1)->get();
 
@@ -424,7 +424,7 @@ class JobApplicationController extends Controller
 
     public function jobOnBoard()
     {
-        if(\Auth::user()->can('manage job onBoard'))
+        if(\Auth::user()->type == 'company')
         {
             $jobOnBoards = JobOnBoard::where('created_by', \Auth::user()->creatorId())->with('applications')->get();
 

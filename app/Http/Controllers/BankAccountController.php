@@ -18,7 +18,7 @@ class BankAccountController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('create bank account'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $accounts = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->with(['chartAccount'])->get();
 
@@ -32,7 +32,7 @@ class BankAccountController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create bank account'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $chartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(code, " - ", name) AS code_name, id'))
             ->where('parent', '=', 0)
@@ -59,7 +59,7 @@ class BankAccountController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create bank account'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
 
             $rules = [
@@ -107,7 +107,7 @@ class BankAccountController extends Controller
 
     public function edit(BankAccount $bankAccount)
     {
-        if(\Auth::user()->can('edit bank account'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             if($bankAccount->created_by == \Auth::user()->creatorId())
             {
@@ -142,7 +142,7 @@ class BankAccountController extends Controller
 
     public function update(Request $request, BankAccount $bankAccount)
     {
-        if(\Auth::user()->can('create bank account'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
 
             $rules = [
@@ -184,7 +184,7 @@ class BankAccountController extends Controller
 
     public function destroy(BankAccount $bankAccount)
     {
-        if(\Auth::user()->can('delete bank account'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             if($bankAccount->created_by == \Auth::user()->creatorId())
             {

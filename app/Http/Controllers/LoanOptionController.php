@@ -9,7 +9,7 @@ class LoanOptionController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage loan option'))
+        if(\Auth::user()->type == 'company')
         {
             $loanoptions = LoanOption::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -23,7 +23,7 @@ class LoanOptionController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create loan option'))
+        if(\Auth::user()->type == 'company')
         {
             return view('loanoption.create');
         }
@@ -35,7 +35,7 @@ class LoanOptionController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create loan option'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -69,7 +69,7 @@ class LoanOptionController extends Controller
 
     public function edit(LoanOption $loanoption)
     {
-        if(\Auth::user()->can('edit loan option'))
+        if(\Auth::user()->type == 'company')
         {
             if($loanoption->created_by == \Auth::user()->creatorId())
             {
@@ -89,7 +89,7 @@ class LoanOptionController extends Controller
 
     public function update(Request $request, LoanOption $loanoption)
     {
-        if(\Auth::user()->can('edit loan option'))
+        if(\Auth::user()->type == 'company')
         {
             if($loanoption->created_by == \Auth::user()->creatorId())
             {
@@ -123,7 +123,7 @@ class LoanOptionController extends Controller
 
     public function destroy(LoanOption $loanoption)
     {
-        if(\Auth::user()->can('delete loan option'))
+        if(\Auth::user()->type == 'company')
         {
             if($loanoption->created_by == \Auth::user()->creatorId())
             {

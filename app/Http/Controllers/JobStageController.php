@@ -9,7 +9,7 @@ class JobStageController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage job stage'))
+        if(\Auth::user()->type == 'company')
         {
             $stages = JobStage::where('created_by', '=', \Auth::user()->creatorId())->orderBy('order', 'asc')->get();
 
@@ -30,7 +30,7 @@ class JobStageController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create job stage'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -74,7 +74,7 @@ class JobStageController extends Controller
 
     public function update(Request $request, JobStage $jobStage)
     {
-        if(\Auth::user()->can('edit job stage'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -106,7 +106,7 @@ class JobStageController extends Controller
 
     public function destroy(JobStage $jobStage)
     {
-        if(\Auth::user()->can('delete job stage'))
+        if(\Auth::user()->type == 'company')
         {
             if($jobStage->created_by == \Auth::user()->creatorId())
             {

@@ -10,7 +10,7 @@ class GoalTypeController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage goal type'))
+        if(\Auth::user()->type == 'company')
         {
             $goaltypes = GoalType::where('created_by', '=', \Auth::user()->creatorId())->get();
             return view('goaltype.index', compact('goaltypes'));
@@ -24,7 +24,7 @@ class GoalTypeController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create goal type'))
+        if(\Auth::user()->type == 'company')
         {
             return view('goaltype.create');
         }
@@ -37,7 +37,7 @@ class GoalTypeController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create goal type'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -75,7 +75,7 @@ class GoalTypeController extends Controller
     public function edit($id)
     {
 
-        if(\Auth::user()->can('edit goal type'))
+        if(\Auth::user()->type == 'company')
         {
             $goalType = GoalType::find($id);
 
@@ -90,7 +90,7 @@ class GoalTypeController extends Controller
 
     public function update(Request $request, $id)
     {
-        if(\Auth::user()->can('edit goal type'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -118,7 +118,7 @@ class GoalTypeController extends Controller
 
     public function destroy($id)
     {
-        if(\Auth::user()->can('delete goal type'))
+        if(\Auth::user()->type == 'company')
         {
             $goalType = GoalType::find($id);
             if($goalType->created_by == \Auth::user()->creatorId())

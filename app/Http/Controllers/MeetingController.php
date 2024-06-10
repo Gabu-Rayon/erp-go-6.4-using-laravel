@@ -15,7 +15,7 @@ class MeetingController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage meeting'))
+        if(\Auth::user()->type == 'company')
         {
             $employees = Employee::get();
             if(Auth::user()->type == 'Employee')
@@ -45,7 +45,7 @@ class MeetingController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create meeting'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'Employee')
             {
@@ -86,7 +86,7 @@ class MeetingController extends Controller
             return redirect()->back()->with('error', $messages->first());
         }
 
-        if(\Auth::user()->can('create meeting'))
+        if(\Auth::user()->type == 'company')
         {
             $meeting                = new Meeting();
             $meeting->branch_id     = $request->branch_id;
@@ -181,7 +181,7 @@ class MeetingController extends Controller
 
     public function edit($meeting)
     {
-        if(\Auth::user()->can('edit meeting'))
+        if(\Auth::user()->type == 'company')
         {
             $meeting = Meeting::find($meeting);
             if($meeting->created_by == Auth::user()->creatorId())
@@ -210,7 +210,7 @@ class MeetingController extends Controller
 
     public function update(Request $request, Meeting $meeting)
     {
-        if(\Auth::user()->can('edit meeting'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -250,7 +250,7 @@ class MeetingController extends Controller
 
     public function destroy(Meeting $meeting)
     {
-        if(\Auth::user()->can('delete meeting'))
+        if(\Auth::user()->type == 'company')
         {
             if($meeting->created_by == \Auth::user()->creatorId())
             {
@@ -301,7 +301,7 @@ class MeetingController extends Controller
     public function calender(Request $request)
     {
 
-        if(\Auth::user()->can('manage meeting'))
+        if(\Auth::user()->type == 'company')
         {
             $transdate = date('Y-m-d', time());
 

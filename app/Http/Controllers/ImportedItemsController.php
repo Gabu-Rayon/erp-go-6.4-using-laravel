@@ -17,7 +17,7 @@ class ImportedItemsController extends Controller
      */
     public function index()
     {
-        if (\Auth::user()->can('show purchase')) {
+        if(\Auth::user()->type == 'company') {
             try {
                 $importedItems = ImportedItems::all();
                 return view('importeditems.index', compact('importedItems'));
@@ -33,7 +33,7 @@ class ImportedItemsController extends Controller
      */
     public function create()
     {
-        if (\Auth::user()->can('create purchase')) {
+        if(\Auth::user()->type == 'company') {
             $importedItems = ImportedItems::all()->pluck('itemName', 'taskCode');
             $items = ItemInformation::all()->pluck('itemNm', 'itemCd');
             $importItemStatusCode = ImportItemStatusCode::all()->pluck('code', 'KRA_Code');
@@ -49,7 +49,7 @@ class ImportedItemsController extends Controller
     public function store(Request $request)
     {
 
-        if (\Auth::user()->can('create purchase')) {
+        if(\Auth::user()->type == 'company') {
             try {
 
 
@@ -153,7 +153,7 @@ class ImportedItemsController extends Controller
     {
 
 
-        if (\Auth::user()->can('show purchase')) {
+        if(\Auth::user()->type == 'company') {
             $importedItem = ImportedItems::find($id);
             return view('importeditems.show', compact('importedItem'));
 
@@ -232,7 +232,7 @@ class ImportedItemsController extends Controller
      */
     public function edit(ImportedItems $importedItems)
     {
-        if (\Auth::user()->can('show purchase')) {
+        if(\Auth::user()->type == 'company') {
             //method code here
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
@@ -244,7 +244,7 @@ class ImportedItemsController extends Controller
      */
     public function update(Request $request, ImportedItems $importedItems)
     {
-        if (\Auth::user()->can('show purchase')) {
+        if(\Auth::user()->type == 'company') {
             //method code here  //method code here
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
@@ -256,7 +256,7 @@ class ImportedItemsController extends Controller
      */
     public function destroy(ImportedItems $importedItems)
     {
-        if (\Auth::user()->can('show purchase')) {
+        if(\Auth::user()->type == 'company') {
             //method code here
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));

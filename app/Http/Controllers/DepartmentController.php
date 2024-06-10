@@ -10,7 +10,7 @@ class DepartmentController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage department'))
+        if(\Auth::user()->type == 'company')
         {
             $departments = Department::where('created_by', '=', \Auth::user()->creatorId())->get();
             $branches = BranchesList::all();
@@ -26,7 +26,7 @@ class DepartmentController extends Controller
     public function create()
     {
         try {
-            if(\Auth::user()->can('create department'))
+            if(\Auth::user()->type == 'company')
             {
                 $branch = BranchesList::all()->pluck('bhfNm', 'bhfId');
 
@@ -44,7 +44,7 @@ class DepartmentController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create department'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -81,7 +81,7 @@ class DepartmentController extends Controller
 
     public function edit(Department $department)
     {
-        if(\Auth::user()->can('edit department'))
+        if(\Auth::user()->type == 'company')
         {
             if($department->created_by == \Auth::user()->creatorId())
             {
@@ -102,7 +102,7 @@ class DepartmentController extends Controller
 
     public function update(Request $request, Department $department)
     {
-        if(\Auth::user()->can('edit department'))
+        if(\Auth::user()->type == 'company')
         {
             if($department->created_by == \Auth::user()->creatorId())
             {
@@ -138,7 +138,7 @@ class DepartmentController extends Controller
 
     public function destroy(Department $department)
     {
-        if(\Auth::user()->can('delete department'))
+        if(\Auth::user()->type == 'company')
         {
             if($department->created_by == \Auth::user()->creatorId())
             {

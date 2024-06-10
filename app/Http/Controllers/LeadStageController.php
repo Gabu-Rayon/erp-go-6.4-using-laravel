@@ -26,7 +26,10 @@ class LeadStageController extends Controller
      */
     public function index()
     {
-        if(\Auth::user()->can('manage lead stage'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        )
         {
             $lead_stages = LeadStage::select('lead_stages.*', 'pipelines.name as pipeline')->join('pipelines', 'pipelines.id', '=', 'lead_stages.pipeline_id')->where('pipelines.created_by', '=', \Auth::user()->ownerId())->where('lead_stages.created_by', '=', \Auth::user()->ownerId())->orderBy('lead_stages.pipeline_id')->orderBy('lead_stages.order')->get();
             $pipelines   = [];
@@ -57,7 +60,7 @@ class LeadStageController extends Controller
      */
     public function create()
     {
-        if(\Auth::user()->can('create lead stage'))
+        if(\Auth::user()->type == 'company')
         {
             $pipelines = Pipeline::where('created_by', '=', \Auth::user()->ownerId())->get()->pluck('name', 'id');
 
@@ -78,7 +81,7 @@ class LeadStageController extends Controller
      */
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create lead stage'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -128,7 +131,7 @@ class LeadStageController extends Controller
      */
     public function edit(LeadStage $leadStage)
     {
-        if(\Auth::user()->can('edit lead stage'))
+        if(\Auth::user()->type == 'company')
         {
             if($leadStage->created_by == \Auth::user()->ownerId())
             {
@@ -157,7 +160,7 @@ class LeadStageController extends Controller
      */
     public function update(Request $request, LeadStage $leadStage)
     {
-        if(\Auth::user()->can('edit lead stage'))
+        if(\Auth::user()->type == 'company')
         {
 
             if($leadStage->created_by == \Auth::user()->ownerId())
@@ -203,7 +206,7 @@ class LeadStageController extends Controller
      */
     public function destroy(LeadStage $leadStage)
     {
-        if(\Auth::user()->can('delete lead stage'))
+        if(\Auth::user()->type == 'company')
         {
             $leadStage->delete();
 

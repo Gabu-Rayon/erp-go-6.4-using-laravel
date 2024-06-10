@@ -14,7 +14,7 @@ class PromotionController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage promotion'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'Employee')
             {
@@ -36,7 +36,7 @@ class PromotionController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create promotion'))
+        if(\Auth::user()->type == 'company')
         {
             $designations = Designation::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
             $employees    = Employee::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -51,7 +51,7 @@ class PromotionController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create promotion'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -116,7 +116,7 @@ class PromotionController extends Controller
     {
         $designations = Designation::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
         $employees    = Employee::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
-        if(\Auth::user()->can('edit promotion'))
+        if(\Auth::user()->type == 'company')
         {
             if($promotion->created_by == \Auth::user()->creatorId())
             {
@@ -135,7 +135,7 @@ class PromotionController extends Controller
 
     public function update(Request $request, Promotion $promotion)
     {
-        if(\Auth::user()->can('edit promotion'))
+        if(\Auth::user()->type == 'company')
         {
             if($promotion->created_by == \Auth::user()->creatorId())
             {
@@ -177,7 +177,7 @@ class PromotionController extends Controller
 
     public function destroy(Promotion $promotion)
     {
-        if(\Auth::user()->can('delete promotion'))
+        if(\Auth::user()->type == 'company')
         {
             if($promotion->created_by == \Auth::user()->creatorId())
             {

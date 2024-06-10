@@ -19,7 +19,7 @@ class FormBuilderController extends Controller
     public function index()
     {
         $usr = \Auth::user();
-        if($usr->can('manage form builder'))
+        if(\Auth::user()->type == 'company')
         {
             $forms = FormBuilder::where('created_by', '=', $usr->creatorId())->get();
 
@@ -39,7 +39,7 @@ class FormBuilderController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create form builder'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -72,7 +72,7 @@ class FormBuilderController extends Controller
 
     public function show(FormBuilder $formBuilder)
     {
-        if(\Auth::user()->can('manage form field'))
+        if(\Auth::user()->type == 'company')
         {
             if($formBuilder->created_by == \Auth::user()->creatorId())
             {
@@ -91,9 +91,9 @@ class FormBuilderController extends Controller
 
     public function edit(FormBuilder $formBuilder)
     {
-        if(\Auth::user()->can('edit form builder'))
+        if(\Auth::user()->type == 'company')
         {
-            if($formBuilder->created_by == Auth::user()->creatorId())
+            if($formBuilder->created_by == \Auth::user()->creatorId())
             {
                 return view('form_builder.edit', compact('formBuilder'));
             }
@@ -112,7 +112,7 @@ class FormBuilderController extends Controller
     public function update(Request $request, FormBuilder $formBuilder)
     {
         $usr = \Auth::user();
-        if($usr->can('edit form builder'))
+        if(\Auth::user()->type == 'company')
         {
             if($formBuilder->created_by == $usr->creatorId())
             {
@@ -150,7 +150,7 @@ class FormBuilderController extends Controller
 
     public function destroy(FormBuilder $formBuilder)
     {
-        if(Auth::user()->can('delete form builder'))
+        if(\Auth::user()->type == 'company')
         {
             if($formBuilder->created_by == \Auth::user()->ownerId())
             {
@@ -177,7 +177,7 @@ class FormBuilderController extends Controller
     public function fieldCreate($id)
     {
         $usr = \Auth::user();
-        if($usr->can('create form field'))
+        if(\Auth::user()->type == 'company')
         {
             $formbuilder = FormBuilder::find($id);
             if($formbuilder->created_by == $usr->creatorId())
@@ -200,7 +200,7 @@ class FormBuilderController extends Controller
     public function fieldStore($id, Request $request)
     {
         $usr = \Auth::user();
-        if($usr->can('create form field'))
+        if(\Auth::user()->type == 'company')
         {
             $formbuilder = FormBuilder::find($id);
             if($formbuilder->created_by == $usr->creatorId())
@@ -240,7 +240,7 @@ class FormBuilderController extends Controller
     public function fieldEdit($id, $field_id)
     {
         $usr = \Auth::user();
-        if($usr->can('edit form field'))
+        if(\Auth::user()->type == 'company')
         {
             $form = FormBuilder::find($id);
             if($form->created_by == $usr->creatorId())
@@ -272,7 +272,7 @@ class FormBuilderController extends Controller
     public function fieldUpdate($id, $field_id, Request $request)
     {
         $usr = \Auth::user();
-        if($usr->can('edit form field'))
+        if(\Auth::user()->type == 'company')
         {
             $form = FormBuilder::find($id);
             if($form->created_by == $usr->creatorId())
@@ -313,7 +313,7 @@ class FormBuilderController extends Controller
     public function fieldDestroy($id, $field_id)
     {
         $usr = \Auth::user();
-        if($usr->can('delete form field'))
+        if(\Auth::user()->type == 'company')
         {
             $form = FormBuilder::find($id);
             if($form->created_by == $usr->creatorId())
@@ -354,7 +354,7 @@ class FormBuilderController extends Controller
     // For Response
     public function viewResponse($form_id)
     {
-        if(Auth::user()->can('view form response'))
+        if(\Auth::user()->type == 'company')
         {
             $form = FormBuilder::find($form_id);
 
@@ -380,7 +380,7 @@ class FormBuilderController extends Controller
     // For Response Detail
     public function responseDetail($response_id)
     {
-        if(Auth::user()->can('view form response'))
+        if(\Auth::user()->type == 'company')
         {
             $formResponse = FormResponse::find($response_id);
             $form         = FormBuilder::find($formResponse->form_id);

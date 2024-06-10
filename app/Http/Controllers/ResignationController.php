@@ -14,7 +14,7 @@ class ResignationController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage resignation'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'Employee')
             {
@@ -36,7 +36,7 @@ class ResignationController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create resignation'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'company')
             {
@@ -57,7 +57,7 @@ class ResignationController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create resignation'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -131,7 +131,7 @@ class ResignationController extends Controller
 
     public function edit(Resignation $resignation)
     {
-        if(\Auth::user()->can('edit resignation'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'company')
             {
@@ -159,7 +159,7 @@ class ResignationController extends Controller
 
     public function update(Request $request, Resignation $resignation)
     {
-        if(\Auth::user()->can('edit resignation'))
+        if(\Auth::user()->type == 'company')
         {
             if($resignation->created_by == \Auth::user()->creatorId())
             {
@@ -205,7 +205,7 @@ class ResignationController extends Controller
 
     public function destroy(Resignation $resignation)
     {
-        if(\Auth::user()->can('delete resignation'))
+        if(\Auth::user()->type == 'company')
         {
             if($resignation->created_by == \Auth::user()->creatorId())
             {

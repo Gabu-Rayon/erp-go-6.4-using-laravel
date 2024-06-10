@@ -31,7 +31,7 @@ class BillController extends Controller
 
     public function index(Request $request)
     {
-        if(\Auth::user()->can('manage bill'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
 
             $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -78,7 +78,7 @@ class BillController extends Controller
     public function create($vendorId)
     {
 
-        if(\Auth::user()->can('create bill'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'bill')->get();
             $category     = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())
@@ -116,7 +116,7 @@ class BillController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create bill'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
 
             $validator = \Validator::make(
@@ -305,7 +305,11 @@ class BillController extends Controller
     public function show($ids)
     {
 
-        if(\Auth::user()->can('show bill'))
+        if(
+            \Auth::user()->type == 'company' ||
+            \Auth::user()->type == 'accountant' ||
+            \Auth::user()->type == 'vender'
+        )
         {
             try {
                 $id       = Crypt::decrypt($ids);
@@ -367,7 +371,7 @@ class BillController extends Controller
     public function edit($ids)
     {
 
-        if(\Auth::user()->can('edit bill'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             try {
                 $id       = Crypt::decrypt($ids);
@@ -446,7 +450,8 @@ class BillController extends Controller
     public function update(Request $request, Bill $bill)
     {
 
-        if (\Auth::user()->can('edit bill')) {
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
+        {
 
             if ($bill->created_by == \Auth::user()->creatorId()) {
                 $validator = \Validator::make(
@@ -609,7 +614,7 @@ class BillController extends Controller
 
     public function destroy(Bill $bill)
     {
-        if(\Auth::user()->can('delete bill'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             if($bill->created_by == \Auth::user()->creatorId())
             {
@@ -682,7 +687,7 @@ class BillController extends Controller
     public function productDestroy(Request $request)
     {
 
-        if(\Auth::user()->can('delete bill product'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $billProduct=BillProduct::find($request->id);
             $bill=Bill::find($billProduct->bill_id);
@@ -706,7 +711,7 @@ class BillController extends Controller
 
     public function sent($id)
     {
-        if(\Auth::user()->can('send bill'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $bill            = Bill::where('id', $id)->first();
             $bill->send_date = date('Y-m-d');
@@ -786,10 +791,6 @@ class BillController extends Controller
 
     public function resent($id)
     {
-//        if(\Auth::user()->can('send bill'))
-//        {
-
-            // Send Email
             $setings = Utility::settings();
 
             if($setings['bill_resent'] == 1)
@@ -812,17 +813,12 @@ class BillController extends Controller
             }
 
             return redirect()->back()->with('success', __('Bill successfully sent.') . (($resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
-//        }
-//        else
-//        {
-//            return redirect()->back()->with('error', __('Permission denied.'));
-//        }
 
     }
 
     public function payment($bill_id)
     {
-        if(\Auth::user()->can('create payment bill'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $bill    = Bill::where('id', $bill_id)->first();
             $venders = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -842,7 +838,7 @@ class BillController extends Controller
     public function createPayment(Request $request, $bill_id)
     {
 
-        if(\Auth::user()->can('create payment bill'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -991,7 +987,7 @@ class BillController extends Controller
     public function paymentDestroy(Request $request, $bill_id, $payment_id)
     {
 
-        if(\Auth::user()->can('delete payment bill'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $payment = BillPayment::find($payment_id);
             BillPayment::where('id', '=', $payment_id)->delete();
@@ -1040,7 +1036,7 @@ class BillController extends Controller
 
     public function venderBill(Request $request)
     {
-        if(\Auth::user()->can('manage vender bill'))
+        if(\Auth::user()->type == 'vender')
         {
 
             $status = Bill::$statues;
@@ -1074,7 +1070,11 @@ class BillController extends Controller
 
     public function venderBillShow($id)
     {
-        if(\Auth::user()->can('show bill'))
+        if(
+            \Auth::user()->type == 'company' ||
+            \Auth::user()->type == 'accountant' ||
+            \Auth::user()->type == 'vender'
+        )
         {
             $bill_id = Crypt::decrypt($id);
             $bill    = Bill::where('id', $bill_id)->first();
@@ -1166,7 +1166,7 @@ class BillController extends Controller
 
     public function duplicate($bill_id)
     {
-        if(\Auth::user()->can('duplicate bill'))
+        if(\Auth::user()->type == 'company')
         {
             $bill = Bill::where('id', $bill_id)->first();
 
