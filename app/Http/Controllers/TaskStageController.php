@@ -16,7 +16,7 @@ class TaskStageController extends Controller
      */
     public function index()
     {
-        if(\Auth::user()->can('manage project task stage'))
+        if(\Auth::user()->type == 'company')
         {
             $task_stages = TaskStage::where('created_by', '=', \Auth::user()->creatorId())->orderBy('order','asc')->get();
 
@@ -36,7 +36,7 @@ class TaskStageController extends Controller
      */
      public function storingValue(Request $request)
      {
-       if(\Auth::user()->can('create project task stage'))
+        if(\Auth::user()->type == 'company')
        {
          $validator = \Validator::make(
              $request->all(), [
@@ -62,7 +62,7 @@ class TaskStageController extends Controller
    }
     public function create()
     {
-      if(\Auth::user()->can('create project task stage'))
+        if(\Auth::user()->type == 'company')
       {
           return view('task_stage.create');
       }
@@ -81,7 +81,7 @@ class TaskStageController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create project task stage'))
+        if(\Auth::user()->type == 'company')
         {
             $rules = [
                 'stages' => 'required|present|array',
@@ -212,7 +212,7 @@ class TaskStageController extends Controller
     public function destroy(TaskStage $taskStage,$id)
     {
 
-        if(\Auth::user()->can('delete project task stage'))
+        if(\Auth::user()->type == 'company')
         {
             $taskstage = TaskStage::find($id);
             $taskstage->delete();

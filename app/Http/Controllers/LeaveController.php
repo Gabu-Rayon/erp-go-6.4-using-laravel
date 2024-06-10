@@ -15,7 +15,7 @@ class LeaveController extends Controller
     public function index()
     {
 
-        if(\Auth::user()->can('manage leave'))
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'Employee')
         {
             if(\Auth::user()->type == 'Employee')
             {
@@ -38,7 +38,7 @@ class LeaveController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create leave'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'Employee')
             {
@@ -62,7 +62,7 @@ class LeaveController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create leave'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -126,7 +126,7 @@ class LeaveController extends Controller
 
     public function edit(Leave $leave)
     {
-        if(\Auth::user()->can('edit leave'))
+        if(\Auth::user()->type == 'company')
         {
             if($leave->created_by == \Auth::user()->creatorId())
             {
@@ -150,7 +150,7 @@ class LeaveController extends Controller
     {
 
         $leave = Leave::find($leave);
-        if(\Auth::user()->can('edit leave'))
+        if(\Auth::user()->type == 'company')
         {
             if($leave->created_by == Auth::user()->creatorId())
             {
@@ -209,7 +209,7 @@ class LeaveController extends Controller
 
     public function destroy(Leave $leave)
     {
-        if(\Auth::user()->can('delete leave'))
+        if(\Auth::user()->type == 'company')
         {
             if($leave->created_by == \Auth::user()->creatorId())
             {

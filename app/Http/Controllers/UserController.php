@@ -199,8 +199,6 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-
-        if (\Auth::user()->can('edit user')) {
             if (\Auth::user()->type == 'super admin') {
                 $user = User::findOrFail($id);
                 $validator = \Validator::make(
@@ -262,16 +260,11 @@ class UserController extends Controller
                     'User successfully updated.'
                 );
             }
-        } else {
-            return redirect()->back();
-        }
     }
 
 
     public function destroy($id)
     {
-
-        if (\Auth::user()->can('delete user')) {
             $user = User::find($id);
             if ($user) {
                 if (\Auth::user()->type == 'super admin') {
@@ -300,9 +293,6 @@ class UserController extends Controller
             } else {
                 return redirect()->back()->with('error', __('Something is wrong.'));
             }
-        } else {
-            return redirect()->back();
-        }
     }
 
     public function profile()

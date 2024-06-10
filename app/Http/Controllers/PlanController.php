@@ -13,7 +13,10 @@ class PlanController extends Controller
     public function index()
     {
 
-        if (\Auth::user()->can('manage plan')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'super admin'
+        ){
             $plans = Plan::get();
             $admin_payment_setting = Utility::getAdminPaymentSetting();
 
@@ -26,7 +29,7 @@ class PlanController extends Controller
 
     public function create()
     {
-        if (\Auth::user()->can('create plan')) {
+        if(\Auth::user()->type == 'super admin'){
             $arrDuration = [
                 'lifetime' => __('Lifetime'),
                 'month' => __('Per Month'),
@@ -45,7 +48,7 @@ class PlanController extends Controller
 
 
 
-        if (\Auth::user()->can('create plan')) {
+        if(\Auth::user()->type == 'super admin'){
             $admin_payment_setting = Utility::getAdminPaymentSetting();
 
             if (
@@ -131,7 +134,7 @@ class PlanController extends Controller
 
     public function edit($plan_id)
     {
-        if (\Auth::user()->can('edit plan')) {
+        if(\Auth::user()->type == 'super admin'){
             $arrDuration = Plan::$arrDuration;
             $plan = Plan::find($plan_id);
 
@@ -146,7 +149,7 @@ class PlanController extends Controller
     {
 
 
-        if (\Auth::user()->can('edit plan')) {
+        if(\Auth::user()->type == 'super admin'){
 
             $admin_payment_setting = Utility::getAdminPaymentSetting();
 

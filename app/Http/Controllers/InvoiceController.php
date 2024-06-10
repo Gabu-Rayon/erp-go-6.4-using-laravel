@@ -44,7 +44,10 @@ class InvoiceController extends Controller
 
     public function index(Request $request)
     {
-        if (\Auth::user()->can('manage invoice')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customer->prepend('Select Customer', '');
             $status = Invoice::$statues;
@@ -75,7 +78,10 @@ class InvoiceController extends Controller
 
     public function create($customerId)
     {
-        if (\Auth::user()->can('create invoice')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
             $invoice_number = \Auth::user()->invoiceNumberFormat($this->invoiceNumber());
             $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -396,7 +402,10 @@ class InvoiceController extends Controller
         \Log::info('Invoice Data received From the Form:', $request->all());
 
         try {
-            if (\Auth::user()->can('create invoice')) {
+            if(
+                \Auth::user()->type == 'company'
+                || \Auth::user()->type == 'accountant'
+            ){
                 $validator = $this->validateInvoice($request);
                 if ($validator->fails()) {
                     $messages = $validator->getMessageBag();
@@ -787,7 +796,10 @@ class InvoiceController extends Controller
 
     public function edit($ids)
     {
-        if (\Auth::user()->can('edit invoice')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $id = Crypt::decrypt($ids);
             $invoice = Invoice::find($id);
             $invoice_number = \Auth::user()->invoiceNumberFormat($invoice->invoice_id);
@@ -807,7 +819,10 @@ class InvoiceController extends Controller
     public function update(Request $request, Invoice $invoice)
     {
 
-        if (\Auth::user()->can('edit invoice')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             if ($invoice->created_by == \Auth::user()->creatorId()) {
                 $validator = \Validator::make(
                     $request->all(),
@@ -928,7 +943,11 @@ class InvoiceController extends Controller
     public function show($ids)
     {
 
-        if (\Auth::user()->can('show invoice')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'customer'
+        ){
             try {
                 $id = Crypt::decrypt($ids);
             } catch (\Throwable $th) {
@@ -965,7 +984,10 @@ class InvoiceController extends Controller
 
     public function destroy(Invoice $invoice, Request $request)
     {
-        if (\Auth::user()->can('delete invoice')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             if ($invoice->created_by == \Auth::user()->creatorId()) {
                 foreach ($invoice->payments as $invoices) {
                     Utility::bankAccountBalance($invoices->account_id, $invoices->amount, 'debit');
@@ -1000,7 +1022,10 @@ class InvoiceController extends Controller
     public function productDestroy(Request $request)
     {
 
-        if (\Auth::user()->can('delete invoice product')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $invoiceProduct = InvoiceProduct::find($request->id);
 
             if ($invoiceProduct) {
@@ -1023,7 +1048,7 @@ class InvoiceController extends Controller
 
     public function customerInvoice(Request $request)
     {
-        if (\Auth::user()->can('manage customer invoice')) {
+        if (\Auth::user()->type == 'customer') {
 
             $status = Invoice::$statues;
             $query = Invoice::where('customer_id', '=', \Auth::user()->id)->where('status', '!=', '0')->where('created_by', \Auth::user()->creatorId());
@@ -1067,7 +1092,10 @@ class InvoiceController extends Controller
     public function sent($id)
     {
 
-        if (\Auth::user()->can('send invoice')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             // Send Email
             $setings = Utility::settings();
 
@@ -1143,7 +1171,10 @@ class InvoiceController extends Controller
 
     public function resent($id)
     {
-        if (\Auth::user()->can('send invoice')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $invoice = Invoice::where('id', $id)->first();
 
             $customer = Customer::where('id', $invoice->customer_id)->first();
@@ -1172,7 +1203,10 @@ class InvoiceController extends Controller
 
     public function payment($invoice_id)
     {
-        if (\Auth::user()->can('create payment invoice')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $invoice = Invoice::where('id', $invoice_id)->first();
 
             $customers = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -1192,7 +1226,10 @@ class InvoiceController extends Controller
             return redirect()->back()->with('error', __('Invoice payment amount should not greater than subtotal.'));
         }
 
-        if (\Auth::user()->can('create payment invoice')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $validator = \Validator::make(
                 $request->all(),
                 [
@@ -1320,7 +1357,10 @@ class InvoiceController extends Controller
     {
         //        dd($invoice_id,$payment_id);
 
-        if (\Auth::user()->can('delete payment invoice')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $payment = InvoicePayment::find($payment_id);
 
             InvoicePayment::where('id', '=', $payment_id)->delete();
@@ -1468,7 +1508,7 @@ class InvoiceController extends Controller
 
     public function duplicate($invoice_id)
     {
-        if (\Auth::user()->can('duplicate invoice')) {
+        if (\Auth::user()->type == 'company') {
             $invoice = Invoice::where('id', $invoice_id)->first();
             $duplicateInvoice = new Invoice();
             $duplicateInvoice->invoice_id = $this->invoiceNumber();

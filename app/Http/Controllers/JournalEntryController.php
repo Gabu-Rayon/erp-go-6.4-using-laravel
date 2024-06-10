@@ -15,7 +15,10 @@ class JournalEntryController extends Controller
 
     public function index()
     {
-        if (\Auth::user()->can('manage journal entry')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $journalEntries = JournalEntry::where('created_by', '=', \Auth::user()->creatorId())->get();
 
             return view('journalEntry.index', compact('journalEntries'));
@@ -26,7 +29,10 @@ class JournalEntryController extends Controller
 
     public function create()
     {
-        if (\Auth::user()->can('create journal entry')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $chartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name,chart_of_accounts.id, chart_of_accounts.code,  chart_of_accounts.parent'))
                 ->where('parent', '=', 0)
                 ->where('created_by', \Auth::user()->creatorId())->get()
@@ -49,7 +55,10 @@ class JournalEntryController extends Controller
     public function store(Request $request)
     {
 
-        if (\Auth::user()->can('create invoice')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $validator = \Validator::make(
                 $request->all(), [
                     'date' => 'required',
@@ -143,7 +152,10 @@ class JournalEntryController extends Controller
 
     public function show(JournalEntry $journalEntry)
     {
-        if (\Auth::user()->can('show journal entry')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             if ($journalEntry->created_by == \Auth::user()->creatorId()) {
                 $accounts = $journalEntry->accounts;
                 $settings = Utility::settings();
@@ -159,7 +171,10 @@ class JournalEntryController extends Controller
 
     public function edit(JournalEntry $journalEntry)
     {
-        if (\Auth::user()->can('edit journal entry')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $chartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name,chart_of_accounts.id, chart_of_accounts.code,  chart_of_accounts.parent'))
                 ->where('parent', '=', 0)
                 ->where('created_by', \Auth::user()->creatorId())->get()
@@ -179,7 +194,10 @@ class JournalEntryController extends Controller
 
     public function update(Request $request, JournalEntry $journalEntry)
     {
-        if (\Auth::user()->can('edit journal entry')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             if ($journalEntry->created_by == \Auth::user()->creatorId()) {
                 $validator = \Validator::make(
                     $request->all(), [
@@ -284,7 +302,10 @@ class JournalEntryController extends Controller
     public function destroy(JournalEntry $journalEntry)
     {
 
-        if (\Auth::user()->can('delete journal entry')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             if ($journalEntry->created_by == \Auth::user()->creatorId()) {
                 $journalEntry->delete();
 
@@ -314,7 +335,10 @@ class JournalEntryController extends Controller
     public function accountDestroy(Request $request)
     {
 
-        if (\Auth::user()->can('delete journal entry')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             JournalItem::where('id', '=', $request->id)->delete();
 
             return redirect()->back()->with('success', __('Journal entry account successfully deleted.'));
@@ -325,7 +349,10 @@ class JournalEntryController extends Controller
 
     public function journalDestroy($item_id)
     {
-        if (\Auth::user()->can('delete journal entry')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $journal = JournalItem::find($item_id);
             $journal->delete();
 

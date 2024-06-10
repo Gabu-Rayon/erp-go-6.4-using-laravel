@@ -11,7 +11,7 @@ class ProjectstagesController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage project stage'))
+        if(\Auth::user()->type == 'company')
         {
             $projectstages = Projectstages::where('created_by', '=', \Auth::user()->creatorId())->orderBy('order')->get();
 
@@ -25,7 +25,7 @@ class ProjectstagesController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create project stage'))
+        if(\Auth::user()->type == 'company')
         {
             return view('projectstages.create');
         }
@@ -37,7 +37,7 @@ class ProjectstagesController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create project stage'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -69,7 +69,7 @@ class ProjectstagesController extends Controller
 
     public function edit($id)
     {
-        if(\Auth::user()->can('edit project stage'))
+        if(\Auth::user()->type == 'company')
         {
             $leadstages = Projectstages::findOrfail($id);
             if($leadstages->created_by == \Auth::user()->creatorId())
@@ -89,7 +89,7 @@ class ProjectstagesController extends Controller
 
     public function update(Request $request, $id)
     {
-        if(\Auth::user()->can('edit project stage'))
+        if(\Auth::user()->type == 'company')
         {
             $leadstages = Projectstages::findOrfail($id);
             if($leadstages->created_by == \Auth::user()->creatorId())
@@ -128,7 +128,7 @@ class ProjectstagesController extends Controller
     {
 
 
-        if(\Auth::user()->can('delete project stage'))
+        if(\Auth::user()->type == 'company')
         {
             $projectstages = Projectstages::findOrfail($id);
             if($projectstages->created_by == \Auth::user()->creatorId())

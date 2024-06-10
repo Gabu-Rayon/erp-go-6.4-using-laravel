@@ -24,7 +24,10 @@ class SourceController extends Controller
      */
     public function index()
     {
-        if(\Auth::user()->can('manage source'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        )
         {
             $sources = Source::where('created_by', '=', \Auth::user()->ownerId())->get();
 
@@ -43,7 +46,7 @@ class SourceController extends Controller
      */
     public function create()
     {
-        if(\Auth::user()->can('create source'))
+        if(\Auth::user()->type == 'company')
         {
             return view('sources.create');
         }
@@ -62,7 +65,7 @@ class SourceController extends Controller
      */
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create source'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -112,7 +115,7 @@ class SourceController extends Controller
      */
     public function edit(Source $source)
     {
-        if(\Auth::user()->can('edit source'))
+        if(\Auth::user()->type == 'company')
         {
             if($source->created_by == \Auth::user()->ownerId())
             {
@@ -139,7 +142,7 @@ class SourceController extends Controller
      */
     public function update(Request $request, Source $source)
     {
-        if(\Auth::user()->can('edit source'))
+        if(\Auth::user()->type == 'company')
         {
             if($source->created_by == \Auth::user()->ownerId())
             {
@@ -181,7 +184,7 @@ class SourceController extends Controller
      */
     public function destroy(Source $source)
     {
-        if(\Auth::user()->can('delete source'))
+        if(\Auth::user()->type == 'company')
         {
             if($source->created_by == \Auth::user()->ownerId())
             {

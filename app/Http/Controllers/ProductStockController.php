@@ -17,7 +17,10 @@ class ProductStockController extends Controller
     public function index()
     {
 
-        if(\Auth::user()->can('manage product & service'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
 
             $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product')->get();
@@ -77,7 +80,10 @@ class ProductStockController extends Controller
     public function edit($id)
     {
         $productService = ProductService::find($id);
-        if(\Auth::user()->can('edit product & service'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             if($productService->created_by == \Auth::user()->creatorId())
             {
@@ -105,7 +111,10 @@ class ProductStockController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if(\Auth::user()->can('edit product & service'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $productService = ProductService::find($id);
             $total = $productService->quantity + $request->quantity;

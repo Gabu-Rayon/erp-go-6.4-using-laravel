@@ -19,7 +19,7 @@ class EventController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage event'))
+        if(\Auth::user()->type == 'company')
         {
             $employees = Employee::where('created_by', '=', \Auth::user()->creatorId())->get();
             $events    = LocalEvent::where('created_by', '=', \Auth::user()->creatorId())->get();
@@ -54,7 +54,7 @@ class EventController extends Controller
     public function create()
     {
         try {
-            if(\Auth::user()->can('create event'))
+            if(\Auth::user()->type == 'company')
             {
                 $employees   = Employee::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
                 $branch      = BranchesList::all()->pluck('bhfNm', 'id');
@@ -76,7 +76,7 @@ class EventController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create event'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -227,7 +227,7 @@ class EventController extends Controller
     public function update(Request $request, Event $event)
     {
 
-        if(\Auth::user()->can('edit event'))
+        if(\Auth::user()->type == 'company')
         {
             if($event->created_by == \Auth::user()->creatorId())
             {
@@ -270,7 +270,7 @@ class EventController extends Controller
     {
 
 
-        if(\Auth::user()->can('delete event'))
+        if(\Auth::user()->type == 'company')
         {
             if($event->created_by == \Auth::user()->creatorId())
             {

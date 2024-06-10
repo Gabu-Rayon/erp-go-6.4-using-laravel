@@ -9,7 +9,7 @@ class PayslipTypeController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage payslip type'))
+        if(\Auth::user()->type == 'company')
         {
             $paysliptypes = PayslipType::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -23,7 +23,7 @@ class PayslipTypeController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create payslip type'))
+        if(\Auth::user()->type == 'company')
         {
             return view('paysliptype.create');
         }
@@ -36,7 +36,7 @@ class PayslipTypeController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create payslip type'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -70,7 +70,7 @@ class PayslipTypeController extends Controller
 
     public function edit(PayslipType $paysliptype)
     {
-        if(\Auth::user()->can('edit payslip type'))
+        if(\Auth::user()->type == 'company')
         {
             if($paysliptype->created_by == \Auth::user()->creatorId())
             {
@@ -90,7 +90,7 @@ class PayslipTypeController extends Controller
 
     public function update(Request $request, PayslipType $paysliptype)
     {
-        if(\Auth::user()->can('edit payslip type'))
+        if(\Auth::user()->type == 'company')
         {
             if($paysliptype->created_by == \Auth::user()->creatorId())
             {
@@ -125,7 +125,7 @@ class PayslipTypeController extends Controller
 
     public function destroy(PayslipType $paysliptype)
     {
-        if(\Auth::user()->can('delete payslip type'))
+        if(\Auth::user()->type == 'company')
         {
             if($paysliptype->created_by == \Auth::user()->creatorId())
             {

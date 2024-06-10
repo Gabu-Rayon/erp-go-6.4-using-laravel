@@ -10,7 +10,10 @@ class GoalController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage goal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $golas = Goal::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -24,7 +27,10 @@ class GoalController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create goal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $types = Goal::$goalType;
 
@@ -39,7 +45,10 @@ class GoalController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create goal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -84,7 +93,10 @@ class GoalController extends Controller
 
     public function edit(Goal $goal)
     {
-        if(\Auth::user()->can('create goal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $types = Goal::$goalType;
 
@@ -99,7 +111,10 @@ class GoalController extends Controller
 
     public function update(Request $request, Goal $goal)
     {
-        if(\Auth::user()->can('edit goal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             if($goal->created_by == \Auth::user()->creatorId())
             {
@@ -143,7 +158,10 @@ class GoalController extends Controller
 
     public function destroy(Goal $goal)
     {
-        if(\Auth::user()->can('delete goal'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             if($goal->created_by == \Auth::user()->creatorId())
             {

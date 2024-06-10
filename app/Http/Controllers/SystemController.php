@@ -24,7 +24,7 @@ class SystemController extends Controller
 {
     public function index()
     {
-        if (\Auth::user()->can('manage system settings')) {
+        if(\Auth::user()->type == 'super admin'){
             $settings = Utility::settings();
             $admin_payment_setting = Utility::getAdminPaymentSetting();
             // $emailSetting = Utility::settingsById(\Auth::user()->id);
@@ -43,7 +43,7 @@ class SystemController extends Controller
     public function store(Request $request)
     {
 
-        if (\Auth::user()->can('manage system settings')) {
+        if(\Auth::user()->type == 'super admin') {
             if ($request->logo_dark) {
                 $logoName = 'logo-dark.png';
                 $dir = 'uploads/logo/';
@@ -151,7 +151,7 @@ class SystemController extends Controller
 
     public function saveEmailSettings(Request $request)
     {
-        if (\Auth::user()->can('manage system settings')) {
+        if(\Auth::user()->type == 'super admin') {
             $request->validate(
                 [
                     'mail_driver' => 'required|string|max:255',
@@ -232,7 +232,7 @@ class SystemController extends Controller
     public function saveCompanySettings(Request $request)
     {
 
-        if (\Auth::user()->can('manage company settings')) {
+        if(\Auth::user()->type == 'company'){
             $user = \Auth::user();
             $request->validate(
                 [
@@ -277,7 +277,7 @@ class SystemController extends Controller
     public function savePaymentSettings(Request $request)
     {
 
-        if (\Auth::user()->can('manage stripe settings')) {
+        if(\Auth::user()->type == 'super admin'){
             //dd($request);
 
             $validator = \Validator::make(
@@ -303,7 +303,7 @@ class SystemController extends Controller
     public function saveSystemSettings(Request $request)
     {
 
-        if (\Auth::user()->can('manage company settings')) {
+        if(\Auth::user()->type == 'company'){
             $user = \Auth::user();
             $request->validate(
                 [
@@ -363,7 +363,7 @@ class SystemController extends Controller
     public function saveBusinessSettings(Request $request)
     {
 
-        if (\Auth::user()->can('manage business settings')) {
+        if(\Auth::user()->type == 'company'){
             $post = $request->all();
 
             $user = \Auth::user();
@@ -484,7 +484,7 @@ class SystemController extends Controller
 
     public function companyIndex(Request $request)
     {
-        if (\Auth::user()->can('manage company settings')) {
+        if(\Auth::user()->type == 'company'){
 
             if ($request->offerlangs) {
                 $offerlang = $request->offerlangs;
@@ -1017,7 +1017,10 @@ class SystemController extends Controller
 
     public function printIndex()
     {
-        if (\Auth::user()->can('manage print settings')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $settings = Utility::settings();
 
             return view('settings.print', compact('settings'));
@@ -1028,7 +1031,7 @@ class SystemController extends Controller
 
     public function posPrintIndex()
     {
-        if (\Auth::user()->can('manage print settings')) {
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant'){
             $settings = Utility::settings();
 
             return view('settings.pos', compact('settings'));
@@ -1039,7 +1042,7 @@ class SystemController extends Controller
 
     public function quotationPrintIndex()
     {
-        if (\Auth::user()->can('manage print settings')) {
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant'){
             $settings = Utility::settings();
 
             return view('settings.pos', compact('settings'));
@@ -1883,7 +1886,7 @@ class SystemController extends Controller
     public function webhook()
     {
 
-        if (\Auth::user()->can('create webhook')) {
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
             $webhookSettings = WebhookSetting::where('created_by', '=', \Auth::user()->creatorId())->get();
 
             return redirect()->back()->with('success', __('Webhook successfully created.'));
@@ -1894,7 +1897,7 @@ class SystemController extends Controller
 
     public function webhookCreate()
     {
-        if (\Auth::user()->can('create webhook')) {
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
 
             $modules = WebhookSetting::$modules;
             $methods = WebhookSetting::$method;
@@ -1908,7 +1911,7 @@ class SystemController extends Controller
     public function webhookStore(Request $request)
     {
 
-        if (\Auth::user()->can('create webhook')) {
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
 
             $validator = \Validator::make(
                 $request->all(), [
@@ -1948,7 +1951,7 @@ class SystemController extends Controller
     public function webhookUpdate(Request $request, $id)
     {
 
-        if (\Auth::user()->can('edit webhook')) {
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
 
             $validator = \Validator::make(
                 $request->all(),
@@ -1978,7 +1981,7 @@ class SystemController extends Controller
 
     public function webhookDestroy($id)
     {
-        if (\Auth::user()->can('delete webhook')) {
+        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
             $webhookSetting = WebhookSetting::find($id);
             $webhookSetting->delete();
             return redirect()->back()->with('success', __('Webhook successfully deleted.'));
@@ -2181,7 +2184,7 @@ class SystemController extends Controller
 
     public function storeIp(Request $request)
     {
-        if (\Auth::user()->can('manage company settings')) {
+        if(\Auth::user()->type == 'company'){
             $validator = \Validator::make(
                 $request->all(),
                 [

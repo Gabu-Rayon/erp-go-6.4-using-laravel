@@ -13,7 +13,7 @@ class HolidayController extends Controller
 
     public function index(Request $request)
     {
-        if(\Auth::user()->can('manage holiday'))
+        if(\Auth::user()->type == 'company')
         {
             $holidays = Holiday::where('created_by', '=', \Auth::user()->creatorId());
             if(!empty($request->start_date))
@@ -37,7 +37,7 @@ class HolidayController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create holiday'))
+        if(\Auth::user()->type == 'company')
         {
             $settings = Utility::settings();
             return view('holiday.create',compact('settings'));
@@ -51,7 +51,7 @@ class HolidayController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create holiday'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -141,7 +141,7 @@ class HolidayController extends Controller
 
     public function edit(Holiday $holiday)
     {
-        if(\Auth::user()->can('edit holiday'))
+        if(\Auth::user()->type == 'company')
         {
             return view('holiday.edit', compact('holiday'));
         }
@@ -154,7 +154,7 @@ class HolidayController extends Controller
 
     public function update(Request $request, Holiday $holiday)
     {
-        if(\Auth::user()->can('edit holiday'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -186,7 +186,7 @@ class HolidayController extends Controller
 
     public function destroy(Holiday $holiday)
     {
-        if(\Auth::user()->can('delete holiday'))
+        if(\Auth::user()->type == 'company')
         {
             $holiday->delete();
 
@@ -202,7 +202,7 @@ class HolidayController extends Controller
     public function calender(Request $request)
     {
 
-        if(\Auth::user()->can('manage holiday'))
+        if(\Auth::user()->type == 'company')
         {
             $transdate = date('Y-m-d', time());
 

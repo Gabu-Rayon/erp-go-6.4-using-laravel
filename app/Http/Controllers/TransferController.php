@@ -17,7 +17,7 @@ class TransferController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage transfer'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'Employee')
             {
@@ -39,7 +39,7 @@ class TransferController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create transfer'))
+        if(\Auth::user()->type == 'company')
         {
             $departments = Department::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $branches    = BranchesList::all()->pluck('bhfNm', 'id');
@@ -56,7 +56,7 @@ class TransferController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create transfer'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -123,7 +123,7 @@ class TransferController extends Controller
 
     public function edit(Transfer $transfer)
     {
-        if(\Auth::user()->can('edit transfer'))
+        if(\Auth::user()->type == 'company')
         {
             $departments = Department::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $branches    = BranchesList::all()->pluck('bhfNm', 'id');
@@ -145,7 +145,7 @@ class TransferController extends Controller
 
     public function update(Request $request, Transfer $transfer)
     {
-        if(\Auth::user()->can('edit transfer'))
+        if(\Auth::user()->type == 'company')
         {
             if($transfer->created_by == \Auth::user()->creatorId())
             {
@@ -186,7 +186,7 @@ class TransferController extends Controller
 
     public function destroy(Transfer $transfer)
     {
-        if(\Auth::user()->can('delete transfer'))
+        if(\Auth::user()->type == 'company')
         {
             if($transfer->created_by == \Auth::user()->creatorId())
             {

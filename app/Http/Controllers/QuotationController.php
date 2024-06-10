@@ -25,7 +25,7 @@ class QuotationController extends Controller
      */
     public function index()
     {
-        if (Auth::user()->can('manage quotation'))
+        if(\Auth::user()->type == 'company')
         {
             $quotations      = Quotation::where('created_by', \Auth::user()->creatorId())->with(['customer','warehouse'])->get();
 
@@ -42,7 +42,7 @@ class QuotationController extends Controller
      */
     public function create()
     {
-        if(\Auth::user()->can('create quotation'))
+        if(\Auth::user()->type == 'company')
         {
             $customers     = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customers->prepend('Select Customer', '');
@@ -82,7 +82,7 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create quotation'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -139,7 +139,7 @@ class QuotationController extends Controller
     public function show($ids)
     {
 
-        if (\Auth::user()->can('show quotation') || \Auth::user()->type == 'company') {
+        if (|| \Auth::user()->type == 'company') {
             try {
                 $id = Crypt::decrypt($ids);
             } catch (\Throwable $th) {
@@ -169,7 +169,7 @@ class QuotationController extends Controller
      */
     public function edit($ids)
     {
-        if(\Auth::user()->can('edit quotation'))
+        if(\Auth::user()->type == 'company')
         {
             $id   = Crypt::decrypt($ids);
             $quotation     = Quotation::find($id);
@@ -196,7 +196,7 @@ class QuotationController extends Controller
      */
     public function update(Request $request, Quotation $quotation)
     {
-        if(\Auth::user()->can('edit quotation'))
+        if(\Auth::user()->type == 'company')
         {
 
             if($quotation->created_by == \Auth::user()->creatorId())
@@ -267,7 +267,7 @@ class QuotationController extends Controller
      */
     public function destroy(Quotation $quotation)
     {
-        if(\Auth::user()->can('delete quotation'))
+        if(\Auth::user()->type == 'company')
         {
             if($quotation->created_by == \Auth::user()->creatorId())
             {
@@ -326,7 +326,7 @@ class QuotationController extends Controller
     public function productDestroy(Request $request)
     {
 
-        if(\Auth::user()->can('delete quotation'))
+        if(\Auth::user()->type == 'company')
         {
 
             QuotationProduct::where('id', '=', $request->id)->delete();

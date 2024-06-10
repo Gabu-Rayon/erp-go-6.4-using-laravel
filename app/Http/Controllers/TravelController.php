@@ -15,7 +15,7 @@ class TravelController extends Controller
     public function index()
     {
         
-        if(\Auth::user()->can('manage travel'))
+        if(\Auth::user()->type == 'company')
         {
             if(Auth::user()->type == 'Employee')
             {
@@ -37,7 +37,7 @@ class TravelController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create travel'))
+        if(\Auth::user()->type == 'company')
         {
             $employees = Employee::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
@@ -51,7 +51,7 @@ class TravelController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create travel'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -116,7 +116,7 @@ class TravelController extends Controller
     public function edit(Travel $travel)
     {
 
-        if(\Auth::user()->can('edit travel'))
+        if(\Auth::user()->type == 'company')
         {
             $employees = Employee::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             if($travel->created_by == \Auth::user()->creatorId())
@@ -136,7 +136,7 @@ class TravelController extends Controller
 
     public function update(Request $request, Travel $travel)
     {
-        if(\Auth::user()->can('edit travel'))
+        if(\Auth::user()->type == 'company')
         {
             if($travel->created_by == \Auth::user()->creatorId())
             {
@@ -180,7 +180,7 @@ class TravelController extends Controller
 
     public function destroy(Travel $travel)
     {
-        if(\Auth::user()->can('delete travel'))
+        if(\Auth::user()->type == 'company')
         {
             if($travel->created_by == \Auth::user()->creatorId())
             {

@@ -26,7 +26,10 @@ class StageController extends Controller
      */
     public function index()
     {
-        if(\Auth::user()->can('manage stage'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        )
         {
             $stages    = Stage::select('stages.*', 'pipelines.name as pipeline')->join('pipelines', 'pipelines.id', '=', 'stages.pipeline_id')->where('pipelines.created_by', '=', \Auth::user()->ownerId())->where('stages.created_by', '=', \Auth::user()->ownerId())->orderBy('stages.pipeline_id')->orderBy('stages.order')->get();
             $pipelines = [];
@@ -57,7 +60,7 @@ class StageController extends Controller
      */
     public function create()
     {
-        if(\Auth::user()->can('create stage'))
+        if(\Auth::user()->type == 'company')
         {
             $pipelines = Pipeline::where('created_by', '=', \Auth::user()->ownerId())->get()->pluck('name', 'id');
 
@@ -78,7 +81,7 @@ class StageController extends Controller
      */
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create stage'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -127,7 +130,7 @@ class StageController extends Controller
      */
     public function edit(Stage $stage)
     {
-        if(\Auth::user()->can('edit stage'))
+        if(\Auth::user()->type == 'company')
         {
             if($stage->created_by == \Auth::user()->ownerId())
             {
@@ -156,7 +159,7 @@ class StageController extends Controller
      */
     public function update(Request $request, Stage $stage)
     {
-        if(\Auth::user()->can('edit stage'))
+        if(\Auth::user()->type == 'company')
         {
 
             if($stage->created_by == \Auth::user()->ownerId())
@@ -198,7 +201,7 @@ class StageController extends Controller
      */
     public function destroy(Stage $stage)
     {
-        if(\Auth::user()->can('delete stage'))
+        if(\Auth::user()->type == 'company')
         {
             if($stage->created_by == \Auth::user()->ownerId())
             {

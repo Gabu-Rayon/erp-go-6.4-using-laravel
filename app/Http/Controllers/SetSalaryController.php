@@ -20,7 +20,7 @@ class SetSalaryController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage set salary'))
+        if(\Auth::user()->type == 'company')
         {
             $employees = Employee::where('created_by' , \Auth::user()->creatorId())->with('salaryType')->get();
 
@@ -34,7 +34,7 @@ class SetSalaryController extends Controller
 
     public function edit($id)
     {
-        if(\Auth::user()->can('edit set salary'))
+        if(\Auth::user()->type == 'company')
         {
             $payslip_type      = PayslipType::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $allowance_options = AllowanceOption::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');

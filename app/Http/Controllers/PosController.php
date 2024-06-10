@@ -30,7 +30,7 @@ class PosController extends Controller
     public function index($id = 0)
     {
         try {
-            if (Auth::user()->can('manage pos')) {
+            if(\Auth::user()->type == 'company') {
                 session()->forget('pos');
                 $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'name');
                 $customers->prepend('Walk-in-customer', '');
@@ -86,7 +86,7 @@ class PosController extends Controller
     {
         $sess = session()->get('pos');
 
-        if (Auth::user()->can('manage pos') && isset($sess) && !empty($sess) && count($sess) > 0) {
+        if(\Auth::user()->type == 'company' && isset($sess) && !empty($sess) && count($sess) > 0) {
 
 
 
@@ -181,7 +181,7 @@ class PosController extends Controller
         
         $discount = $request->discount;
 
-        if (Auth::user()->can('manage pos')) {
+        if(\Auth::user()->type == 'company'){
 
             if($request->quotation_id != 0)
             {
@@ -305,7 +305,7 @@ class PosController extends Controller
     public function show($ids)
     {
 
-        if (\Auth::user()->can('show pos') || \Auth::user()->type == 'company') {
+        if(\Auth::user()->type == 'company') {
             try {
                 $id = Crypt::decrypt($ids);
             } catch (\Throwable $th) {
@@ -332,7 +332,7 @@ class PosController extends Controller
 
     public function invoicePosNumber()
     {
-        if (Auth::user()->can('manage pos')) {
+        if(\Auth::user()->type == 'company'){
             $latest = Pos::where('created_by', '=', \Auth::user()->creatorId())->latest()->first();
 
             return $latest ? $latest->pos_id + 1 : 1;
@@ -343,7 +343,7 @@ class PosController extends Controller
 
     public function report()
     {
-        if (\Auth::user()->can('manage pos')) {
+        if(\Auth::user()->type == 'company'){
 
             $posPayments = Pos::where('created_by', '=', \Auth::user()->creatorId())->with(['customer', 'warehouse'])->get();
 
@@ -356,7 +356,7 @@ class PosController extends Controller
 
     public function barcode()
     {
-        if (\Auth::user()->can('manage pos')) {
+        if(\Auth::user()->type == 'company'){
             $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->get();
             $barcode = [
                 'barcodeType' => Auth::user()->barcodeType(),
@@ -372,7 +372,7 @@ class PosController extends Controller
 
     public function setting()
     {
-        if (\Auth::user()->can('manage pos')) {
+        if(\Auth::user()->type == 'company'){
             $settings = Utility::settings();
 
             return view('pos.setting', compact('settings'));
@@ -412,7 +412,7 @@ class PosController extends Controller
 
     public function printBarcode()
     {
-        if (\Auth::user()->can('manage pos')) {
+        if(\Auth::user()->type == 'company'){
             $warehouses = warehouse::select('*', \DB::raw("CONCAT(name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
             return view('pos.print', compact('warehouses'));

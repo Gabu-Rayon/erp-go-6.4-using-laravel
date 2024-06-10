@@ -14,7 +14,7 @@ class IndicatorController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage indicator'))
+        if(\Auth::user()->type == 'company')
         {
             $user = \Auth::user();
             if($user->type == 'Employee')
@@ -55,7 +55,7 @@ class IndicatorController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create indicator'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -111,7 +111,7 @@ class IndicatorController extends Controller
 
     public function edit(Indicator $indicator)
     {
-        if(\Auth::user()->can('edit indicator'))
+        if(\Auth::user()->type == 'company')
         {
 
             $performance     = PerformanceType::where('created_by', '=', \Auth::user()->creatorId())->get();
@@ -135,7 +135,7 @@ class IndicatorController extends Controller
     public function update(Request $request, Indicator $indicator)
     {
 
-        if(\Auth::user()->can('edit indicator'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -166,7 +166,7 @@ class IndicatorController extends Controller
 
     public function destroy(Indicator $indicator)
     {
-        if(\Auth::user()->can('delete indicator'))
+        if(\Auth::user()->type == 'company')
         {
             if($indicator->created_by == \Auth::user()->creatorId())
             {

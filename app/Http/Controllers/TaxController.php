@@ -16,7 +16,10 @@ class TaxController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage constant tax'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $taxes = Details::where('cdCls', '=', '04')->get();
 
@@ -31,7 +34,10 @@ class TaxController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create constant tax'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             return view('taxes.create');
         }
@@ -43,7 +49,10 @@ class TaxController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create constant tax'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -80,7 +89,10 @@ class TaxController extends Controller
 
     public function edit(Tax $tax)
     {
-        if(\Auth::user()->can('edit constant tax'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             if($tax->created_by == \Auth::user()->creatorId())
             {
@@ -100,7 +112,10 @@ class TaxController extends Controller
 
     public function update(Request $request, Tax $tax)
     {
-        if(\Auth::user()->can('edit constant tax'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             if($tax->created_by == \Auth::user()->creatorId())
             {
@@ -136,7 +151,10 @@ class TaxController extends Controller
 
     public function destroy(Tax $tax)
     {
-        if(\Auth::user()->can('delete constant tax'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             if($tax->created_by == \Auth::user()->creatorId())
             {

@@ -35,7 +35,10 @@ class VenderController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage vender'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $venders = Vender::where('created_by', \Auth::user()->creatorId())->get();
 
@@ -50,7 +53,10 @@ class VenderController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create vender'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'vendor')->get();
 
@@ -65,7 +71,10 @@ class VenderController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create vender'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $rules = [
                 'name' => 'required',
@@ -167,7 +176,10 @@ class VenderController extends Controller
 
     public function edit($id)
     {
-        if(\Auth::user()->can('edit vender'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $vender              = Vender::find($id);
             $vender->customField = CustomField::getData($vender, 'vendor');
@@ -184,7 +196,10 @@ class VenderController extends Controller
 
     public function update(Request $request, Vender $vender)
     {
-        if(\Auth::user()->can('edit vender'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
 
             $rules = [
@@ -234,7 +249,10 @@ class VenderController extends Controller
 
     public function destroy(Vender $vender)
     {
-        if(\Auth::user()->can('delete vender'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             if($vender->created_by == \Auth::user()->creatorId())
             {
@@ -276,7 +294,7 @@ class VenderController extends Controller
     public function payment(Request $request)
     {
 
-        if(\Auth::user()->can('manage vender payment'))
+        if(\Auth::user()->type == 'vender')
         {
             $category = [
                 'Bill' => 'Bill',
@@ -308,7 +326,7 @@ class VenderController extends Controller
     public function transaction(Request $request)
     {
 
-        if(\Auth::user()->can('manage vender transaction'))
+        if(\Auth::user()->type == 'vender')
         {
 
             $category = [

@@ -31,7 +31,10 @@ class PipelineController extends Controller
      */
     public function index()
     {
-        if(\Auth::user()->can('manage pipeline'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'client'
+        )
         {
             $pipelines = Pipeline::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -50,7 +53,7 @@ class PipelineController extends Controller
      */
     public function create()
     {
-        if(\Auth::user()->can('create pipeline'))
+        if(\Auth::user()->type == 'company')
         {
             return view('pipelines.create');
         }
@@ -69,7 +72,7 @@ class PipelineController extends Controller
      */
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create pipeline'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -119,7 +122,7 @@ class PipelineController extends Controller
      */
     public function edit(Pipeline $pipeline)
     {
-        if(\Auth::user()->can('edit pipeline'))
+        if(\Auth::user()->type == 'company')
         {
             if($pipeline->created_by == \Auth::user()->creatorId())
             {
@@ -146,7 +149,7 @@ class PipelineController extends Controller
      */
     public function update(Request $request, Pipeline $pipeline)
     {
-        if(\Auth::user()->can('edit pipeline'))
+        if(\Auth::user()->type == 'company')
         {
 
             if($pipeline->created_by == \Auth::user()->creatorId())
@@ -190,7 +193,7 @@ class PipelineController extends Controller
      */
     public function destroy(Pipeline $pipeline)
     {
-        if(\Auth::user()->can('delete pipeline'))
+        if(\Auth::user()->type == 'company')
         {
             if($pipeline->created_by == \Auth::user()->creatorId())
             {

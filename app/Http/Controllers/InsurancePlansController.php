@@ -14,7 +14,7 @@ class InsurancePlansController extends Controller
      */
     public function index()
     {
-        if (\Auth::user()->can('manage purchase')) {
+        if(\Auth::user()->type == 'company'){
             try {
                 $insurances = Insurance::all();
                 return view('insurance.index', compact('insurances'));
@@ -30,7 +30,7 @@ class InsurancePlansController extends Controller
      */
     public function create()
     {
-        if (\Auth::user()->can('manage purchase')) {
+        if(\Auth::user()->type == 'company') {
             return view('insurance.create');
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
@@ -41,7 +41,7 @@ class InsurancePlansController extends Controller
      */
      public function store(Request $request)
     {
-        if (\Auth::user()->can('create purchase')) {
+        if(\Auth::user()->type == 'company'){
             // Validate the incoming request data
             $request->validate([
                 'insurancecode' => 'required|string',
@@ -107,7 +107,7 @@ class InsurancePlansController extends Controller
     {
 
 
-        if (\Auth::user()->can('show purchase')) {
+        if(\Auth::user()->type == 'company'){
             $insurance = Insurance::find($id);
             return view('insurance.view', compact('insurance'));
 
@@ -120,7 +120,7 @@ class InsurancePlansController extends Controller
      */
     public function edit(Insurance $Insurance)
     {
-        if (\Auth::user()->can('show purchase')) {
+        if(\Auth::user()->type == 'company'){
             //method code here
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
@@ -132,7 +132,7 @@ class InsurancePlansController extends Controller
      */
     public function update(Request $request, Insurance $Insurance)
     {
-        if (\Auth::user()->can('edit purchase')) {
+        if(\Auth::user()->type == 'company'){
             //method code here  //method code here
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
@@ -144,7 +144,7 @@ class InsurancePlansController extends Controller
      */
     public function destroy(Insurance $Insurance)
     {
-        if (\Auth::user()->can('edit purchase')) {
+        if(\Auth::user()->type == 'company'){
             //method code here
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));

@@ -19,7 +19,7 @@ class JobController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage job'))
+        if(\Auth::user()->type == 'company')
         {
             $jobs = Job::where('created_by', '=', \Auth::user()->creatorId())->with('branches','createdBy')->get();
 
@@ -54,7 +54,7 @@ class JobController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create job'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -136,7 +136,7 @@ class JobController extends Controller
 
     public function update(Request $request, Job $job)
     {
-        if(\Auth::user()->can('edit job'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(

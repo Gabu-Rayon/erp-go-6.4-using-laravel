@@ -35,7 +35,7 @@ class WarehouseTransferController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create warehouse'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -87,7 +87,7 @@ class WarehouseTransferController extends Controller
 
     public function destroy(WarehouseTransfer $warehouseTransfer)
     {
-        if(\Auth::user()->can('delete warehouse'))
+        if(\Auth::user()->type == 'company')
         {
             if($warehouseTransfer->created_by == \Auth::user()->creatorId())
             {

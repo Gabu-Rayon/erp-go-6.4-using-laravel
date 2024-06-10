@@ -17,7 +17,7 @@ class OvertimeController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create overtime'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -60,7 +60,7 @@ class OvertimeController extends Controller
     public function edit($overtime)
     {
         $overtime = Overtime::find($overtime);
-        if(\Auth::user()->can('edit overtime'))
+        if(\Auth::user()->type == 'company')
         {
             if($overtime->created_by == \Auth::user()->creatorId())
             {
@@ -80,7 +80,7 @@ class OvertimeController extends Controller
     public function update(Request $request, $overtime)
     {
         $overtime = Overtime::find($overtime);
-        if(\Auth::user()->can('edit overtime'))
+        if(\Auth::user()->type == 'company')
         {
             if($overtime->created_by == \Auth::user()->creatorId())
             {
@@ -120,7 +120,7 @@ class OvertimeController extends Controller
 
     public function destroy(Overtime $overtime)
     {
-        if(\Auth::user()->can('delete overtime'))
+        if(\Auth::user()->type == 'company')
         {
             if($overtime->created_by == \Auth::user()->creatorId())
             {

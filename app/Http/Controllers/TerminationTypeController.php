@@ -9,7 +9,7 @@ class TerminationTypeController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage termination type'))
+        if(\Auth::user()->type == 'company')
         {
             $terminationtypes = TerminationType::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -23,7 +23,7 @@ class TerminationTypeController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create termination type'))
+        if(\Auth::user()->type == 'company')
         {
             return view('terminationtype.create');
         }
@@ -35,7 +35,7 @@ class TerminationTypeController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create termination type'))
+        if(\Auth::user()->type == 'company')
         {
 
             $validator = \Validator::make(
@@ -70,7 +70,7 @@ class TerminationTypeController extends Controller
 
     public function edit(TerminationType $terminationtype)
     {
-        if(\Auth::user()->can('edit termination type'))
+        if(\Auth::user()->type == 'company')
         {
             if($terminationtype->created_by == \Auth::user()->creatorId())
             {
@@ -90,7 +90,7 @@ class TerminationTypeController extends Controller
 
     public function update(Request $request, TerminationType $terminationtype)
     {
-        if(\Auth::user()->can('edit termination type'))
+        if(\Auth::user()->type == 'company')
         {
             if($terminationtype->created_by == \Auth::user()->creatorId())
             {
@@ -119,7 +119,7 @@ class TerminationTypeController extends Controller
 
     public function destroy(TerminationType $terminationtype)
     {
-        if(\Auth::user()->can('delete termination type'))
+        if(\Auth::user()->type == 'company')
         {
             if($terminationtype->created_by == \Auth::user()->creatorId())
             {

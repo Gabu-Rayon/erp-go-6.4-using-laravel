@@ -39,7 +39,10 @@ class ProductServiceController extends Controller
     public function index(Request $request)
     {
 
-        if (\Auth::user()->can('manage product & service')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
 
@@ -51,7 +54,8 @@ class ProductServiceController extends Controller
             }
 
             return view('productservice.index', compact('productServices', 'category'));
-        } else {
+        }
+         else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -59,7 +63,10 @@ class ProductServiceController extends Controller
 
     public function create()
     {
-        if (\Auth::user()->can('create product & service')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $items = ProductService::all()->pluck('itemNm', 'itemCd');
             $itemclassifications = ProductsServicesClassification::pluck('itemClsNm', 'itemClsCd');
             $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
@@ -130,7 +137,10 @@ class ProductServiceController extends Controller
     public function store(Request $request)
     {
         try {
-            if (\Auth::user()->can('create product & service')) {
+            if(
+                \Auth::user()->type == 'company'
+                || \Auth::user()->type == 'accountant'
+            ){
                 \Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
                 \Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
 
@@ -642,7 +652,10 @@ class ProductServiceController extends Controller
 }
     public function edit($id)
     {
-        if (\Auth::user()->can('manage product & service')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $productServiceinformation = ProductService::find($id);
 
             $productServiceclassifications = ProductsServicesClassification::pluck('itemClsNm', 'itemClsCd');
@@ -716,7 +729,10 @@ class ProductServiceController extends Controller
 
     public function destroy($id)
     {
-        if (\Auth::user()->can('delete product & service')) {
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        ){
             $productService = ProductService::find($id);
             if ($productService->created_by == \Auth::user()->creatorId()) {
                 if (!empty($productService->pro_image)) {
@@ -944,7 +960,7 @@ class ProductServiceController extends Controller
 
         $lastsegment = $request->session_key;
 
-        if (Auth::user()->can('manage pos') && $request->ajax() && isset($lastsegment) && !empty($lastsegment)) {
+        if (Auth::user()->type == 'company' && $request->ajax() && isset($lastsegment) && !empty($lastsegment)) {
 
             $output = "";
             if ($request->war_id == '0') {
@@ -1032,7 +1048,10 @@ class ProductServiceController extends Controller
     public function addToCart(Request $request, $id, $session_key) {
 
         try {
-            if (Auth::user()->can('manage product & service') && $request->ajax()) {
+            if(
+                \Auth::user()->type == 'company'
+                || \Auth::user()->type == 'accountant'
+             && $request->ajax()) {
                 $product = WarehouseProduct::where('product_id', $id)->first();
                 $productquantity = 0;
     
@@ -1274,7 +1293,7 @@ class ProductServiceController extends Controller
         $discount = $request->discount;
         $session_key = $request->session_key;
 
-        if (Auth::user()->can('manage product & service') && $request->ajax() && isset($id) && !empty($id) && isset($session_key) && !empty($session_key)) {
+        if (Auth::user()->type == 'company' || Auth::user()->type == 'accountant' && $request->ajax() && isset($id) && !empty($id) && isset($session_key) && !empty($session_key)) {
             $cart = session()->get($session_key);
 
 
@@ -1340,7 +1359,7 @@ class ProductServiceController extends Controller
     {
         $session_key = $request->session_key;
 
-        if (Auth::user()->can('manage product & service') && isset($session_key) && !empty($session_key)) {
+        if (Auth::user()->type == 'company' || Auth::user()->type == 'accountant' && isset($session_key) && !empty($session_key)) {
             $cart = session()->get($session_key);
             if (isset($cart) && count($cart) > 0) {
                 session()->forget($session_key);
@@ -1370,7 +1389,7 @@ class ProductServiceController extends Controller
     {
         $id = $request->id;
         $session_key = $request->session_key;
-        if (Auth::user()->can('manage product & service') && isset($id) && !empty($id) && isset($session_key) && !empty($session_key)) {
+        if (Auth::user()->type == 'company' || Auth::user()->type == 'accountant' && isset($id) && !empty($id) && isset($session_key) && !empty($session_key)) {
             $cart = session()->get($session_key);
             if (isset($cart[$id])) {
                 unset($cart[$id]);

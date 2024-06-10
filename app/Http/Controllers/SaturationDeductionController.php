@@ -19,7 +19,7 @@ class SaturationDeductionController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create saturation deduction'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -61,7 +61,7 @@ class SaturationDeductionController extends Controller
     public function edit($saturationdeduction)
     {
         $saturationdeduction = SaturationDeduction::find($saturationdeduction);
-        if(\Auth::user()->can('edit saturation deduction'))
+        if(\Auth::user()->type == 'company')
         {
             if($saturationdeduction->created_by == \Auth::user()->creatorId())
             {
@@ -83,7 +83,7 @@ class SaturationDeductionController extends Controller
 
     public function update(Request $request, SaturationDeduction $saturationdeduction)
     {
-        if(\Auth::user()->can('edit saturation deduction'))
+        if(\Auth::user()->type == 'company')
         {
             if($saturationdeduction->created_by == \Auth::user()->creatorId())
             {
@@ -123,7 +123,7 @@ class SaturationDeductionController extends Controller
 
     public function destroy(SaturationDeduction $saturationdeduction)
     {
-        if(\Auth::user()->can('delete saturation deduction'))
+        if(\Auth::user()->type == 'company')
         {
             if($saturationdeduction->created_by == \Auth::user()->creatorId())
             {

@@ -19,7 +19,10 @@ class RevenueController extends Controller
     public function index(Request $request)
     {
 
-        if(\Auth::user()->can('manage revenue'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customer->prepend('Select Customer', '');
@@ -77,7 +80,10 @@ class RevenueController extends Controller
     public function create()
     {
 
-        if(\Auth::user()->can('create revenue'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $customers = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customers->prepend('--', 0);
@@ -95,7 +101,10 @@ class RevenueController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create revenue'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
 
             $validator = \Validator::make(
@@ -238,7 +247,10 @@ class RevenueController extends Controller
 
     public function edit(Revenue $revenue)
     {
-        if(\Auth::user()->can('edit revenue'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             $customers = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customers->prepend('--', 0);
@@ -257,7 +269,10 @@ class RevenueController extends Controller
     public function update(Request $request, Revenue $revenue)
     {
 
-        if(\Auth::user()->can('edit revenue'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
 
             $validator = \Validator::make(
@@ -359,7 +374,10 @@ class RevenueController extends Controller
     public function destroy(Revenue $revenue)
     {
 
-        if(\Auth::user()->can('delete revenue'))
+        if(
+            \Auth::user()->type == 'company'
+            || \Auth::user()->type == 'accountant'
+        )
         {
             if($revenue->created_by == \Auth::user()->creatorId())
             {

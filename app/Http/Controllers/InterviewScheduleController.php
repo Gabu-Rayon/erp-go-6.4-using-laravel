@@ -50,7 +50,7 @@ class InterviewScheduleController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create interview schedule'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -117,7 +117,7 @@ class InterviewScheduleController extends Controller
 
     public function update(Request $request, InterviewSchedule $interviewSchedule)
     {
-        if(\Auth::user()->can('edit interview schedule'))
+        if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
