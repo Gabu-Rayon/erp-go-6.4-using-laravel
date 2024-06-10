@@ -15,7 +15,8 @@ class AnnouncementController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage announcement'))
+        try {
+            if(\Auth::user()->type == 'company' || \Auth::user()->type == 'employee')
         {
 
             if(Auth::user()->type == 'Employee')
@@ -39,35 +40,39 @@ class AnnouncementController extends Controller
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+        } catch (\Exception $e) {
+            \Log::info('GET ANNOUNCEMENT ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function create()
     {
         try {
-            if(\Auth::user()->can('create announcement'))
+            if(\Auth::user()->type == 'company')
             {
                 $employees   = Employee::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
                 $branch      = BranchesList::all()->pluck('bhfNm', 'id');
-                $departments = Department::where('created_by', '=', Auth::user()->creatorId())->get();
+                $departments = Department::where('created_by', '=', \Auth::user()->creatorId())->get();
 
                 return view('announcement.create', compact('employees', 'branch', 'departments'));
             }
             else
             {
-                return response()->json(['error' => __('Permission denied.')], 401);
+                return redirect()->back()->with('error', __('Permission denied.'));
             }
         } catch (\Exception $e) {
             \Log::info('CREATE ANNOUNCEMENT RENDER ERROR');
             \Log::info($e);
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
     public function store(Request $request)
     {
-
-
-
-        if(\Auth::user()->can('create announcement'))
+        try {
+            if(\Auth::user()->type == 'company')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -171,16 +176,28 @@ class AnnouncementController extends Controller
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+        } catch (\Exception $e) {
+            \Log::info('STORE ANNOUNCEMENT ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function show(Announcement $announcement)
     {
-        return redirect()->route('announcement.index');
+        try {
+            return redirect()->route('announcement.index');
+        } catch (\Exception $e) {
+            \Log::info('SHOW ANNOUNCEMENT ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function edit($announcement)
     {
-        if(\Auth::user()->can('edit announcement'))
+        try {
+            if(\Auth::user()->type == 'company')
         {
             $announcement = Announcement::find($announcement);
             if($announcement->created_by == Auth::user()->creatorId())
@@ -199,11 +216,17 @@ class AnnouncementController extends Controller
         {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
+        } catch (\Exception $e) {
+            \Log::info('EDIT ANNOUNCEMENT RENDER ERROR');
+            \Log::info($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function update(Request $request, Announcement $announcement)
     {
-        if(\Auth::user()->can('edit announcement'))
+        try {
+            if(\Auth::user()->type == 'company' )
         {
             if($announcement->created_by == \Auth::user()->creatorId())
             {
@@ -243,11 +266,17 @@ class AnnouncementController extends Controller
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+        } catch (\Exception $e) {
+            \Log::info('UPDATE ANNOUNCEMENT ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function destroy(Announcement $announcement)
     {
-        if(\Auth::user()->can('delete announcement'))
+        try {
+            if(\Auth::user()->type == 'company')
         {
             if($announcement->created_by == \Auth::user()->creatorId())
             {
@@ -264,12 +293,17 @@ class AnnouncementController extends Controller
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+        } catch (\Exception $e) {
+            \Log::info('DESTROY ANNOUNCEMENT ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function getdepartment(Request $request)
     {
-
-        if($request->branch_id == 0)
+        try {
+            if($request->branch_id == 0)
         {
             $departments = Department::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id')->toArray();
         }
@@ -279,27 +313,18 @@ class AnnouncementController extends Controller
         }
 
         return response()->json($departments);
+        } catch (\Exception $e) {
+            \Log::info('GET DEPARTMENT ERROR');
+            \Log::error($e);
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
     }
-
-//    public function getemployee(Request $request)
-//    {
-//        if(in_array('0', $request->department_id))
-//        {
-//            $employees = Employee::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id')->toArray();
-//        }
-//        else
-//        {
-//            $employees = Employee::where('created_by', '=', \Auth::user()->creatorId())->whereIn('department_id', $request->department_id)->get()->pluck('name', 'id')->toArray();
-//        }
-//
-//        return response()->json($employees);
-//    }
 
 
     public function getemployee(Request $request)
     {
-        // dd(department_id);
-        if(!$request->department_id )
+        try {
+            if(!$request->department_id )
         {
             $employees = Employee::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id')->toArray();
         }
@@ -309,7 +334,10 @@ class AnnouncementController extends Controller
         }
 
         return response()->json($employees);
+        } catch (\Exception $e) {
+            \Log::info('GET EMPLOYEE ERROR');
+            \Log::error($e);
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
     }
-
-
 }

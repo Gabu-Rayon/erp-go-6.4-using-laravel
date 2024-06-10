@@ -10,7 +10,8 @@ class AssetController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage assets'))
+        try {
+            if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $assets = Asset::where('created_by', '=', \Auth::user()->creatorId())->get();
 
@@ -20,12 +21,18 @@ class AssetController extends Controller
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+        } catch (\Exception $e) {
+            \Log::error('ASSET INDEX ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
 
     public function create()
     {
-        if(\Auth::user()->can('create assets'))
+        try {
+            if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $employee      = Employee::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'user_id');
 
@@ -35,13 +42,18 @@ class AssetController extends Controller
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+        } catch (\Exception $e) {
+            \Log::error('ASSET CREATE ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
 
     public function store(Request $request)
     {
-//        dd($request->all());
-        if(\Auth::user()->can('create assets'))
+        try {
+            if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $validator = \Validator::make(
                 $request->all(), [
@@ -74,18 +86,17 @@ class AssetController extends Controller
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+        } catch (\Exception $e) {
+            \Log::error('ASSET STORE ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
-
-    public function show(Asset $asset)
-    {
-        //
-    }
-
 
     public function edit($id)
     {
-
-        if(\Auth::user()->can('edit assets'))
+        try {
+            if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $asset = Asset::find($id);
             $employee      = Employee::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -99,12 +110,18 @@ class AssetController extends Controller
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+        } catch (\Exception $e) {
+            \Log::error('ASSET EDIT ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
 
     public function update(Request $request, $id)
     {
-        if(\Auth::user()->can('edit assets'))
+        try {
+            if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $asset = Asset::find($id);
             if($asset->created_by == \Auth::user()->creatorId())
@@ -144,12 +161,18 @@ class AssetController extends Controller
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+        } catch (\Exception $e) {
+            \Log::error('ASSET UPDATE ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
 
     public function destroy($id)
     {
-        if(\Auth::user()->can('delete assets'))
+        try {
+            if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant')
         {
             $asset = Asset::find($id);
             if($asset->created_by == \Auth::user()->creatorId())
@@ -166,6 +189,11 @@ class AssetController extends Controller
         else
         {
             return redirect()->back()->with('error', __('Permission denied.'));
+        }
+        } catch (\Exception $e) {
+            \Log::error('ASSET DESTROY ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 }

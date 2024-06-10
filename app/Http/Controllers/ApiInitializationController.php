@@ -15,7 +15,6 @@ class ApiInitializationController extends Controller
      * Display a listing of the resource.
      */
     public function index() {
-        \Log::info(\Auth::user()->type);
         try {
             if (\Auth::user()->type == 'company') {
                 $apiinitializations = ApiInitialization::all();

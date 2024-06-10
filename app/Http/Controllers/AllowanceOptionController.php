@@ -9,68 +9,92 @@ class AllowanceOptionController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->can('manage allowance option'))
-        {
-            $allowanceoptions = AllowanceOption::where('created_by', '=', \Auth::user()->creatorId())->get();
+        try {
+            if(\Auth::user()->type == 'company'){
+                $allowanceoptions = AllowanceOption::where('created_by', '=', \Auth::user()->creatorId())->get();
 
-            return view('allowanceoption.index', compact('allowanceoptions'));
+                return view('allowanceoption.index', compact('allowanceoptions'));
         }
         else
         {
             return redirect()->back()->with('error', __('Permission denied.'));
+        }
+        } catch (\Exception $e) {
+            \Log::info('GET ALLOWANCE OPTION ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
     public function create()
     {
-        if(\Auth::user()->can('create allowance option'))
+        try {
+            if(\Auth::user()->type == 'company')
         {
             return view('allowanceoption.create');
         }
         else
         {
-            return response()->json(['error' => __('Permission denied.')], 401);
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+        } catch (\Exception $e) {
+            \Log::info('CREATE ALLOWANCE OPTION ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create allowance option'))
-        {
-
-            $validator = \Validator::make(
-                $request->all(), [
-                                   'name' => 'required|max:20',
-                               ]
-            );
-            if($validator->fails())
+        try {
+            if(\Auth::user()->type == 'company')
             {
-                $messages = $validator->getMessageBag();
-
-                return redirect()->back()->with('error', $messages->first());
+    
+                $validator = \Validator::make(
+                    $request->all(), [
+                                       'name' => 'required|max:20',
+                                   ]
+                );
+                if($validator->fails())
+                {
+                    $messages = $validator->getMessageBag();
+    
+                    return redirect()->back()->with('error', $messages->first());
+                }
+    
+                $allowanceoption             = new AllowanceOption();
+                $allowanceoption->name       = $request->name;
+                $allowanceoption->created_by = \Auth::user()->creatorId();
+                $allowanceoption->save();
+    
+                return redirect()->route('allowanceoption.index')->with('success', __('AllowanceOption  successfully created.'));
             }
-
-            $allowanceoption             = new AllowanceOption();
-            $allowanceoption->name       = $request->name;
-            $allowanceoption->created_by = \Auth::user()->creatorId();
-            $allowanceoption->save();
-
-            return redirect()->route('allowanceoption.index')->with('success', __('AllowanceOption  successfully created.'));
-        }
-        else
-        {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            else
+            {
+                return redirect()->back()->with('error', __('Permission denied.'));
+            }
+        } catch (\Exception $e) {
+            \Log::info('STORE ALLOWANCE OPTION ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
     public function show(AllowanceOption $allowanceoption)
     {
-        return redirect()->route('allowanceoption.index');
+        try {
+            return redirect()->route('allowanceoption.index');
+        } catch (\Exception $e) {
+            \Log::info('SHOW ALLOWANCE OPTION ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function edit(AllowanceOption $allowanceoption)
     {
-        if(\Auth::user()->can('edit allowance option'))
+        try {
+            if(\Auth::user()->type == 'company')
         {
             if($allowanceoption->created_by == \Auth::user()->creatorId())
             {
@@ -86,11 +110,17 @@ class AllowanceOptionController extends Controller
         {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
+        } catch (\Exception $e) {
+            \Log::info('EDIT ALLOWANCE OPTION ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function update(Request $request, AllowanceOption $allowanceoption)
     {
-        if(\Auth::user()->can('edit allowance option'))
+        try {
+            if(\Auth::user()->type == 'company')
         {
             if($allowanceoption->created_by == \Auth::user()->creatorId())
             {
@@ -121,11 +151,17 @@ class AllowanceOptionController extends Controller
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+        } catch (\Exception $e) {
+            \Log::info('UPDATE ALLOWANCE OPTION ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function destroy(AllowanceOption $allowanceoption)
     {
-        if(\Auth::user()->can('delete allowance option'))
+        try {
+            if(\Auth::user()->type == 'company')
         {
             if($allowanceoption->created_by == \Auth::user()->creatorId())
             {
@@ -141,6 +177,11 @@ class AllowanceOptionController extends Controller
         else
         {
             return redirect()->back()->with('error', __('Permission denied.'));
+        }
+        } catch (\Exception $e) {
+            \Log::info('DESTROY ALLOWANCE OPTION ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 

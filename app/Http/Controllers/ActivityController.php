@@ -8,14 +8,13 @@ use App\Models\Email;
 use App\Models\Activity;
 use App\Models\Schedule;
 use App\Models\LogActivity;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ActivityController extends Controller
 {
-    public function activity()
-    {
-        if(\Auth::user()->can('view CRM activity'))
+    public function activity(){
+        try {
+            if(Auth::user()->type == 'company')
         {
             $notes = Note::where('created_by',\Auth::user()->creatorId())->orderBy('id','desc')->get();
             $tasks = Task::where('created_by',\Auth::user()->creatorId())->orderBy('id','desc')->get();
@@ -73,6 +72,10 @@ class ActivityController extends Controller
         {
             return redirect()->back()->with('errors', __('Permission denied.'));
         }
-
+        } catch (\Exception $e) {
+            \Log::info('Activity Error');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 }
