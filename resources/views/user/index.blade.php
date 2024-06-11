@@ -19,11 +19,11 @@
                    data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('User Logs History') }}"><i class="ti ti-user-check"></i>
             </a>
         @endif
-        @can('create user')
+        @if (\Auth::user()->type == 'super admin')
             <a href="#" data-size="lg" data-url="{{ route('users.create') }}" data-ajax-popup="true"  data-bs-toggle="tooltip" title="{{__('Create')}}"  class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-        @endcan
+            @endif
     </div>
 @endsection
 @section('content')
@@ -37,7 +37,6 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0">
                                 @if(\Auth::user()->type == 'super admin')
-
                                         <div class="badge bg-primary p-2 px-3 rounded">
                                             {{!empty($user->currentPlan)?$user->currentPlan->name:''}}
                                         </div>
@@ -48,7 +47,7 @@
                                         @endif
                                     </h6>
                                 </div>
-                                @if(Gate::check('edit user') || Gate::check('delete user'))
+                                @if(\Auth::user()->type == 'super admin')
                                     <div class="card-header-right">
                                         <div class="btn-group card-option">
                                             @if($user->is_active == 1 && $user->is_disable == 1)
@@ -60,21 +59,21 @@
 
                                                 <div class="dropdown-menu dropdown-menu-end">
 
-                                                    @can('edit user')
+                                                @if(\Auth::user()->type == 'super admin')
                                                         <a href="#!" data-size="lg" data-url="{{ route('users.edit',$user->id) }}" data-ajax-popup="true" class="dropdown-item" data-bs-original-title="{{__('Edit User')}}">
                                                             <i class="ti ti-pencil"></i>
                                                             <span>{{__('Edit')}}</span>
                                                         </a>
-                                                    @endcan
+                                                    
 
-                                                    @can('delete user')
+                                                    
                                                         {!! Form::open(['method' => 'DELETE', 'route' => ['users.destroy', $user['id']],'id'=>'delete-form-'.$user['id']]) !!}
                                                         <a href="#!"  class="dropdown-item bs-pass-para">
                                                             <i class="ti ti-archive"></i>
                                                             <span> @if($user->delete_status!=0){{__('Delete')}} @else {{__('Restore')}}@endif</span>
                                                         </a>
                                                         {!! Form::close() !!}
-                                                    @endcan
+                                                    @endif
 
                                                     @if(Auth::user()->type == "super admin")
                                                     <a href="{{ route('login.with.company',$user->id) }}" class="dropdown-item"
