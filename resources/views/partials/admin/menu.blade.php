@@ -1183,7 +1183,7 @@
                                                 : '' }}">
                     <a href="#!" class="dash-link"><span class="dash-micon"><i
                                 class="ti ti-share"></i></span><span
-                            class="dash-mtext">{{ __('Project System Here') }}</span><span class="dash-arrow"><i
+                            class="dash-mtext">{{ __('Project System') }}</span><span class="dash-arrow"><i
                                 data-feather="chevron-right"></i></span></a>
                     <ul class="dash-submenu">
 
