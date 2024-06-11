@@ -1415,10 +1415,16 @@
                                 <a class="dash-link" href="{{ route('warehouse.index') }}">{{ __('Warehouse') }}</a>
                             </li>
                         @endif
+                        @if ($role->hasPermissionTo('manage purchase'))
+                            <li
+                                class="dash-item {{ Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : '' }}">
+                                <a class="dash-link" href="{{ route('purchase.index') }}">{{ __('Get Purchase List') }}</a>
+                            </li>
+                        @endif
                          @if ($role->hasPermissionTo('manage purchase'))
                             <li
                                 class="dash-item {{ Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : '' }}">
-                                <a class="dash-link" href="{{ route('purchase.index') }}">{{ __('Purchase') }}</a>
+                                <a class="dash-link" href="{{ route('purchase.create', 0) }}">{{ __('Purchase') }}</a>
                             </li>
                         @endif
 

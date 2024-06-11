@@ -1190,7 +1190,7 @@
                                                 : ''); ?>">
                     <a href="#!" class="dash-link"><span class="dash-micon"><i
                                 class="ti ti-share"></i></span><span
-                            class="dash-mtext"><?php echo e(__('Project System Here')); ?></span><span class="dash-arrow"><i
+                            class="dash-mtext"><?php echo e(__('Project System')); ?></span><span class="dash-arrow"><i
                                 data-feather="chevron-right"></i></span></a>
                     <ul class="dash-submenu">
 
@@ -1426,10 +1426,16 @@
                                 <a class="dash-link" href="<?php echo e(route('warehouse.index')); ?>"><?php echo e(__('Warehouse')); ?></a>
                             </li>
                         <?php endif; ?>
+                        <?php if($role->hasPermissionTo('manage purchase')): ?>
+                            <li
+                                class="dash-item <?php echo e(Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : ''); ?>">
+                                <a class="dash-link" href="<?php echo e(route('purchase.index')); ?>"><?php echo e(__('Get Purchase List')); ?></a>
+                            </li>
+                        <?php endif; ?>
                          <?php if($role->hasPermissionTo('manage purchase')): ?>
                             <li
                                 class="dash-item <?php echo e(Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('purchase.index')); ?>"><?php echo e(__('Purchase')); ?></a>
+                                <a class="dash-link" href="<?php echo e(route('purchase.create', 0)); ?>"><?php echo e(__('Purchase')); ?></a>
                             </li>
                         <?php endif; ?>
 
