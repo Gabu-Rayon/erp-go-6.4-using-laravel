@@ -28,7 +28,6 @@
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
         <!-- Add the form for date search -->
-        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create purchase')): ?>
             <div class="d-inline-block mb-4">
                 <!-- <?php echo e(Form::open(['url' => 'purchase.searchByDate', 'class' => 'w-100'])); ?> -->
                 <?php echo e(Form::open(['route' => 'purchase.searchByDate', 'method' => 'GET', 'class' => 'w-100'])); ?>
@@ -49,7 +48,6 @@
                 title="<?php echo e(__('Add New Purchase')); ?>">
                 <i class="ti ti-plus"></i>
             </a>
-        <?php endif; ?>
     </div>
 <?php $__env->stopSection(); ?>
 
