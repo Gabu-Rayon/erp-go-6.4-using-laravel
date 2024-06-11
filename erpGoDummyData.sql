@@ -1,23 +1,3 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1
--- Generation Time: Jun 08, 2024 at 01:56 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
-
 
 INSERT INTO `bank_accounts` (`id`, `holder_name`, `bank_name`, `account_number`, `chart_account_id`, `opening_balance`, `contact_number`, `bank_address`, `created_by`, `created_at`, `updated_at`) VALUES
 (1, 'cash', '', '-', 0, 0.00, '-', '-', 2, '2024-06-08 08:56:23', '2024-06-08 08:56:23');
@@ -2928,7 +2908,7 @@ INSERT INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
 (514, 1),
 (515, 1),
 (516, 1),
-(517, 1);
+(517, 1),
 (517, 4);
 
 INSERT INTO `settings` (`id`, `name`, `value`, `created_by`, `created_at`, `updated_at`) VALUES
@@ -3053,6 +3033,5 @@ INSERT INTO `user_email_templates` (`id`, `template_id`, `user_id`, `is_active`,
 (22, 22, 2, 1, '2024-06-08 08:56:25', '2024-06-08 08:56:25'),
 (23, 23, 2, 1, '2024-06-08 08:56:25', '2024-06-08 08:56:25');
 
-
-INSERT INTO `warehouses` (`id`,branch_id `name`, `address`, `city`, `city_zip`, `created_by`, `created_at`, `updated_at`) VALUES
-(1,1 'North Warehouse', '723 N. Tillamook Street Portland, OR Portland, United States', 'Portland', '97227', 2, '2024-06-08 08:56:25', '2024-06-08 08:56:25');
+INSERT INTO `warehouses` (`id`,`branch_id`,`name`, `address`, `city`, `city_zip`, `created_by`, `created_at`, `updated_at`) VALUES
+(1,1,'North Warehouse', '723 N. Tillamook Street Portland, OR Portland, United States', 'Portland', '97227', 2, '2024-06-08 08:56:25', '2024-06-08 08:56:25');
