@@ -8,11 +8,9 @@
 @endsection
 @section('action-btn')
     <div class="float-end">
-        @can('create purchase')
             <a href="#" data-size="lg" data-url="{{ route('insurance.create') }}" data-ajax-popup="true"  data-bs-toggle="tooltip" title="{{__('Add New Insurance')}}"  class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-        @endcan
     </div>
 @endsection
 @section('content')

@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('insurances', function (Blueprint $table) {
             $table->id();
-            $table->string('insurance_code');
-            $table->string('insurance_name');
-            $table->decimal('premium_rate', 8, 2);
-            $table->boolean('is_used')->default(true);
+            $table->string('insuranceCode');
+            $table->string('insuranceName');
+            $table->decimal('premiumRate', 8, 2);
+            $table->boolean('isUsed')->default(true);
             $table->timestamps();
         });
     }
