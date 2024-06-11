@@ -101,10 +101,7 @@
     \Auth::user()->can('tax report') ||
     \Auth::user()->can('loss & profit report') ||
     \Auth::user()->can('invoice report') ||
-    \Auth::user()->can('bill report')) ||
-    \Auth::user()->can('manage transaction') ||
-    \Auth::user()->can('statement report') ||
-    \Auth::user()->can('stock report'))
+    \Auth::user()->can('bill report'))
 
                                             <li
                                                 class="dash-item dash-hasmenu {{ Request::segment(1) == 'report' || Request::segment(1) == 'reports-monthly-cashflow' || Request::segment(1) == 'reports-quarterly-cashflow' ? 'active dash-trigger ' : '' }}">
