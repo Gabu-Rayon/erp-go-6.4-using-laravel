@@ -152,7 +152,6 @@
                                             @endforeach
                                         </select>
                                     </td>
-
                                     <td class="form-group col-md-3">
                                         {{ Form::label('itemCode', __('Item Code'), ['class' => 'form-label']) }}
                                         {{ Form::text('itemCode', '', ['class' => 'form-control', 'required' => 'required']) }}
@@ -183,7 +182,7 @@
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('qtyUnitCode', __('Quantity Unit Code'), ['class' => 'form-label']) }}
-                                        {{ Form::text('qtyUnitCode', '', ['class' => 'form-control', 'required' => 'required']) }}
+                                        {{ Form::select('qtyUnitCode', $quantityUnitCode, null, ['class' => 'form-control select2', 'placeholder' => __('Select Quantity Unit Code'), 'required' => 'required']) }}
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('taxTypeCode', __('Tax Type Code'), ['class' => 'form-label']) }}
@@ -227,15 +226,15 @@
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('isInrcApplicable', __('Is Inrc Applicable'), ['class' => 'form-label']) }}
-                                        {{ Form::select('isInrcApplicable', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control', 'required' => 'required']) }}
+                                        {{ Form::select('isInrcApplicable', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2', 'required' => 'required']) }}
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('useYn', __('useYn'), ['class' => 'form-label']) }}
-                                        {{ Form::select('useYn', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control', 'required' => 'required']) }}
+                                        {{ Form::select('useYn', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2', 'required' => 'required']) }}
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('isUsed', __('Is Used'), ['class' => 'form-label']) }}
-                                        {{ Form::select('isUsed', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control', 'required' => 'required']) }}
+                                        {{ Form::select('isUsed', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2', 'required' => 'required']) }}
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('quantity', __('Quantity'), ['class' => 'form-label']) }}
@@ -248,7 +247,7 @@
                                     <td class="form-group col-md-3">
                                         {{ Form::label('category_id', __('Category'), ['class' => 'form-label']) }}<span
                                             class="text-danger">*</span>
-                                        {{ Form::select('category_id', $category, null, ['class' => 'form-control select', 'required' => 'required']) }}
+                                        {{ Form::select('category_id', $category, null, ['class' => 'form-control select2', 'required' => 'required']) }}
 
                                         <div class=" text-xs">
                                             {{ __('Please add constant category. ') }}<a

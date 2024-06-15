@@ -94,41 +94,39 @@ class ProductServiceUnitController extends Controller
 
     public function update(Request $request, $id)
     {
-        if(
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
-        )
-        {
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
             $unit = ProductServiceUnit::find($id);
-            if($unit->created_by == \Auth::user()->creatorId())
-            {
+            if ($unit->created_by == \Auth::user()->creatorId()) {
                 $validator = \Validator::make(
-                    $request->all(), [
-                                       'name' => 'required|max:20',
-                                   ]
+                    $request->all(),
+                    [
+                        'code' => 'required|max:20',
+                        'name' => 'required|max:20',
+                        'description' => 'required',
+                        'status' => 'required|in:0,1',
+                    ]
                 );
-                if($validator->fails())
-                {
-                    $messages = $validator->getMessageBag();
 
+                if ($validator->fails()) {
+                    $messages = $validator->getMessageBag();
                     return redirect()->back()->with('error', $messages->first());
                 }
 
+                $unit->code = $request->code;
                 $unit->name = $request->name;
+                $unit->description = $request->description;
+                $unit->status = $request->status;
                 $unit->save();
 
                 return redirect()->route('product-unit.index')->with('success', __('Unit successfully updated.'));
-            }
-            else
-            {
+            } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
+
 
     public function destroy($id)
     {

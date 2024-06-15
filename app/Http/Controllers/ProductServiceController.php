@@ -73,7 +73,7 @@ class ProductServiceController extends Controller
             $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
             $category = ProductServiceCategory::all()->pluck('name', 'id');
             $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
-
+            $quantityUnitCode = ProductServiceUnit::pluck('Name','code');
 
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
             $unit = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -126,6 +126,7 @@ class ProductServiceController extends Controller
                     'incomeChartAccounts',
                     'incomeSubAccounts',
                     'expenseChartAccounts',
+                    'quantityUnitCode',
                     'expenseSubAccounts'
                 )
             );
