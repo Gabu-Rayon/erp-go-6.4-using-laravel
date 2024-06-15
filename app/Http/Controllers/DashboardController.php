@@ -159,10 +159,9 @@ class DashboardController extends Controller
                     $data['monthlyBill'] = \Auth::user()->monthlyBill();
                     $data['goals'] = Goal::where('created_by', '=', \Auth::user()->creatorId())->where('is_display', 1)->get();
 
-                    //Storage limit
                     $data['users'] = User::find(\Auth::user()->creatorId());
                     $data['plan'] = Plan::getPlan(\Auth::user()->show_dashboard());
-                    if ($data['plan']->storage_limit > 0) {
+                    if ($data['users']->storage_limit > 0) {
                         $data['storage_limit'] = ($data['users']->storage_limit / $data['plan']->storage_limit) * 100;
                     } else {
                         $data['storage_limit'] = 0;

@@ -31,6 +31,7 @@ class ProductServiceCategoryController extends Controller
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
         ){
+        ){
             $types = ProductServiceCategory::$catTypes;
             $type = ['' => 'Select Category Type'];
 
@@ -47,12 +48,12 @@ class ProductServiceCategoryController extends Controller
         }
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request){
 
         if(
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
+        ){
         ){
 
             $validator = \Validator::make(
@@ -89,6 +90,7 @@ class ProductServiceCategoryController extends Controller
         if(
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
+        ){
         ){
             $types = ProductServiceCategory::$catTypes;
             $category = ProductServiceCategory::find($id);
@@ -142,6 +144,7 @@ class ProductServiceCategoryController extends Controller
         if(
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
+        ){
         ){
             $category = ProductServiceCategory::find($id);
             if ($category->created_by == \Auth::user()->creatorId()) {

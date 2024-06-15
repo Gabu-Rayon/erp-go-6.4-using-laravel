@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Code;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\Details;
@@ -37,15 +38,27 @@ class DetailsController extends Controller
                 $banks = array_filter($classList, function ($item) {
                     return $item['cdCls'] === '36';
                 });
-            
+
                 \Log::info('FILTERED BANKS');
                 \Log::info($banks);
+
+                Code::firstOrCreate([
+                    'cdCls' => $banks[4]['cdCls'],
+                    'cdClsNm' => $banks[4]['cdClsNm'],
+                    'cdClsDesc' => $banks[4]['cdClsDesc'],
+                    'useYn' => $banks[4]['useYn'],
+                    'userDfnNm1' => $banks[4]['userDfnNm1'],
+                    'userDfnNm2' => $banks[4]['userDfnNm2'],
+                    'userDfnNm3' => $banks[4]['userDfnNm3'],
+                ]);
             
                 $syncedDetails = 0;
             
                 foreach ($banks as $bank) {
                     // Ensure 'dtlList' key exists in the current bank array
                     if (isset($bank['dtlList'])) {
+                        \Log::info('GIVEN BANK');
+                        \Log::info($bank);                    
                         foreach ($bank['dtlList'] as $detail) {
                             \Log::info('GIVEN BANK');
                             \Log::info($detail);
@@ -87,7 +100,18 @@ class DetailsController extends Controller
             
                 \Log::info('FILTERED TAXES');
                 \Log::info($banks);
-            
+
+                Code::firstOrCreate([
+                    'cdCls' => $banks[0]['cdCls'],
+                    'cdClsNm' => $banks[0]['cdClsNm'],
+                    'cdClsDesc' => $banks[0]['cdClsDesc'],
+                    'useYn' => $banks[0]['useYn'],
+                    'userDfnNm1' => $banks[0]['userDfnNm1'],
+                    'userDfnNm2' => $banks[0]['userDfnNm2'],
+                    'userDfnNm3' => $banks[0]['userDfnNm3'],
+                ]);
+
+
                 $syncedDetails = 0;
             
                 foreach ($banks as $bank) {
@@ -133,6 +157,16 @@ class DetailsController extends Controller
             
                 \Log::info('FILTERED COUNTRIES');
                 \Log::info($banks);
+
+                Code::firstOrCreate([
+                    'cdCls' => $banks[1]['cdCls'],
+                    'cdClsNm' => $banks[1]['cdClsNm'],
+                    'cdClsDesc' => $banks[1]['cdClsDesc'],
+                    'useYn' => $banks[1]['useYn'],
+                    'userDfnNm1' => $banks[1]['userDfnNm1'],
+                    'userDfnNm2' => $banks[1]['userDfnNm2'],
+                    'userDfnNm3' => $banks[1]['userDfnNm3'],
+                ]);
             
                 $syncedDetails = 0;
             
@@ -178,6 +212,16 @@ class DetailsController extends Controller
             
                 \Log::info('FILTERED REFUND REASONS');
                 \Log::info($banks);
+
+                Code::firstOrCreate([
+                    'cdCls' => $banks[2]['cdCls'],
+                    'cdClsNm' => $banks[2]['cdClsNm'],
+                    'cdClsDesc' => $banks[2]['cdClsDesc'],
+                    'useYn' => $banks[2]['useYn'],
+                    'userDfnNm1' => $banks[2]['userDfnNm1'],
+                    'userDfnNm2' => $banks[2]['userDfnNm2'],
+                    'userDfnNm3' => $banks[2]['userDfnNm3'],
+                ]);
             
                 $syncedDetails = 0;
             
@@ -223,6 +267,16 @@ class DetailsController extends Controller
             
                 \Log::info('FILTERED CURRENCIES');
                 \Log::info($banks);
+
+                Code::firstOrCreate([
+                    'cdCls' => $banks[3]['cdCls'],
+                    'cdClsNm' => $banks[3]['cdClsNm'],
+                    'cdClsDesc' => $banks[3]['cdClsDesc'],
+                    'useYn' => $banks[3]['useYn'],
+                    'userDfnNm1' => $banks[3]['userDfnNm1'],
+                    'userDfnNm2' => $banks[3]['userDfnNm2'],
+                    'userDfnNm3' => $banks[3]['userDfnNm3'],
+                ]);
             
                 $syncedDetails = 0;
             
@@ -268,6 +322,16 @@ class DetailsController extends Controller
             
                 \Log::info('FILTERED LANGUAGES');
                 \Log::info($banks);
+
+                Code::firstOrCreate([
+                    'cdCls' => $banks[5]['cdCls'],
+                    'cdClsNm' => $banks[5]['cdClsNm'],
+                    'cdClsDesc' => $banks[5]['cdClsDesc'],
+                    'useYn' => $banks[5]['useYn'],
+                    'userDfnNm1' => $banks[5]['userDfnNm1'],
+                    'userDfnNm2' => $banks[5]['userDfnNm2'],
+                    'userDfnNm3' => $banks[5]['userDfnNm3'],
+                ]);
             
                 $syncedDetails = 0;
             
