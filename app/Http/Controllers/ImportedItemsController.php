@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ImportedItems;
 use Illuminate\Support\Carbon;
-use App\Models\ItemInformation;
+use App\Models\ProductService;
 use App\Models\ImportItemStatusCode;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -35,7 +35,7 @@ class ImportedItemsController extends Controller
     {
         if(\Auth::user()->type == 'company') {
             $importedItems = ImportedItems::all()->pluck('itemName', 'taskCode');
-            $items = ItemInformation::all()->pluck('itemNm', 'itemCd');
+            $items = ProductService::all()->pluck('itemNm', 'itemCd');
             $importItemStatusCode = ImportItemStatusCode::all()->pluck('code', 'KRA_Code');
             return view('importeditems.mapImportedItem', compact('importedItems', 'items', 'importItemStatusCode'));
 
@@ -79,7 +79,7 @@ class ImportedItemsController extends Controller
                 }
 
                 // Retrieve the given item by its item code
-                $givenItem = ItemInformation::where('itemCd', $request['item'])->first();
+                $givenItem = ProductService::where('itemCd', $request['item'])->first();
 
                 // Ensure the given item exists
                 if (!$givenItem) {
