@@ -20,11 +20,11 @@
                    data-bs-toggle="tooltip" data-bs-placement="top" title="<?php echo e(__('User Logs History')); ?>"><i class="ti ti-user-check"></i>
             </a>
         <?php endif; ?>
-        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create user')): ?>
+        <?php if(\Auth::user()->type == 'super admin'): ?>
             <a href="#" data-size="lg" data-url="<?php echo e(route('users.create')); ?>" data-ajax-popup="true"  data-bs-toggle="tooltip" title="<?php echo e(__('Create')); ?>"  class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-        <?php endif; ?>
+            <?php endif; ?>
     </div>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('content'); ?>
@@ -38,7 +38,6 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0">
                                 <?php if(\Auth::user()->type == 'super admin'): ?>
-
                                         <div class="badge bg-primary p-2 px-3 rounded">
                                             <?php echo e(!empty($user->currentPlan)?$user->currentPlan->name:''); ?>
 
@@ -51,7 +50,7 @@
                                         <?php endif; ?>
                                     </h6>
                                 </div>
-                                <?php if(Gate::check('edit user') || Gate::check('delete user')): ?>
+                                <?php if(\Auth::user()->type == 'super admin'): ?>
                                     <div class="card-header-right">
                                         <div class="btn-group card-option">
                                             <?php if($user->is_active == 1 && $user->is_disable == 1): ?>
@@ -63,14 +62,14 @@
 
                                                 <div class="dropdown-menu dropdown-menu-end">
 
-                                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit user')): ?>
+                                                <?php if(\Auth::user()->type == 'super admin'): ?>
                                                         <a href="#!" data-size="lg" data-url="<?php echo e(route('users.edit',$user->id)); ?>" data-ajax-popup="true" class="dropdown-item" data-bs-original-title="<?php echo e(__('Edit User')); ?>">
                                                             <i class="ti ti-pencil"></i>
                                                             <span><?php echo e(__('Edit')); ?></span>
                                                         </a>
-                                                    <?php endif; ?>
+                                                    
 
-                                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete user')): ?>
+                                                    
                                                         <?php echo Form::open(['method' => 'DELETE', 'route' => ['users.destroy', $user['id']],'id'=>'delete-form-'.$user['id']]); ?>
 
                                                         <a href="#!"  class="dropdown-item bs-pass-para">

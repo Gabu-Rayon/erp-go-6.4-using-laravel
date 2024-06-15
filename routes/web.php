@@ -488,8 +488,6 @@ Route::group(['middleware' => ['verified']], function () {
         }
     );
 
-    Route::resource('taxes', TaxController::class)->middleware(['auth', 'XSS', 'revalidate']);
-
     Route::resource('product-category', ProductServiceCategoryController::class)->middleware(['auth', 'XSS', 'revalidate']);
 
     Route::post('product-category/getaccount', [ProductServiceCategoryController::class, 'getAccount'])->name('productServiceCategory.getaccount')->middleware(['auth', 'XSS', 'revalidate']);
