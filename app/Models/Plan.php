@@ -59,9 +59,12 @@ class Plan extends Model
 
     public static function getPlan($id)
     {
+        \Log::info('Plan ID: '.$id);
         if(self::$getplans == null)
         {
             $plan = Plan::find($id);
+            \Log::info('RETRIEVED PLAN');
+            \Log::info($plan);
             self::$getplans = $plan;
         }
 
