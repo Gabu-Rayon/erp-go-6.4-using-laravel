@@ -15,6 +15,16 @@
     <li class="breadcrumb-item"><?php echo e(__('Imported Items')); ?></li>
 <?php $__env->stopSection(); ?>
 
+<?php $__env->startSection('action-btn'); ?>
+    <div class="float-end">
+        <a
+            href="<?php echo e(route('importeditems.sync')); ?>"
+            class="btn btn-sm btn-primary">
+            Synchronize
+        </a>
+    </div>
+<?php $__env->stopSection(); ?>
+
 <?php $__env->startSection('content'); ?>
 <div class="row">
     <div class="col-md-12">

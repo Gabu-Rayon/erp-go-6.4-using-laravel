@@ -1893,6 +1893,7 @@ Route::post('mapimporteditem', [ImportedItemsController::class, 'store'])->name(
 ;
 Route::get('importeditems/show/{id}', [ImportedItemsController::class, 'show'])->name('importeditems.show')->middleware(['auth', 'XSS']);
 ;
+Route::get('importeditems/sync', [ImportedItemsController::class, 'synchronize'])->name('importeditems.sync')->middleware(['auth', 'XSS']);
 
 
 Route::group(

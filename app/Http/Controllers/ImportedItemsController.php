@@ -129,7 +129,6 @@ class ImportedItemsController extends Controller
                     return redirect()->route('importeditems.index')->with('error', $response['message']);
                 }
 
-                // Code to update the Imported item status, mapped_product_id, mapped_date
                 $importItem->update([
                     'status' => $importItemStatusCode,
                     'mapped_itemCd' => $givenItem->id,
@@ -260,6 +259,27 @@ class ImportedItemsController extends Controller
             //method code here
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
+        }
+    }
+
+    public function synchronize () {
+        try {
+            $date = Carbon::now()->format('YmdHis');
+            $url = 'https://etims.your-apps.biz/api/GetImportedItemInformation?date=' . $date;
+
+            $response = Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
+                'key' => '123456'
+            ])->get($url);
+
+            if ($response['statusCode'] == 500) {
+                return redirect()->back()->with('error', $response['data']['resultMsg']);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error synchronizing Imported Items');
+            \Log::error($e);
+            return redirect()->back()->with('error', 'Something went wrong');
         }
     }
 

@@ -14,6 +14,16 @@
     <li class="breadcrumb-item">{{__('Imported Items')}}</li>
 @endsection
 
+@section('action-btn')
+    <div class="float-end">
+        <a
+            href="{{ route('importeditems.sync') }}"
+            class="btn btn-sm btn-primary">
+            Synchronize
+        </a>
+    </div>
+@endsection
+
 @section('content')
 <div class="row">
     <div class="col-md-12">
