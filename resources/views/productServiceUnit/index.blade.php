@@ -9,11 +9,9 @@
 
 @section('action-btn')
     <div class="float-end">
-        @can('create constant unit')
             <a href="#" data-url="{{ route('product-unit.create') }}" data-ajax-popup="true" data-title="{{__('Create New Unit')}}" data-bs-toggle="tooltip" title="{{__('Create')}}"  class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-        @endcan
     </div>
 @endsection
 
@@ -28,10 +26,14 @@
                     <div class="table-responsive">
                         <table class="table datatable">
                             <thead>
-                            <tr>
-                                <th> {{__('Unit')}}</th>
-                                <th width="10%"> {{__('Action')}}</th>
-                            </tr>
+                                <tr>
+                                    <th>{{__('Code')}}</th>
+                                    <th>{{__('Unit/Name')}}</th>
+                                    <th>{{__('Description')}}</th>
+                                    <th>{{__('Mapping')}}</th>
+                                    <th>{{__('Status')}}</th>
+                                    <th width="10%">{{__('Action')}}</th>
+                                </tr>
                             </thead>
                             <tbody>
                             @foreach ($units as $unit)
@@ -39,14 +41,11 @@
                                     <td>{{ $unit->name }}</td>
                                     <td class="Action">
                                         <span>
-                                        @can('edit constant category')
                                                 <div class="action-btn bg-primary ms-2">
                                                     <a href="#" class="mx-3 btn btn-sm align-items-center" data-url="{{ route('product-unit.edit',$unit->id) }}" data-ajax-popup="true" data-title="{{__('Edit Unit')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                 <i class="ti ti-pencil text-white"></i>
                                             </a>
                                                 </div>
-                                            @endcan
-                                            @can('delete constant category')
                                                 <div class="action-btn bg-danger ms-2">
 
                                                 {!! Form::open(['method' => 'DELETE', 'route' => ['product-unit.destroy', $unit->id],'id'=>'delete-form-'.$unit->id]) !!}
@@ -55,7 +54,6 @@
                                                     </a>
                                                 {!! Form::close() !!}
                                                 </div>
-                                            @endcan
                                         </span>
                                     </td>
                                 </tr>
@@ -67,6 +65,4 @@
             </div>
         </div>
     </div>
-
-
 @endsection

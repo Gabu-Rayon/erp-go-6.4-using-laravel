@@ -162,7 +162,6 @@
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
                                     </td>
-
                                     <td class="form-group col-md-3">
                                         <?php echo e(Form::label('itemCode', __('Item Code'), ['class' => 'form-label'])); ?>
 
@@ -208,7 +207,7 @@
                                     <td class="form-group col-md-3">
                                         <?php echo e(Form::label('qtyUnitCode', __('Quantity Unit Code'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::text('qtyUnitCode', '', ['class' => 'form-control', 'required' => 'required'])); ?>
+                                        <?php echo e(Form::select('qtyUnitCode', $quantityUnitCode, null, ['class' => 'form-control select2', 'placeholder' => __('Select Quantity Unit Code'), 'required' => 'required'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-3">
@@ -274,19 +273,19 @@
                                     <td class="form-group col-md-3">
                                         <?php echo e(Form::label('isInrcApplicable', __('Is Inrc Applicable'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::select('isInrcApplicable', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control', 'required' => 'required'])); ?>
+                                        <?php echo e(Form::select('isInrcApplicable', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2', 'required' => 'required'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-3">
                                         <?php echo e(Form::label('useYn', __('useYn'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::select('useYn', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control', 'required' => 'required'])); ?>
+                                        <?php echo e(Form::select('useYn', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2', 'required' => 'required'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-3">
                                         <?php echo e(Form::label('isUsed', __('Is Used'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::select('isUsed', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control', 'required' => 'required'])); ?>
+                                        <?php echo e(Form::select('isUsed', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2', 'required' => 'required'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-3">
@@ -304,7 +303,7 @@
                                     <td class="form-group col-md-3">
                                         <?php echo e(Form::label('category_id', __('Category'), ['class' => 'form-label'])); ?><span
                                             class="text-danger">*</span>
-                                        <?php echo e(Form::select('category_id', $category, null, ['class' => 'form-control select', 'required' => 'required'])); ?>
+                                        <?php echo e(Form::select('category_id', $category, null, ['class' => 'form-control select2', 'required' => 'required'])); ?>
 
 
                                         <div class=" text-xs">

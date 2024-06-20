@@ -7,7 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class ProductServiceUnit extends Model
 {
     protected $fillable = [
+        'code',
         'name',
+        'description',
+        'mapping',
+        'status',
         'created_by',
     ];
 
