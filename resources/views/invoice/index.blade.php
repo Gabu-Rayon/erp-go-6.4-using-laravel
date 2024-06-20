@@ -28,7 +28,7 @@
 @section('action-btn')
     <div class="float-end">
         <div class="d-inline-block mb-4">
-         {{ Form::open(['route' => 'invoice.no.getSalesByTraderInvoiceNo', 'method' => 'POST', 'class' => 'w-100']) }}
+            {{ Form::open(['route' => 'invoice.no.getSalesByTraderInvoiceNo', 'method' => 'POST', 'class' => 'w-100']) }}
             @csrf
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <div class="form-group">
@@ -38,17 +38,19 @@
             <button type="submit" class="btn btn-primary  sync">{{ __('Search') }}</button>
             {{ Form::close() }}
         </div>
-       <a class="btn btn-sm btn-primary" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1" data-bs-toggle="tooltip" title="{{__('Filter')}}"><i class="ti ti-filter"></i>
-       </a>
+        <a class="btn btn-sm btn-primary" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button"
+            aria-expanded="false" aria-controls="multiCollapseExample1" data-bs-toggle="tooltip"
+            title="{{ __('Filter') }}"><i class="ti ti-filter"></i>
+        </a>
 
         <a href="{{ route('invoice.export') }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
             title="{{ __('Export') }}">
             <i class="ti ti-file-export"></i>
         </a>
-            <a href="{{ route('invoice.create', 0) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
-                title="{{ __('Create') }}">
-                <i class="ti ti-plus"></i>
-            </a>
+        <a href="{{ route('invoice.create', 0) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
+            title="{{ __('Create') }}">
+            <i class="ti ti-plus"></i>
+        </a>
     </div>
 @endsection
 
@@ -116,7 +118,7 @@
                                     <th>{{ __('Due Date') }}</th>
                                     <th>{{ __('Due Amount') }}</th>
                                     <th>{{ __('Status') }}</th>
-                                        <th>{{ __('Action') }}</th>
+                                    <th>{{ __('Action') }}</th>
                                     {{-- <th>
                                 <td class="barcode">
                                     {!! DNS1D::getBarcodeHTML($invoice->sku, "C128",1.4,22) !!}
@@ -162,87 +164,84 @@
                                                     class="status_badge badge bg-primary p-2 px-3 rounded">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
                                             @endif
                                         </td>
-                                            <td class="Action">
-                                                <span>
-                                                    @php $invoiceID= Crypt::encrypt($invoice->id); @endphp
+                                        <td class="Action">
+                                            <span>
+                                                @php $invoiceID= Crypt::encrypt($invoice->id); @endphp
 
-                                                        <div class="action-btn bg-warning ms-2">
-                                                            <a href="#"
-                                                                id="{{ route('invoice.link.copy', [$invoiceID]) }}"
-                                                                class="mx-3 btn btn-sm align-items-center"
-                                                                onclick="copyToClipboard(this)" data-bs-toggle="tooltip"
-                                                                title="{{ __('Copy Invoice') }}"
-                                                                data-original-title="{{ __('Copy Invoice') }}"><i
-                                                                    class="ti ti-link text-white"></i></a>
-                                                        </div>
-                                                        <div class="action-btn bg-primary ms-2">
-                                                            {!! Form::open([
-                                                                'method' => 'get',
-                                                                'route' => ['invoice.duplicate', $invoice->id],
-                                                                'id' => 'duplicate-form-' . $invoice->id,
-                                                            ]) !!}
+                                                <div class="action-btn bg-warning ms-2">
+                                                    <a href="#" id="{{ route('invoice.link.copy', [$invoiceID]) }}"
+                                                        class="mx-3 btn btn-sm align-items-center"
+                                                        onclick="copyToClipboard(this)" data-bs-toggle="tooltip"
+                                                        title="{{ __('Copy Invoice') }}"
+                                                        data-original-title="{{ __('Copy Invoice') }}"><i
+                                                            class="ti ti-link text-white"></i></a>
+                                                </div>
+                                                <div class="action-btn bg-primary ms-2">
+                                                    {!! Form::open([
+                                                        'method' => 'get',
+                                                        'route' => ['invoice.duplicate', $invoice->id],
+                                                        'id' => 'duplicate-form-' . $invoice->id,
+                                                    ]) !!}
 
-                                                            <a href="#"
-                                                                class="mx-3 btn btn-sm align-items-center bs-pass-para"
-                                                                data-toggle="tooltip"
-                                                                data-original-title="{{ __('Duplicate') }}"
-                                                                data-bs-toggle="tooltip" title="Duplicate Invoice"
-                                                                data-original-title="{{ __('Delete') }}"
-                                                                data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back"
-                                                                data-confirm-yes="document.getElementById('duplicate-form-{{ $invoice->id }}').submit();">
-                                                                <i class="ti ti-copy text-white"></i>
-                                                                {!! Form::open([
-                                                                    'method' => 'get',
-                                                                    'route' => ['invoice.duplicate', $invoice->id],
-                                                                    'id' => 'duplicate-form-' . $invoice->id,
-                                                                ]) !!}
-                                                                {!! Form::close() !!}
-                                                            </a>
-                                                        </div>
-                                                        {{--                                                        @if (\Auth::guard('customer')->check()) --}}
-                                                        {{--                                                            <div class="action-btn bg-info ms-2"> --}}
-                                                        {{--                                                                    <a href="{{ route('customer.invoice.show', \Crypt::encrypt($invoice->id)) }}" --}}
-                                                        {{--                                                                       class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip" title="Show " --}}
-                                                        {{--                                                                       data-original-title="{{ __('Detail') }}"> --}}
-                                                        {{--                                                                        <i class="ti ti-eye text-white"></i> --}}
-                                                        {{--                                                                    </a> --}}
-                                                        {{--                                                                </div> --}}
-                                                        {{--                                                        @else --}}
-                                                        <div class="action-btn bg-info ms-2">
-                                                            <a href="{{ route('invoice.show', \Crypt::encrypt($invoice->id)) }}"
-                                                                class="mx-3 btn btn-sm align-items-center"
-                                                                data-bs-toggle="tooltip" title="Show "
-                                                                data-original-title="{{ __('Detail') }}">
-                                                                <i class="ti ti-eye text-white"></i>
-                                                            </a>
-                                                        </div>
-                                                        {{--                                                        @endif --}}
-                                                        <div class="action-btn bg-primary ms-2">
-                                                            <a href="{{ route('invoice.edit', \Crypt::encrypt($invoice->id)) }}"
-                                                                class="mx-3 btn btn-sm align-items-center"
-                                                                data-bs-toggle="tooltip" title="Edit "
-                                                                data-original-title="{{ __('Edit') }}">
-                                                                <i class="ti ti-pencil text-white"></i>
-                                                            </a>
-                                                        </div>
-                                                        <div class="action-btn bg-danger ms-2">
-                                                            {!! Form::open([
-                                                                'method' => 'DELETE',
-                                                                'route' => ['invoice.destroy', $invoice->id],
-                                                                'id' => 'delete-form-' . $invoice->id,
-                                                            ]) !!}
-                                                            <a href="#"
-                                                                class="mx-3 btn btn-sm align-items-center bs-pass-para "
-                                                                data-bs-toggle="tooltip" title="{{ __('Delete') }}"
-                                                                data-original-title="{{ __('Delete') }}"
-                                                                data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
-                                                                data-confirm-yes="document.getElementById('delete-form-{{ $invoice->id }}').submit();">
-                                                                <i class="ti ti-trash text-white"></i>
-                                                            </a>
-                                                            {!! Form::close() !!}
-                                                        </div>
-                                                </span>
-                                            </td>
+                                                    <a href="#"
+                                                        class="mx-3 btn btn-sm align-items-center bs-pass-para"
+                                                        data-toggle="tooltip" data-original-title="{{ __('Duplicate') }}"
+                                                        data-bs-toggle="tooltip" title="Duplicate Invoice"
+                                                        data-original-title="{{ __('Delete') }}"
+                                                        data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back"
+                                                        data-confirm-yes="document.getElementById('duplicate-form-{{ $invoice->id }}').submit();">
+                                                        <i class="ti ti-copy text-white"></i>
+                                                        {!! Form::open([
+                                                            'method' => 'get',
+                                                            'route' => ['invoice.duplicate', $invoice->id],
+                                                            'id' => 'duplicate-form-' . $invoice->id,
+                                                        ]) !!}
+                                                        {!! Form::close() !!}
+                                                    </a>
+                                                </div>
+                                                {{--                                                        @if (\Auth::guard('customer')->check()) --}}
+                                                {{--                                                            <div class="action-btn bg-info ms-2"> --}}
+                                                {{--                                                                    <a href="{{ route('customer.invoice.show', \Crypt::encrypt($invoice->id)) }}" --}}
+                                                {{--                                                                       class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip" title="Show " --}}
+                                                {{--                                                                       data-original-title="{{ __('Detail') }}"> --}}
+                                                {{--                                                                        <i class="ti ti-eye text-white"></i> --}}
+                                                {{--                                                                    </a> --}}
+                                                {{--                                                                </div> --}}
+                                                {{--                                                        @else --}}
+                                                <div class="action-btn bg-info ms-2">
+                                                    <a href="{{ route('invoice.show', \Crypt::encrypt($invoice->id)) }}"
+                                                        class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip"
+                                                        title="Show " data-original-title="{{ __('Detail') }}">
+                                                        <i class="ti ti-eye text-white"></i>
+                                                    </a>
+                                                </div>
+                                                {{--                                                        @endif --}}
+                                                <div class="action-btn bg-primary ms-2">
+                                                    <a href="{{ route('invoice.edit', \Crypt::encrypt($invoice->id)) }}"
+                                                        class="mx-3 btn btn-sm align-items-center"
+                                                        data-bs-toggle="tooltip" title="Edit "
+                                                        data-original-title="{{ __('Edit') }}">
+                                                        <i class="ti ti-pencil text-white"></i>
+                                                    </a>
+                                                </div>
+                                                <div class="action-btn bg-danger ms-2">
+                                                    {!! Form::open([
+                                                        'method' => 'DELETE',
+                                                        'route' => ['invoice.destroy', $invoice->id],
+                                                        'id' => 'delete-form-' . $invoice->id,
+                                                    ]) !!}
+                                                    <a href="#"
+                                                        class="mx-3 btn btn-sm align-items-center bs-pass-para "
+                                                        data-bs-toggle="tooltip" title="{{ __('Delete') }}"
+                                                        data-original-title="{{ __('Delete') }}"
+                                                        data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
+                                                        data-confirm-yes="document.getElementById('delete-form-{{ $invoice->id }}').submit();">
+                                                        <i class="ti ti-trash text-white"></i>
+                                                    </a>
+                                                    {!! Form::close() !!}
+                                                </div>
+                                            </span>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

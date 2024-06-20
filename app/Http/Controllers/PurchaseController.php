@@ -621,14 +621,14 @@ class PurchaseController extends Controller
 
         // Validate the date input
         $request->validate([
-            'searchByDate' => 'required|date_format:Y-m-d',
+            'getpurchaseByDate' => 'required|date_format:Y-m-d',
         ], [
-            'searchByDate.required' => __('Date is required for synchronization Search for Purchase SearchByDate.'),
-            'searchByDate.date_format' => __('Invalid date format.'),
+            'getpurchaseByDate.required' => __('Date is required for synchronization Search for Purchase SearchByDate.'),
+            'getpurchaseByDate.date_format' => __('Invalid date format.'),
         ]);
 
         // Get and format the date
-        $date = $request->input('searchByDate');
+        $date = $request->input('getpurchaseByDate');
         $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
         \Log::info('Date formatted from synchronization request:', ['formattedDate' => $formattedDate]);
 
@@ -2259,144 +2259,7 @@ class PurchaseController extends Controller
         }
     }
 
-
-    // public function searchByDate(Request $request)
-    // {
-    //     // Log the request from the form
-    //     \Log::info('Synchronization request received From Searching the MapPurchase SearchByDate Form:', $request->all());
-
-    //     // Get the date passed from the search form
-    //     $date = $request->input('searchByDate');
-    //     if (!$date) {
-    //         return redirect()->back()->with('error', __('Date is required for synchronization Search for MapPurchase SearchByDate.'));
-    //     }
-
-    //     // Format the date using Carbon
-    //     $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd');
-
-    //     \Log::info('Date Formatted From Synchronization request received From Searching the MapPurchase SearchByDate Form:' . $formattedDate);
-
-    //     try {
-    //         $url = 'https://etims.your-apps.biz/api/MapPurchase/SearchByDate?date=' . $formattedDate;
-
-    //         $response = Http::withOptions(['verify' => false])
-    //             ->withHeaders(['key' => '123456'])
-    //             ->get($url);
-
-    //         $data = $response->json();
-    //         if (!isset($data['data'])) {
-    //             return redirect()->back()->with('error', __('There is no search result.'));
-    //         }
-
-    //         $remoteMapPurchaseSearchByDateinfo = $data['data'];
-    //         \Log::info('REMOTE ITEM INFO', $remoteMapPurchaseSearchByDateinfo);
-
-    //         $remoteMapPurchaseSearchByDateinfoToSync = [];
-    //         foreach ($remoteMapPurchaseSearchByDateinfo as $remoteItem) {
-    //             $item = [
-    //                 'mappedPurchaseId' => $remoteItem['id'],
-    //                 'invcNo' => $remoteItem['invcNo'],
-    //                 'orgInvcNo' => $remoteItem['orgInvcNo'],
-    //                 'supplrTin' => $remoteItem['supplrTin'],
-    //                 'supplrBhfId' => $remoteItem['supplrBhfId'],
-    //                 'supplrName' => $remoteItem['supplrName'],
-    //                 'supplrInvcNo' => $remoteItem['supplrInvcNo'],
-    //                 'purchaseTypeCode' => $remoteItem['purchaseTypeCode'],
-    //                 'rceiptTyCd' => $remoteItem['rceiptTyCd'],
-    //                 'paymentTypeCode' => $remoteItem['paymentTypeCode'],
-    //                 'purchaseSttsCd' => $remoteItem['purchaseSttsCd'],
-    //                 'confirmDate' => $remoteItem['purchaseSttsCd'],
-    //                 'purchaseDate' => $remoteItem['purchaseDate'],
-    //                 'warehouseDt' => $remoteItem['warehouseDt'],
-    //                 'cnclReqDt' => $remoteItem['cnclReqDt'],
-    //                 'cnclDt' => $remoteItem['cnclDt'],
-    //                 'refundDate' => $remoteItem['refundDate'],
-    //                 'totItemCnt' => $remoteItem['totItemCnt'],
-    //                 'taxblAmtA' => $remoteItem['taxblAmtA'],
-    //                 'taxblAmtB' => $remoteItem['taxblAmtB'],
-    //                 'taxblAmtC' => $remoteItem['taxblAmtC'],
-    //                 'taxblAmtD' => $remoteItem['taxblAmtD'],
-    //                 'taxRtA' => $remoteItem['taxRtA'],
-    //                 'taxRtB' => $remoteItem['taxRtB'],
-    //                 'taxRtC' => $remoteItem['taxRtC'],
-    //                 'taxRtD' => $remoteItem['taxRtD'],
-    //                 'taxAmtA' => $remoteItem['taxAmtA'],
-    //                 'taxAmtB' => $remoteItem['taxAmtB'],
-    //                 'taxAmtC' => $remoteItem['taxAmtC'],
-    //                 'taxAmtD' => $remoteItem['taxAmtD'],
-    //                 'totTaxblAmt' => $remoteItem['totTaxblAmt'],
-    //                 'totTaxAmt' => $remoteItem['totTaxAmt'],
-    //                 'totAmt' => $remoteItem['totAmt'],
-    //                 'remark' => $remoteItem['remark'],
-    //                 'resultDt' => $remoteItem['resultDt'],
-    //                 'createdDate' => $remoteItem['createdDate'],
-    //                 'isUpload' => $remoteItem['isUpload'],
-    //                 'isStockIOUpdate' => $remoteItem['isStockIOUpdate'],
-    //                 'isClientStockUpdate' => $remoteItem['isClientStockUpdate'],
-    //             ];
-
-    //             array_push($remoteMapPurchaseSearchByDateinfoToSync, $item);
-    //         }
-
-    //         \Log::info('REMOTE Mapped Purchase Search By Date INFO TO SYNC:', $remoteMapPurchaseSearchByDateinfoToSync);
-
-    //         // Synchronize the purchases
-    //         $syncedLocalMapPurchaseSearchByDateinfosInfo = 0;
-
-    //         foreach ($remoteMapPurchaseSearchByDateinfoToSync as $remoteItemInfo) {
-    //             $exists = MappedPurchases::where('invcNo', $remoteItemInfo['invcNo'])->exists();
-    //             if (!$exists) {
-    //                 $mappedPurchase = MappedPurchases::create($remoteItemInfo);
-    //                 $syncedLocalMapPurchaseSearchByDateinfosInfo++;
-
-    //                 // Check if mapPurchaseItemList key exists in $remoteItemInfo
-    //                 if (isset($remoteItemInfo['mapPurchaseItemList']) && is_array($remoteItemInfo['mapPurchaseItemList'])) {
-    //                     foreach ($remoteItemInfo['mapPurchaseItemList'] as $itemList) {
-    //                         // Create a new MappedPurchaseItemList instance
-    //                         $mappedPurchaseItemList = new MappedPurchaseItemList();
-
-    //                         // Set the attributes
-    //                         $mappedPurchaseItemList->purchase_item_list_id = $itemList['id'];
-    //                         $mappedPurchaseItemList->mapped_purchase_id = $mappedPurchase->id;
-    //                         $mappedPurchaseItemList->itemSeq = $itemList['itemSeq'];
-    //                         $mappedPurchaseItemList->itemCd = $itemList['itemCd'];
-    //                         $mappedPurchaseItemList->itemClsCd = $itemList['itemClsCd'];
-    //                         $mappedPurchaseItemList->itemNmme = $itemList['itemNmme'];
-    //                         $mappedPurchaseItemList->bcd = $itemList['bcd'];
-    //                         $mappedPurchaseItemList->supplrItemClsCd = $itemList['supplrItemClsCd'];
-    //                         $mappedPurchaseItemList->supplrItemCd = $itemList['supplrItemCd'];
-    //                         $mappedPurchaseItemList->supplrItemNm = $itemList['supplrItemNm'];
-    //                         $mappedPurchaseItemList->pkgUnitCd = $itemList['pkgUnitCd'];
-    //                         $mappedPurchaseItemList->pkg = $itemList['pkg'];
-    //                         $mappedPurchaseItemList->qtyUnitCd = $itemList['qtyUnitCd'];
-    //                         $mappedPurchaseItemList->qty = $itemList['qty'];
-    //                         $mappedPurchaseItemList->unitprice = $itemList['unitprice'];
-    //                         $mappedPurchaseItemList->supplyAmt = $itemList['supplyAmt'];
-    //                         $mappedPurchaseItemList->discountRate = $itemList['discountRate'];
-    //                         $mappedPurchaseItemList->discountAmt = $itemList['discountAmt'];
-    //                         $mappedPurchaseItemList->taxblAmt = $itemList['taxblAmt'];
-    //                         $mappedPurchaseItemList->taxTyCd = $itemList['taxTyCd'];
-    //                         $mappedPurchaseItemList->taxAmt = $itemList['taxAmt'];
-    //                         $mappedPurchaseItemList->totAmt = $itemList['totAmt'];
-    //                         $mappedPurchaseItemList->itemExprDt = $itemList['itemExprDt'];
-
-    //                         // Save the instance
-    //                         $mappedPurchaseItemList->save();
-    //                     }
-    //                 }
-    //             }
-    //         }
-
-    //         if ($syncedLocalMapPurchaseSearchByDateinfosInfo > 0) {
-    //             return redirect()->back()->with('success', __('Synced ' . $syncedLocalMapPurchaseSearchByDateinfosInfo . ' Map Purchases Successfully'));
-    //         } else {
-    //             return redirect()->back()->with('success', __('Map Purchases Up To Date'));
-    //         }
-    //     } catch (\Exception $e) {
-    //         \Log::error('Error syncing Map Purchases :', ['error' => $e->getMessage()]);
-    //         return redirect()->back()->with('error', __('Error SyncingMap Purchases '));
-    //     }
-    // }
+     ///search MapPurchase  by Date Code Here 
 
     public function searchByDate(Request $request)
     {

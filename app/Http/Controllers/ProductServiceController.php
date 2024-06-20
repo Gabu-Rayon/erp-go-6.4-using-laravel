@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\Tax;
 use App\Models\Code;
 use App\Models\User;
@@ -39,10 +40,10 @@ class ProductServiceController extends Controller
     public function index(Request $request)
     {
 
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
 
@@ -54,8 +55,7 @@ class ProductServiceController extends Controller
             }
 
             return view('productservice.index', compact('productServices', 'category'));
-        }
-         else {
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -63,17 +63,17 @@ class ProductServiceController extends Controller
 
     public function create()
     {
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             $items = ProductService::all()->pluck('itemNm', 'itemCd');
             $itemclassifications = ProductsServicesClassification::pluck('itemClsNm', 'itemClsCd');
             $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
             $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
             $category = ProductServiceCategory::all()->pluck('name', 'id');
             $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
-            $quantityUnitCode = ProductServiceUnit::pluck('Name','code');
+            $quantityUnitCode = ProductServiceUnit::pluck('Name', 'code');
 
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
             $unit = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -138,10 +138,10 @@ class ProductServiceController extends Controller
     public function store(Request $request)
     {
         try {
-            if(
+            if (
                 \Auth::user()->type == 'company'
                 || \Auth::user()->type == 'accountant'
-            ){
+            ) {
                 \Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
                 \Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
 
@@ -182,7 +182,7 @@ class ProductServiceController extends Controller
                             $path = Utility::upload_file($item, 'pro_image', $fileName, $dir, []);
 
                             \Log::info('product image path:', $path);
-                            
+
                             // Assign the file name to the pro_image field
                             $item['pro_image'] = $fileName;
 
@@ -464,100 +464,146 @@ class ProductServiceController extends Controller
 //     }
 
 
-   public function update(Request $request, $id)
-{
-    $iteminformation = ProductService::find($id);
-    \Log::info('Product Service INFO being edited :', ['item' => $iteminformation]);
-    try {
-        $request->validate([
-            'itemCd' => 'required',
-            'itemClsCd' => 'required',
-            'itemTyCd' => 'required',
-            'itemNm' => 'required',
-            'orgnNatCd' => 'required',
-            'pkgUnitCd' => 'required',
-            'qtyUnitCd' => 'required',
-            'taxTyCd' => 'required',
-            'dftPrc' => 'required',
-            'isrcAplcbYn' => 'required',
-            'useYn' => 'required',
-        ]);
+    public function update(Request $request, $id)
+    {
+        $iteminformation = ProductService::find($id);
+        \Log::info('Product Service INFO being edited :', ['item' => $iteminformation]);
+        try {
+            $request->validate([
+                'itemCd' => 'required',
+                'itemClsCd' => 'required',
+                'itemTyCd' => 'required',
+                'itemNm' => 'required',
+                'orgnNatCd' => 'required',
+                'pkgUnitCd' => 'required',
+                'qtyUnitCd' => 'required',
+                'taxTyCd' => 'required',
+                'dftPrc' => 'required',
+                'isrcAplcbYn' => 'required',
+                'useYn' => 'required',
+            ]);
 
-        $data = $request->all();
-        \Log::info('Product Service INFO being edited and posted to the API:', $data);
+            $data = $request->all();
+            \Log::info('Product Service INFO being edited and posted to the API:', $data);
 
-        $reqData = [
-            "itemCode" => $data['itemCd'],
-            "itemClassifiCode" => $data['itemClsCd'],
-            "itemTypeCode" => $data['itemTyCd'],
-            "itemName" => $data['itemNm'],
-            "itemStrdName" => $data['itemStdNm'],
-            "countryCode" => $data['orgnNatCd'],
-            "pkgUnitCode" => $data['pkgUnitCd'],
-            "qtyUnitCode" => $data['qtyUnitCd'],
-            "taxTypeCode" => $data['taxTyCd'],
-            "batchNo" => $data['btchNo'],
-            "barcode" => $data['bcd'],
-            "unitPrice" => $data['dftPrc'],
-            "group1UnitPrice" => $data['grpPrcL1'],
-            "group2UnitPrice" => $data['grpPrcL2'],
-            "group3UnitPrice" => $data['grpPrcL3'],
-            "group4UnitPrice" => $data['grpPrcL4'],
-            "group5UnitPrice" => $data['grpPrcL5'],
-            "additionalInfo" => $data['addInfo'],
-            "saftyQuantity" => $data['saftyQuantity'],
-            "isInrcApplicable" => (boolean) $data['isrcAplcbYn'],
-            "isUsed" => (boolean) $data['useYn'],
-            "packageQuantity" => $data['packageQuantity'],
-        ];
+            $reqData = [
+                "itemCode" => $data['itemCd'],
+                "itemClassifiCode" => $data['itemClsCd'],
+                "itemTypeCode" => $data['itemTyCd'],
+                "itemName" => $data['itemNm'],
+                "itemStrdName" => $data['itemStdNm'],
+                "countryCode" => $data['orgnNatCd'],
+                "pkgUnitCode" => $data['pkgUnitCd'],
+                "qtyUnitCode" => $data['qtyUnitCd'],
+                "taxTypeCode" => $data['taxTyCd'],
+                "batchNo" => $data['btchNo'],
+                "barcode" => $data['bcd'],
+                "unitPrice" => $data['dftPrc'],
+                "group1UnitPrice" => $data['grpPrcL1'],
+                "group2UnitPrice" => $data['grpPrcL2'],
+                "group3UnitPrice" => $data['grpPrcL3'],
+                "group4UnitPrice" => $data['grpPrcL4'],
+                "group5UnitPrice" => $data['grpPrcL5'],
+                "additionalInfo" => $data['addInfo'],
+                "saftyQuantity" => $data['saftyQuantity'],
+                "isInrcApplicable" => (boolean) $data['isrcAplcbYn'],
+                "isUsed" => (boolean) $data['useYn'],
+                "packageQuantity" => $data['packageQuantity'],
+            ];
 
-        $response = Http::withOptions([
-            'verify' => false
-        ])->withHeaders([
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-            'key' => '123456'
-        ])->post('https://etims.your-apps.biz/api/UpdateItem', $reqData);
+            $response = Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                        'key' => '123456'
+                    ])->post('https://etims.your-apps.biz/api/UpdateItem', $reqData);
 
-        $res = $response->json();
+            $res = $response->json();
 
-        \Log::info('API Request Data: ' . json_encode($reqData));
-        \Log::info('API RESPONSE when posting the Product Details When being Edited: ', ['response' => $res]);
+            \Log::info('API Request Data: ' . json_encode($reqData));
+            \Log::info('API RESPONSE when posting the Product Details When being Edited: ', ['response' => $res]);
 
-        if ($res['statusCode'] != 200) {
-            return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
-        }
+            if ($res['statusCode'] != 200) {
+                return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
+            }
 
-        // Mapping array for taxTypeCode to tax_id
-        $taxTypeMapping = [
-            'A' => 1,
-            'B' => 2,
-            'C' => 3,
-            'D' => 4,
-            'E' => 5,
-            'F' => 6,
-        ];
+            // Mapping array for taxTypeCode to tax_id
+            $taxTypeMapping = [
+                'A' => 1,
+                'B' => 2,
+                'C' => 3,
+                'D' => 4,
+                'E' => 5,
+                'F' => 6,
+            ];
 
-        // Determine the tax_id based on taxTypeCode
-        $taxIdCode = isset($data['taxTyCd']) && array_key_exists($data['taxTyCd'], $taxTypeMapping)
-            ? $taxTypeMapping[$data['taxTyCd']]
-            : null;
+            // Determine the tax_id based on taxTypeCode
+            $taxIdCode = isset($data['taxTyCd']) && array_key_exists($data['taxTyCd'], $taxTypeMapping)
+                ? $taxTypeMapping[$data['taxTyCd']]
+                : null;
 
-        // Handling image upload with storage limit check
-        if (!empty($data['pro_image']) && $data['pro_image']->isValid()) {
-            \Log::info('Image File Object for Item being edited');
-            $image_size = $data['pro_image']->getSize();
-            $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
+            // Handling image upload with storage limit check
+            if (!empty($data['pro_image']) && $data['pro_image']->isValid()) {
+                \Log::info('Image File Object for Item being edited');
+                $image_size = $data['pro_image']->getSize();
+                $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
 
-            if ($result == 1) {
-                $fileName = $data['pro_image']->getClientOriginalName();
-                $dir = 'uploads/pro_image';
-                $path = Utility::upload_file($data, 'pro_image', $fileName, $dir, []);
+                if ($result == 1) {
+                    $fileName = $data['pro_image']->getClientOriginalName();
+                    $dir = 'uploads/pro_image';
+                    $path = Utility::upload_file($data, 'pro_image', $fileName, $dir, []);
 
-                \Log::info('PATH');
-                \Log::info($path);
+                    \Log::info('PATH');
+                    \Log::info($path);
 
-                // Update the product Service information including the new image name
+                    // Update the product Service information including the new image name
+                    $iteminformation->update([
+                        'name' => $data['itemNm'],
+                        'sku' => $data['sku'],
+                        'sale_price' => $data['sale_price'],
+                        'purchase_price' => $data['purchase_price'],
+                        'quantity' => $data['quantity'],
+                        'tax_id' => $taxIdCode,
+                        'category_id' => $data['category_id'],
+                        'unit_id' => $data['unit_id'],
+                        'type' => $data['type'],
+                        'sale_chartaccount_id' => $data['sale_chartaccount_id'],
+                        'expense_chartaccount_id' => $data['expense_chartaccount_id'],
+                        'description' => $data['description'],
+                        'pro_image' => $fileName,
+                        'tin' => $data['tin'],
+                        'itemCd' => $data['itemCd'],
+                        'itemClsCd' => $data['itemClsCd'],
+                        'itemTyCd' => $data['itemTyCd'],
+                        'itemNm' => $data['itemNm'],
+                        'itemStdNm' => $data['itemStdNm'],
+                        'orgnNatCd' => $data['orgnNatCd'],
+                        'pkgUnitCd' => $data['pkgUnitCd'],
+                        'qtyUnitCd' => $data['qtyUnitCd'],
+                        'taxTyCd' => $data['taxTyCd'],
+                        'btchNo' => $data['btchNo'],
+                        'regBhfId' => $data['regBhfId'],
+                        'bcd' => $data['bcd'],
+                        'dftPrc' => $data['dftPrc'],
+                        'grpPrcL1' => $data['grpPrcL1'],
+                        'grpPrcL2' => $data['grpPrcL2'],
+                        'grpPrcL3' => $data['grpPrcL3'],
+                        'grpPrcL4' => $data['grpPrcL4'],
+                        'grpPrcL5' => $data['grpPrcL5'],
+                        'addInfo' => $data['addInfo'],
+                        'sftyQty' => $data['sftyQty'],
+                        'isrcAplcbYn' => $data['isrcAplcbYn'],
+                        'rraModYn' => $data['isUsed'],
+                        'packageQuantity' => $data['packageQuantity'],
+                        'useYn' => $data['useYn'],
+                    ]);
+                } else {
+                    \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
+                    return redirect()->back()->with('error', 'Storage limit exceeded.');
+                }
+            } else {
+                // Update the Product Service information without changing the image
                 $iteminformation->update([
                     'name' => $data['itemNm'],
                     'sku' => $data['sku'],
@@ -571,7 +617,6 @@ class ProductServiceController extends Controller
                     'sale_chartaccount_id' => $data['sale_chartaccount_id'],
                     'expense_chartaccount_id' => $data['expense_chartaccount_id'],
                     'description' => $data['description'],
-                    'pro_image' => $fileName,
                     'tin' => $data['tin'],
                     'itemCd' => $data['itemCd'],
                     'itemClsCd' => $data['itemClsCd'],
@@ -598,65 +643,20 @@ class ProductServiceController extends Controller
                     'packageQuantity' => $data['packageQuantity'],
                     'useYn' => $data['useYn'],
                 ]);
-            } else {
-                \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
-                return redirect()->back()->with('error', 'Storage limit exceeded.');
             }
-        } else {
-            // Update the Product Service information without changing the image
-            $iteminformation->update([
-                'name' => $data['itemNm'],
-                'sku' => $data['sku'],
-                'sale_price' => $data['sale_price'],
-                'purchase_price' => $data['purchase_price'],
-                'quantity' => $data['quantity'],
-                'tax_id' => $taxIdCode,
-                'category_id' => $data['category_id'],
-                'unit_id' => $data['unit_id'],
-                'type' => $data['type'],
-                'sale_chartaccount_id' => $data['sale_chartaccount_id'],
-                'expense_chartaccount_id' => $data['expense_chartaccount_id'],
-                'description' => $data['description'],
-                'tin' => $data['tin'],
-                'itemCd' => $data['itemCd'],
-                'itemClsCd' => $data['itemClsCd'],
-                'itemTyCd' => $data['itemTyCd'],
-                'itemNm' => $data['itemNm'],
-                'itemStdNm' => $data['itemStdNm'],
-                'orgnNatCd' => $data['orgnNatCd'],
-                'pkgUnitCd' => $data['pkgUnitCd'],
-                'qtyUnitCd' => $data['qtyUnitCd'],
-                'taxTyCd' => $data['taxTyCd'],
-                'btchNo' => $data['btchNo'],
-                'regBhfId' => $data['regBhfId'],
-                'bcd' => $data['bcd'],
-                'dftPrc' => $data['dftPrc'],
-                'grpPrcL1' => $data['grpPrcL1'],
-                'grpPrcL2' => $data['grpPrcL2'],
-                'grpPrcL3' => $data['grpPrcL3'],
-                'grpPrcL4' => $data['grpPrcL4'],
-                'grpPrcL5' => $data['grpPrcL5'],
-                'addInfo' => $data['addInfo'],
-                'sftyQty' => $data['sftyQty'],
-                'isrcAplcbYn' => $data['isrcAplcbYn'],
-                'rraModYn' => $data['isUsed'],
-                'packageQuantity' => $data['packageQuantity'],
-                'useYn' => $data['useYn'],
-            ]);
-        }
 
-        return redirect()->route('productservice.index')->with('success', 'Product / Service Updated Successfully');
-    } catch (\Exception $e) {
-        \Log::error('UPDATE PRODUCT SERVICE ERROR', ['exception' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-        return redirect()->back()->with('error', 'Something Went Wrong');
+            return redirect()->route('productservice.index')->with('success', 'Product / Service Updated Successfully');
+        } catch (\Exception $e) {
+            \Log::error('UPDATE PRODUCT SERVICE ERROR', ['exception' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return redirect()->back()->with('error', 'Something Went Wrong');
+        }
     }
-}
     public function edit($id)
     {
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             $productServiceinformation = ProductService::find($id);
 
             $productServiceclassifications = ProductsServicesClassification::pluck('itemClsNm', 'itemClsCd');
@@ -730,10 +730,10 @@ class ProductServiceController extends Controller
 
     public function destroy($id)
     {
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             $productService = ProductService::find($id);
             if ($productService->created_by == \Auth::user()->creatorId()) {
                 if (!empty($productService->pro_image)) {
@@ -957,7 +957,8 @@ class ProductServiceController extends Controller
         return view('productservice.detail', compact('products'));
     }
 
-    public function searchProducts(Request $request) {
+    public function searchProducts(Request $request)
+    {
 
         $lastsegment = $request->session_key;
 
@@ -1046,20 +1047,22 @@ class ProductServiceController extends Controller
         }
     }
 
-    public function addToCart(Request $request, $id, $session_key) {
+    public function addToCart(Request $request, $id, $session_key)
+    {
 
         try {
-            if(
+            if (
                 \Auth::user()->type == 'company'
                 || \Auth::user()->type == 'accountant'
-             && $request->ajax()) {
+                && $request->ajax()
+            ) {
                 $product = WarehouseProduct::where('product_id', $id)->first();
                 $productquantity = 0;
-    
+
                 if ($product) {
                     $productquantity = $product->quantity;
                 }
-    
+
                 if (!$product || ($session_key == 'pos' && $productquantity == 0)) {
                     return response()->json(
                         [
@@ -1070,49 +1073,49 @@ class ProductServiceController extends Controller
                         404
                     );
                 }
-    
+
                 $productname = $product->name;
-    
+
                 if ($session_key == 'purchases') {
-    
+
                     $productprice = $product->purchase_price != 0 ? $product->purchase_price : 0;
                 } else if ($session_key == 'pos') {
-    
+
                     $productprice = $product->sale_price != 0 ? $product->sale_price : 0;
                 } else {
-    
+
                     $productprice = $product->sale_price != 0 ? $product->sale_price : $product->purchase_price;
                 }
-    
+
                 $originalquantity = (int) $productquantity;
-    
+
                 $taxes = Utility::tax($product->tax_id);
-    
+
                 $totalTaxRate = Utility::totalTaxRate($product->tax_id);
-    
+
                 $product_tax = '';
                 $product_tax_id = [];
                 foreach ($taxes as $tax) {
                     $product_tax .= !empty($tax) ? "<span class='badge badge-primary'>" . $tax->name . ' (' . $tax->rate . '%)' . "</span><br>" : '';
                     $product_tax_id[] = !empty($tax) ? $tax->id : 0;
                 }
-    
+
                 if (empty($product_tax)) {
                     $product_tax = "-";
                 }
                 $producttax = $totalTaxRate;
-    
-    
+
+
                 $tax = ($productprice * $producttax) / 100;
-    
+
                 $subtotal = $productprice + $tax;
                 $cart = session()->get($session_key);
                 $image_url = (!empty($product->pro_image) && Storage::exists($product->pro_image)) ? $product->pro_image : 'uploads/pro_image/' . $product->pro_image;
-    
+
                 $model_delete_id = 'delete-form-' . $id;
-    
+
                 $carthtml = '';
-    
+
                 $carthtml .= '<tr data-product-id="' . $id . '" id="product-id-' . $id . '">
                                 <td class="cart-images">
                                     <img alt="Image placeholder" src="' . asset(Storage::url($image_url)) . '" class="card-image avatar shadow hover-shadow-lg">
@@ -1148,7 +1151,7 @@ class ProductServiceController extends Controller
     
                                 </td>
                             </td>';
-    
+
                 // if cart is empty then this the first product
                 if (!$cart) {
                     $cart = [
@@ -1164,8 +1167,8 @@ class ProductServiceController extends Controller
                             "product_tax_id" => !empty($product_tax_id) ? implode(',', $product_tax_id) : 0,
                         ],
                     ];
-    
-    
+
+
                     if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
                         return response()->json(
                             [
@@ -1176,9 +1179,9 @@ class ProductServiceController extends Controller
                             404
                         );
                     }
-    
+
                     session()->put($session_key, $cart);
-    
+
                     return response()->json(
                         [
                             'code' => 200,
@@ -1189,19 +1192,19 @@ class ProductServiceController extends Controller
                         ]
                     );
                 }
-    
+
                 // if cart not empty then check if this product exist then increment quantity
                 if (isset($cart[$id])) {
-    
+
                     $cart[$id]['quantity']++;
                     $cart[$id]['id'] = $id;
-    
+
                     $subtotal = $cart[$id]["price"] * $cart[$id]["quantity"];
                     $tax = ($subtotal * $cart[$id]["tax"]) / 100;
-    
+
                     $cart[$id]["subtotal"] = $subtotal + $tax;
                     $cart[$id]["originalquantity"] = $originalquantity;
-    
+
                     if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
                         return response()->json(
                             [
@@ -1212,9 +1215,9 @@ class ProductServiceController extends Controller
                             404
                         );
                     }
-    
+
                     session()->put($session_key, $cart);
-    
+
                     return response()->json(
                         [
                             'code' => 200,
@@ -1225,7 +1228,7 @@ class ProductServiceController extends Controller
                         ]
                     );
                 }
-    
+
                 // if item not exist in cart then add to cart with quantity = 1
                 $cart[$id] = [
                     "name" => $productname,
@@ -1237,7 +1240,7 @@ class ProductServiceController extends Controller
                     "originalquantity" => $originalquantity,
                     "product_tax" => $product_tax,
                 ];
-    
+
                 if ($originalquantity < $cart[$id]['quantity'] && $session_key == 'pos') {
                     return response()->json(
                         [
@@ -1248,9 +1251,9 @@ class ProductServiceController extends Controller
                         404
                     );
                 }
-    
+
                 session()->put($session_key, $cart);
-    
+
                 return response()->json(
                     [
                         'code' => 200,
@@ -1720,7 +1723,114 @@ class ProductServiceController extends Controller
         }
     }
 
+    public function productServiceSearchByDate(Request $request)
+    {
+        // Log the incoming request
+        \Log::info('Synchronization Product Search by Date request received:', $request->all());
 
+        // Validate the product service search by date date 
+        $request->validate([
+            'searchByDate' => 'required|date_format:Y-m-d',
+        ], [
+            'searchByDate.required' => __('Date is required for synchronization Search for Product & Services SearchByDate.'),
+            'searchByDate.date_format' => __('Invalid date format.'),
+        ]);
+
+        // Get and format the date
+        $date = $request->input('searchByDate');
+        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
+        \Log::info('Date formatted from synchronization product & Services request:', ['formattedDate' => $formattedDate]);
+
+        try {
+            // Make the API call
+            $response = Http::withOptions(['verify' => false])
+                ->withHeaders(['key' => '123456'])
+                ->get("https://etims.your-apps.biz/api/GetItemInformation", [
+                    'date' => $date,
+                ]);
+
+            // Check if the response contains the required data
+            $data = $response->json()['data']['itemList'] ?? [];
+            if (empty($data)) {
+                return redirect()->back()->with('error', __('There is no search result.'));
+            }
+
+            \Log::info('API Request Data For All Items Information: ' . json_encode($data));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+
+            // Define the mapping array for taxTyCd to tax_id
+            $taxTypeMapping = [
+                'A' => 1,
+                'B' => 2,
+                'C' => 3,
+                'D' => 4,
+                'E' => 5,
+                'F' => 6,
+            ];
+
+            foreach ($data as $item) {
+                // Determine the tax_id based on taxTyCd
+                $taxIdCode = $item['taxTyCd'] ?? null;
+                $taxIdCode = $taxIdCode && array_key_exists($taxIdCode, $taxTypeMapping) ? $taxTypeMapping[$taxIdCode] : null;
+
+                $productServiceData = [
+                    'name' => $item['itemNm'],
+                    'sku' => null,
+                    'sale_price' => null,
+                    'purchase_price' => null,
+                    'quantity' => null,
+                    'tax_id' => $taxIdCode,
+                    'category_id' => null,
+                    'unit_id' => null,
+                    'type' => 'product',  // Set the type to 'product'
+                    'sale_chartaccount_id' => null,
+                    'expense_chartaccount_id' => null,
+                    'description' => $item['addInfo'],
+                    'pro_image' => null,
+                    'created_by' => \Auth::user()->creatorId(),
+                    'tin' => $item['tin'],
+                    'itemCd' => $item['itemCd'],
+                    'itemClsCd' => $item['itemClsCd'],
+                    'itemTyCd' => $item['itemTyCd'],
+                    'itemNm' => $item['itemNm'],
+                    'itemStdNm' => $item['itemStdNm'],
+                    'orgnNatCd' => $item['orgnNatCd'],
+                    'pkgUnitCd' => $item['pkgUnitCd'],
+                    'qtyUnitCd' => $item['qtyUnitCd'],
+                    'taxTyCd' => $item['taxTyCd'],
+                    'btchNo' => $item['btchNo'],
+                    'regBhfId' => $item['regBhfId'],
+                    'bcd' => $item['bcd'],
+                    'dftPrc' => $item['dftPrc'],
+                    'grpPrcL1' => $item['grpPrcL1'],
+                    'grpPrcL2' => $item['grpPrcL2'],
+                    'grpPrcL3' => $item['grpPrcL3'],
+                    'grpPrcL4' => $item['grpPrcL4'],
+                    'grpPrcL5' => $item['grpPrcL5'],
+                    'addInfo' => $item['addInfo'],
+                    'sftyQty' => $item['sftyQty'],
+                    'isrcAplcbYn' => $item['isrcAplcbYn'],
+                    'rraModYn' => $item['rraModYn'],
+                    'useYn' => $item['useYn']
+                ];
+
+                \Log::info('Product & Service Data to Sync:', $productServiceData);
+
+                // Check if the product service already exists and sync if not
+                $exists = ProductService::where('tin', $productServiceData['tin'])->exists();
+                if (!$exists) {
+                    ProductService::create($productServiceData);
+                    return redirect()->back()->with('success', __('Synced Product & Service successfully.'));
+                } else {
+                    return redirect()->back()->with('success', __('Product & Service record is up to date.'));
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error syncing Product & Service:', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', __('Product & Service Not Found !'));
+        }
+    }
 
 
 
