@@ -262,25 +262,87 @@ class ImportedItemsController extends Controller
         }
     }
 
-    public function synchronize () {
+    public function synchronize(Request $request)
+    {
+        // Log the request from the form
+        \Log::info('Synchronization request received From Searching the Imported Items Search Form:', $request->all());
+
+        // Get the date passed from the search form
+        $date = $request->input('importedItemDate');
+        if (!$date) {
+            return redirect()->back()->with('error', __('Date is required for synchronization Search for Imported Item.'));
+        }
+
+        // Format the date using Carbon
+        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
+
+        \Log::info('Date Formatted Synchronization request received From Searching the Imported Items Search Form:'. $formattedDate);
+
         try {
-            $date = Carbon::now()->format('YmdHis');
-            $url = 'https://etims.your-apps.biz/api/GetImportedItemInformation?date=' . $date;
+            $url = 'https://etims.your-apps.biz/api/GetImportedItemInformation?date=' . $formattedDate;
 
-            $response = Http::withOptions([
-                'verify' => false
-            ])->withHeaders([
-                'key' => '123456'
-            ])->get($url);
+            $response = Http::withOptions(['verify' => false])
+                ->withHeaders(['key' => '123456'])
+                ->get($url);
 
-            if ($response['statusCode'] == 500) {
-                return redirect()->back()->with('error', $response['data']['resultMsg']);
+            $data = $response->json();
+            if (!isset($data['data']['itemClsList'])) {
+                return redirect()->back()->with('error', __('There is no search result.'));
+            }
+
+            $remoteImportedItemsinfo = $data['data']['itemClsList'];
+            \Log::info('REMOTE ITEM INFO', $remoteImportedItemsinfo);
+
+            $remoteImportedItemsinfoToSync = [];
+            foreach ($remoteImportedItemsinfo as $remoteItem) {
+                $item = [
+                    'srNo' => $remoteItem['srNo'],
+                    'taskCode' => $remoteItem['taskCode'],
+                    'itemName' => $remoteItem['itemName'],
+                    'hsCode' => $remoteItem['hsCode'],
+                    'pkgUnitCode' => $remoteItem['pkgUnitCode'],
+                    'netWeight' => $remoteItem['netWeight'],
+                    'invForCode' => $remoteItem['invForCode'],
+                    'declarationDate' => $remoteItem['declarationDate'],
+                    'orginNationCode' => $remoteItem['orginNationCode'],
+                    'qty' => $remoteItem['qty'],
+                    'supplierName' => $remoteItem['supplierName'],
+                    'nvcfcurExcrt' => $remoteItem['nvcfcurExcrt'],
+                    'itemSeq' => $remoteItem['itemSeq'],
+                    'exprtNatCode' => $remoteItem['exprtNatCode'],
+                    'qtyUnitCode' => $remoteItem['qtyUnitCode'],
+                    'agentName' => $remoteItem['agentName'],
+                    'declarationNo' => $remoteItem['declarationNo'],
+                    'package' => $remoteItem['package'],
+                    'grossWeight' => $remoteItem['grossWeight'],
+                    'invForCurrencyAmount' => $remoteItem['invForCurrencyAmount'],
+                    'status' => $remoteItem['status'],
+                    'mapped_product_id' => null,
+                    'mapped_date' => null,
+                    'created_by' => \Auth::user()->creatorId()
+                ];
+                array_push($remoteImportedItemsinfoToSync, $item);
+            }
+
+            \Log::info('REMOTE ITEM INFO TO SYNC:', $remoteImportedItemsinfoToSync);
+
+            $syncedLocalImportedItemsInfo = 0;
+            foreach ($remoteImportedItemsinfoToSync as $remoteItemInfo) {
+                $exists = ImportedItems::where('taskCode', $remoteItemInfo['taskCode'])->exists();
+                if (!$exists) {
+                    ImportedItems::create($remoteItemInfo);
+                    $syncedLocalImportedItemsInfo++;
+                }
+            }
+
+            if ($syncedLocalImportedItemsInfo > 0) {
+                return redirect()->back()->with('success', __('Synced ' . $syncedLocalImportedItemsInfo . ' Imported Items Successfully'));
+            } else {
+                return redirect()->back()->with('success', __('Imported Items Up To Date'));
             }
         } catch (\Exception $e) {
-            \Log::error('Error synchronizing Imported Items');
-            \Log::error($e);
-            return redirect()->back()->with('error', 'Something went wrong');
+            \Log::error('Error syncing imported items:', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', __('Error Syncing Imported Items'));
         }
     }
-
 }

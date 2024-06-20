@@ -16,11 +16,17 @@
 
 @section('action-btn')
     <div class="float-end">
-        <a
-            href="{{ route('importeditems.sync') }}"
-            class="btn btn-sm btn-primary">
-            Synchronize
-        </a>
+        <div class="d-inline-block mb-4">
+            {{ Form::open(['route' => 'importeditems.sync', 'method' => 'POST', 'class' => 'w-100']) }}
+            @csrf
+            <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                {{ Form::label('importedItemDate', __('Search Date (ex- 01-Dec-2021)'), ['class' => 'form-label']) }}
+                {{ Form::date('importedItemDate', null, ['class' => 'form-control','required' => 'required']) }}
+            </div>
+            <button type="submit" class="btn btn-primary  sync">{{ __('Search') }}</button>
+            {{ Form::close() }}
+        </div>
     </div>
 @endsection
 
@@ -37,7 +43,7 @@
                             <th scope="col">{{__('Task Code')}}</th>
                             <th scope="col">{{__('Item Name')}}</th>
                             <th scope="col">{{__('Status')}}</th>
-                            <th scope="col" >{{__('Action')}}</th>
+                            <th scope="col">{{__('Action')}}</th>
                         </tr>
                         </thead>
                         <tbody class="list">
@@ -52,13 +58,13 @@
                                             <a href="{{ route('importeditems.show',$importedItem->id) }}" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="{{__('Details')}}"><i class="ti ti-eye text-white"></i></a>
                                         </div>
                                     </td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-        </div>
     </div>
+</div>
 @endsection
-

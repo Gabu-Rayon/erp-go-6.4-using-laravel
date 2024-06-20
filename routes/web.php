@@ -1581,7 +1581,7 @@ Route::group(['middleware' => ['verified']], function () {
 
 
      //Get All the Purchase Lists From The Apis 
-     Route::get('purchase/synchronize', [PurchaseController::class, 'synchronize'])->name('purchase.synchronize');
+     Route::post('purchase/synchronize', [PurchaseController::class, 'synchronize'])->name('purchase.synchronize');
     Route::group(
         [
             'middleware' => [
@@ -1617,7 +1617,7 @@ Route::group(['middleware' => ['verified']], function () {
     // purchase.mapPurchase
     Route::any('map-purchase', [PurchaseController::class, 'mapPurchase'])->name('purchase.mapPurchase');
     //  purchase.SearchByDate
-    Route::any('/searchByDate', [PurchaseController::class, 'searchByDate'])->name('purchase.searchByDate');
+    Route::post('/searchByDate', [PurchaseController::class, 'searchByDate'])->name('purchase.searchByDate');
     // mapPurchase blade
     Route::any('/mappedpurchases', [PurchaseController::class, 'mappedPurchases'])->name('purchase.mappedPurchases');
     //  getMapPurchaseSearchByDate
@@ -1625,7 +1625,7 @@ Route::group(['middleware' => ['verified']], function () {
     //   getMapPurchaseSearchByDateItemLists
     Route::any('/getMapPurchaseSearchByDateItemLists', [PurchaseController::class, 'getMapPurchaseSearchByDateItemLists'])->name('purchase.getMapPurchaseSearchByDateItemLists');
     //mappedPurchases.details
-    Route::any('/mappedPurchasesDetails/{mappedPurchaseId}/details', [PurchaseController::class, 'MapPurchasesDetails'])->name('mappedPurchases.details');
+    Route::any('/mappedPurchasesDetails/{id}/details', [PurchaseController::class, 'MapPurchasesDetails'])->name('mappedPurchases.details');
 
     Route::get('pos-print-setting', [SystemController::class, 'posPrintIndex'])->name('pos.print.setting')->middleware(['auth', 'XSS']);
     Route::get('purchase/preview/{template}/{color}', [PurchaseController::class, 'previewPurchase'])->name('purchase.preview')->middleware(['auth', 'XSS']);
@@ -1893,8 +1893,12 @@ Route::post('mapimporteditem', [ImportedItemsController::class, 'store'])->name(
 ;
 Route::get('importeditems/show/{id}', [ImportedItemsController::class, 'show'])->name('importeditems.show')->middleware(['auth', 'XSS']);
 ;
-Route::get('importeditems/sync', [ImportedItemsController::class, 'synchronize'])->name('importeditems.sync')->middleware(['auth', 'XSS']);
+Route::post('importeditems/sync', [ImportedItemsController::class, 'synchronize'])->name('importeditems.sync')->middleware(['auth', 'XSS']);
 
+//  GetImportedProductService
+
+Route::get('GetImportedProductService', [ImportedItemsController::class, 'GetImportedProductService']);
+;
 
 Route::group(
     [

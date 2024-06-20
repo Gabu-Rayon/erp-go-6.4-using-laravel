@@ -39,21 +39,17 @@
             <button type="submit" class="btn btn-primary  sync">{{ __('Search      ') }}</button>
             {{ Form::close() }}
         </div>
-        {{--        <a class="btn btn-sm btn-primary" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1" data-bs-toggle="tooltip" title="{{__('Filter')}}"> --}}
-        {{--            <i class="ti ti-filter"></i> --}}
-        {{--        </a> --}}
+       <a class="btn btn-sm btn-primary" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1" data-bs-toggle="tooltip" title="{{__('Filter')}}"><i class="ti ti-filter"></i>
+       </a>
 
         <a href="{{ route('invoice.export') }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
             title="{{ __('Export') }}">
             <i class="ti ti-file-export"></i>
         </a>
-
-        @can('create invoice')
             <a href="{{ route('invoice.create', 0) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
                 title="{{ __('Create') }}">
                 <i class="ti ti-plus"></i>
             </a>
-        @endcan
     </div>
 @endsection
 
