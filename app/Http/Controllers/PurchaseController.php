@@ -614,196 +614,203 @@ class PurchaseController extends Controller
     // }
 
 
-public function synchronize(Request $request)
-{
-    // Log the request from the form
-    \Log::info('Synchronization request received from Searching the Purchase Search By Date Form:', $request->all());
+    public function synchronize(Request $request)
+    {
+        // Log the request from the form
+        \Log::info('Synchronization request received from Searching the Purchase Search By Date Form:', $request->all());
 
-    // Validate the date input
-    $request->validate([
-        'searchByDate' => 'required|date_format:Y-m-d',
-    ], [
-        'searchByDate.required' => __('Date is required for synchronization Search for Purchase SearchByDate.'),
-        'searchByDate.date_format' => __('Invalid date format.'),
-    ]);
+        // Validate the date input
+        $request->validate([
+            'searchByDate' => 'required|date_format:Y-m-d',
+        ], [
+            'searchByDate.required' => __('Date is required for synchronization Search for Purchase SearchByDate.'),
+            'searchByDate.date_format' => __('Invalid date format.'),
+        ]);
 
-    // Get and format the date
-    $date = $request->input('searchByDate');
-    $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd').'000000';
-    \Log::info('Date formatted from synchronization request:', ['formattedDate' => $formattedDate]);
+        // Get and format the date
+        $date = $request->input('searchByDate');
+        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
+        \Log::info('Date formatted from synchronization request:', ['formattedDate' => $formattedDate]);
 
-    try {
-        // Make the API call
-        $response = Http::withOptions(['verify' => false])
-            ->withHeaders(['key' => '123456'])
-            ->get("https://etims.your-apps.biz/api/GetPurchaseList?date={$formattedDate}");
+        try {
+            // Make the API call
+            $response = Http::withOptions(['verify' => false])
+                ->withHeaders(['key' => '123456'])
+                ->get("https://etims.your-apps.biz/api/GetPurchaseList?date={$formattedDate}");
 
-        $data = $response->json();
-        if (!isset($data['data'])) {
-            return redirect()->back()->with('error', __('There is no search result.'));
-        }
-
-        $remotePurchaseSearchByDateinfo = $data['data'];
-        \Log::info('Remote Purchase info:', $remotePurchaseSearchByDateinfo);
-
-        // Prepare data for synchronization
-        $remotePurchaseSearchByDateinfoToSync = [];
-        $remotePurchaseItemListsToSync = [];
-        foreach ($remotePurchaseSearchByDateinfo as $remoteItem) {
-            $item = $this->preparePurchaseData($remoteItem);
-            $remotePurchaseSearchByDateinfoToSync[] = $item;
-
-            if (isset($remoteItem['PurchaseItemList']) && is_array($remoteItem['PurchaseItemList'])) {
-                foreach ($remoteItem['PurchaseItemList'] as $itemList) {
-                    $remotePurchaseItemListsToSync[] = $this->preparePurchaseItemListData($itemList, $remoteItem['spplrInvcNo']);
-                }
+            $data = $response->json();
+            if (!isset($data['data'])) {
+                return redirect()->back()->with('error', __('There is no search result.'));
             }
-        }
 
-        \Log::info('Remote purchase search by date info to sync:', $remotePurchaseSearchByDateinfoToSync);
-        \Log::info('Remote purchase item lists to sync:', $remotePurchaseItemListsToSync);
+            $remotePurchaseSearchByDateinfo = $data['data'];
+            \Log::info('Remote Purchase info:', $remotePurchaseSearchByDateinfo);
 
-        // Synchronize the purchases
-        $syncedCount = $this->synchronizePurchases($remotePurchaseSearchByDateinfoToSync, $remotePurchaseItemListsToSync);
+            // Prepare data for synchronization
+            $remotePurchaseSearchByDateinfoToSync = [];
+            $remotePurchaseItemListsToSync = [];
+            foreach ($remotePurchaseSearchByDateinfo as $remoteItem) {
+                $item = $this->preparePurchaseData($remoteItem);
+                $remotePurchaseSearchByDateinfoToSync[] = $item;
 
-        if ($syncedCount > 0) {
-            return redirect()->back()->with('success', __('Synced ' . $syncedCount . ' Purchases successfully.'));
-        } else {
-            return redirect()->back()->with('success', __('Purchases up to date.'));
-        }
-    } catch (\Exception $e) {
-        \Log::error('Error syncing purchases:', ['error' => $e->getMessage()]);
-        return redirect()->back()->with('error', __('Error syncing purchases.'));
-    }
-}
-
-private function preparePurchaseData($remoteItem)
-{
-    static $purchaseId = 1;
-    return [
-        'purchase_id' => $purchaseId++,
-        'vender_id' => null,
-        'warehouse_id' => 1,
-        'purchase_date' => $remoteItem['salesDt'],
-        'purchase_number' => null,
-        'discount_apply' => null,
-        'category_id' => null,
-        'created_by' => \Auth::user()->creatorId(),
-        'spplrTin' => $remoteItem['spplrTin'],
-        'spplrNm' => $remoteItem['spplrNm'],
-        'spplrBhfId' => $remoteItem['spplrBhfId'],
-        'spplrInvcNo' => $remoteItem['spplrInvcNo'],
-        'spplrSdcId' => $remoteItem['spplrSdcId'],
-        'spplrMrcNo' => $remoteItem['spplrMrcNo'],
-        'rcptTyCd' => $remoteItem['rcptTyCd'],
-        'pmtTyCd' => $remoteItem['pmtTyCd'],
-        'cfmDt' => $remoteItem['cfmDt'],
-        'salesDt' => $remoteItem['salesDt'],
-        'stockRlsDt' => $remoteItem['stockRlsDt'],
-        'totItemCnt' => $remoteItem['totItemCnt'],
-        'taxblAmtA' => $remoteItem['taxblAmtA'],
-        'taxblAmtB' => $remoteItem['taxblAmtB'],
-        'taxblAmtC' => $remoteItem['taxblAmtC'],
-        'taxblAmtD' => $remoteItem['taxblAmtD'],
-        'taxblAmtE' => $remoteItem['taxblAmtE'],
-        'taxRtA' => $remoteItem['taxRtA'],
-        'taxRtB' => $remoteItem['taxRtB'],
-        'taxRtC' => $remoteItem['taxRtC'],
-        'taxRtD' => $remoteItem['taxRtD'],
-        'taxRtE' => $remoteItem['taxRtE'],
-        'taxAmtA' => $remoteItem['taxAmtA'],
-        'taxAmtB' => $remoteItem['taxAmtB'],
-        'taxAmtC' => $remoteItem['taxAmtC'],
-        'taxAmtD' => $remoteItem['taxAmtD'],
-        'taxAmtE' => $remoteItem['taxAmtE'],
-        'totTaxblAmt' => $remoteItem['totTaxblAmt'],
-        'totTaxAmt' => $remoteItem['totTaxAmt'],
-        'totAmt' => $remoteItem['totAmt'],
-        'remark' => $remoteItem['remark'],
-    ];
-}
-
-private function preparePurchaseItemListData($itemList, $saleItemCode)
-{
-    $taxCode = $this->mapTaxTypeCode($itemList['taxTyCd']);
-    return [
-        'purchase_id' => null, // to be set later
-        'quantity' => $itemList['totAmt'],
-        'tax' => $taxCode,
-        'price' => $itemList['prc'],
-        'discount' => $itemList['prc'] * $itemList['dcRt'] / 100,
-        'saleItemCode' => $saleItemCode,
-        'itemSeq' => $itemList['itemSeq'],
-        'itemCd' => $itemList['itemCd'],
-        'itemClsCd' => $itemList['itemClsCd'],
-        'itemNm' => $itemList['itemNm'],
-        'bcd' => $itemList['bcd'],
-        'spplrItemClsCd' => $itemList['spplrItemClsCd'],
-        'spplrItemCd' => $itemList['spplrItemCd'],
-        'spplrItemNm' => $itemList['spplrItemNm'],
-        'pkgUnitCd' => $itemList['pkgUnitCd'],
-        'pkg' => $itemList['pkg'],
-        'qtyUnitCd' => $itemList['qtyUnitCd'],
-        'qty' => $itemList['qty'],
-        'prc' => $itemList['prc'],
-        'splyAmt' => $itemList['splyAmt'],
-        'dcRt' => $itemList['dcRt'],
-        'taxTyCd' => $itemList['taxTyCd'],
-        'taxblAmt' => $itemList['taxblAmt'],
-        'taxAmt' => $itemList['taxAmt'],
-        'totAmt' => $itemList['totAmt'],
-        'itemExprDt' => $itemList['itemExprDt'],
-    ];
-}
-
-private function mapTaxTypeCode($taxTyCd)
-{
-    switch ($taxTyCd) {
-        case 'A': return 1;
-        case 'B': return 2;
-        case 'C': return 3;
-        case 'D': return 4;
-        case 'E': return 5;
-        case 'F': return 6;
-        default: return null;
-    }
-}
-
-private function synchronizePurchases($Purchases, $itemLists)
-{
-    $syncedCount = 0;
-
-    foreach ($Purchases as $purchase) {
-        // Check if the purchase already exists
-        if (!Purchase::where('spplrInvcNo', $purchase['spplrInvcNo'])->exists()) {
-            // Create the purchase
-            $newPurchase = Purchase::create($purchase);
-            $syncedCount++;
-
-            $syncedPurchaseItemCount = 0;
-
-            foreach ($itemLists as $itemList) {
-                // Set the purchase ID
-                $itemList['purchase_id'] = $newPurchase->id;
-
-                // Check if the item list already exists
-                $exists = PurchaseProduct::where('saleItemCode', $itemList['saleItemCode'])
-                    ->where('purchase_id', $newPurchase->id)
-                    ->exists();
-
-                if (!$exists) {
-                    // Create the purchase item list
-                    PurchaseProduct::create($itemList);
-                    $syncedPurchaseItemCount++;
+                if (isset($remoteItem['PurchaseItemList']) && is_array($remoteItem['PurchaseItemList'])) {
+                    foreach ($remoteItem['PurchaseItemList'] as $itemList) {
+                        $remotePurchaseItemListsToSync[] = $this->preparePurchaseItemListData($itemList, $remoteItem['spplrInvcNo']);
+                    }
                 }
             }
 
-            \Log::info("Synced $syncedPurchaseItemCount item lists for purchase ID {$newPurchase->id}");
+            \Log::info('Remote purchase search by date info to sync:', $remotePurchaseSearchByDateinfoToSync);
+            \Log::info('Remote purchase item lists to sync:', $remotePurchaseItemListsToSync);
+
+            // Synchronize the purchases
+            $syncedCount = $this->synchronizePurchases($remotePurchaseSearchByDateinfoToSync, $remotePurchaseItemListsToSync);
+
+            if ($syncedCount > 0) {
+                return redirect()->back()->with('success', __('Synced ' . $syncedCount . ' Purchases successfully.'));
+            } else {
+                return redirect()->back()->with('success', __('Purchases up to date.'));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error syncing purchases:', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', __('Error syncing purchases.'));
         }
     }
 
-    return $syncedCount;
-}
+    private function preparePurchaseData($remoteItem)
+    {
+        static $purchaseId = 1;
+        return [
+            'purchase_id' => $purchaseId++,
+            'vender_id' => null,
+            'warehouse_id' => 1,
+            'purchase_date' => $remoteItem['salesDt'],
+            'purchase_number' => null,
+            'discount_apply' => null,
+            'category_id' => null,
+            'created_by' => \Auth::user()->creatorId(),
+            'spplrTin' => $remoteItem['spplrTin'],
+            'spplrNm' => $remoteItem['spplrNm'],
+            'spplrBhfId' => $remoteItem['spplrBhfId'],
+            'spplrInvcNo' => $remoteItem['spplrInvcNo'],
+            'spplrSdcId' => $remoteItem['spplrSdcId'],
+            'spplrMrcNo' => $remoteItem['spplrMrcNo'],
+            'rcptTyCd' => $remoteItem['rcptTyCd'],
+            'pmtTyCd' => $remoteItem['pmtTyCd'],
+            'cfmDt' => $remoteItem['cfmDt'],
+            'salesDt' => $remoteItem['salesDt'],
+            'stockRlsDt' => $remoteItem['stockRlsDt'],
+            'totItemCnt' => $remoteItem['totItemCnt'],
+            'taxblAmtA' => $remoteItem['taxblAmtA'],
+            'taxblAmtB' => $remoteItem['taxblAmtB'],
+            'taxblAmtC' => $remoteItem['taxblAmtC'],
+            'taxblAmtD' => $remoteItem['taxblAmtD'],
+            'taxblAmtE' => $remoteItem['taxblAmtE'],
+            'taxRtA' => $remoteItem['taxRtA'],
+            'taxRtB' => $remoteItem['taxRtB'],
+            'taxRtC' => $remoteItem['taxRtC'],
+            'taxRtD' => $remoteItem['taxRtD'],
+            'taxRtE' => $remoteItem['taxRtE'],
+            'taxAmtA' => $remoteItem['taxAmtA'],
+            'taxAmtB' => $remoteItem['taxAmtB'],
+            'taxAmtC' => $remoteItem['taxAmtC'],
+            'taxAmtD' => $remoteItem['taxAmtD'],
+            'taxAmtE' => $remoteItem['taxAmtE'],
+            'totTaxblAmt' => $remoteItem['totTaxblAmt'],
+            'totTaxAmt' => $remoteItem['totTaxAmt'],
+            'totAmt' => $remoteItem['totAmt'],
+            'remark' => $remoteItem['remark'],
+        ];
+    }
+
+    private function preparePurchaseItemListData($itemList, $saleItemCode)
+    {
+        $taxCode = $this->mapTaxTypeCode($itemList['taxTyCd']);
+        return [
+            'purchase_id' => null, // to be set later
+            'quantity' => $itemList['totAmt'],
+            'tax' => $taxCode,
+            'price' => $itemList['prc'],
+            'discount' => $itemList['prc'] * $itemList['dcRt'] / 100,
+            'saleItemCode' => $saleItemCode,
+            'itemSeq' => $itemList['itemSeq'],
+            'itemCd' => $itemList['itemCd'],
+            'itemClsCd' => $itemList['itemClsCd'],
+            'itemNm' => $itemList['itemNm'],
+            'bcd' => $itemList['bcd'],
+            'spplrItemClsCd' => $itemList['spplrItemClsCd'],
+            'spplrItemCd' => $itemList['spplrItemCd'],
+            'spplrItemNm' => $itemList['spplrItemNm'],
+            'pkgUnitCd' => $itemList['pkgUnitCd'],
+            'pkg' => $itemList['pkg'],
+            'qtyUnitCd' => $itemList['qtyUnitCd'],
+            'qty' => $itemList['qty'],
+            'prc' => $itemList['prc'],
+            'splyAmt' => $itemList['splyAmt'],
+            'dcRt' => $itemList['dcRt'],
+            'taxTyCd' => $itemList['taxTyCd'],
+            'taxblAmt' => $itemList['taxblAmt'],
+            'taxAmt' => $itemList['taxAmt'],
+            'totAmt' => $itemList['totAmt'],
+            'itemExprDt' => $itemList['itemExprDt'],
+        ];
+    }
+
+    private function mapTaxTypeCode($taxTyCd)
+    {
+        switch ($taxTyCd) {
+            case 'A':
+                return 1;
+            case 'B':
+                return 2;
+            case 'C':
+                return 3;
+            case 'D':
+                return 4;
+            case 'E':
+                return 5;
+            case 'F':
+                return 6;
+            default:
+                return null;
+        }
+    }
+
+    private function synchronizePurchases($Purchases, $itemLists)
+    {
+        $syncedCount = 0;
+
+        foreach ($Purchases as $purchase) {
+            // Check if the purchase already exists
+            if (!Purchase::where('spplrInvcNo', $purchase['spplrInvcNo'])->exists()) {
+                // Create the purchase
+                $newPurchase = Purchase::create($purchase);
+                $syncedCount++;
+
+                $syncedPurchaseItemCount = 0;
+
+                foreach ($itemLists as $itemList) {
+                    // Set the purchase ID
+                    $itemList['purchase_id'] = $newPurchase->id;
+
+                    // Check if the item list already exists
+                    $exists = PurchaseProduct::where('saleItemCode', $itemList['saleItemCode'])
+                        ->where('purchase_id', $newPurchase->id)
+                        ->exists();
+
+                    if (!$exists) {
+                        // Create the purchase item list
+                        PurchaseProduct::create($itemList);
+                        $syncedPurchaseItemCount++;
+                    }
+                }
+
+                \Log::info("Synced $syncedPurchaseItemCount item lists for purchase ID {$newPurchase->id}");
+            }
+        }
+
+        return $syncedCount;
+    }
 
     /**
      * Display a listing of the resource.
@@ -2111,9 +2118,9 @@ private function synchronizePurchases($Purchases, $itemLists)
                     // Fetch related purchase Lists items
                     $mappedpurchaseItemsList = MappedPurchaseItemList::where('mapped_purchase_id', $id)->get();
 
-                     \Log::info( 'mapped Purchases: ' . $mappedpurchase);
+                    \Log::info('mapped Purchases: ' . $mappedpurchase);
 
-                      \Log::info(' Mapped Purchase Item List: ' . $mappedpurchaseItemsList);
+                    \Log::info(' Mapped Purchase Item List: ' . $mappedpurchaseItemsList);
 
                     return view('purchase.mappedPurchasesDetails', compact('mappedpurchase', 'mappedpurchaseItemsList'));
                 } else {

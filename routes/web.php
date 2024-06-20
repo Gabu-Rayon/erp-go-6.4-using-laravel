@@ -523,7 +523,7 @@ Route::group(['middleware' => ['verified']], function () {
 
     Route::get('/invoices/preview/{template}/{color}', [InvoiceController::class, 'previewInvoice'])->name('invoice.preview');
     Route::post('/invoices/template/setting', [InvoiceController::class, 'saveTemplateSettings'])->name('template.setting');
-    Route::get('getSalesByTraderInvoiceNo', [InvoiceController::class, 'getSalesByTraderInvoiceNo'])->name('invoice.no.getSalesByTraderInvoiceNo');
+    Route::post('getSalesByTraderInvoiceNo', [InvoiceController::class, 'getSalesByTraderInvoiceNo'])->name('invoice.no.getSalesByTraderInvoiceNo');
 
     //for autofilling the item information in the forms
     Route::get('geInvoiceItemInformation', [InvoiceController::class, 'getItem'])->name('invoice.getiteminformation');

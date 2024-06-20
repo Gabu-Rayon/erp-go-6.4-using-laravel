@@ -28,15 +28,14 @@
 @section('action-btn')
     <div class="float-end">
         <div class="d-inline-block mb-4">
-            <!-- {{ Form::open(['url' => 'invoice.no.getSalesByTraderInvoiceNo', 'class' => 'w-100']) }} -->
-            {{ Form::open(['route' => 'invoice.no.getSalesByTraderInvoiceNo', 'method' => 'GET', 'class' => 'w-100']) }}
+         {{ Form::open(['route' => 'invoice.no.getSalesByTraderInvoiceNo', 'method' => 'POST', 'class' => 'w-100']) }}
             @csrf
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <div class="form-group">
-                {{ Form::label('getSalesByTraderInvoiceNo', __('Get Sales By Trader Invoice No'), ['class' => 'form-label']) }}
-                {{ Form::number('getSalesByTraderInvoiceNo', null, ['class' => 'form-control', 'placeholder' => '1', 'required' => 'required']) }}
+                {{ Form::label('SalesByTraderInvoiceNo', __('Get Sales By Trader Invoice No'), ['class' => 'form-label']) }}
+                {{ Form::number('SalesByTraderInvoiceNo', null, ['class' => 'form-control', 'placeholder' => '1', 'required' => 'required']) }}
             </div>
-            <button type="submit" class="btn btn-primary  sync">{{ __('Search      ') }}</button>
+            <button type="submit" class="btn btn-primary  sync">{{ __('Search') }}</button>
             {{ Form::close() }}
         </div>
        <a class="btn btn-sm btn-primary" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1" data-bs-toggle="tooltip" title="{{__('Filter')}}"><i class="ti ti-filter"></i>
@@ -117,9 +116,7 @@
                                     <th>{{ __('Due Date') }}</th>
                                     <th>{{ __('Due Amount') }}</th>
                                     <th>{{ __('Status') }}</th>
-                                    @if (Gate::check('edit invoice') || Gate::check('delete invoice') || Gate::check('show invoice'))
                                         <th>{{ __('Action') }}</th>
-                                    @endif
                                     {{-- <th>
                                 <td class="barcode">
                                     {!! DNS1D::getBarcodeHTML($invoice->sku, "C128",1.4,22) !!}
@@ -165,12 +162,10 @@
                                                     class="status_badge badge bg-primary p-2 px-3 rounded">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
                                             @endif
                                         </td>
-                                        @if (Gate::check('edit invoice') || Gate::check('delete invoice') || Gate::check('show invoice'))
                                             <td class="Action">
                                                 <span>
                                                     @php $invoiceID= Crypt::encrypt($invoice->id); @endphp
 
-                                                    @can('copy invoice')
                                                         <div class="action-btn bg-warning ms-2">
                                                             <a href="#"
                                                                 id="{{ route('invoice.link.copy', [$invoiceID]) }}"
@@ -180,8 +175,6 @@
                                                                 data-original-title="{{ __('Copy Invoice') }}"><i
                                                                     class="ti ti-link text-white"></i></a>
                                                         </div>
-                                                    @endcan
-                                                    @can('duplicate invoice')
                                                         <div class="action-btn bg-primary ms-2">
                                                             {!! Form::open([
                                                                 'method' => 'get',
@@ -206,8 +199,6 @@
                                                                 {!! Form::close() !!}
                                                             </a>
                                                         </div>
-                                                    @endcan
-                                                    @can('show invoice')
                                                         {{--                                                        @if (\Auth::guard('customer')->check()) --}}
                                                         {{--                                                            <div class="action-btn bg-info ms-2"> --}}
                                                         {{--                                                                    <a href="{{ route('customer.invoice.show', \Crypt::encrypt($invoice->id)) }}" --}}
@@ -226,8 +217,6 @@
                                                             </a>
                                                         </div>
                                                         {{--                                                        @endif --}}
-                                                    @endcan
-                                                    @can('edit invoice')
                                                         <div class="action-btn bg-primary ms-2">
                                                             <a href="{{ route('invoice.edit', \Crypt::encrypt($invoice->id)) }}"
                                                                 class="mx-3 btn btn-sm align-items-center"
@@ -236,8 +225,6 @@
                                                                 <i class="ti ti-pencil text-white"></i>
                                                             </a>
                                                         </div>
-                                                    @endcan
-                                                    @can('delete invoice')
                                                         <div class="action-btn bg-danger ms-2">
                                                             {!! Form::open([
                                                                 'method' => 'DELETE',
@@ -254,10 +241,8 @@
                                                             </a>
                                                             {!! Form::close() !!}
                                                         </div>
-                                                    @endcan
                                                 </span>
                                             </td>
-                                        @endif
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -268,60 +253,3 @@
         </div>
     </div>
 @endsection
-
-
-@push('script-page')
-<script>
-  const sync = document.querySelector('.sync');
-
-sync.addEventListener('click', async function(event) {
-    event.preventDefault();
-
-    const inputValue = document.querySelector('input[name="getSalesByTraderInvoiceNo"]').value;
-
-    if (!inputValue) {
-        alert('{{ __('Please enter Invoice No to search by e.g. 10') }}');
-        return;
-    }
-
-    try {
-        showLoadingSpinner(sync);
-
-        const response = await fetch(
-            `{{ route('invoice.no.getSalesByTraderInvoiceNo') }}?getSalesByTraderInvoiceNo=${inputValue}`, {
-                method: 'POST', // Change to POST since we're sending data
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Include CSRF token
-                },
-                body: JSON.stringify({ getSalesByTraderInvoiceNo: inputValue }) // Send the invoice number in the body
-            });
-
-        if (!response.ok) {
-            throw new Error('{{ __('An error occurred while syncing the data Sales Invoices') }}');
-        }
-
-        const data = await response.json();
-
-        if (data.error) {
-            showErrorPopup(data.error);
-        } else if (data.newData) {
-            showSuccessPopup(data.message);
-            if (data.newData.length > 0) {
-                setTimeout(() => {
-                    location.reload();
-                }, 3000);
-            } else {
-                showErrorPopup('{{ __('Invoice Already existing. No New Invoices data added.') }}');
-            }
-        }
-    } catch (error) {
-        showErrorPopup(error.message);
-    } finally {
-        removeLoadingSpinner(sync);
-    }
-});
-
-</script>
-@endpush
