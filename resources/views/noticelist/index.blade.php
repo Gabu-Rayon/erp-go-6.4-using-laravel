@@ -8,9 +8,20 @@
     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
     <li class="breadcrumb-item">{{ __('Notices List') }}</li>
 @endsection
+
 @section('action-btn')
     <div class="float-end">
-        <a href="{{ route('noticelist.synchronize') }}" class="btn btn-sm btn-primary">
+        <div class="d-inline-block mb-4">
+            {{ Form::open(['route' => 'noticelist.searchByDate', 'method' => 'POST', 'class' => 'w-100']) }}
+            @csrf
+            <div class="form-group">
+                {{ Form::label('SearchByDate', __('Search Date (ex- 01-Jan-2022)'), ['class' => 'form-label']) }}
+                {{ Form::date('searchByDate', null, ['class' => 'form-control', 'required' => 'required']) }}
+            </div>
+            <button type="submit" class="btn btn-primary sync">{{ __('Search') }}</button>
+            {{ Form::close() }}
+        </div>
+       <a href="{{ route('noticelist.synchronize') }}" class="btn btn-sm btn-primary">
             Synchronize
         </a>
     </div>

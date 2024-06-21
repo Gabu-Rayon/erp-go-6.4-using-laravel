@@ -17,17 +17,17 @@
 
 @section('action-btn')
     <div class="float-end m-2">
-        <a href="{{ route('stockinfo.index') }}" class="btn btn-sm btn-info">
+        <a href="{{ route('stockmove.index') }}" class="btn btn-sm btn-info">
             {{__('Back')}}
         </a>
     </div>
     <div class="float-end m-2">
-        <a href="{{ route('stockinfo.cancel', $stockMoveList->id) }}" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="{{__('Cancel')}}">
+        <a href="{{ route('stockmove.index', $stockMove->id) }}" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="{{__('Cancel')}}">
             {{__('Cancel')}}
         </a>
     </div>
     <div class="float-end m-2">
-        <a href="{{ route('stockinfo.edit', $stockMoveList->id) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{__('Cancel')}}">
+        <a href="{{ route('stockmove.edit', $stockMove->id) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{__('Cancel')}}">
             {{__('Stock Move')}}
         </a>
     </div>
@@ -36,46 +36,46 @@
 @section('content')
     <div class="row">
         <div class="col-md-12">
-            {{ Form::open(['url' => 'sale', 'enctype' => 'multipart/form-data']) }}
+            {{ Form::open(['url' => 'stockmove', 'enctype' => 'multipart/form-data']) }}
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-3">
                         <h6>{{ __('Customer TIN: ') }}</h6>
-                        <p>{{ $stockMoveList->custTin }}</h6>
+                        <p>{{ $stockMove->custTin }}</h6>
                     </div>
                     <div class="col-md-3">
                         <h6>{{ __('Customer Branch ID: ') }}</h6>
-                        <p>{{ $stockMoveList->custBhfId }}</h6>
+                        <p>{{ $stockMove->custBhfId }}</h6>
                     </div>
                     <div class="col-md-3">
                         <h6>{{ __('Sar NO: ') }}</h6>
-                        <p>{{ $stockMoveList->sarNo }}</h6>
+                        <p>{{ $stockMove->sarNo }}</h6>
                     </div>
                     <div class="col-md-3">
                         <h6>{{ __('OCRN Date: ') }}</h6>
-                        <p>{{ $stockMoveList->ocrnDt }}</h6>
+                        <p>{{ $stockMove->ocrnDt }}</h6>
                     </div>
                     <div class="col-md-3">
                         <h6>{{ __('Total Item Count: ') }}</h6>
-                        <p>{{ $stockMoveList->totItemCnt }}</h6>
+                        <p>{{ $stockMove->totItemCnt }}</h6>
                     </div>
                     <div class="col-md-3">
                         <h6>{{ __('Total Taxable Amount: ') }}</h6>
-                        <p>{{ $stockMoveList->totTaxblAmt }}</h6>
+                        <p>{{ $stockMove->totTaxblAmt }}</h6>
                     </div>
                     <div class="col-md-3">
                         <h6>{{ __('Total Tax Amount: ') }}</h6>
-                        <p>{{ $stockMoveList->totTaxAmt }}</h6>
+                        <p>{{ $stockMove->totTaxAmt }}</h6>
                     </div>
                     <div class="col-md-12">
                         <h6>{{ __('Remark: ') }}</h6>
-                        <p>{{ $stockMoveList->remark }}</h6>
+                        <p>{{ $stockMove->remark }}</h6>
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-header">
                         <h6 class="card-title">Items</h6>
-                        @foreach ($items as $item)
+                        @foreach ($stockMoveItems as $item)
                         {{ \Log::info($item) }}
                         <div class="card-body">
                             <div class="row">

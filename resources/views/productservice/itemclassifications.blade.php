@@ -8,9 +8,21 @@
     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
     <li class="breadcrumb-item">{{ __('Item Classifications') }}</li>
 @endsection
+
 @section('action-btn')
     <div class="float-end">
-        <a href="{{ route('productservice.synchronizeitemclassifications') }}" class="btn btn-sm btn-primary">
+        <div class="d-inline-block mb-4">
+            {{ Form::open(['route' => 'productservice.searchItemClassificationByDate', 'method' => 'POST', 'class' => 'w-100']) }}
+            @csrf
+            <div class="form-group">
+                {{ Form::label('SearchItemClassificationByDate', __('Search Date (ex- 01-Jan-2022)'), ['class' => 'form-label']) }}
+                {{ Form::date('searchItemClassificationByDate', null, ['class' => 'form-control', 'required' => 'required']) }}
+            </div>
+            <button type="submit" class="btn btn-primary sync">{{ __('Search') }}</button>
+            {{ Form::close() }}
+        </div>
+        <a href="{{ route('productservice.synchronizeitemclassifications') }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
+            title="{{ __('Synchronize') }}">
             Synchronize
         </a>
     </div>

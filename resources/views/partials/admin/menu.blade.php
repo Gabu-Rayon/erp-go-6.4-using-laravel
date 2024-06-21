@@ -1369,8 +1369,8 @@
                             <li class="dash-item {{ request()->is('productstock.index') ? 'active' : '' }}">
                                 <a class="dash-link" href="{{ route('productstock.index') }}">{{ __('Stock') }}</a>
                             </li>
-                            <li class="dash-item {{ request()->is('stockinfo') ? 'active' : '' }}">
-                                <a class="dash-link" href="{{ route('stockinfo.index') }}">{{ __('Get Move List') }}</a>
+                            <li class="dash-item {{ request()->is('stockmove.index') ? 'active' : '' }}">
+                                <a class="dash-link" href="{{ route('stockmove.index') }}">{{ __('Get Move List') }}</a>
                             </li>
                             <li class="dash-item {{ request()->is('stockadjustment') ? 'active' : '' }}">
                                 <a class="dash-link" href="{{ route('stockadjustment.index') }}">{{ __('Stock Adjustment') }}</a>

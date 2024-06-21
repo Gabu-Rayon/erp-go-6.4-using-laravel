@@ -199,7 +199,7 @@ class ProductServiceController extends Controller
                                 'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
                                 'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
                                 'description' => $item['description'] ?? null,
-                                'pro_image' => $fileName,
+                                'pro_image' => $dir,
                                 'created_by' => \Auth::user()->creatorId(),
                                 'tin' => $item['tin'] ?? null,
                                 'itemCd' => $item['itemCode'],
@@ -1524,8 +1524,8 @@ class ProductServiceController extends Controller
                 array_push($itemsToSync, $item);
             }
 
-            \Log::info('ITEMS TO SYNC');
-            \Log::info($itemsToSync);
+            \Log::info('ITEMS TO SYNC : ');
+            \Log::info("Product & service being sync" .$itemsToSync);
 
             $syncedItems = 0;
 
@@ -1746,18 +1746,21 @@ class ProductServiceController extends Controller
             $response = Http::withOptions(['verify' => false])
                 ->withHeaders(['key' => '123456'])
                 ->get("https://etims.your-apps.biz/api/GetItemInformation", [
-                    'date' => $date,
+                    'date' => $formattedDate,
                 ]);
 
             // Check if the response contains the required data
-            $data = $response->json()['data']['itemList'] ?? [];
-            if (empty($data)) {
+            $data = $response->json();
+            \Log::info('REMOTE Item Information Data INFO From API ', ['Item Information Data From API info' => $data]);
+
+            if (!isset($data['data']['itemClsList'])) {
                 return redirect()->back()->with('error', __('There is no search result.'));
             }
 
-            \Log::info('API Request Data For All Items Information: ' . json_encode($data));
-            \Log::info('API Response: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
+            $remoteItemInformationinfo = $data['data']['itemClsList'];
+            \Log::info('REMOTE Item Information INFO', ['remoteItemInformationinfo' => $remoteItemInformationinfo]);
+
+            $remoteItemInformationinfoToSync = [];
 
             // Define the mapping array for taxTyCd to tax_id
             $taxTypeMapping = [
@@ -1769,7 +1772,7 @@ class ProductServiceController extends Controller
                 'F' => 6,
             ];
 
-            foreach ($data as $item) {
+            foreach ($remoteItemInformationinfo as $item) {
                 // Determine the tax_id based on taxTyCd
                 $taxIdCode = $item['taxTyCd'] ?? null;
                 $taxIdCode = $taxIdCode && array_key_exists($taxIdCode, $taxTypeMapping) ? $taxTypeMapping[$taxIdCode] : null;
@@ -1815,23 +1818,102 @@ class ProductServiceController extends Controller
                     'useYn' => $item['useYn']
                 ];
 
-                \Log::info('Product & Service Data to Sync:', $productServiceData);
+                array_push($remoteItemInformationinfoToSync, $productServiceData);
+            }
 
-                // Check if the product service already exists and sync if not
-                $exists = ProductService::where('tin', $productServiceData['tin'])->exists();
+            \Log::info('Product & Service Data to Sync:', ['remoteItemInformationinfoToSync' => $remoteItemInformationinfoToSync]);
+
+            $syncedLocalItemInformationinfo = 0;
+            // Check if the product service already exists and sync if not
+            foreach ($remoteItemInformationinfoToSync as $remoteItemInformationInfo) {
+                $exists = ProductService::where('tin', $remoteItemInformationInfo['tin'])->exists();
                 if (!$exists) {
-                    ProductService::create($productServiceData);
-                    return redirect()->back()->with('success', __('Synced Product & Service successfully.'));
-                } else {
-                    return redirect()->back()->with('success', __('Product & Service record is up to date.'));
+                    ProductService::create($remoteItemInformationInfo);
+                    $syncedLocalItemInformationinfo++;
                 }
+            }
+
+            if ($syncedLocalItemInformationinfo > 0) {
+                return redirect()->back()->with('success', __('Synced ' . $syncedLocalItemInformationinfo . ' Product & Service(s) Successfully'));
+            } else {
+                return redirect()->back()->with('success', __('Product & Service(s) Up To Date'));
             }
         } catch (\Exception $e) {
             \Log::error('Error syncing Product & Service:', ['error' => $e->getMessage()]);
-            return redirect()->back()->with('error', __('Product & Service Not Found !'));
+            return redirect()->back()->with('error', __('Error Syncing Product & Service'));
         }
     }
 
+
+    public function searchCodeListByDate(Request $request)
+    {
+        // Log the request from the form
+        \Log::info('Synchronization request received From Searching the Code List Search Form:', $request->all());
+
+        // Get the date passed from the search form
+        $date = $request->input('searchCodeListByDate');
+        if (!$date) {
+            return redirect()->back()->with('error', __('Date is required for synchronization Search for Code List.'));
+        }
+
+        // Format the date using Carbon
+        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
+
+        \Log::info('Date Formatted for Synchronization request:', ['formattedDate' => $formattedDate]);
+
+        try {
+            $url = 'https://etims.your-apps.biz/api/GetCodeList?date=' . $formattedDate;
+
+            $response = Http::withOptions(['verify' => false])
+                ->withHeaders(['key' => '123456'])
+                ->get($url);
+
+            $data = $response->json()['data'];
+
+            \Log::info('REMOTE Code List INFO From Data Response', ['remote Item Classifications' => $data]);
+
+            if (!isset($data['data']['clsList'])) {
+                return redirect()->back()->with('error', __('There is no search result.'));
+            }
+
+            $remoteCodeListinfo = $data['data']['clsList'];
+            \Log::info('REMOTE CODE LIST INFO', ['remoteCodeListinfo' => $remoteCodeListinfo]);
+
+            $remoteCodeListinfoToSync = [];
+            foreach ($remoteCodeListinfo as $remoteCodeList) {
+                $codeList = [
+                    'cdCls' => $remoteCodeList['cdCls'],
+                    'cdClsNm' => $remoteCodeList['cdClsNm'],
+                    'cdClsDesc' => $remoteCodeList['cdClsDesc'],
+                    'useYn' => $remoteCodeList['useYn'],
+                    'userDfnNm1' => $remoteCodeList['userDfnNm1'],
+                    'userDfnNm2' => $remoteCodeList['userDfnNm2'],
+                    'userDfnNm3' => $remoteCodeList['userDfnNm3'],
+                ];
+                array_push($remoteCodeListinfoToSync, $codeList);
+            }
+
+            \Log::info('REMOTE CODE LIST INFO TO SYNC:', ['remoteCodeListinfoToSync' => $remoteCodeListinfoToSync]);
+
+            $syncedLocalCodeListinfo = 0;
+            foreach ($remoteCodeListinfoToSync as $remoteCodeListInfo) {
+                $exists = Code::where('cdCls', $remoteCodeListInfo['cdCls'])->exists();
+                if (!$exists) {
+                    Code::create($remoteCodeListInfo);
+                    $syncedLocalCodeListinfo++;
+                }
+            }
+
+            if ($syncedLocalCodeListinfo > 0) {
+                return redirect()->back()->with('success', __('Synced ' . $syncedLocalCodeListinfo . ' Code List Successfully'));
+            } else {
+                return redirect()->back()->with('success', __('Code List Up To Date'));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error syncing Code List:', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', __('Error Syncing Code List'));
+        }
+    }
 
 
 }

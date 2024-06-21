@@ -16,7 +16,17 @@
 
 @section('action-btn')
     <div class="float-end">
-        <a href="#" data-url="{{ route('stockinfo.create') }}" class="btn btn-sm btn-primary" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Update Stock By Invoice Number')}}">
+        <div class="d-inline-block mb-4">
+            {{ Form::open(['route' => 'stockmove.searchByDate', 'method' => 'POST', 'class' => 'w-100']) }}
+            @csrf
+            <div class="form-group">
+                {{ Form::label('SearchByDate', __('Search By Date'), ['class' => 'form-label']) }}
+                {{ Form::date('searchByDate', null, ['class' => 'form-control', 'required' => 'required']) }}
+            </div>
+            <button type="submit" class="btn btn-primary sync">{{ __('Search') }}</button>
+            {{ Form::close() }}
+        </div>
+         <a href="#" data-url="{{ route('stockinfo.create') }}" class="btn btn-sm btn-primary" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Update Stock By Invoice Number')}}">
             Update Stock By Invoice Number
         </a>
     </div>
@@ -53,7 +63,7 @@
                                     <td>{{ $stockMove->status }}</td>
                                     <td>
                                         <div class="action-btn bg-warning ms-2">
-                                            <a href="{{ route('stockinfo.show',$stockMove) }}" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="{{__('Details')}}"><i class="ti ti-eye text-white"></i></a>
+                                            <a href="{{ route('stockmove.show',$stockMove) }}" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-bs-toggle="tooltip" title="{{__('Details')}}"><i class="ti ti-eye text-white"></i></a>
                                         </div>
                                     </td>
                             @endforeach
@@ -65,5 +75,4 @@
         </div>
     </div>
 @endsection
-
 

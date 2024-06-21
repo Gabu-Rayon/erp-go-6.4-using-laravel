@@ -2285,7 +2285,7 @@ class PurchaseController extends Controller
                 ->withHeaders(['key' => '123456'])
                 ->get("https://etims.your-apps.biz/api/MapPurchase/SearchByDate?date={$formattedDate}");
 
-            $data = $response->json();
+            $data = $response->json()['data'];
             if (!isset($data['data'])) {
                 return redirect()->back()->with('error', __('There is no search result.'));
             }

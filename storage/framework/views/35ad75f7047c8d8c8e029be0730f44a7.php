@@ -6,8 +6,8 @@
 <?php $__env->startSection('breadcrumb'); ?>
     <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
     <li class="breadcrumb-item"><?php echo e(__('Admin')); ?></li>
-     <li class="breadcrumb-item"><?php echo e(__('Purchases')); ?></li>
-      <li class="breadcrumb-item"><?php echo e(__('List')); ?></li>
+    <li class="breadcrumb-item"><?php echo e(__('Purchases')); ?></li>
+    <li class="breadcrumb-item"><?php echo e(__('List')); ?></li>
 <?php $__env->stopSection(); ?>
 <?php $__env->startPush('script-page'); ?>
     <script>
@@ -28,30 +28,6 @@
 
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
-            <div class="d-inline-block mb-4">
-                <?php echo e(Form::open(['route' => 'purchase.searchByDate', 'method' => 'POST', 'class' => 'w-100'])); ?>
-
-                <?php echo csrf_field(); ?>
-                <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
-                <div class="form-group">
-                    <?php echo e(Form::label('SearchByDate', __('Search By Date'), ['class' => 'form-label'])); ?>
-
-                    <?php echo e(Form::date('searchByDate', null, ['class' => 'form-control', 'required' => 'required'])); ?>
-
-                </div>
-                <button type="submit" class="btn btn-primary  sync"><?php echo e(__('Search')); ?></button>
-                <?php echo e(Form::close()); ?>
-
-            </div>
-            <a href="<?php echo e(route('purchase.create', 0)); ?>" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
-                title="<?php echo e(__('Add New Purchase')); ?>">
-                <i class="ti ti-plus"></i>
-            </a>
-    </div>
-<?php $__env->stopSection(); ?>
-
-<?php $__env->startSection('action-btn'); ?>
-    <div class="float-end">
         <div class="d-inline-block mb-4">
             <?php echo e(Form::open(['route' => 'importeditems.sync', 'method' => 'POST', 'class' => 'w-100'])); ?>
 
@@ -60,7 +36,7 @@
             <div class="form-group">
                 <?php echo e(Form::label('importedItemDate', __('Search Date (ex- 01-Dec-2021)'), ['class' => 'form-label'])); ?>
 
-                <?php echo e(Form::date('importedItemDate', null, ['class' => 'form-control','required' => 'required'])); ?>
+                <?php echo e(Form::date('importedItemDate', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
             </div>
             <button type="submit" class="btn btn-primary  sync"><?php echo e(__('Search')); ?></button>
@@ -86,71 +62,72 @@
                                     <th> <?php echo e(__('SupplrTin')); ?></th>
                                     <th><?php echo e(__('supplrBhfId')); ?></th>
                                     <th><?php echo e(__('SupplrName')); ?></th>
-                                     <th><?php echo e(__('SupplrInvcNo')); ?></th>
+                                    <th><?php echo e(__('SupplrInvcNo')); ?></th>
                                     <?php if(Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase')): ?>
                                         <th> <?php echo e(__('Action')); ?></th>
                                     <?php endif; ?>
                                 </tr>
                             </thead>
                             <?php if(isset($filteredPurchases)): ?>
-                            <tbody>
-                                <?php $__currentLoopData = $mappedPurchases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $purchase): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <tr>
-                                        <td><?php echo e($purchase->mappedPurchaseId); ?></td>
-                                        <td><?php echo e($purchase->invcNo); ?></td>
-                                        <td><?php echo e($purchase->purchaseDate); ?></td>
-                                        <td><?php echo e($purchase->supplrTin); ?></td>
-                                        <td><?php echo e($purchase->supplrBhfId); ?></td>
-                                        <td><?php echo e($purchase->supplrName); ?></td>
-                                        <td><?php echo e($purchase->supplrInvcNo); ?></td>
+                                <tbody>
+                                    <?php $__currentLoopData = $mappedPurchases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $purchase): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <tr>
+                                            <td><?php echo e($purchase->mappedPurchaseId); ?></td>
+                                            <td><?php echo e($purchase->invcNo); ?></td>
+                                            <td><?php echo e($purchase->purchaseDate); ?></td>
+                                            <td><?php echo e($purchase->supplrTin); ?></td>
+                                            <td><?php echo e($purchase->supplrBhfId); ?></td>
+                                            <td><?php echo e($purchase->supplrName); ?></td>
+                                            <td><?php echo e($purchase->supplrInvcNo); ?></td>
                                             <td class="Action">
                                                 <span>
-                                                        <div class="action-btn bg-info ms-2">
-                                                            <a href="<?php echo e(route('mappedPurchases.details', ['id' => $purchase->id])); ?>"
-                                                                class="mx-3 btn btn-sm align-items-center"
-                                                                data-bs-toggle="tooltip"
-                                                                title="<?php echo e(__('View Map purchase Item Details')); ?>"
-                                                                data-original-title="<?php echo e(__('View Map purchase Item Details')); ?>">
-                                                                <i class="ti ti-eye text-white"></i></a>
-                                                        </div>
+                                                    <div class="action-btn bg-info ms-2">
+                                                        <a href="<?php echo e(route('mappedPurchases.details', ['id' => $purchase->id])); ?>"
+                                                            class="mx-3 btn btn-sm align-items-center"
+                                                            data-bs-toggle="tooltip"
+                                                            title="<?php echo e(__('View Map purchase Item Details')); ?>"
+                                                            data-original-title="<?php echo e(__('View Map purchase Item Details')); ?>">
+                                                            <i class="ti ti-eye text-white"></i></a>
+                                                    </div>
                                                 </span>
                                             </td>
-                                    </tr>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </tbody>
-                            <?php else: ?> if (isset($filteredPurchases))
-                            <tbody>
-                                <?php $__currentLoopData = $filteredPurchases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $purchase): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                     <tr>
-                                        <td><?php echo e($purchase->mappedPurchaseId); ?></td>
-                                        <td><?php echo e($purchase->invcNo); ?></td>
-                                        <td><?php echo e($purchase->orgInvcNo); ?></td>
-                                        <td><?php echo e($purchase->supplrTin); ?></td>
-                                        <td><?php echo e($purchase->supplrBhfId); ?></td>
-                                        <td><?php echo e($purchase->supplrName); ?></td>
-                                        <td><?php echo e($purchase->supplrInvcNo); ?></td>
+                                        </tr>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </tbody>
+                            <?php else: ?>
+                                if (isset($filteredPurchases))
+                                <tbody>
+                                    <?php $__currentLoopData = $filteredPurchases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $purchase): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <tr>
+                                            <td><?php echo e($purchase->mappedPurchaseId); ?></td>
+                                            <td><?php echo e($purchase->invcNo); ?></td>
+                                            <td><?php echo e($purchase->orgInvcNo); ?></td>
+                                            <td><?php echo e($purchase->supplrTin); ?></td>
+                                            <td><?php echo e($purchase->supplrBhfId); ?></td>
+                                            <td><?php echo e($purchase->supplrName); ?></td>
+                                            <td><?php echo e($purchase->supplrInvcNo); ?></td>
                                             <td class="Action">
                                                 <span>
-                                                        <div class="action-btn bg-info ms-2">
-                                                            <a href="<?php echo e(route('mappedPurchases.details', ['id' => $purchase->id])); ?>"
-                                                                class="mx-3 btn btn-sm align-items-center"
-                                                                data-bs-toggle="tooltip"
-                                                                title="<?php echo e(__('View Map purchase Item Details')); ?>"
-                                                                data-original-title="<?php echo e(__('View Map purchase Item Details')); ?>">
-                                                                <i class="ti ti-eye text-white"></i></a>
-                                                        </div>
+                                                    <div class="action-btn bg-info ms-2">
+                                                        <a href="<?php echo e(route('mappedPurchases.details', ['id' => $purchase->id])); ?>"
+                                                            class="mx-3 btn btn-sm align-items-center"
+                                                            data-bs-toggle="tooltip"
+                                                            title="<?php echo e(__('View Map purchase Item Details')); ?>"
+                                                            data-original-title="<?php echo e(__('View Map purchase Item Details')); ?>">
+                                                            <i class="ti ti-eye text-white"></i></a>
+                                                    </div>
                                                 </span>
                                             </td>
-                                    </tr>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </tbody>
+                                        </tr>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </tbody>
                             <?php endif; ?>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
-    </div>   
+    </div>
 
 <?php $__env->stopSection(); ?>
 

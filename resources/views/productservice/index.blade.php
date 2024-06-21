@@ -27,10 +27,6 @@
             <button type="submit" class="btn btn-primary sync">{{ __('Search') }}</button>
             {{ Form::close() }}
         </div>
-        <a href="{{ route('purchase.create', 0) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
-            title="{{ __('Add New Purchase') }}">
-            <i class="ti ti-plus"></i>
-        </a>
         <a href="#" data-size="md" data-bs-toggle="tooltip" title="{{ __('Import') }}"
             data-url="{{ route('productservice.file.import') }}" data-ajax-popup="true"
             data-title="{{ __('Import product CSV file') }}" class="btn btn-sm btn-primary">

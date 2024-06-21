@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\ProductsServicesClassification;
@@ -103,6 +104,74 @@ class ProductServiceClassificationController extends Controller
             return redirect()->back()->with('error', __('Error Syncing Item Classifications'));
         }
 
+    }
+
+    public function searchItemClassificationsByDate(Request $request)
+    {
+        // Log the request from the form
+        \Log::info('Synchronization request received From Searching the Item Classification Search Form:', $request->all());
+
+        // Get the date passed from the search form
+        $date = $request->input('searchItemClassificationByDate');
+        if (!$date) {
+            return redirect()->back()->with('error', __('Date is required for synchronization Search for Item Classification.'));
+        }
+
+        // Format the date using Carbon
+        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
+
+        \Log::info('Date Formatted for Synchronization request:', ['formattedDate' => $formattedDate]);
+
+        try {
+            $url = 'https://etims.your-apps.biz/api/GetItemClassificationList?date=' . $formattedDate;
+
+            $response = Http::withOptions(['verify' => false])
+                ->withHeaders(['key' => '123456'])
+                ->get($url);
+
+            $data = $response->json()['data'];
+            \Log::info('REMOTE Item Classification INFO From Data Response', ['remote Item Classifications' => $data]);
+            
+            if (!isset($data['data']['itemClsList'])) {
+                return redirect()->back()->with('error', __('There is no search result.'));
+            }
+
+            $remoteItemClassificationsinfo = $data['data']['itemClsList'];
+            \Log::info('REMOTE Item Classification INFO', ['remoteItemClassificationsinfo' => $remoteItemClassificationsinfo]);
+
+            $remoteItemClassificationsinfoToSync = [];
+            foreach ($remoteItemClassificationsinfo as $remoteItemClassification) {
+                $itemClassification = [
+                    'itemClsCd' => $remoteItemClassification['itemClsCd'],
+                    'itemClsNm' => $remoteItemClassification['itemClsNm'],
+                    'itemClsLvl' => $remoteItemClassification['itemClsLvl'],
+                    'taxTyCd' => $remoteItemClassification['taxTyCd'],
+                    'mjrTgYn' => $remoteItemClassification['mjrTgYn'],
+                    'useYn' => $remoteItemClassification['useYn'],
+                ];
+                array_push($remoteItemClassificationsinfoToSync, $itemClassification);
+            }
+
+            \Log::info('REMOTE ITEM CLASSIFICATIONS INFO TO SYNC:', ['remoteItemClassificationsinfoToSync' => $remoteItemClassificationsinfoToSync]);
+
+            $syncedLocalItemClassificationsinfo = 0;
+            foreach ($remoteItemClassificationsinfoToSync as $remoteItemClassificationInfo) {
+                $exists = ProductsServicesClassification::where('itemClsCd', $remoteItemClassificationInfo['itemClsCd'])->exists();
+                if (!$exists) {
+                    ProductsServicesClassification::create($remoteItemClassificationInfo);
+                    $syncedLocalItemClassificationsinfo++;
+                }
+            }
+
+            if ($syncedLocalItemClassificationsinfo > 0) {
+                return redirect()->back()->with('success', __('Synced ' . $syncedLocalItemClassificationsinfo . ' Item Classification Successfully'));
+            } else {
+                return redirect()->back()->with('success', __('Item Classification/s Up To Date'));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error syncing Item Classification:', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', __('Error Syncing Item Classification'));
+        }
     }
 
 

@@ -14,14 +14,26 @@
     <li class="breadcrumb-item">{{__('Manage Code List')}}</li>
 @endsection
 
-@section('action-btn')
-<div class="float-end">
-    <a href="{{ route('productservice.synccodelist') }}" class="btn btn-sm btn-primary flex justify-center items-center text-center gap-2">
-        Synchronize
-    </a>
-</div>
-@endsection
 
+
+@section('action-btn')
+    <div class="float-end">
+        <div class="d-inline-block mb-4">
+            {{ Form::open(['route' => 'productservice.searchCodeListByDate', 'method' => 'POST', 'class' => 'w-100']) }}
+            @csrf
+            <div class="form-group">
+                {{ Form::label('SearchCodeListByDate', __('Search Date (ex- 01-Jan-2022)'), ['class' => 'form-label']) }}
+                {{ Form::date('searchCodeListByDate', null, ['class' => 'form-control', 'required' => 'required']) }}
+            </div>
+            <button type="submit" class="btn btn-primary">{{ __('Search') }}</button>
+            {{ Form::close() }}
+        </div>
+        <a href="{{ route('productservice.synccodelist') }}" class="btn btn-sm btn-primary sync" data-bs-toggle="tooltip"
+            title="{{ __('Synchronize') }}">
+            Synchronize
+        </a>
+    </div>
+@endsection
 @section('content')
 <div class="row">
     <div class="col-md-12">

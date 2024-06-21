@@ -22,6 +22,7 @@ use App\Http\Controllers\PaytrController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SspayController;
 use App\Http\Controllers\StageController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\ClientController;
@@ -411,9 +412,15 @@ Route::group(['middleware' => ['verified']], function () {
 
     Route::get('productservice/index', [ProductServiceController::class, 'index'])->name('productservice.index');
     Route::get('productservice/synchronize', [ProductServiceController::class, 'synchronize'])->name('productservice.synchronize');
+    
     // productservice.synchronizeitemclassifications
     Route::get('productserviceclassification/synchronizeitemclassifications', [ProductServiceClassificationController::class, 'synchronizeItemClassifications'])->name('productservice.synchronizeitemclassifications');
+    
+     Route::post('productserviceclassification/searchitemclassificationsbydate', [ProductServiceClassificationController::class, 'searchItemClassificationsByDate'])->name('productservice.searchItemClassificationByDate');
+    
     Route::get('productservice/synccodelist', [ProductServiceController::class, 'syncCodeList'])->name('productservice.synccodelist');
+
+    Route::post('productservice/searchcodelistbydate', [ProductServiceController::class, 'searchCodeListByDate'])->name('productservice.searchCodeListByDate');
 
     // productservice.searchByDate
     Route::post('productservice/searchByDate', [ProductServiceController::class, 'productServiceSearchByDate'])->name('productservice.searchByDate');
@@ -1825,7 +1832,7 @@ Route::group(
     }
 );
 Route::get('noticeslist/synchronize', [NoticesListController::class, 'synchronize'])->name('noticelist.synchronize');
-
+Route::post('noticeslist/noticelistsearchbydate', [NoticesListController::class, 'noticeListSearchByDate'])->name('noticelist.searchByDate');
 
 Route::group(
     [
@@ -1923,48 +1930,10 @@ Route::group(
         ],
     ],
     function () {
-        Route::resource('stockadjustment', StockAdjustmentListController::class);
-    }
-);
-
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'XSS',
-            'revalidate',
-        ],
-    ],
-    function () {
-        Route::resource('sales', SalesController::class);
-    }
-);
-
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'XSS',
-            'revalidate',
-        ],
-    ],
-    function () {
         Route::resource('salescreditnote', SalesCreditNoteController::class);
     }
 );
 
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'XSS',
-            'revalidate',
-        ],
-    ],
-    function () {
-        Route::resource('stockmove', StockMoveController::class);
-    }
-);
 
 Route::post('salescreditnote/{salescreditnote}', 'SalesCreditNoteController@update')->name('salescreditnote.update');
 
@@ -1989,7 +1958,38 @@ Route::get('/getcustomerbyname/{name}', [CustomerController::class, 'getCustomer
 //Get Customer By Tin
 Route::any('/getcustomerbypin', [CustomerController::class, 'getCustomerByTin'])->name('customer.customerbypin');  
 
-Route::get('stockinfoo/getstockmovelistfromapi', [StockMoveController::class, 'getStockMoveListFromApi']);
-Route::get('stockinfo/cancel', [StockMoveController::class, 'cancel'])->name('stockinfo.cancel');
-Route::get('stockinfo/stockmove', [StockMoveController::class, 'stockmove'])->name('stockinfo.stockmove');
-Route::any('/getItemInformationForPurchasing', [PurchaseController::class, 'getItemToPurchase'])->name('productservice.getiteminformation');
+Route::middleware(['auth', 'XSS', 'revalidate'])->group(function () {
+    // Routes for stock adjustments
+    Route::get('stockadjustment', [StockController::class, 'stockIdjustmentIndex'])->name('stockadjustment.index');
+    Route::get('stockadjustment/create', [StockController::class, 'stockIdjustmentCreate'])->name('stockadjustment.create');
+    Route::post('stockadjustment', [StockController::class, 'stockIdjustmentStore'])->name('stockadjustment.store');
+    Route::get('stockadjustment/{stockAdjustment}', [StockController::class, 'stockIdjustmentShow'])->name('stockadjustment.show');
+    Route::get('stockadjustment/{stockAdjustment}/edit', [StockController::class, 'stockIdjustmentEdit'])->name('stockadjustment.edit');
+    Route::put('stockadjustment/{stockAdjustment}', [StockController::class, 'stockIdjustmentUpdate'])->name('stockadjustment.update');
+    Route::delete('stockadjustment/{stockAdjustment}', [StockController::class, 'stockIdjustmentDestroy'])->name('stockadjustment.destroy');
+
+    // Routes for stock moves
+    Route::get('stockmove', [StockController::class, 'stockMoveIndex'])->name('stockmove.index');
+    Route::get('stockmove/create', [StockController::class, 'stockMoveCreate'])->name('stockmove.create');
+    Route::post('stockmove', [StockController::class, 'stockMoveStore'])->name('stockmove.store');
+    Route::get('stockmove/{stockMove}', [StockController::class, 'stockMoveShow'])->name('stockmove.show');
+    Route::get('stockmove/{stockMove}/edit', [StockController::class, 'stockMoveEdit'])->name('stockmove.edit');
+    Route::put('stockmove/{stockMove}', [StockController::class, 'stockMoveUpdate'])->name('stockmove.update');
+    Route::delete('stockmove/{stockMove}', [StockController::class, 'stockMoveDestroy'])->name('stockmove.destroy');
+    //stockmove.searchByDate
+    Route::post('stockmove/searchbydate', [StockController::class, 'stockMoveSearchByDate'])->name('stockmove.searchByDate');
+
+
+    // Routes for stock updates by invoice number
+    Route::get('stockinfo', [StockController::class, 'stockUpdateByInvoiceNoIndex'])->name('stockinfo.index');
+    Route::get('stockinfo/create', [StockController::class, 'stockUpdateByInvoiceNoCreate'])->name('stockinfo.create');
+    Route::post('stockinfo', [StockController::class, 'stockUpdateByInvoiceNoStore'])->name('stockinfo.store');
+    Route::get('stockinfo/{stockMoveList}', [StockController::class, 'stockUpdateByInvoiceNoShow'])->name('stockinfo.show');
+    Route::get('stockinfo/{stockMoveList}/edit', [StockController::class, 'stockUpdateByInvoiceNoEdit'])->name('stockinfo.edit');
+    Route::put('stockinfo/{stockMoveList}', [StockController::class, 'stockUpdateByInvoiceNoUpdate'])->name('stockinfo.update');
+    Route::delete('stockinfo/{stockMoveList}', [StockController::class, 'stockUpdateByInvoiceNoDestroy'])->name('stockinfo.destroy');
+    Route::post('stockinfo/{stockMoveList}/cancel', [StockController::class, 'stockUpdateByInvoiceNoCancel'])->name('stockinfo.cancel');
+
+    // Route for getting stock move list from API
+    Route::get('getStockMoveListFromApi', [StockController::class, 'getStockMoveListFromApi'])->name('stock.getStockMoveListFromApi');
+});
