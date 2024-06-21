@@ -31,10 +31,6 @@
             <?php echo e(Form::close()); ?>
 
         </div>
-        <a href="<?php echo e(route('purchase.create', 0)); ?>" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
-            title="<?php echo e(__('Add New Purchase')); ?>">
-            <i class="ti ti-plus"></i>
-        </a>
         <a href="#" data-size="md" data-bs-toggle="tooltip" title="<?php echo e(__('Import')); ?>"
             data-url="<?php echo e(route('productservice.file.import')); ?>" data-ajax-popup="true"
             data-title="<?php echo e(__('Import product CSV file')); ?>" class="btn btn-sm btn-primary">

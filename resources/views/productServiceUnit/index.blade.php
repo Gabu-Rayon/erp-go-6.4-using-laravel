@@ -8,11 +8,11 @@
 @endsection
 
 @section('action-btn')
-    <div class="float-end">
+   <!--  <div class="float-end">
             <a href="#" data-url="{{ route('product-unit.create') }}" data-ajax-popup="true" data-title="{{__('Create New Unit')}}" data-bs-toggle="tooltip" title="{{__('Create')}}"  class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-    </div>
+    </div> -->
 @endsection
 
 @section('content')
@@ -27,10 +27,12 @@
                         <table class="table datatable">
                             <thead>
                                 <tr>
+                                    <th>{{__('SrNo')}}</th>
                                     <th>{{__('Code')}}</th>
                                     <th>{{__('Unit/Name')}}</th>
                                     <th>{{__('Description')}}</th>
                                     <th>{{__('Mapping')}}</th>
+                                    <th>{{__('Remark')}}</th>
                                     <th>{{__('Status')}}</th>
                                     <th width="10%">{{__('Action')}}</th>
                                 </tr>
@@ -38,7 +40,14 @@
                             <tbody>
                             @foreach ($units as $unit)
                                 <tr>
-                                    <td>{{ $unit->name }}</td>
+                                    <td>{{ $unit->id}}</td>
+
+                                    <td>{{ $unit->code}}</td>
+                                     <td>{{ $unit->name }}</td>
+                                      <td>{{ $unit->description }}</td>
+                                       <td>{{ $unit->mapping}}</td>
+                                        <td>{{ $unit->remark}}</td>
+                                         <td></td>
                                     <td class="Action">
                                         <span>
                                                 <div class="action-btn bg-primary ms-2">

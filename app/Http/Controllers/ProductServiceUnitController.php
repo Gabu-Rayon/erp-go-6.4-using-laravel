@@ -15,7 +15,8 @@ class ProductServiceUnitController extends Controller
             || \Auth::user()->type == 'accountant'
         )
         {
-            $units = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get();
+            // $units = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get();
+            $units = ProductServiceUnit::all();
 
             return view('productServiceUnit.index', compact('units'));
         }

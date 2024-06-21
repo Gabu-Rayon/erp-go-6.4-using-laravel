@@ -1,8 +1,4 @@
 <?php
-<<<<<<< HEAD
-
-=======
->>>>>>> dbbf8106dac659f88cd267969f17db174d77eee6
 namespace Database\Seeders;
 
 use App\Models\Utility;
@@ -27,6 +23,16 @@ class DatabaseSeeder extends Seeder
             $this->call(PlansTableSeeder::class);
             $this->call(UsersTableSeeder::class);
             $this->call(AiTemplateSeeder::class);
+            $this->call(ProductServicesPackagingUnitsSeeder::class);
+            $this->call(ProductServiceUnitsSeeder::class);
+            $this->call(ImportItemStatusCodesSeeder::class);
+            $this->call(InvoiceStatusCodesSeeder::class);
+            $this->call(PaymentTypesCodeSeeder::class);
+            $this->call(PurchaseStatusCodesSeeder::class);
+
+            $this->call(PurchaseTypesCodeSeeder::class);
+            $this->call(SalesTypeCodesSeeder::class);
+            $this->call(CreditNoteReasonsSeeder::class);
 
         }else{
             Utility::languagecreate();
@@ -35,7 +41,3 @@ class DatabaseSeeder extends Seeder
 
     }
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> dbbf8106dac659f88cd267969f17db174d77eee6

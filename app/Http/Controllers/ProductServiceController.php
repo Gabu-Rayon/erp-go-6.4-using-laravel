@@ -33,6 +33,7 @@ use App\Imports\ProductServiceImport;
 use App\Models\ProductServiceCategory;
 use Illuminate\Support\Facades\Storage;
 use GuzzleHttp\Exception\RequestException;
+use App\Models\ProductServicesPackagingUnit;
 use App\Models\ProductsServicesClassification;
 
 class ProductServiceController extends Controller
@@ -74,6 +75,7 @@ class ProductServiceController extends Controller
             $category = ProductServiceCategory::all()->pluck('name', 'id');
             $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
             $quantityUnitCode = ProductServiceUnit::pluck('Name', 'code');
+            $productServicesPackagingUnit = ProductServicesPackagingUnit::pluck('Name', 'code');
 
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
             $unit = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -127,7 +129,8 @@ class ProductServiceController extends Controller
                     'incomeSubAccounts',
                     'expenseChartAccounts',
                     'quantityUnitCode',
-                    'expenseSubAccounts'
+                    'expenseSubAccounts',
+                    'productServicesPackagingUnit'
                 )
             );
         } else {

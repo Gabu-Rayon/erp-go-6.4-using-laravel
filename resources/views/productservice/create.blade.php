@@ -177,8 +177,9 @@
                                         {{ Form::select('countryCode', $countrynames, null, ['class' => 'form-control select2', 'placeholder' => __('Select Origin Place Code'), 'required' => 'required']) }}
                                     </td>
                                     <td class="form-group col-md-3">
-                                        {{ Form::label('pkgUnitCode', __('Package Unit Code'), ['class' => 'form-label']) }}
-                                        {{ Form::text('pkgUnitCode', '', ['class' => 'form-control', 'required' => 'required']) }}
+
+                                         {{ Form::label('pkgUnitCode', __('Package Unit Code'), ['class' => 'form-label']) }}
+                                        {{ Form::select('pkgUnitCode', $productServicesPackagingUnit, null, ['class' => 'form-control select2', 'placeholder' => __('Select Package Unit Code'), 'required' => 'required']) }}
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('qtyUnitCode', __('Quantity Unit Code'), ['class' => 'form-label']) }}

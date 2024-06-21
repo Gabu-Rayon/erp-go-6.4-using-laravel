@@ -1380,8 +1380,8 @@
                             <li class="dash-item <?php echo e(request()->is('productstock.index') ? 'active' : ''); ?>">
                                 <a class="dash-link" href="<?php echo e(route('productstock.index')); ?>"><?php echo e(__('Stock')); ?></a>
                             </li>
-                            <li class="dash-item <?php echo e(request()->is('stockinfo') ? 'active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('stockinfo.index')); ?>"><?php echo e(__('Get Move List')); ?></a>
+                            <li class="dash-item <?php echo e(request()->is('stockmove.index') ? 'active' : ''); ?>">
+                                <a class="dash-link" href="<?php echo e(route('stockmove.index')); ?>"><?php echo e(__('Get Move List')); ?></a>
                             </li>
                             <li class="dash-item <?php echo e(request()->is('stockadjustment') ? 'active' : ''); ?>">
                                 <a class="dash-link" href="<?php echo e(route('stockadjustment.index')); ?>"><?php echo e(__('Stock Adjustment')); ?></a>

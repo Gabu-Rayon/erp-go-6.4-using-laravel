@@ -91,9 +91,9 @@ class InvoiceController extends Controller
             $category->prepend('Select Category', '');
             $product_services = ProductService::all()->pluck('itemNm', 'itemCd');
             $product_services->prepend('--', '');
-            $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'saleTypeCode');
+            $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'code');
             $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'code');
-            $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusCode', 'invoiceStatusCode');
+            $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusCode', 'code');
             $taxationtype = Details::where('cdCls', '04')->pluck('userDfnCd1', 'cd');
 
             return view(

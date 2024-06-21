@@ -33,11 +33,9 @@
 
 @section('action-btn')
     <div class="float-end">
-        @can('create credit note')
             <a href="{{ route('invoice.custom.credit.note') }}" data-bs-toggle="tooltip" title="{{__('Add Direct Credit Note')}}" data-title="{{__('Add Direct Credit Note')}}" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-        @endcan
     </div>
 @endsection
 @section('content')
@@ -72,14 +70,11 @@
                                             <td>{{ Auth::user()->priceFormat($creditNote->amount) }}</td>
                                             <td>{{!empty($creditNote->remark)?$creditNote->remark:'-'}}</td>
                                             <td>
-                                                @can('edit credit note')
                                                     <div class="action-btn bg-primary ms-2">
                                                         <a data-url="{{ route('invoice.edit.credit.note',[$creditNote->invoice,$creditNote->id]) }}" data-ajax-popup="true" data-title="{{__('Edit Credit Note')}}" href="#" class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip" title="{{__('Edit')}}" data-original-title="{{__('Edit')}}">
                                                             <i class="ti ti-pencil text-white"></i>
                                                         </a>
                                                     </div>
-                                                @endcan
-                                                @can('edit credit note')
                                                         <div class="action-btn bg-danger ms-2">
                                                             {!! Form::open(['method' => 'DELETE', 'route' => array('invoice.delete.credit.note', $creditNote->invoice,$creditNote->id),'class'=>'delete-form-btn','id'=>'delete-form-'.$creditNote->id]) !!}
                                                                 <a href="#" class="mx-3 btn btn-sm align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?').'|'.__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$creditNote->id}}').submit();">
@@ -87,7 +82,6 @@
                                                                 </a>
                                                             {!! Form::close() !!}
                                                         </div>
-                                                @endcan
                                             </td>
                                         </tr>
                                     @endforeach
