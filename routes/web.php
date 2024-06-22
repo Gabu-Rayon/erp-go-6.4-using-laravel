@@ -1917,7 +1917,7 @@ Route::group(
         ],
     ],
     function () {
-        Route::resource('iteminformation', ProductServiceController::class);
+        Route::resource('productservice', ProductServiceController::class);
     }
 );
 

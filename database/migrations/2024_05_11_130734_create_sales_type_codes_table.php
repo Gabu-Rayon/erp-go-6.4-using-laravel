@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('sales_type_codes', function (Blueprint $table) {
             $table->id();
+            $table->string('code');
             $table->string('saleTypeCode');
             $table->timestamps();
         });

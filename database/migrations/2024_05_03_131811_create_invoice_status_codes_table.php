@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('invoice_status_codes', function (Blueprint $table) {
             $table->id();
+            $table->string('code');
             $table->string('invoiceStatusCode');
             $table->timestamps();
         });

@@ -140,6 +140,7 @@ class ProductServiceController extends Controller
 
     public function store(Request $request)
     {
+        \Log::info('CREATE PRODUCT SERVICE REQUEST Clicked :' . $request );
         try {
             if (
                 \Auth::user()->type == 'company'

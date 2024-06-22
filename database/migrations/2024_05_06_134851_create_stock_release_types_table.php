@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('stock_release_types', function (Blueprint $table) {
             $table->id();
+            $table->string('code');
             $table->string('type');
             $table->timestamps();
         });

@@ -199,9 +199,10 @@
 
                                     </td>
                                     <td class="form-group col-md-3">
-                                        <?php echo e(Form::label('pkgUnitCode', __('Package Unit Code'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::text('pkgUnitCode', '', ['class' => 'form-control', 'required' => 'required'])); ?>
+                                         <?php echo e(Form::label('pkgUnitCode', __('Package Unit Code'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::select('pkgUnitCode', $productServicesPackagingUnit, null, ['class' => 'form-control select2', 'placeholder' => __('Select Package Unit Code'), 'required' => 'required'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-3">

@@ -18,9 +18,9 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->text('mapping')->nullable();
             $table->text('remark')->nullable();
-            $table->integer('created_by')->nullable();
-            $table->timestamps();
             $table->string('status', 50)->default('active');
+            $table->integer('created_by')->nullable();
+            $table->timestamps();            
         });
     }
 

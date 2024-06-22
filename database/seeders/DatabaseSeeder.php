@@ -33,6 +33,8 @@ class DatabaseSeeder extends Seeder
             $this->call(PurchaseTypesCodeSeeder::class);
             $this->call(SalesTypeCodesSeeder::class);
             $this->call(CreditNoteReasonsSeeder::class);
+            $this->call(ItemTypeSeeder::class);
+            $this->call(StockReleaseTypesSeeder::class);
 
         }else{
             Utility::languagecreate();
