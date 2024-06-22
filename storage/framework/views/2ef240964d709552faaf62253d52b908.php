@@ -1570,10 +1570,10 @@
         <?php endif; ?>
 
          <!-- <?php if(\Auth::user()->type == 'company'): ?>
-            <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'iteminfomation' ? 'active' : ''); ?>">
-                <a href="<?php echo e(route('iteminformation.index')); ?>" class="dash-link">
+            <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'productservice' ? 'active' : ''); ?>">
+                <a href="<?php echo e(route('productservice.index')); ?>" class="dash-link">
                     <span class="dash-micon"><i class="ti ti-notification"></i></span><span
-                        class="dash-mtext"><?php echo e(__('Items Information')); ?></span>
+                        class="dash-mtext"><?php echo e(__('Product Service')); ?></span>
                 </a>
             </li>
         <?php endif; ?>

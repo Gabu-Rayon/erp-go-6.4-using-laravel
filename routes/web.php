@@ -412,12 +412,12 @@ Route::group(['middleware' => ['verified']], function () {
 
     Route::get('productservice/index', [ProductServiceController::class, 'index'])->name('productservice.index');
     Route::get('productservice/synchronize', [ProductServiceController::class, 'synchronize'])->name('productservice.synchronize');
-    
+
     // productservice.synchronizeitemclassifications
     Route::get('productserviceclassification/synchronizeitemclassifications', [ProductServiceClassificationController::class, 'synchronizeItemClassifications'])->name('productservice.synchronizeitemclassifications');
-    
-     Route::post('productserviceclassification/searchitemclassificationsbydate', [ProductServiceClassificationController::class, 'searchItemClassificationsByDate'])->name('productservice.searchItemClassificationByDate');
-    
+
+    Route::post('productserviceclassification/searchitemclassificationsbydate', [ProductServiceClassificationController::class, 'searchItemClassificationsByDate'])->name('productservice.searchItemClassificationByDate');
+
     Route::get('productservice/synccodelist', [ProductServiceController::class, 'syncCodeList'])->name('productservice.synccodelist');
 
     Route::post('productservice/searchcodelistbydate', [ProductServiceController::class, 'searchCodeListByDate'])->name('productservice.searchCodeListByDate');
@@ -873,7 +873,7 @@ Route::group(['middleware' => ['verified']], function () {
     Route::resource('leads', LeadController::class)->middleware(['auth', 'XSS']);
 
     // end Leads Module 
-    
+
     Route::get('user/{id}/plan', [UserController::class, 'upgradePlan'])->name('plan.upgrade')->middleware(['auth', 'XSS']);
     Route::get('user/{id}/plan/{pid}', [UserController::class, 'activePlan'])->name('plan.active')->middleware(['auth', 'XSS']);
     Route::get('/{uid}/notification/seen', [UserController::class, 'notificationSeen'])->name('notification.seen');
@@ -1588,8 +1588,8 @@ Route::group(['middleware' => ['verified']], function () {
     Route::resource('warehouse', WarehouseController::class)->middleware(['auth', 'XSS', 'revalidate']);
 
 
-     //Get All the Purchase Lists From The Apis 
-     Route::post('purchase/synchronize', [PurchaseController::class, 'synchronize'])->name('purchase.synchronize');
+    //Get All the Purchase Lists From The Apis 
+    Route::post('purchase/synchronize', [PurchaseController::class, 'synchronize'])->name('purchase.synchronize');
     Route::group(
         [
             'middleware' => [
@@ -1601,9 +1601,9 @@ Route::group(['middleware' => ['verified']], function () {
         function () {
             Route::get('purchase/items', [PurchaseController::class, 'items'])->name('purchase.items');
             Route::resource('purchase', PurchaseController::class);
-            Route::get('purchase/{id}/show', [PurchaseController::class, 'show'])->name('purchase.show');        
+            Route::get('purchase/{id}/show', [PurchaseController::class, 'show'])->name('purchase.show');
 
-            
+
             Route::get('purchase/{spplrInvcNo}/details', [PurchaseController::class, 'details'])->name('purchase.details');
             Route::get('purchase/{id}/payment', [PurchaseController::class, 'payment'])->name('purchase.payment');
             Route::post('purchase/{id}/payment', [PurchaseController::class, 'createPayment'])->name('purchase.payment');
@@ -1621,7 +1621,7 @@ Route::group(['middleware' => ['verified']], function () {
 
     );
 
-   
+
     // purchase.mapPurchase
     Route::any('map-purchase', [PurchaseController::class, 'mapPurchase'])->name('purchase.mapPurchase');
     //  purchase.SearchByDate
@@ -1956,7 +1956,7 @@ Route::get('/getcustomer/{id}', [CustomerController::class, 'getCustomer']);
 Route::get('/getcustomerbyname/{name}', [CustomerController::class, 'getCustomerByName']);
 
 //Get Customer By Tin
-Route::any('/getcustomerbypin', [CustomerController::class, 'getCustomerByTin'])->name('customer.customerbypin');  
+Route::any('/getcustomerbypin', [CustomerController::class, 'getCustomerByTin'])->name('customer.customerbypin');
 
 Route::middleware(['auth', 'XSS', 'revalidate'])->group(function () {
     // Routes for stock adjustments

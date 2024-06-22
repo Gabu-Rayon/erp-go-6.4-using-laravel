@@ -32,11 +32,9 @@ $profile = asset(Storage::url('uploads/avatar/'));
         <a href="{{ route('vender.export') }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{ __('Export') }}">
             <i class="ti ti-file-export"></i>
         </a>
-        @can('create vender')
             <a href="#" data-size="lg" data-url="{{ route('vender.create') }}" data-ajax-popup="true" data-title="{{__('Create New Vendor')}}" data-bs-toggle="tooltip" title="{{ __('Create') }}" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-        @endcan
 
     </div>
 @endsection
