@@ -141,262 +141,6 @@ class InvoiceController extends Controller
      * Post the data to api EnPoint
      * 
      ***************************************************************************/
-    // public function store(Request $request)
-    // {
-
-    //     // Log the entire request data
-    //     \Log::info('Form data received:', $request->all());
-    //     try {
-    //         if (\Auth::user()->can('create invoice')) {
-    //             $validator = \Validator::make(
-    //                 $request->all(),
-    //                 [
-    //                     'customer_id' => 'required',
-    //                     'issue_date' => 'required',
-    //                     'due_date' => 'required',
-    //                     'category_id' => 'required',
-    //                     'traderInvoiceNo' => 'required|max:50|min:1',
-    //                     'items' => 'required'
-    //                 ]
-    //             );
-    //             if ($validator->fails()) {
-    //                 $messages = $validator->getMessageBag();
-    //                 return redirect()->back()->with('error', $messages->first());
-    //             }
-
-
-    //             $data = $request->all();
-    //             $customer = Customer::find($data['customer_id']);
-    //             \Log::info('CUSTOMER');
-    //             \Log::info($customer);
-
-    //             $salesDt = str_replace('-', '', $data['salesDate']);
-    //             $salesDate = date('Ymd', strtotime($salesDt));
-
-    //             $occurredDt = str_replace('-', '', $data['occurredDate']);
-    //             $occurredDate = date('Ymd', strtotime($occurredDt));
-    //             $confirmDate = date('YmdHis', strtotime($request->input('confirmDate')));
-    //             $stockReleseDate = date('YmdHis', strtotime($request->input('stockReleseDate')));
-    //             $receiptPublishDate = date('YmdHis', strtotime($request->input('receiptPublishDate')));
-
-    //             $saleItemList = [];
-
-    //             $apiRequestData = [
-    //                 "customerNo" => $customer->customerNo,
-    //                 "customerTin" => $customer->customerTin,
-    //                 "customerName" => $customer->name,
-    //                 "customerMobileNo" => $customer->contact,
-    //                 "salesType" => $data['salesType'],
-    //                 "paymentType" => $data['paymentType'],
-    //                 "traderInvoiceNo" => $data['traderInvoiceNo'],
-    //                 "confirmDate" => $confirmDate,
-    //                 "salesDate" => $salesDate,
-    //                 "stockReleseDate" => $stockReleseDate,
-    //                 "receiptPublishDate" => $receiptPublishDate,
-    //                 "occurredDate" => $occurredDate,
-    //                 "invoiceStatusCode" => $data['invoiceStatusCode'],
-    //                 "remark" => $data['remark'],
-    //                 "isPurchaseAccept" => $data['isPurchaseAccept'],
-    //                 "isStockIOUpdate" => $data['isStockIOUpdate'],
-    //                 "mapping" => $data['mapping'],
-    //                 "saleItemList" => $saleItemList
-    //             ];
-    //             $totalAmount = 0;
-
-    //             \Log::info('INV REQ DATA');
-    //             \Log::info($apiRequestData);
-
-    //             function calculateDiscountAmount($packageQuantity, $quantity, $unitPrice, $discountRate)
-    //             {
-    //                 $totalItems = $packageQuantity * $quantity;
-    //                 $totalPriceBeforeDiscount = $totalItems * $unitPrice;
-    //                 $discountAmount = ($totalPriceBeforeDiscount * $discountRate) / 100;
-    //                 return $discountAmount;
-    //             }
-
-    //             function calculateTotalAmount($packageQuantity, $quantity, $unitPrice)
-    //             {
-    //                 $totalItems = $packageQuantity * $quantity;
-    //                 $totalPriceBeforeDiscount = $totalItems * $unitPrice;
-    //                 return $totalPriceBeforeDiscount;
-    //             }
-
-    //             foreach ($data['items'] as $item) {
-    //                 $itemDetails =ProductService::where('itemCd', $item['itemCode'])->first();
-    //                 $itemExprDt = str_replace('-', '', $item['itemExprDate']);
-    //                 $itemExprDate = date('Ymd', strtotime($itemExprDt));
-    //                 $itemData = [
-    //                     "itemCode" => $itemDetails->itemCd,
-    //                     "itemClassCode" => $itemDetails->itemClsCd,
-    //                     "itemTypeCode" => $itemDetails->itemTyCd,
-    //                     "itemName" => $itemDetails->itemNm,
-    //                     "orgnNatCd" => $itemDetails->orgnNatCd,
-    //                     "taxTypeCode" => $itemDetails->taxTyCd,
-    //                     "unitPrice" => $item['unitPrice'],
-    //                     "isrcAplcbYn" => $itemDetails->isrcAplcbYn,
-    //                     "pkgUnitCode" => $itemDetails->pkgUnitCd,
-    //                     "pkgQuantity" => $item['pkgQuantity'],
-    //                     "tax" => $item['tax'],
-    //                     "qtyUnitCd" => $itemDetails->qtyUnitCd,
-    //                     "quantity" => $item['quantity'],
-    //                     "discountRate" => $item['discountRate'],
-    //                     "discountAmt" => calculateDiscountAmount(
-    //                         $item['pkgQuantity'],
-    //                         $item['quantity'],
-    //                         $item['unitPrice'],
-    //                         $item['discountRate'],
-    //                     ),
-    //                     "itemExprDate" => $itemExprDate
-    //                 ];
-
-    //                 array_push($saleItemList, $itemData);
-
-
-    //             }
-
-    //             $apiRequestData['saleItemList'] = $saleItemList;
-    //             \Log::info('INV REQ DATA');
-    //             \Log::info($apiRequestData);
-
-    //             // $url = 'https://etims.your-apps.biz/api/AddSale';
-
-    //             // $response = Http::withOptions(['verify' => false])->withHeaders([
-    //             //     'key' => '123456'
-    //             //     ])->post($url, $apiRequestData);
-
-    //             // \Log::info('SALES API RESPONSE');
-    //             // \Log::info($response);
-
-    //             // if ($response['statusCode'] == 400) {
-    //             //     return redirect()->back()->with('error', $response['message']);
-    //             // }
-
-    //             \Log::info('INV DEYTA');
-    //             \Log::info($data);
-
-    //             foreach ($saleItemList as $item) {
-    //                 $totalAmount += calculateTotalAmount($item['pkgQuantity'], $item['quantity'], $item['unitPrice']);
-    //             }
-
-    //             $inv = Invoice::create([
-    //                 'invoice_id' => $this->invoiceNumber(),
-    //                 'customer_id' => $data['customer_id'],
-    //                 'issue_date' => $data['issue_date'],
-    //                 'due_date' => $data['due_date'],
-    //                 'send_date' => $data['send_date'],
-    //                 'category_id' => $data['category_id'],
-    //                 'ref_number' => $data['ref_number'],
-    //                 'status' => 0, // Assuming 'status' is nullable or has a default value
-    //                 'shipping_display' => null, // Assuming 'shipping_display' is nullable or has a default value
-    //                 'discount_apply' => null, // Assuming 'discount_apply' is nullable or has a default value
-    //                 'created_by' => \Auth::user()->creatorId(),
-    //                 'trderInvoiceNo' => $data['traderInvoiceNo'],
-    //                 'invoiceNo' => $data['traderInvoiceNo'],
-    //                 'orgInvoiceNo' => $data['traderInvoiceNo'],
-    //                 'customerTin' => $customer->customerTin,
-    //                 'customerName' => $customer->name,
-    //                 'receptTypeCode' => null, // Assuming 'receptTypeCode' is nullable or has a default value
-    //                 'paymentTypeCode' => null, // Assuming 'paymentTypeCode' is nullable or has a default value
-    //                 'salesSttsCode' => null, // Assuming 'salesSttsCode' is nullable or has a default value
-    //                 'confirmDate' => $data['confirmDate'],
-    //                 'salesDate' => $salesDate,
-    //                 'stockReleaseDate' => $data['stockReleseDate'],
-    //                 'cancelReqDate' => null, // Assuming 'cancelReqDate' is nullable or has a default value
-    //                 'cancelDate' => null, // Assuming 'cancelDate' is nullable or has a default value
-    //                 'refundDate' => null, // Assuming 'refundDate' is nullable or has a default value
-    //                 'refundReasonCd' => null, // Assuming 'refundReasonCd' is nullable or has a default value
-    //                 'totalItemCnt' => null, // Assuming 'totalItemCnt' is nullable or has a default value
-    //                 'taxableAmtA' => null, // Assuming 'taxableAmtA' is nullable or has a default value
-    //                 'taxableAmtB' => null, // Assuming 'taxableAmtB' is nullable or has a default value
-    //                 'taxableAmtC' => null, // Assuming 'taxableAmtC' is nullable or has a default value
-    //                 'taxableAmtD' => null, // Assuming 'taxableAmtD' is nullable or has a default value
-    //                 'taxRateA' => null, // Assuming 'taxRateA' is nullable or has a default value
-    //                 'taxRateB' => null, // Assuming 'taxRateB' is nullable or has a default value
-    //                 'taxRateC' => null, // Assuming 'taxRateC' is nullable or has a default value
-    //                 'taxRateD' => null, // Assuming 'taxRateD' is nullable or has a default value
-    //                 'taxAmtA' => null, // Assuming 'taxAmtA' is nullable or has a default value
-    //                 'taxAmtB' => null, // Assuming 'taxAmtB' is nullable or has a default value
-    //                 'taxAmtC' => null, // Assuming 'taxAmtC' is nullable or has a default value
-    //                 'taxAmtD' => null, // Assuming 'taxAmtD' is nullable or has a default value
-    //                 'totalTaxableAmt' => null, // Assuming 'totalTaxableAmt' is nullable or has a default value
-    //                 'totalTaxAmt' => null, // Assuming 'totalTaxAmt' is nullable or has a default value
-    //                 'totalAmt' => $totalAmount,
-    //                 'prchrAcptcYn' => null, // Assuming 'prchrAcptcYn' is nullable or has a default value
-    //                 'remark' => $data['remark'],
-    //                 'regrNm' => null, // Assuming 'regrNm' is nullable or has a default value
-    //                 'regrId' => null, // Assuming 'regrId' is nullable or has a default value
-    //                 'modrNm' => null, // Assuming 'modrNm' is nullable or has a default value
-    //                 'modrId' => null, // Assuming 'modrId' is nullable or has a default value
-    //                 'receipt_CustomerTin' => null, // Assuming 'receipt_CustomerTin' is nullable or has a default value
-    //                 'receipt_CustomerMblNo' => null, // Assuming 'receipt_CustomerMblNo' is nullable or has a default value
-    //                 'receipt_RptNo' => null, // Assuming 'receipt_RptNo' is nullable or has a default value
-    //                 'receipt_RcptPbctDt' => null, // Assuming 'receipt_RcptPbctDt' is nullable or has a default value
-    //                 'receipt_TrdeNm' => null, // Assuming 'receipt_TrdeNm' is nullable or has a default value
-    //                 'receipt_Adrs' => null, // Assuming 'receipt_Adrs' is nullable or has a default value
-    //                 'receipt_TopMsg' => null, // Assuming 'receipt_TopMsg' is nullable or has a default value
-    //                 'receipt_BtmMsg' => null, // Assuming 'receipt_BtmMsg' is nullable or has a default value
-    //                 'receipt_PrchrAcptcYn' => null, // Assuming 'receipt_PrchrAcptcYn' is nullable or has a default value
-    //                 'createdDate' => null, // Assuming 'createdDate' is nullable or has a default value
-    //                 'isKRASynchronized' => null, // Assuming 'isKRASynchronized' is nullable or has a default value
-    //                 'kraSynchronizedDate' => null, // Assuming 'kraSynchronizedDate' is nullable or has a default value
-    //                 'isStockIOUpdate' => $data['isStockIOUpdate'],
-    //                 'resultCd' => null, // Assuming 'resultCd' is nullable or has a default value
-    //                 'resultMsg' => null, // Assuming 'resultMsg' is nullable or has a default value
-    //                 'resultDt' => null, // Assuming 'resultDt' is nullable or has a default value
-    //                 'response_CurRcptNo' => null, // Assuming 'response_CurRcptNo' is nullable or has a default value
-    //                 'response_TotRcptNo' => null, // Assuming 'response_TotRcptNo' is nullable or has a default value
-    //                 'response_IntrlData' => null, // Assuming 'response_IntrlData' is nullable or has a default value
-    //                 'response_RcptSign' => null, // Assuming 'response_RcptSign' is nullable or has a default value
-    //                 'response_SdcDateTime' => null, // Assuming 'response_SdcDateTime' is nullable or has a default value
-    //                 'response_SdcId' => null, // Assuming 'response_SdcId' is nullable or has a default value
-    //                 'response_MrcNo' => null, // Assuming 'response_MrcNo' is nullable or has a default value
-    //                 'qrCodeURL' => null, // Assuming 'qrCodeURL' is nullable or has a default value
-    //             ]);
-
-    //             foreach ($saleItemList as $item) {
-    //                 InvoiceProduct::create([
-    //                     'product_id' => $item['itemCode'],
-    //                     'invoice_id' => $inv['invoice_id'],
-    //                     'quantity' => $item['quantity'],
-    //                     'tax' => $itemDetails->taxTyCd,
-    //                     'discount' => $item['discountAmt'],
-    //                     'price' => calculateTotalAmount(
-    //                         $item['pkgQuantity'],
-    //                         $item['quantity'],
-    //                         $item['unitPrice'],
-    //                     ),
-    //                     'customer_id' => $data['customer_id'],
-    //                     "itemCode" => $itemDetails->itemCd,
-    //                     "itemClassCode" => $itemDetails->itemClsCd,
-    //                     "itemTypeCode" => $itemDetails->itemTyCd,
-    //                     "itemName" => $itemDetails->itemNm,
-    //                     "orgnNatCd" => $itemDetails->orgnNatCd,
-    //                     "taxTypeCode" => $itemDetails->taxTyCd,
-    //                     "unitPrice" => $item['unitPrice'],
-    //                     "isrcAplcbYn" => $itemDetails->isrcAplcbYn,
-    //                     "pkgUnitCode" => $itemDetails->pkgUnitCd,
-    //                     "pkgQuantity" => $item['pkgQuantity'],
-    //                     "qtyUnitCd" => $itemDetails->qtyUnitCd,
-    //                     "discountRate" => $item['discountRate'],
-    //                     "discountAmt" => calculateDiscountAmount(
-    //                         $item['pkgQuantity'],
-    //                         $item['quantity'],
-    //                         $item['unitPrice'],
-    //                         $item['discountRate'],
-    //                     ),
-    //                     "itemExprDate" => $itemExprDate
-    //                 ]);
-    //             }
-    //             return redirect()->to('invoice')->with('success', 'Sale Created Successfully');
-    //         }
-    //     } catch (\Exception $e) {
-    //         \Log::info('ADD INV ERROR');
-    //         \Log::info($e);
-
-    //         return redirect()->back()->with('error', $e->getMessage());
-    //     }
-    // }
-
     public function store(Request $request)
     {
         // Log the entire request data
@@ -424,54 +168,54 @@ class InvoiceController extends Controller
                 $apiRequestData['saleItemList'] = $saleItemList;
                 \Log::info('Invoice  REQ DATA To Be Posted to the Api ', ['apiRequestData' => $apiRequestData]);
 
-                // Send data to AddSale API
-                // $url = 'https://etims.your-apps.biz/api/AddSale';
-                // $response = Http::withOptions(['verify' => false])
-                //     ->withHeaders(['key' => '123456'])
-                //     ->post($url, $apiRequestData);
+                //Send data to AddSale API
+                $url = 'https://etims.your-apps.biz/api/AddSale';
+                $response = Http::withOptions(['verify' => false])
+                    ->withHeaders(['key' => '123456'])
+                    ->post($url, $apiRequestData);
 
 
-                // if ($response->failed()) {
-                //     if ($response->json('statusCode') == 400 && $response->json('message') == 'Trader invoice number is alrady exist') {
-                //         return redirect()->back()->with('error', 'Trader invoice number already exists.');
-                //     }
-                //     return redirect()->back()->with('error', 'Failed to post invoice data.');
-                // }
+                if ($response->failed()) {
+                    if ($response->json('statusCode') == 400 && $response->json('message') == 'Trader invoice number is alrady exist') {
+                        return redirect()->back()->with('error', 'Trader invoice number already exists.');
+                    }
+                    return redirect()->back()->with('error', 'Failed to post invoice data.');
+                }
 
-                // // Log the response of the AddSale API call
-                // \Log::info('SALES Invoice API RESPONSE', ['response' => $response->json()]);
-                // \Log::info('API Response Status Code For Posting Invoice Data: ' . $response->status());
-                // \Log::info('API Request Invoice Being Posted: ' . json_encode($apiRequestData));
-                // \Log::info('API Response Body For Posting Invoice Data: ' . $response->body());
+                // Log the response of the AddSale API call
+                \Log::info('SALES Invoice API RESPONSE', ['response' => $response->json()]);
+                \Log::info('API Response Status Code For Posting Invoice Data: ' . $response->status());
+                \Log::info('API Request Invoice Being Posted: ' . json_encode($apiRequestData));
+                \Log::info('API Response Body For Posting Invoice Data: ' . $response->body());
 
-                // if ($response['statusCode'] == 400) {
-                //     return redirect()->back()->with('error', $response['message']);
-                // }
+                if ($response['statusCode'] == 400) {
+                    return redirect()->back()->with('error', $response['message']);
+                }
 
-                // // Prepare data for ItemOpeningStock API
-                // $openingItemsLists = $this->prepareOpeningItemsList($saleItemList);
-                // $itemOpeningStockRequestData = [
-                //     "openingItemsLists" => $openingItemsLists
-                // ];
+                // Prepare data for ItemOpeningStock API
+                $openingItemsLists = $this->prepareOpeningItemsList($saleItemList);
+                $itemOpeningStockRequestData = [
+                    "openingItemsLists" => $openingItemsLists
+                ];
 
-                // // Send data to ItemOpeningStock API
-                // $url = 'https://etims.your-apps.biz/api/ItemOpeningStock';
-                // $response = Http::withOptions(['verify' => false])
-                //     ->withHeaders([
-                //         'accept' => '*/*',
-                //         'key' => '123456',
-                //         'Content-Type' => 'application/json'
-                //     ])
-                //     ->post($url, $itemOpeningStockRequestData);
+                // Send data to ItemOpeningStock API
+                $url = 'https://etims.your-apps.biz/api/ItemOpeningStock';
+                $response = Http::withOptions(['verify' => false])
+                    ->withHeaders([
+                        'accept' => '*/*',
+                        'key' => '123456',
+                        'Content-Type' => 'application/json'
+                    ])
+                    ->post($url, $itemOpeningStockRequestData);
 
-                // \Log::info('ITEM OPENING STOCK API RESPONSE', ['response' => $response->json()]);
-                // \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $response->status());
-                // \Log::info('API Request Opening Stock Data Posted: ' . json_encode($itemOpeningStockRequestData));
-                // \Log::info('API Response Body For Posting Opening Stock Data: ' . json_encode($response->body()));
+                \Log::info('ITEM OPENING STOCK API RESPONSE', ['response' => $response->json()]);
+                \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $response->status());
+                \Log::info('API Request Opening Stock Data Posted: ' . json_encode($itemOpeningStockRequestData));
+                \Log::info('API Response Body For Posting Opening Stock Data: ' . json_encode($response->body()));
 
-                // if ($response->failed()) {
-                //     return redirect()->back()->with('error', 'Failed to sync item opening stock');
-                // }
+                if ($response->failed()) {
+                    return redirect()->back()->with('error', 'Failed to sync item opening stock');
+                }
 
                 $totalAmount = $this->calculateTotalAmount($saleItemList);
                 $inv = $this->createInvoice($data, $customer, $totalAmount);
