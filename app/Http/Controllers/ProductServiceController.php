@@ -301,6 +301,7 @@ class ProductServiceController extends Controller
 
     public function show($id)
     {
+        try{
         $productServiceInfo = ProductService::findOrFail($id);
         $taxName = DB::table('taxes')->where('id', $productServiceInfo->tax_id)->value('name');
         $categoryName = DB::table('product_service_categories')->where('id', $productServiceInfo->category_id)->value('name');
