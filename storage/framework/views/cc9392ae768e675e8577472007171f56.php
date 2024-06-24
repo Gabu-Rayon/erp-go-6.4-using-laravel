@@ -81,7 +81,7 @@
                                 <?php echo e(Form::select('mainItemCode', $mainItemCode, null, ['class' => 'form-control select2'])); ?>
 
                             <?php else: ?>
-                                <p><?php echo e(__('You No  Finish Product or Service')); ?></p>
+                                <p><?php echo e(__('You have  Finish Product or Service')); ?></p>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -123,7 +123,7 @@
                                             <?php echo e(Form::select('compoItemCode', $compoItemCode, null, ['class' => 'form-control select2'])); ?>
 
                                         <?php else: ?>
-                                            <p><?php echo e(__('You No Raw Material Product !')); ?></p>
+                                            <p><?php echo e(__('You have No Raw Material Product !')); ?></p>
                                         <?php endif; ?>
                                     </td>
                                     <td class="form-group col-md-4">

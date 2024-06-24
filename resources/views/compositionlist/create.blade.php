@@ -77,7 +77,7 @@
                             @if($mainItemCode->isNotEmpty())
                                 {{ Form::select('mainItemCode', $mainItemCode, null, ['class' => 'form-control select2']) }}
                             @else
-                                <p>{{ __('You No  Finish Product or Service') }}</p>
+                                <p>{{ __('You have  Finish Products or Service s') }}</p>
                             @endif
                         </div>
                     </div>
@@ -116,7 +116,7 @@
                                         @if($compoItemCode->isNotEmpty())
                                             {{ Form::select('compoItemCode', $compoItemCode, null, ['class' => 'form-control select2']) }}
                                         @else
-                                            <p>{{ __('You No Raw Material Product !') }}</p>
+                                            <p>{{ __('You have No Raw Material Products !') }}</p>
                                         @endif
                                     </td>
                                     <td class="form-group col-md-4">
