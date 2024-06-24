@@ -181,7 +181,7 @@
                 <td >
                     <h3 style=" display: block; text-transform: uppercase; font-size: 30px; font-weight: bold; padding: 15px; background: {{ $color }};color:{{ $font_color }} ">{{__('INVOICE')}}</h3>
                     <div class="view-qrcode" style="margin-left: 0; margin-bottom: 15px; ">
-                        {!! DNS2D::getBarcodeHTML(route('invoice.link.copy',\Crypt::encrypt($invoice->invoice_id)), "QRCODE",2,2) !!}
+                       {!! DNS2D::getBarcodeHTML($invoice->qrCodeURL, 'QRCODE', 2, 2) !!}
                     </div>
                     <table class="no-space">
                         <tbody>

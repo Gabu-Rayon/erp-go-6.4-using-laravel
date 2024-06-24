@@ -349,7 +349,7 @@ class Utility extends Model
             "bill_logo" => "",
             "pos_logo" => "",
             "quotation_prefix" => "#QUO",
-            "quotation_logo"=>'',
+            "quotation_logo" => '',
             "pos_color" => "ffffff",
             "quotation_template" => "template1",
             "pos_template" => "template1",
@@ -702,7 +702,8 @@ class Utility extends Model
         return self::$data;
     }
 
-    public static function taxRate($taxRate, $price, $quantity, $discount = 0) {
+    public static function taxRate($taxRate, $price, $quantity, $discount = 0)
+    {
         \Log::info('TAX RATEEE');
         \Log::info($taxRate);
         return (($price * $quantity) - $discount) * ($taxRate / 100);
@@ -907,7 +908,7 @@ class Utility extends Model
 
     public static function chartOfAccountTypeData($company_id)
     {
-        $chartOfAccountTypes = Self::$chartOfAccountType;
+        $chartOfAccountTypes = self::$chartOfAccountType;
         foreach ($chartOfAccountTypes as $k => $type) {
 
             $accountType = ChartOfAccountType::create(
@@ -917,7 +918,7 @@ class Utility extends Model
                 ]
             );
 
-            $chartOfAccountSubTypes = Self::$chartOfAccountSubType;
+            $chartOfAccountSubTypes = self::$chartOfAccountSubType;
 
             foreach ($chartOfAccountSubTypes[$k] as $subType) {
                 ChartOfAccountSubType::create(
@@ -1058,7 +1059,8 @@ class Utility extends Model
             'name' => 'Purchase Tax',
             'type' => 2,
             'sub_type' => 4,
-        ], [
+        ],
+        [
             'code' => '2150',
             'name' => 'VAT Pay / Refund',
             'type' => 2,
@@ -1129,7 +1131,8 @@ class Utility extends Model
             'name' => 'Accr. Benefits - Central Provident Fund',
             'type' => 2,
             'sub_type' => 4,
-        ], [
+        ],
+        [
             'code' => '2320',
             'name' => 'Accr. Benefits - Stock Purchase',
             'type' => 2,
@@ -1733,7 +1736,8 @@ class Utility extends Model
             'name' => 'Purchase Tax',
             'type' => 'Liabilities',
             'sub_type' => 'Current Liabilities',
-        ], [
+        ],
+        [
             'code' => '2150',
             'name' => 'VAT Pay / Refund',
             'type' => 'Liabilities',
@@ -1804,7 +1808,8 @@ class Utility extends Model
             'name' => 'Accr. Benefits - Central Provident Fund',
             'type' => 'Liabilities',
             'sub_type' => 'Current Liabilities',
-        ], [
+        ],
+        [
             'code' => '2320',
             'name' => 'Accr. Benefits - Stock Purchase',
             'type' => 'Liabilities',
@@ -2281,10 +2286,10 @@ class Utility extends Model
 
     );
 
-// chart of account for new company
+    // chart of account for new company
     public static function chartOfAccountData1($user)
     {
-        $chartOfAccounts = Self::$chartOfAccount1;
+        $chartOfAccounts = self::$chartOfAccount1;
 
         foreach ($chartOfAccounts as $account) {
 
@@ -2306,7 +2311,7 @@ class Utility extends Model
 
     public static function chartOfAccountData($user)
     {
-        $chartOfAccounts = Self::$chartOfAccount;
+        $chartOfAccounts = self::$chartOfAccount;
         foreach ($chartOfAccounts as $account) {
             ChartOfAccount::create(
                 [
@@ -2347,8 +2352,7 @@ class Utility extends Model
                     if (!empty($content->content)) {
                         $content->content = self::replaceVariable($content->content, $obj);
                         // send email
-                        try
-                        {
+                        try {
                             config(
                                 [
                                     'mail.driver' => $settings['mail_driver'],
@@ -2424,8 +2428,7 @@ class Utility extends Model
                 if (!empty($content->content)) {
                     $content->content = self::replaceVariable($content->content, $obj);
                     // send email
-                    try
-                    {
+                    try {
                         config(
                             [
                                 'mail.driver' => $settings['mail_driver'],
@@ -2748,7 +2751,7 @@ class Utility extends Model
             $arrValue[$key] = $val;
         }
 
-//        dd($obj);
+        //        dd($obj);
         $settings = Utility::settings();
         $company_name = $settings['company_name'];
 
@@ -3090,7 +3093,7 @@ class Utility extends Model
         return $dateCollection;
     }
 
-//    public static function employeePayslipDetail($employeeId)
+    //    public static function employeePayslipDetail($employeeId)
 //    {
 ////        dd($employeeId);
 //        $earning['allowance']         = Allowance::where('employee_id', $employeeId)->get();
@@ -3481,7 +3484,7 @@ class Utility extends Model
 
         }
         $data = $data->get();
-//        dd($data);
+        //        dd($data);
         foreach ($data as $row) {
             $settings[$row->name] = $row->value;
         }
@@ -3642,7 +3645,7 @@ class Utility extends Model
             }
         }
 
-//dd($msg);
+        //dd($msg);
         if (isset($msg)) {
             $settings = Utility::settingsById($user->id);
             try {
@@ -3747,7 +3750,7 @@ class Utility extends Model
             }
         }
 
-//        dd($msg);
+        //        dd($msg);
 
         if (isset($msg)) {
             $settings = Utility::settingsById($user->id);
@@ -3987,7 +3990,8 @@ class Utility extends Model
 
         $data = WarehouseProduct::updateOrCreate(
             ['warehouse_id' => $warehouse_id, 'product_id' => $product_id, 'created_by' => \Auth::user()->id],
-            ['warehouse_id' => $warehouse_id, 'product_id' => $product_id, 'quantity' => $product_quantity, 'created_by' => \Auth::user()->id])
+            ['warehouse_id' => $warehouse_id, 'product_id' => $product_id, 'quantity' => $product_quantity, 'created_by' => \Auth::user()->id]
+        )
         ;
 
     }
@@ -4012,7 +4016,7 @@ class Utility extends Model
     {
         try {
             $settings = Utility::getStorageSetting();
-//                dd($settings);
+            //                dd($settings);
 
             if (!empty($settings['storage_setting'])) {
 
@@ -4054,41 +4058,41 @@ class Utility extends Model
                 $file = $request[$key_name];
 
                 \Log::info('FILELELELELE');
-                        \Log::info($file);
+                \Log::info($file);
 
-                    $name = $name;
+                $name = $name;
 
-                    if ($settings['storage_setting'] == 'local') {
-//                    dd(\Storage::disk(),$path);
-                        $request[$key_name]->move(storage_path($path), $name);
-                        $path = $path . $name;
-                    } else if ($settings['storage_setting'] == 'wasabi') {
+                if ($settings['storage_setting'] == 'local') {
+                    //                    dd(\Storage::disk(),$path);
+                    $request[$key_name]->move(storage_path($path), $name);
+                    $path = $path . $name;
+                } else if ($settings['storage_setting'] == 'wasabi') {
 
-                        $path = \Storage::disk('wasabi')->putFileAs(
-                            $path,
-                            $file,
-                            $name
-                        );
+                    $path = \Storage::disk('wasabi')->putFileAs(
+                        $path,
+                        $file,
+                        $name
+                    );
 
-                        // $path = $path.$name;
+                    // $path = $path.$name;
 
-                    } else if ($settings['storage_setting'] == 's3') {
+                } else if ($settings['storage_setting'] == 's3') {
 
-                        $path = \Storage::disk('s3')->putFileAs(
-                            $path,
-                            $file,
-                            $name
-                        );
-                        // $path = $path.$name;
-                        // dd($path);
-                    }
+                    $path = \Storage::disk('s3')->putFileAs(
+                        $path,
+                        $file,
+                        $name
+                    );
+                    // $path = $path.$name;
+                    // dd($path);
+                }
 
-                    $res = [
-                        'flag' => 1,
-                        'msg' => 'success',
-                        'url' => $path,
-                    ];
-                    return $res;
+                $res = [
+                    'flag' => 1,
+                    'msg' => 'success',
+                    'url' => $path,
+                ];
+                return $res;
 
             } else {
                 $res = [
@@ -4390,21 +4394,21 @@ class Utility extends Model
 
     public static function addCalendarData($request, $type)
     {
-        Self::googleCalendarConfig();
+        self::googleCalendarConfig();
         $event = new GoogleEvent();
         $event->name = $request->title;
         $event->startDateTime = Carbon::parse($request->start_date);
         $event->endDateTime = Carbon::parse($request->end_date);
-        $event->colorId = Self::colorCodeData($type);
+        $event->colorId = self::colorCodeData($type);
         $event->save();
     }
 
     public static function getCalendarData($type)
     {
-        Self::googleCalendarConfig();
+        self::googleCalendarConfig();
         $data = GoogleEvent::get();
 
-        $type = Self::colorCodeData($type);
+        $type = self::colorCodeData($type);
         $arrayJson = [];
         foreach ($data as $val) {
             $end_date = date_create($val->endDateTime);
@@ -4416,7 +4420,7 @@ class Utility extends Model
                     "title" => $val->summary,
                     "start" => $val->startDateTime,
                     "end" => date_format($end_date, "Y-m-d H:i:s"),
-                    "className" => Self::$colorCode[$type],
+                    "className" => self::$colorCode[$type],
                     "allDay" => true,
 
                 ];
@@ -4485,9 +4489,17 @@ class Utility extends Model
     //start for cookie settings
     public static function getCookieSetting()
     {
-        $data = \DB::table('settings')->whereIn('name', ['enable_cookie', 'cookie_logging', 'cookie_title',
-            'cookie_description', 'necessary_cookies', 'strictly_cookie_title',
-            'strictly_cookie_description', 'more_information_description', 'contactus_url'])->get();
+        $data = \DB::table('settings')->whereIn('name', [
+            'enable_cookie',
+            'cookie_logging',
+            'cookie_title',
+            'cookie_description',
+            'necessary_cookies',
+            'strictly_cookie_title',
+            'strictly_cookie_description',
+            'more_information_description',
+            'contactus_url'
+        ])->get();
         $settings = [
             'enable_cookie' => 'off',
             'necessary_cookies' => 'on',
@@ -4756,9 +4768,13 @@ class Utility extends Model
 
         // foreach ($types as $type) {
         $total = TransactionLines::
-            select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name',
-            \DB::raw('sum(debit) as totalDebit'),
-            \DB::raw('sum(credit) as totalCredit'));
+            select(
+                'chart_of_accounts.id',
+                'chart_of_accounts.code',
+                'chart_of_accounts.name',
+                \DB::raw('sum(debit) as totalDebit'),
+                \DB::raw('sum(credit) as totalCredit')
+            );
         $total->leftjoin('chart_of_accounts', 'transaction_lines.account_id', 'chart_of_accounts.id');
         $total->leftjoin('chart_of_account_types', 'chart_of_accounts.type', 'chart_of_account_types.id');
         // $total->where('chart_of_accounts.type', $type->id);
@@ -5220,10 +5236,12 @@ class Utility extends Model
             $taxData = Utility::getTaxData();
 
             $InvoiceProducts = \DB::table('invoice_products')
-                ->select('invoice_products.invoice_id as invoice',
+                ->select(
+                    'invoice_products.invoice_id as invoice',
                     \DB::raw('SUM(quantity) as total_quantity'),
                     \DB::raw('SUM(discount) as total_discount'),
-                    \DB::raw('SUM(price * quantity)  as sub_total'))
+                    \DB::raw('SUM(price * quantity)  as sub_total')
+                )
                 ->selectRaw('(SELECT SUM((price * quantity - discount) * (taxes.rate / 100)) FROM invoice_products
                     LEFT JOIN taxes ON FIND_IN_SET(taxes.id, invoice_products.tax) > 0
                     WHERE invoice_products.invoice_id = invoices.id) as tax_values')
@@ -5254,10 +5272,12 @@ class Utility extends Model
         if (self::$billProductsData === null) {
             $taxData = Utility::getTaxData();
             $BillProducts = \DB::table('bill_products')
-                ->select('bill_products.bill_id as bill',
+                ->select(
+                    'bill_products.bill_id as bill',
                     \DB::raw('SUM(quantity) as total_quantity'),
                     \DB::raw('SUM(discount) as total_discount'),
-                    \DB::raw('SUM(bill_products.price * quantity)  as sub_total'))
+                    \DB::raw('SUM(bill_products.price * quantity)  as sub_total')
+                )
                 ->selectRaw('(SELECT SUM(bill_accounts.price) FROM bill_accounts
                     WHERE bill_accounts.ref_id = bills.id) as acc_price')
                 ->selectRaw('(SELECT SUM((price * quantity - discount) * (taxes.rate / 100)) FROM bill_products
@@ -5360,7 +5380,7 @@ class Utility extends Model
     }
 
     public static function totalData($billArr, $expenseArr, $request, $yearList)
-    { 
+    {
 
         $chartExpenseArr = [];
         foreach ($yearList as $year) {

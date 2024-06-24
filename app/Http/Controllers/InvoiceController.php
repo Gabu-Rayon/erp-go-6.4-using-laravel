@@ -37,18 +37,12 @@ use Illuminate\Support\Facades\Storage;
 
 class InvoiceController extends Controller
 {
-    public function __construct()
-    {
-    }
-
-
-
     public function index(Request $request)
     {
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customer->prepend('Select Customer', '');
             $status = Invoice::$statues;
@@ -79,10 +73,10 @@ class InvoiceController extends Controller
 
     public function create($customerId)
     {
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
             $invoice_number = \Auth::user()->invoiceNumberFormat($this->invoiceNumber());
             $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -147,10 +141,10 @@ class InvoiceController extends Controller
         \Log::info('Invoice Data received From the Form:', $request->all());
 
         try {
-            if(
+            if (
                 \Auth::user()->type == 'company'
                 || \Auth::user()->type == 'accountant'
-            ){
+            ) {
                 $validator = $this->validateInvoice($request);
                 if ($validator->fails()) {
                     $messages = $validator->getMessageBag();
@@ -192,33 +186,36 @@ class InvoiceController extends Controller
                     return redirect()->back()->with('error', $response['message']);
                 }
 
+                // Store API response data in local database
+                $apiResponseData = $response->json();
+
                 // Prepare data for ItemOpeningStock API
-                $openingItemsLists = $this->prepareOpeningItemsList($saleItemList);
-                $itemOpeningStockRequestData = [
-                    "openingItemsLists" => $openingItemsLists
-                ];
+                // $openingItemsLists = $this->prepareOpeningItemsList($saleItemList);
+                // $itemOpeningStockRequestData = [
+                //     "openingItemsLists" => $openingItemsLists
+                // ];
 
-                // Send data to ItemOpeningStock API
-                $url = 'https://etims.your-apps.biz/api/ItemOpeningStock';
-                $response = Http::withOptions(['verify' => false])
-                    ->withHeaders([
-                        'accept' => '*/*',
-                        'key' => '123456',
-                        'Content-Type' => 'application/json'
-                    ])
-                    ->post($url, $itemOpeningStockRequestData);
+                // // Send data to ItemOpeningStock API
+                // $url = 'https://etims.your-apps.biz/api/ItemOpeningStock';
+                // $response = Http::withOptions(['verify' => false])
+                //     ->withHeaders([
+                //         'accept' => '*/*',
+                //         'key' => '123456',
+                //         'Content-Type' => 'application/json'
+                //     ])
+                //     ->post($url, $itemOpeningStockRequestData);
 
-                \Log::info('ITEM OPENING STOCK API RESPONSE', ['response' => $response->json()]);
-                \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $response->status());
-                \Log::info('API Request Opening Stock Data Posted: ' . json_encode($itemOpeningStockRequestData));
-                \Log::info('API Response Body For Posting Opening Stock Data: ' . json_encode($response->body()));
+                // \Log::info('ITEM OPENING STOCK API RESPONSE', ['response' => $response->json()]);
+                // \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $response->status());
+                // \Log::info('API Request Opening Stock Data Posted: ' . json_encode($itemOpeningStockRequestData));
+                // \Log::info('API Response Body For Posting Opening Stock Data: ' . json_encode($response->body()));
 
-                if ($response->failed()) {
-                    return redirect()->back()->with('error', 'Failed to sync item opening stock');
-                }
+                // if ($response->failed()) {
+                //     return redirect()->back()->with('error', 'Failed to sync item opening stock');
+                // }
 
                 $totalAmount = $this->calculateTotalAmount($saleItemList);
-                $inv = $this->createInvoice($data, $customer, $totalAmount);
+                $inv = $this->createInvoice($data, $customer, $totalAmount, $apiResponseData);
                 $this->createInvoiceProducts($saleItemList, $inv, $data['customer_id']);
 
                 // Update the quantities in product_services and warehouse_products tables
@@ -361,7 +358,7 @@ class InvoiceController extends Controller
         return $totalAmount;
     }
 
-    private function createInvoice($data, $customer, $totalAmount)
+    private function createInvoice($data, $customer, $totalAmount, $apiResponseData)
     {
         $salesDate = $this->formatDate($data['salesDate']);
 
@@ -382,9 +379,10 @@ class InvoiceController extends Controller
             'orgInvoiceNo' => $data['traderInvoiceNo'],
             'customerTin' => $customer->customerTin,
             'customerName' => $customer->name,
+            'saleType' => $data['salesType'],
             'receptTypeCode' => null,
-            'paymentTypeCode' => null,
-            'salesSttsCode' => null,
+            'paymentTypeCode' => $data['paymentType'],
+            'salesSttsCode' => $data['invoiceStatusCode'],
             'confirmDate' => $data['confirmDate'],
             'salesDate' => $salesDate,
             'stockReleaseDate' => $data['stockReleseDate'],
@@ -426,18 +424,18 @@ class InvoiceController extends Controller
             'createdDate' => null,
             'isKRASynchronized' => null,
             'kraSynchronizedDate' => null,
-            'isStockIOUpdate' => $data['isStockIOUpdate'],
-            'resultCd' => null,
-            'resultMsg' => null,
+            'isStockIOUpdate' => $apiResponseData['data']['isStockIOUpdate'],
+            'resultCd' => $apiResponseData['statusCode'],
+            'resultMsg' => $apiResponseData['message'],
             'resultDt' => null,
             'response_CurRcptNo' => null,
             'response_TotRcptNo' => null,
-            'response_IntrlData' => null,
-            'response_RcptSign' => null,
-            'response_SdcDateTime' => null,
-            'response_SdcId' => null,
-            'response_MrcNo' => null,
-            'qrCodeURL' => null,
+            'response_IntrlData' => $apiResponseData['data']['scuInternalData'],
+            'response_RcptSign' => $apiResponseData['data']['scuReceiptSignature'],
+            'response_SdcDateTime' => $apiResponseData['data']['sdcDateTime'],
+            'response_SdcId' => $apiResponseData['data']['sdcid'],
+            'response_MrcNo' => $apiResponseData['data']['sdcmrcNo'],
+            'qrCodeURL' => $apiResponseData['data']['scuqrCode'],
         ]);
     }
 
@@ -478,73 +476,12 @@ class InvoiceController extends Controller
             ]);
         }
     }
-
-
-
-    // if (\Auth::user()->can('create invoice')) {
-    //     $validator = \Validator::make(
-    //         $request->all(),
-    //         [
-    //             'customer_id' => 'required',
-    //             'issue_date' => 'required',
-    //             'due_date' => 'required',
-    //             'category_id' => 'required',
-    //             'items' => 'required',
-    //         ]
-    //     );
-    //     if ($validator->fails()) {
-    //         $messages = $validator->getMessageBag();
-    //         return redirect()->back()->with('error', $messages->first());
-    //     }
-
-    //     $invoiceData = [
-    //         'customer_id' => $request->customer_id,
-    //         'issue_date' => $request->issue_date,
-    //         'due_date' => $request->due_date,
-    //         'category_id' => $request->category_id,
-    //         'items' => $request->items,
-    //         // Add other fields as needed
-
-    //         "customerTin" => $request->customer_tin,
-    //         "salesType" => $request->sales_types,
-    //         "paymentType" => $request->payment_type,
-    //         "invoiceStatusCode" => $request->invoice_status_code,
-    //         "remark" => $request->remark,
-    //         "isPurchaseAccept" => $request->is_purchase_accept,
-    //         "itemCode" => $request->item_code,
-    //         "unitPrice" => $request->unit_price,
-    //         "quantity" => $request->quantity,
-    //         "discountRate" => $request->discount_rate,
-    //         "discountAmt" => $request->discount_amount
-    //     ];
-
-    //     // Post data to the API endpoint
-    //     $response = Http::post('https://etims.your-apps.biz/api/SaveSales', $invoiceData);
-    //     // $response = Http::post('https://etims.your-apps.biz/api/AddSale', $invoiceData);           
-
-    //     // Check if the request was successful (status code 2xx)
-    //     if ($response->successful()) {
-    //         // API request was successful, handle response if needed
-    //         $apiResponse = $response->json(); // Convert response to JSON
-    //         // Handle API response here
-    //     } else {
-    //         // API request failed, handle error
-    //         $errorResponse = $response->json(); // Convert error response to JSON
-    //         // Handle error response here
-    //         return redirect()->back()->with('error', 'Failed to post data to API.');
-    //     }
-
-    //     // Rest of your logic...
-    // } else {
-    //     return redirect()->back()->with('error', __('Permission denied.'));
-    // }
-
     public function edit($ids)
     {
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             $id = Crypt::decrypt($ids);
             $invoice = Invoice::find($id);
             $invoice_number = \Auth::user()->invoiceNumberFormat($invoice->invoice_id);
@@ -564,10 +501,10 @@ class InvoiceController extends Controller
     public function update(Request $request, Invoice $invoice)
     {
 
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             if ($invoice->created_by == \Auth::user()->creatorId()) {
                 $validator = \Validator::make(
                     $request->all(),
@@ -688,11 +625,11 @@ class InvoiceController extends Controller
     public function show($ids)
     {
 
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
             || \Auth::user()->type == 'customer'
-        ){
+        ) {
             try {
                 $id = Crypt::decrypt($ids);
             } catch (\Throwable $th) {
@@ -729,10 +666,10 @@ class InvoiceController extends Controller
 
     public function destroy(Invoice $invoice, Request $request)
     {
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             if ($invoice->created_by == \Auth::user()->creatorId()) {
                 foreach ($invoice->payments as $invoices) {
                     Utility::bankAccountBalance($invoices->account_id, $invoices->amount, 'debit');
@@ -767,10 +704,10 @@ class InvoiceController extends Controller
     public function productDestroy(Request $request)
     {
 
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             $invoiceProduct = InvoiceProduct::find($request->id);
 
             if ($invoiceProduct) {
@@ -837,10 +774,10 @@ class InvoiceController extends Controller
     public function sent($id)
     {
 
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             // Send Email
             $setings = Utility::settings();
 
@@ -916,10 +853,10 @@ class InvoiceController extends Controller
 
     public function resent($id)
     {
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             $invoice = Invoice::where('id', $id)->first();
 
             $customer = Customer::where('id', $invoice->customer_id)->first();
@@ -948,10 +885,10 @@ class InvoiceController extends Controller
 
     public function payment($invoice_id)
     {
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             $invoice = Invoice::where('id', $invoice_id)->first();
 
             $customers = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -971,10 +908,10 @@ class InvoiceController extends Controller
             return redirect()->back()->with('error', __('Invoice payment amount should not greater than subtotal.'));
         }
 
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             $validator = \Validator::make(
                 $request->all(),
                 [
@@ -1102,10 +1039,10 @@ class InvoiceController extends Controller
     {
         //        dd($invoice_id,$payment_id);
 
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             $payment = InvoicePayment::find($payment_id);
 
             InvoicePayment::where('id', '=', $payment_id)->delete();
@@ -1520,7 +1457,12 @@ class InvoiceController extends Controller
         }
 
         $id = Crypt::decrypt($invoiceId);
+        \Log::info('INVOICE ID');
+        \Log::info($invoiceId);
         $invoice = Invoice::with(['creditNote', 'payments.bankAccount', 'items.product.unit'])->where('invoice_id', $id)->first();
+
+        \Log::info('INVOICE');
+        \Log::info($invoice);
 
         $settings = Utility::settingsById($invoice->created_by);
 
@@ -1555,7 +1497,7 @@ class InvoiceController extends Controller
         return $data;
     }
 
-public function getItem($itemCd)
+    public function getItem($itemCd)
     {
         try {
             $itemInfo = ProductService::where('itemCd', $itemCd)->first();
@@ -1575,130 +1517,130 @@ public function getItem($itemCd)
 
 
 
-    
-public function getSalesByTraderInvoiceNo(Request $request)
-{
-    // Log the incoming request
-    \Log::info('Synchronization request received:', $request->all());
 
-    // Validate the trader invoice number input
-    $request->validate([
-        'SalesByTraderInvoiceNo' => 'required|integer',
-    ], [
-        'SalesByTraderInvoiceNo.required' => __('Data is required for synchronization.'),
-    ]);
+    public function getSalesByTraderInvoiceNo(Request $request)
+    {
+        // Log the incoming request
+        \Log::info('Synchronization request received:', $request->all());
 
-    // Get the trader invoice number
-    $traderInvoiceNo = $request->input('SalesByTraderInvoiceNo');
-    \Log::info('Trader Invoice No for synchronization request:', ['Trader Invoice' => $traderInvoiceNo]);
+        // Validate the trader invoice number input
+        $request->validate([
+            'SalesByTraderInvoiceNo' => 'required|integer',
+        ], [
+            'SalesByTraderInvoiceNo.required' => __('Data is required for synchronization.'),
+        ]);
 
-    try {
-        // Make the API call
-        $response = Http::withOptions(['verify' => false])
-            ->withHeaders(['key' => '123456'])
-            ->get("https://etims.your-apps.biz/api/GetSalesByTraderInvoiceNo", [
-                'traderInvoiceNo' => $traderInvoiceNo,
-            ]);
+        // Get the trader invoice number
+        $traderInvoiceNo = $request->input('SalesByTraderInvoiceNo');
+        \Log::info('Trader Invoice No for synchronization request:', ['Trader Invoice' => $traderInvoiceNo]);
 
-        // Check if the response contains the required data
-        $data = $response->json();
-        if (empty($data)) {
-            return redirect()->back()->with('error', __('There is no search result.'));
+        try {
+            // Make the API call
+            $response = Http::withOptions(['verify' => false])
+                ->withHeaders(['key' => '123456'])
+                ->get("https://etims.your-apps.biz/api/GetSalesByTraderInvoiceNo", [
+                    'traderInvoiceNo' => $traderInvoiceNo,
+                ]);
+
+            // Check if the response contains the required data
+            $data = $response->json();
+            if (empty($data)) {
+                return redirect()->back()->with('error', __('There is no search result.'));
+            }
+
+            \Log::info('Remote Sales Data:', $data);
+
+            $invoiceData = [
+                'srNo' => $data['id'],
+                'invoice_id' => $data['id'],
+                'customer_id' => null,
+                'issue_date' => $data['salesDate'],
+                'due_date' => $data['salesDate'],
+                'send_date' => null,
+                'category_id' => null,
+                'ref_number' => $data['invoiceNo'],
+                'status' => $data['salesSttsCode'],
+                'shipping_display' => null,
+                'discount_apply' => null,
+                'created_by' => \Auth::user()->creatorId(),
+                'trderInvoiceNo' => $data['trderInvoiceNo'],
+                'invoiceNo' => $data['invoiceNo'],
+                'orgInvoiceNo' => $data['orgInvoiceNo'],
+                'customerTin' => $data['customerTin'],
+                'customerName' => $data['customerName'],
+                'receptTypeCode' => $data['receptTypeCode'],
+                'paymentTypeCode' => $data['paymentTypeCode'],
+                'salesSttsCode' => $data['salesSttsCode'],
+                'confirmDate' => $data['confirmDate'],
+                'salesDate' => $data['salesDate'],
+                'stockReleaseDate' => $data['stockReleaseDate'],
+                'cancelReqDate' => $data['cancelReqDate'],
+                'cancelDate' => $data['cancelDate'],
+                'refundDate' => $data['refundDate'],
+                'refundReasonCd' => $data['refundReasonCd'],
+                'totalItemCnt' => $data['totalItemCnt'],
+                'taxableAmtA' => $data['taxableAmtA'],
+                'taxableAmtB' => $data['taxableAmtB'],
+                'taxableAmtC' => $data['taxableAmtC'],
+                'taxableAmtD' => $data['taxableAmtD'],
+                'taxRateA' => $data['taxRateA'],
+                'taxRateB' => $data['taxRateB'],
+                'taxRateC' => $data['taxRateC'],
+                'taxRateD' => $data['taxRateD'],
+                'taxAmtA' => $data['taxAmtA'],
+                'taxAmtB' => $data['taxAmtB'],
+                'taxAmtC' => $data['taxAmtC'],
+                'taxAmtD' => $data['taxAmtD'],
+                'totalTaxableAmt' => $data['totalTaxableAmt'],
+                'totalTaxAmt' => $data['totalTaxAmt'],
+                'totalAmt' => $data['totalAmt'],
+                'prchrAcptcYn' => $data['prchrAcptcYn'],
+                'remark' => $data['remark'],
+                'regrNm' => $data['regrNm'],
+                'regrId' => $data['regrId'],
+                'modrNm' => $data['modrNm'],
+                'modrId' => $data['modrId'],
+                'receipt_CustomerTin' => $data['receipt_CustomerTin'],
+                'receipt_CustomerMblNo' => $data['receipt_CustomerMblNo'],
+                'receipt_RptNo' => $data['receipt_RptNo'],
+                'receipt_RcptPbctDt' => $data['receipt_RcptPbctDt'],
+                'receipt_TrdeNm' => $data['receipt_TrdeNm'],
+                'receipt_Adrs' => $data['receipt_Adrs'],
+                'receipt_TopMsg' => $data['receipt_TopMsg'],
+                'receipt_BtmMsg' => $data['receipt_BtmMsg'],
+                'receipt_PrchrAcptcYn' => $data['receipt_PrchrAcptcYn'],
+                'createdDate' => $data['createdDate'],
+                'isKRASynchronized' => $data['isKRASynchronized'],
+                'kraSynchronizedDate' => $data['kraSynchronizedDate'],
+                'isStockIOUpdate' => $data['isStockIOUpdate'],
+                'resultCd' => $data['resultCd'],
+                'resultMsg' => $data['resultMsg'],
+                'resultDt' => $data['resultDt'],
+                'response_CurRcptNo' => $data['response_CurRcptNo'],
+                'response_TotRcptNo' => $data['response_TotRcptNo'],
+                'response_IntrlData' => $data['response_IntrlData'],
+                'response_RcptSign' => $data['response_RcptSign'],
+                'response_SdcDateTime' => $data['response_SdcDateTime'],
+                'response_SdcId' => $data['response_SdcId'],
+                'response_MrcNo' => $data['response_MrcNo'],
+                'qrCodeURL' => $data['qrCodeURL'],
+            ];
+
+            \Log::info('Invoice Data to Sync:', $invoiceData);
+
+            // Check if the invoice already exists and sync if not
+            $exists = Invoice::where('trderInvoiceNo', $invoiceData['trderInvoiceNo'])->exists();
+            if (!$exists) {
+                Invoice::create($invoiceData);
+                return redirect()->back()->with('success', __('Synced sales record successfully.'));
+            } else {
+                return redirect()->back()->with('success', __('Sales record is up to date.'));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error syncing sales Trader Invoice No:', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', __('Sales Trader Invoice No, Not Found !'));
         }
-
-        \Log::info('Remote Sales Data:', $data);
-
-        $invoiceData = [
-            'srNo' => $data['id'],
-            'invoice_id' => $data['id'],
-            'customer_id' => null,
-            'issue_date' => $data['salesDate'],
-            'due_date' => $data['salesDate'],
-            'send_date' => null,
-            'category_id' => null,
-            'ref_number' => $data['invoiceNo'],
-            'status' => $data['salesSttsCode'],
-            'shipping_display' => null,
-            'discount_apply' => null,
-            'created_by' => \Auth::user()->creatorId(),
-            'trderInvoiceNo' => $data['trderInvoiceNo'],
-            'invoiceNo' => $data['invoiceNo'],
-            'orgInvoiceNo' => $data['orgInvoiceNo'],
-            'customerTin' => $data['customerTin'],
-            'customerName' => $data['customerName'],
-            'receptTypeCode' => $data['receptTypeCode'],
-            'paymentTypeCode' => $data['paymentTypeCode'],
-            'salesSttsCode' => $data['salesSttsCode'],
-            'confirmDate' => $data['confirmDate'],
-            'salesDate' => $data['salesDate'],
-            'stockReleaseDate' => $data['stockReleaseDate'],
-            'cancelReqDate' => $data['cancelReqDate'],
-            'cancelDate' => $data['cancelDate'],
-            'refundDate' => $data['refundDate'],
-            'refundReasonCd' => $data['refundReasonCd'],
-            'totalItemCnt' => $data['totalItemCnt'],
-            'taxableAmtA' => $data['taxableAmtA'],
-            'taxableAmtB' => $data['taxableAmtB'],
-            'taxableAmtC' => $data['taxableAmtC'],
-            'taxableAmtD' => $data['taxableAmtD'],
-            'taxRateA' => $data['taxRateA'],
-            'taxRateB' => $data['taxRateB'],
-            'taxRateC' => $data['taxRateC'],
-            'taxRateD' => $data['taxRateD'],
-            'taxAmtA' => $data['taxAmtA'],
-            'taxAmtB' => $data['taxAmtB'],
-            'taxAmtC' => $data['taxAmtC'],
-            'taxAmtD' => $data['taxAmtD'],
-            'totalTaxableAmt' => $data['totalTaxableAmt'],
-            'totalTaxAmt' => $data['totalTaxAmt'],
-            'totalAmt' => $data['totalAmt'],
-            'prchrAcptcYn' => $data['prchrAcptcYn'],
-            'remark' => $data['remark'],
-            'regrNm' => $data['regrNm'],
-            'regrId' => $data['regrId'],
-            'modrNm' => $data['modrNm'],
-            'modrId' => $data['modrId'],
-            'receipt_CustomerTin' => $data['receipt_CustomerTin'],
-            'receipt_CustomerMblNo' => $data['receipt_CustomerMblNo'],
-            'receipt_RptNo' => $data['receipt_RptNo'],
-            'receipt_RcptPbctDt' => $data['receipt_RcptPbctDt'],
-            'receipt_TrdeNm' => $data['receipt_TrdeNm'],
-            'receipt_Adrs' => $data['receipt_Adrs'],
-            'receipt_TopMsg' => $data['receipt_TopMsg'],
-            'receipt_BtmMsg' => $data['receipt_BtmMsg'],
-            'receipt_PrchrAcptcYn' => $data['receipt_PrchrAcptcYn'],
-            'createdDate' => $data['createdDate'],
-            'isKRASynchronized' => $data['isKRASynchronized'],
-            'kraSynchronizedDate' => $data['kraSynchronizedDate'],
-            'isStockIOUpdate' => $data['isStockIOUpdate'],
-            'resultCd' => $data['resultCd'],
-            'resultMsg' => $data['resultMsg'],
-            'resultDt' => $data['resultDt'],
-            'response_CurRcptNo' => $data['response_CurRcptNo'],
-            'response_TotRcptNo' => $data['response_TotRcptNo'],
-            'response_IntrlData' => $data['response_IntrlData'],
-            'response_RcptSign' => $data['response_RcptSign'],
-            'response_SdcDateTime' => $data['response_SdcDateTime'],
-            'response_SdcId' => $data['response_SdcId'],
-            'response_MrcNo' => $data['response_MrcNo'],
-            'qrCodeURL' => $data['qrCodeURL'],
-        ];
-
-        \Log::info('Invoice Data to Sync:', $invoiceData);
-
-        // Check if the invoice already exists and sync if not
-        $exists = Invoice::where('trderInvoiceNo', $invoiceData['trderInvoiceNo'])->exists();
-        if (!$exists) {
-            Invoice::create($invoiceData);
-            return redirect()->back()->with('success', __('Synced sales record successfully.'));
-        } else {
-            return redirect()->back()->with('success', __('Sales record is up to date.'));
-        }
-    } catch (\Exception $e) {
-        \Log::error('Error syncing sales Trader Invoice No:', ['error' => $e->getMessage()]);
-        return redirect()->back()->with('error', __('Sales Trader Invoice No, Not Found !'));
     }
-}
 
 
 }

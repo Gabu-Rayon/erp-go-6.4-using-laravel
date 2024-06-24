@@ -77,8 +77,12 @@
                         <div class="form-group col-md-12">
                             <?php echo e(Form::label('mainItemCode', __('Main Item Code (*)'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::select('mainItemCode', $mainItemCode, null, ['class' => 'form-control'])); ?>
+                            <?php if($mainItemCode->isNotEmpty()): ?>
+                                <?php echo e(Form::select('mainItemCode', $mainItemCode, null, ['class' => 'form-control select2'])); ?>
 
+                            <?php else: ?>
+                                <p><?php echo e(__('You No  Finish Product or Service')); ?></p>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -92,8 +96,7 @@
                     <div class="row justify-content-between align-items-center">
                         <div class="col-md-12 d-flex align-items-center justify-content-between justify-content-md-end">
                             <div class="all-button-box me-2">
-                                <a href="#" data-repeater-create="" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-target="#add-bank">
+                                <a href="#" data-repeater-create="" class="btn btn-primary" data-bs-toggle="modal" data-target="#add-bank">
                                     <i class="ti ti-plus"></i> <?php echo e(__('Add item')); ?>
 
                                 </a>
@@ -105,22 +108,31 @@
                     <div class="table-responsive">
                         <table class="table mb-0" data-repeater-list="items" id="sortable-table">
                             <thead>
+                                <tr>
+                                    <th><?php echo e(__('Composition Item Code')); ?></th>
+                                    <th><?php echo e(__('Quantity')); ?></th>
+                                    <th><?php echo e(__('Action')); ?></th>
+                                </tr>
                             </thead>
                             <tbody class="ui-sortable" data-repeater-item data-clone>
                                 <tr>
                                     <td class="form-group col-md-4">
                                         <?php echo e(Form::label('compoItemCode', __('Composition Item Code'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::select('compoItemCode', $mainItemCode, null, ['class' => 'form-control'])); ?>
+                                        <?php if($compoItemCode->isNotEmpty()): ?>
+                                            <?php echo e(Form::select('compoItemCode', $compoItemCode, null, ['class' => 'form-control select2'])); ?>
 
+                                        <?php else: ?>
+                                            <p><?php echo e(__('You No Raw Material Product !')); ?></p>
+                                        <?php endif; ?>
                                     </td>
                                     <td class="form-group col-md-4">
                                         <?php echo e(Form::label('quantity', __('Quantity'),['class'=>'form-label'])); ?>
 
-                                        <?php echo e(Form::number('compoItemQty', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+                                        <?php echo e(Form::number('compoItemQty', '', ['class' => 'form-control', 'required' => 'required'])); ?>
 
                                     </td>
-                                    <td class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
+                                    <td class="ti ti-trash text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -130,13 +142,13 @@
         </div>
 
         <div class="modal-footer">
-            <input type="button" value="<?php echo e(__('Cancel')); ?>" onclick="location.href = '<?php echo e(route('compositionlist.index')); ?>';"
-                class="btn btn-light">
+            <input type="button" value="<?php echo e(__('Cancel')); ?>" onclick="location.href = '<?php echo e(route('compositionlist.index')); ?>';" class="btn btn-light">
             <input type="submit" value="<?php echo e(__('Create')); ?>" class="btn  btn-primary">
         </div>
         <?php echo e(Form::close()); ?>
 
     </div>
 <?php $__env->stopSection(); ?>
+
 
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/compositionlist/create.blade.php ENDPATH**/ ?>

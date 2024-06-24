@@ -323,7 +323,7 @@
                             </div>
                             <div class="row">
                                 <div class="form-group col-md-4">
-                                     <?php echo e(Form::label('category_id', __('Item (*)'), ['class' => 'form-label'])); ?>
+                                     <?php echo e(Form::label('category_id', __('Category (*)'), ['class' => 'form-label'])); ?>
 
                                         <?php echo e(Form::select('category_id', $category, null, ['class' => 'form-control select2', 'placeholder' => __('Select Category'), 'required' => 'required'])); ?>
 

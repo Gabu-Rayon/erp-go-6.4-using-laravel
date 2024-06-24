@@ -38,19 +38,30 @@ class CompositionListController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->type == 'company')
-        {
+        if (\Auth::user()->type == 'company') {
             try {
-                if (\Auth::user()->type == 'company') {
-                    $mainItemCode = ProductService::all()->pluck('itemNm', 'itemCd');
-                    $compoItemCode = ItemType::all()->pluck('item_type_name', 'item_type_code');
-                    return view('compositionlist.create', compact('mainItemCode', 'compoItemCode'));
-                } else {
-                    return redirect()->back()->with('error', 'Permission Denied');
-                }
+                // Fetch all product services
+                $productServices = ProductService::all();
+
+                // Filter main item codes (Finished material type)
+                /***
+                 * Where 1 == Raw Material 
+                 * where 2 == Finished Product
+                 * where 3 == Service 
+                 */
+                $mainItemCode = $productServices->filter(function ($item) {
+                    return $item->itemTyCd == 2 || $item->itemTyCd == 3;
+                })->pluck('itemNm', 'itemCd');
+
+                // Filter component item codes (Raw material type)
+                $compoItemCode = $productServices->filter(function ($item) {
+                    return $item->itemTyCd == 1;
+                })->pluck('itemNm', 'itemCd');
+
+                return view('compositionlist.create', compact('mainItemCode', 'compoItemCode'));
             } catch (\Exception $e) {
                 \Log::info('RENDER COMPOSITION ITEMS CREATE ERROR');
-                Log::error($e);
+                \Log::error($e);
                 return redirect()->back()->with('error', $e->getMessage());
             }
         } else {

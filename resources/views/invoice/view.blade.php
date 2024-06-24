@@ -277,7 +277,7 @@
                                             {{ \Auth::user()->dateFormat($invoice->send_date) }}
                                         @else
                                             @can('send invoice')
-                                                <small>{{ __('Status') }} : {{__('Not Sent') }}</small>
+                                                <small>{{ __('Status') }} : {{ __('Not Sent') }}</small>
                                             @endcan
                                         @endif
                                     </p>
@@ -295,7 +295,7 @@
                                         <i class="ti ti-report-money text-info"></i>
                                     </div>
                                     <h6 class="text-info my-3">{{ __('Get Paid') }}</h6>
-                                    <p class="text-muted text-sm mb-3">{{__('Status') }} : {{__('Awaiting payment') }} </p>
+                                    <p class="text-muted text-sm mb-3">{{ __('Status') }} : {{ __('Awaiting payment') }} </p>
                                     @if ($invoice->status != 0)
                                         @can('create payment invoice')
                                             <a href="#" data-url="{{ route('invoice.payment', $invoice->id) }}"
@@ -318,14 +318,12 @@
         @if ($invoice->status != 0)
             <div class="row justify-content-between align-iteams-center mb-3">
                 <div class="col-md-12 d-flex align-iteams-center justify-content-between justify-content-md-end">
-                        <div class="all-button-box mx-2 mr-2">
-                            <a
-                                href="{{ route('invoice.credit.note', $invoice->id) }}"
-                                class="btn btn-sm btn-primary"
-                                data-title="{{ __('Add Credit Note') }}">
-                                {{ __('Add Credit Note') }}
-                            </a>
-                        </div>
+                    <div class="all-button-box mx-2 mr-2">
+                        <a href="{{ route('invoice.credit.note', $invoice->id) }}" class="btn btn-sm btn-primary"
+                            data-title="{{ __('Add Credit Note') }}">
+                            {{ __('Add Credit Note') }}
+                        </a>
+                    </div>
                     @if ($invoice->status != 4)
                         <div class="all-button-box mr-2">
                             <a href="{{ route('invoice.payment.reminder', $invoice->id) }}"
@@ -423,16 +421,13 @@
                                         </small>
                                     </div>
                                 @endif
+
                                 <div class="col">
                                     <div class="float-end mt-3">
-                                        {!! DNS2D::getBarcodeHTML(
-                                            route('invoice.link.copy', \Illuminate\Support\Facades\Crypt::encrypt($invoice->id)),
-                                            'QRCODE',
-                                            2,
-                                            2,
-                                        ) !!}
+                                        {!! DNS2D::getBarcodeHTML($invoice->qrCodeURL, 'QRCODE', 2, 2) !!}
                                     </div>
                                 </div>
+
                             </div>
                             <div class="row mt-3">
                                 <div class="col">
@@ -501,7 +496,8 @@
                                                 <td>{{ !empty($iteam->itemName) ? $iteam->itemName : '' }}</td>
                                                 <td>{{ !empty($iteam->quantity) ? $iteam->quantity : '' }}</td>
                                                 <td>{{ !empty($iteam->pkgQuantity) ? $iteam->pkgQuantity : '' }}</td>
-                                                <td>Kes {{ $iteam->unitPrice * $iteam->pkgQuantity * $iteam->quantity }}</td>
+                                                <td>Kes {{ $iteam->unitPrice * $iteam->pkgQuantity * $iteam->quantity }}
+                                                </td>
                                                 <td>{{ !empty($iteam->discountAmt) ? $iteam->discountAmt : '' }}</td>
                                                 <td>
                                                     @php
@@ -517,7 +513,8 @@
                                                         $taxData = \Utility::getTaxData();
                                                         $taxRate = floatval($taxData[$iteam->taxTypeCode]);
                                                         $taxTot = ($iteam->price - $iteam->discount) * ($taxRate / 100);
-                                                        $totAfterTaxAndDiscount = ($iteam->price - $iteam->discount) + $taxTot;
+                                                        $totAfterTaxAndDiscount =
+                                                            $iteam->price - $iteam->discount + $taxTot;
                                                     @endphp
                                                     KES {{ $totAfterTaxAndDiscount }}
                                                 </td>
@@ -553,7 +550,10 @@
                                                             @php
                                                                 $unitPrcSum = 0;
                                                                 foreach ($iteams as $iteam) {
-                                                                    $prc = $iteam->unitPrice * $iteam->pkgQuantity * $iteam->quantity;
+                                                                    $prc =
+                                                                        $iteam->unitPrice *
+                                                                        $iteam->pkgQuantity *
+                                                                        $iteam->quantity;
                                                                     $unitPrcSum += $prc;
                                                                 }
                                                             @endphp
@@ -578,7 +578,9 @@
                                                                 $taxData = \Utility::getTaxData();
                                                                 $taxRate = floatval($taxData[$iteam->taxTypeCode]);
                                                                 foreach ($iteams as $iteam) {
-                                                                    $tax = ($iteam->price - $iteam->discount) * ($taxRate / 100);
+                                                                    $tax =
+                                                                        ($iteam->price - $iteam->discount) *
+                                                                        ($taxRate / 100);
                                                                     $taxSum += $tax;
                                                                 }
                                                             @endphp
@@ -594,13 +596,16 @@
                                                                 $taxData = \Utility::getTaxData();
                                                                 $taxRate = floatval($taxData[$iteam->taxTypeCode]);
                                                                 foreach ($iteams as $iteam) {
-                                                                    $tax = ($iteam->price - $iteam->discount) * ($taxRate / 100);
+                                                                    $tax =
+                                                                        ($iteam->price - $iteam->discount) *
+                                                                        ($taxRate / 100);
                                                                     $taxSum += $tax;
                                                                 }
                                                                 foreach ($iteams as $iteam) {
                                                                     \Log::info('iteam(item)');
                                                                     \Log::info($iteam);
-                                                                    $totAfterTaxAndDiscount = ($iteam->price - $iteam->discount) + $taxSum;
+                                                                    $totAfterTaxAndDiscount =
+                                                                        $iteam->price - $iteam->discount + $taxSum;
                                                                     $tot += $totAfterTaxAndDiscount;
                                                                 }
                                                             @endphp
@@ -750,7 +755,7 @@
                                                     <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para"
                                                         data-bs-toggle="tooltip" title="Delete"
                                                         data-original-title="{{ __('Delete') }}"
-                                                        data-confirm="{{ __('Are You Sure?') . '|' .__('This action can not be undone. Do you want to continue?') }}"
+                                                        data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
                                                         data-confirm-yes="document.getElementById('delete-form-{{ $payment->id }}').submit();">
                                                         <i class="ti ti-trash text-white"></i>
                                                     </a>
@@ -812,7 +817,7 @@
                                                     <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para"
                                                         data-bs-toggle="tooltip" title="Delete"
                                                         data-original-title="{{ __('Delete') }}"
-                                                        data-confirm="{{__('Are You Sure?') . '|' .__('This action can not be undone. Do you want to continue?') }}"
+                                                        data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
                                                         data-confirm-yes="document.getElementById('delete-form-{{ $bankPayment->id }}').submit();">
                                                         <i class="ti ti-trash text-white"></i>
                                                     </a>
@@ -881,7 +886,7 @@
                                                 <a href="#" class="mx-3 btn btn-sm align-iteams-center bs-pass-para "
                                                     data-bs-toggle="tooltip" title="Delete"
                                                     data-original-title="{{ __('Delete') }}"
-                                                    data-confirm="{{__('Are You Sure?') . '|' .__('This action can not be undone. Do you want to continue?') }}"
+                                                    data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
                                                     data-confirm-yes="document.getElementById('delete-form-{{ $creditNote->id }}').submit();">
                                                     <i class="ti ti-trash text-white"></i>
                                                 </a>

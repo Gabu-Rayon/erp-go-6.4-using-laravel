@@ -31,6 +31,7 @@ return new class extends Migration{
             $table->string('orgInvoiceNo')->nullable();
             $table->string('customerTin')->nullable();
             $table->string('customerName')->nullable();
+            $table->string('saleType')->nullable();
             $table->unsignedBigInteger('receptTypeCode')->nullable();
             $table->unsignedBigInteger('paymentTypeCode')->nullable();
             $table->unsignedBigInteger('salesSttsCode')->nullable();
