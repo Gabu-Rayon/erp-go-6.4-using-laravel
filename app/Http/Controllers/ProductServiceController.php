@@ -113,11 +113,18 @@ class ProductServiceController extends Controller
      * Store a newly created resource in storage.
      */
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
+        \Log::info('CREATE PRODUCT SERVICE REQUEST Clicked :' . $request );
         try {
-            $url = 'https://etims.your-apps.biz/api/AddItemsList';
+            if (
+                \Auth::user()->type == 'company'
+                || \Auth::user()->type == 'accountant'
+            ) {
+                \Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
+                \Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
 
-            $data = $request->all();
+                $data = $request->all();
 
                 \Log::info('ITEMS');
                 \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
@@ -133,6 +140,11 @@ class ProductServiceController extends Controller
                     'E' => 5,
                     'F' => 6,
                 ];
+                $productTypeMapping = [
+                    1 => 'Raw Material',
+                    2 => 'Finished Product',
+                    3 => 'Service' ,
+                ];
 
                 foreach ($data['items'] as $index => $item) {
                     \Log::info('ITEM INDEX: ' . $index);
@@ -141,6 +153,13 @@ class ProductServiceController extends Controller
                     $taxIdCode = isset($item['taxTypeCode']) && array_key_exists($item['taxTypeCode'], $taxTypeMapping)
                         ? $taxTypeMapping[$item['taxTypeCode']]
                         : null;
+
+                    // Determine the product type  based on itemTypeCode
+                    $productType = isset($item['itemTypeCode']) && array_key_exists($item['itemTypeCode'], $productTypeMapping)
+                        ? $productTypeMapping[$item['itemTypeCode']]
+                        : null;
+
+                    \Log::info('Product Type selected for this Product : '. $productType);
 
                     // Handling image upload with storage limit check
                     if (!empty($item['pro_image']) && $item['pro_image']->isValid()) {
@@ -158,20 +177,26 @@ class ProductServiceController extends Controller
                             // Assign the file name to the pro_image field
                             $item['pro_image'] = $fileName;
 
+                            // Determine the unit_id from qtyUnitCode
+                            $unitId = null;
+                            if (isset($item['qtyUnitCode'])) {
+                                $unit = ProductServiceUnit::where('code', $item['qtyUnitCode'])->first();
+                                $unitId = $unit ? $unit->id : null;
+                            }
                             $productService = ProductService::create([
                                 'name' => $item['itemName'] ?? null,
-                                'sku' => $item['sku'] ?? null,
+                                'sku' => $item['itemCode'] ?? null,
                                 'sale_price' => $item['sale_price'] ?? null,
-                                'purchase_price' => $item['purchase_price'] ?? null,
-                                'quantity' => $item['quantity'],
+                                'purchase_price' => $item['purchase_price'] ?? null,                                
                                 'tax_id' => $taxIdCode,
                                 'category_id' => $item['category_id'] ?? null,
-                                'unit_id' => $item['unit_id'] ?? null,
-                                'type' => $item['type'] ?? null,
+                                'unit_id' => $unitId ?? null,
+                                'type' => $productType ?? null,
+                                'quantity' => $item['quantity'],
+                                'description' => $item['additionalInfo'] ?? null,
+                                'pro_image' => $dir . '/' . $fileName, 
                                 'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
                                 'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
-                                'description' => $item['description'] ?? null,
-                                'pro_image' => $dir,
                                 'created_by' => \Auth::user()->creatorId(),
                                 'tin' => $item['tin'] ?? null,
                                 'itemCd' => $item['itemCode'],
@@ -272,7 +297,6 @@ class ProductServiceController extends Controller
             "packageQuantity" => $item["packageQuantity"],
         ];
     }
-
 
 
     public function show($id)
