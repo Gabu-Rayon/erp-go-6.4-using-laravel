@@ -124,6 +124,147 @@
                                             {{ Form::label('purchase_price', __('Purchase Price'), ['class' => 'form-label']) }}<span
                                                 class="text-danger">*</span>
                                             {{ Form::number('purchase_price', '', ['class' => 'form-control', 'required' => 'required', 'step' => '0.01']) }}
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('itemCode', __('Item Code'), ['class' => 'form-label']) }}
+                                            <span class="text-danger">*</span>
+                                            {{ Form::text('itemCode', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'A001']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('itemClassifiCode', __('Item Classification Code'), ['class' => 'form-label']) }}
+                                            <span class="text-danger">*</span>
+                                            {{ Form::select('itemClassifiCode', $itemclassifications, null, ['class' => 'form-control', 'placeholder' => __('Select Item Classification'), 'required' => 'required']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('itemName', __('Item Name'), ['class' => 'form-label']) }}
+                                            <span class="text-danger">*</span>
+                                            {{ Form::text('itemName', '', ['class' => 'form-control', 'required' => 'required']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('itemStrdName', __('Item Standard Name'), ['class' => 'form-label']) }}
+                                            <span class="text-danger">*</span>
+                                            {{ Form::text('itemStrdName', '', ['class' => 'form-control', 'required' => 'required']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('countryCode', __('Country'), ['class' => 'form-label']) }}
+                                            <span class="text-danger">*</span>
+                                            {{ Form::select('countryCode', $countries, null, ['class' => 'form-control', 'placeholder' => __('Select Country'), 'required' => 'required']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('qtyUnitCode', __('Quantity Unit Code'), ['class' => 'form-label']) }}
+                                            <span class="text-danger">*</span>
+                                            {{ Form::text('qtyUnitCode', '', ['class' => 'form-control', 'required' => 'required']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('pkgUnitCode', __('Package Unit Code'), ['class' => 'form-label']) }}
+                                            <span class="text-danger">*</span>
+                                            {{ Form::text('pkgUnitCode', '', ['class' => 'form-control', 'required' => 'required']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('taxTypeCode', __('Tax'), ['class' => 'form-label']) }}
+                                            <span class="text-danger">*</span>
+                                            {{ Form::select('taxTypeCode', $taxes, null, ['class' => 'form-control select2', 'placeholder' => __('Select Tax'), 'required' => 'required']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('batchNo', __('Batch Number'), ['class' => 'form-label']) }}
+                                            {{ Form::text('batchNo', '', ['class' => 'form-control']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('barcode', __('Bar Code'), ['class' => 'form-label']) }}
+                                            {{ Form::text('barcode', '', ['class' => 'form-control']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('purchasePrice', __('Purchase Price'), ['class' => 'form-label']) }}
+                                            <span class="text-danger">*</span>
+                                            {{ Form::number('purchasePrice', '', ['class' => 'form-control', 'required' => 'required']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('unitPrice', __('Unit Price'), ['class' => 'form-label']) }}
+                                            <span class="text-danger">*</span>
+                                            {{ Form::number('unitPrice', '', ['class' => 'form-control', 'required' => 'required']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('group1UnitPrice', __('Group 1 Unit Price'), ['class' => 'form-label']) }}
+                                            {{ Form::number('group1UnitPrice', '', ['class' => 'form-control']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('group2UnitPrice', __('Group 2 Unit Price'), ['class' => 'form-label']) }}
+                                            {{ Form::number('group2UnitPrice', '', ['class' => 'form-control']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('group3UnitPrice', __('Group 3 Unit Price'), ['class' => 'form-label']) }}
+                                            {{ Form::number('group3UnitPrice', '', ['class' => 'form-control']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('group4UnitPrice', __('Group 4 Unit Price'), ['class' => 'form-label']) }}
+                                            {{ Form::number('group4UnitPrice', '', ['class' => 'form-control']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('group5UnitPrice', __('Group 5 Unit Price'), ['class' => 'form-label']) }}
+                                            {{ Form::number('group5UnitPrice', '', ['class' => 'form-control']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('quantity', __('Quantity'), ['class' => 'form-label']) }}
+                                            {{ Form::number('quantity', '', ['class' => 'form-control']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('packageQuantity', __('Package Quantity'), ['class' => 'form-label']) }}
+                                            {{ Form::number('packageQuantity', '', ['class' => 'form-control']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('saftyQuantity', __('Safety Quantity'), ['class' => 'form-label']) }}
+                                            {{ Form::number('saftyQuantity', '', ['class' => 'form-control']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('isInrcApplicable', __('Insurance Applicable'), ['class' => 'form-label']) }}
+                                            {{ Form::select('isInrcApplicable', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <div class="form-group">
+                                            {{ Form::label('isUsed', __('Is Used'), ['class' => 'form-label']) }}
+                                            {{ Form::select('isUsed', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2']) }}
+                                        </div>
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('sale_chartaccount_id', __('Income Account'), ['class' => 'form-label']) }}
@@ -266,6 +407,39 @@
                                         data-repeater-delete></td>
                                     <td class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2"
                                         data-repeater-delete></td>
+                                    </td>
+                                    <td class="form-group col-md-12">
+                                        <div class="form-group">
+                                            {{ Form::label('productImage', __('Product Image'), ['class' => 'form-label']) }}
+                                            {{ Form::file('productImage', ['class' => 'form-control', 'accept' => 'image/*']) }}
+                                        </div>
+                                    </td>
+                                    <td class="form-group col-md-12">
+                                        <div class="form-group">
+                                            <div class="btn-box">
+                                                <label class="d-block form-label">{{ __('Type') }}</label>
+                                                <div class="row">
+                                                    @foreach($itemtypes as $value => $label)
+                                                        <div class="col-md-4">
+                                                            <div class="form-check form-check-inline">
+                                                                <input type="radio" class="form-check-input type" 
+                                                                    id="customRadio{{ $loop->index }}" name="itemTypeCode" 
+                                                                    value="{{ $value }}" {{ $loop->first ? 'checked' : '' }}>
+                                                                <label class="custom-control-label form-label" 
+                                                                    for="customRadio{{ $loop->index }}">{{ $label }}</label>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>                                    
+                                    <td class="form-group col-md-12">
+                                        <div class="form-group">
+                                            {{ Form::label('additionalInfo', __('Additional Info'), ['class' => 'form-label']) }}
+                                            {{ Form::textarea('additionalInfo', '', ['class' => 'form-control', 'rows' => '3']) }}
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

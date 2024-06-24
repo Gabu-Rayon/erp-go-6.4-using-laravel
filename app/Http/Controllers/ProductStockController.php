@@ -6,6 +6,7 @@ use App\Models\ProductService;
 use App\Models\ProductStock;
 use App\Models\Utility;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductStockController extends Controller
 {
@@ -18,14 +19,11 @@ class ProductStockController extends Controller
     {
 
         if(
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
+            Auth::user()->type == 'company'
+            || Auth::user()->type == 'accountant'
         )
         {
-
-            $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product')->get();
-
-
+            $productServices = ProductService::where('created_by', '=', Auth::user()->creatorId())->get();
             return view('productstock.index', compact('productServices'));
         }
         else
@@ -111,38 +109,7 @@ class ProductStockController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if(
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
-        )
-        {
-            $productService = ProductService::find($id);
-            $total = $productService->quantity + $request->quantity;
-
-            if($productService->created_by == \Auth::user()->creatorId())
-            {
-                $productService->quantity   = $total;
-                $productService->created_by = \Auth::user()->creatorId();
-                $productService->save();
-
-                //Product Stock Report
-                $type        = 'manually';
-                $type_id     = 0;
-                $description = $request->quantity . '  ' . __('quantity added by manually');
-                Utility::addProductStock($productService->id, $request->quantity, $type, $description, $type_id);
-
-
-                return redirect()->route('productstock.index')->with('success', __('Product quantity updated manually.'));
-            }
-            else
-            {
-                return redirect()->back()->with('error', __('Permission denied.'));
-            }
-        }
-        else
-        {
-            return redirect()->back()->with('error', __('Permission denied.'));
-        }
+        //
     }
 
     /**

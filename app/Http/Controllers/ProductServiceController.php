@@ -7,22 +7,14 @@ use Carbon\Carbon;
 use App\Models\Tax;
 use App\Models\Code;
 use App\Models\User;
-use App\Models\Vender;
-use GuzzleHttp\Client;
 use App\Models\Details;
-use App\Models\Product;
 use App\Models\Utility;
 use App\Models\ItemType;
-use App\Models\Countries;
 use App\Models\CustomField;
 use Illuminate\Http\Request;
 use App\Models\ChartOfAccount;
-use App\Models\CodeListDetail;
 use App\Models\ProductService;
-use App\Models\CodeListClasses;
-use Illuminate\Validation\Rule;
 use App\Models\WarehouseProduct;
-use App\Models\ChartOfAccountType;
 use App\Models\ProductServiceUnit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -32,54 +24,42 @@ use App\Exports\ProductServiceExport;
 use App\Imports\ProductServiceImport;
 use App\Models\ProductServiceCategory;
 use Illuminate\Support\Facades\Storage;
-use GuzzleHttp\Exception\RequestException;
-use App\Models\ProductServicesPackagingUnit;
 use App\Models\ProductsServicesClassification;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class ProductServiceController extends Controller
 {
-    public function index(Request $request)
-    {
-
-        if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
-        ) {
-            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
+    public function index(Request $request){
+        try {
+            $category = ItemType::whereIn('item_type_name', ['Finished Product', 'Service'])->pluck('item_type_name', 'item_type_code');
             $category->prepend('Select Category', '');
 
             if (!empty($request->category)) {
-
-                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', $request->category)->with(['category', 'unit'])->get();
+                $productServices = ProductService::where('created_by', '=', Auth::user()->creatorId())->where('category_id', $request->category)->with(['category', 'unit'])->get();
             } else {
-                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->with(['category', 'unit'])->get();
+                $productServices = ProductService::where('created_by', '=', Auth::user()->creatorId())->with(['category', 'unit'])->get();
             }
 
             return view('productservice.index', compact('productServices', 'category'));
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
+        } catch (Exception $e) {
+            Log::error('PRODUCT / SERVICE INDEX ERROR');
+            Log::error($e);
+            return redirect()->back()->with('error', 'Something Went Wrong');
         }
     }
 
 
-    public function create()
-    {
-        if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
-        ) {
-            $items = ProductService::all()->pluck('itemNm', 'itemCd');
+    /**
+     * Show the form for creating a new resource.
+     */
+
+    public function create() {
+        try {
             $itemclassifications = ProductsServicesClassification::pluck('itemClsNm', 'itemClsCd');
             $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
-            $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
-            $category = ProductServiceCategory::all()->pluck('name', 'id');
-            $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
-            $quantityUnitCode = ProductServiceUnit::pluck('Name', 'code');
-            $productServicesPackagingUnit = ProductServicesPackagingUnit::pluck('Name', 'code');
-
-            $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
-            $unit = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $tax = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $countries = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
+            $taxes = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
             $incomeChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
                 ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
                 ->where('chart_of_account_types.name', 'income')
@@ -111,45 +91,33 @@ class ProductServiceController extends Controller
             $expenseSubAccounts->where('chart_of_accounts.parent', '!=', 0);
             $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
             $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
+            return view('productservice.create', compact(
+                'itemclassifications',
+                'itemtypes',
+                'countries',
+                'taxes',
+                'incomeChartAccounts',
+                'incomeSubAccounts',
+                'expenseChartAccounts',
+                'expenseSubAccounts',
+            ));
+        } catch (Exception $e) {
+            Log::error('CREATE PRODUCT / SERVICE ERROR');
+            Log::error($e);
 
-
-            return view(
-                'productservice.create',
-                compact(
-                    'items',
-                    'category',
-                    'itemclassifications',
-                    'itemtypes',
-                    'countrynames',
-                    'taxationtype',
-                    'unit',
-                    'tax',
-                    'customFields',
-                    'incomeChartAccounts',
-                    'incomeSubAccounts',
-                    'expenseChartAccounts',
-                    'quantityUnitCode',
-                    'expenseSubAccounts',
-                    'productServicesPackagingUnit'
-                )
-            );
-        } else {
-            return response()->json(['error' => __('Permission denied.')], 401);
+            return redirect()->back()->with('error', 'Something Went Wrong');
         }
     }
 
-    public function store(Request $request)
-    {
-        \Log::info('CREATE PRODUCT SERVICE REQUEST Clicked :' . $request );
-        try {
-            if (
-                \Auth::user()->type == 'company'
-                || \Auth::user()->type == 'accountant'
-            ) {
-                \Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
-                \Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
+    /**
+     * Store a newly created resource in storage.
+     */
 
-                $data = $request->all();
+    public function store(Request $request) {
+        try {
+            $url = 'https://etims.your-apps.biz/api/AddItemsList';
+
+            $data = $request->all();
 
                 \Log::info('ITEMS');
                 \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
@@ -165,11 +133,6 @@ class ProductServiceController extends Controller
                     'E' => 5,
                     'F' => 6,
                 ];
-                $productTypeMapping = [
-                    1 => 'Raw Material',
-                    2 => 'Finished Product',
-                    3 => 'Service' ,
-                ];
 
                 foreach ($data['items'] as $index => $item) {
                     \Log::info('ITEM INDEX: ' . $index);
@@ -178,13 +141,6 @@ class ProductServiceController extends Controller
                     $taxIdCode = isset($item['taxTypeCode']) && array_key_exists($item['taxTypeCode'], $taxTypeMapping)
                         ? $taxTypeMapping[$item['taxTypeCode']]
                         : null;
-
-                    // Determine the product type  based on itemTypeCode
-                    $productType = isset($item['itemTypeCode']) && array_key_exists($item['itemTypeCode'], $productTypeMapping)
-                        ? $productTypeMapping[$item['itemTypeCode']]
-                        : null;
-
-                    \Log::info('Product Type selected for this Product : '. $productType);
 
                     // Handling image upload with storage limit check
                     if (!empty($item['pro_image']) && $item['pro_image']->isValid()) {
@@ -202,26 +158,20 @@ class ProductServiceController extends Controller
                             // Assign the file name to the pro_image field
                             $item['pro_image'] = $fileName;
 
-                            // Determine the unit_id from qtyUnitCode
-                            $unitId = null;
-                            if (isset($item['qtyUnitCode'])) {
-                                $unit = ProductServiceUnit::where('code', $item['qtyUnitCode'])->first();
-                                $unitId = $unit ? $unit->id : null;
-                            }
                             $productService = ProductService::create([
                                 'name' => $item['itemName'] ?? null,
-                                'sku' => $item['itemCode'] ?? null,
+                                'sku' => $item['sku'] ?? null,
                                 'sale_price' => $item['sale_price'] ?? null,
-                                'purchase_price' => $item['purchase_price'] ?? null,                                
+                                'purchase_price' => $item['purchase_price'] ?? null,
+                                'quantity' => $item['quantity'],
                                 'tax_id' => $taxIdCode,
                                 'category_id' => $item['category_id'] ?? null,
-                                'unit_id' => $unitId ?? null,
-                                'type' => $productType ?? null,
-                                'quantity' => $item['quantity'],
-                                'description' => $item['additionalInfo'] ?? null,
-                                'pro_image' => $dir . '/' . $fileName, 
+                                'unit_id' => $item['unit_id'] ?? null,
+                                'type' => $item['type'] ?? null,
                                 'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
                                 'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
+                                'description' => $item['description'] ?? null,
+                                'pro_image' => $dir,
                                 'created_by' => \Auth::user()->creatorId(),
                                 'tin' => $item['tin'] ?? null,
                                 'itemCd' => $item['itemCode'],
@@ -323,6 +273,8 @@ class ProductServiceController extends Controller
         ];
     }
 
+
+
     public function show($id)
     {
         $productServiceInfo = ProductService::findOrFail($id);
@@ -332,7 +284,20 @@ class ProductServiceController extends Controller
         $saleChartAccountName = DB::table('chart_of_accounts')->where('id', $productServiceInfo->sale_chartaccount_id)->value('name');
         $expenseChartAccounName = DB::table('chart_of_accounts')->where('id', $productServiceInfo->expense_chartaccount_id)->value('name');
 
-        return view('productservice.show', compact('productServiceInfo', 'taxName', 'categoryName', 'unitName', 'saleChartAccountName', 'expenseChartAccounName'));
+            return view('productservice.show', compact(
+                'productServiceInfo',
+                'taxName',
+                'categoryName',
+                'unitName',
+                'saleChartAccountName',
+                'expenseChartAccounName'
+            ));
+        } catch (Exception $e) {
+            Log::error('SHOW PRODUCT / SERVICE ERROR');
+            Log::error($e);
+
+            return redirect()->back()->with('error', 'Something Went Wrong');
+        }
     }
 
     public function getItem($code)

@@ -32,14 +32,19 @@
                     <table class="table datatable">
                         <thead>
                         <tr>
-                            <th scope="col"><?php echo e(__('SrNo')); ?></th>
                             <th scope="col"><?php echo e(__('Item Code')); ?></th>
+                            <th scope="col"><?php echo e(__('Release Type')); ?></th>
                             <th scope="col"><?php echo e(__('RSD Quantity')); ?></th>
-                            <th scope="col"><?php echo e(__('Registration No')); ?></th>
-                            <th scope="col"><?php echo e(__('Registration ID')); ?></th>
                         </tr>
                         </thead>
                         <tbody class="list">
+                            <?php $__currentLoopData = $stockadjustments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $stockadjustment): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <tr>
+                                    <td><?php echo e($stockadjustment->itemCode); ?></td>
+                                    <td><?php echo e(\App\Models\ReleaseType::where('code', $stockadjustment->stockAdjustment->storeReleaseTypeCode)->first()->type); ?></td>
+                                    <td><?php echo e($stockadjustment->stockAdjustment->rsdQty); ?></td>
+                                </tr>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>

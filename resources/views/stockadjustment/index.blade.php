@@ -31,14 +31,21 @@
                     <table class="table datatable">
                         <thead>
                         <tr>
-                            <th scope="col">{{__('SrNo')}}</th>
                             <th scope="col">{{__('Item Code')}}</th>
+                            <th scope="col">{{__('Release Type')}}</th>
                             <th scope="col">{{__('RSD Quantity')}}</th>
-                            <th scope="col">{{__('Registration No')}}</th>
-                            <th scope="col">{{__('Registration ID')}}</th>
                         </tr>
                         </thead>
                         <tbody class="list">
+                            @foreach ($stockadjustments as $stockadjustment)
+                                <tr>
+                                    <td>{{ $stockadjustment->itemCode }}</td>
+                                    <td>{{ 
+                                        \App\Models\ReleaseType::where('code', $stockadjustment->stockAdjustment->storeReleaseTypeCode)->first()->type
+                                     }}</td>
+                                    <td>{{ $stockadjustment->stockAdjustment->rsdQty }}</td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

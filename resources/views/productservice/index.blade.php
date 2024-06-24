@@ -87,7 +87,6 @@
                             <table class="table datatable">
                                 <thead>
                                     <tr>
-                                        <th scope="col">{{ __('SrNo') }}</th>
                                         <th scope="col">{{ __('Code') }}</th>
                                         <th scope="col">{{ __('Classification Code') }}</th>
                                         <th scope="col">{{ __('Name') }}</th>
@@ -98,11 +97,10 @@
                                 <tbody class="list">
                                     @foreach ($productServices as $iteminformation)
                                         <tr>
-                                            <td>{{ $iteminformation->id }}</td>
-                                            <td>{{ $iteminformation->itemCd }}</td>
-                                            <td>{{ $iteminformation->itemClsCd }}</td>
-                                            <td>{{ $iteminformation->itemNm }}</td>
-                                            <td>{{ $iteminformation->dftPrc }}</td>
+                                            <td>{{ $iteminformation->itemCode }}</td>
+                                            <td>{{ $iteminformation->itemClassifiCode }}</td>
+                                            <td>{{ $iteminformation->itemName }}</td>
+                                            <td>{{ $iteminformation->unitPrice }}</td>
                                             <td>
                                                 <div class="action-btn bg-warning ms-2">
                                                     <a href="{{ route('productservice.show', $iteminformation->id) }}"

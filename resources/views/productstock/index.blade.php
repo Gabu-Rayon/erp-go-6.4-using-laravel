@@ -21,31 +21,20 @@
                             <thead>
                             <tr>
                                 <th>{{ __('Name') }}</th>
-                                <th>{{ __('Sku') }}</th>
-                                <th>{{ __('Current Quantity') }}</th>
-                                <th>{{ __('Action') }}</th>
+                                <th>{{ __('Code') }}</th>
+                                <th>{{ __('Quantity') }}</th>
+                                <th>{{ __('Package Quantity') }}</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach ($productServices as $productService)
                                 <tr class="font-style">
-                                    <td>{{ $productService->name }}</td>
-                                    <td>{{ $productService->sku }}</td>
+                                    <td>{{ $productService->itemName }}</td>
+                                    <td>{{ $productService->itemCode }}</td>
                                     <td>{{ $productService->quantity }}</td>
-
-                                    <td class="Action">
-                                        <div class="action-btn bg-info ms-2">
-                                            <a data-size="md" href="#" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-url="{{ route('productstock.edit', $productService->id) }}" data-ajax-popup="true"  data-size="xl" data-bs-toggle="tooltip" title="{{__('Update Quantity')}}">
-                                                <i class="ti ti-plus text-white"></i>
-                                            </a>
-                                        </div>
-
-
-                                    </td>
-
+                                    <td>{{ $productService->packageQuantity }}</td>
                                 </tr>
                             @endforeach
-
                             </tbody>
                         </table>
                     </div>

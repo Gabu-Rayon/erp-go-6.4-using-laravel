@@ -12,11 +12,11 @@ class StockAdjustment extends Model
     protected $fillable = [
         'storeReleaseTypeCode',
         'remark',
-        'productCount',
+        'rsdQty',
     ];
 
     public function stockAdjustmentProductLists()
     {
-        return $this->hasMany(StockAdjustmentProductList::class);
+        return $this->hasMany(StockAdjustmentProductList::class, 'stock_adjustments_id', 'id');
     }
 }

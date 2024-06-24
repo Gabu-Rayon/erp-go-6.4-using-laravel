@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('details', function (Blueprint $table) {
             $table->id();
             $table->string('cdCls', 10);
-            $table->string('cd', 10);
+            $table->string('cd', 10)->index();
             $table->string('cdNm', 100);
             $table->string('cdDesc', 100)->nullable();
             $table->char('useYn', 1)->default('Y');

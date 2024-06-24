@@ -3132,7 +3132,7 @@ class UsersTableSeeder extends Seeder
 
         // Super admin
 
-        $superAdminRole        = Role::create(
+        $superAdminRole        = Role::firstOrCreate(
             [
                 'name' => 'super admin',
                 'created_by' => 0,
@@ -3182,7 +3182,7 @@ class UsersTableSeeder extends Seeder
         $superAdmin->assignRole($superAdminRole);
 
         // customer
-        $customerRole       = Role::create(
+        $customerRole       = Role::firstOrCreate(
             [
                 'name' => 'customer',
                 'created_by' => 0,
@@ -3200,7 +3200,7 @@ class UsersTableSeeder extends Seeder
         $customerRole->givePermissionTo($customerPermission);
 
         // vender
-        $venderRole       = Role::create(
+        $venderRole       = Role::firstOrCreate(
             [
                 'name' => 'vender',
                 'created_by' => 0,
@@ -3219,7 +3219,7 @@ class UsersTableSeeder extends Seeder
 
         // company
 
-        $companyRole = Role::create(
+        $companyRole = Role::firstOrCreate(
             [
                 'name' => 'company',
                 'created_by' => 0,
@@ -3751,7 +3751,7 @@ class UsersTableSeeder extends Seeder
         $company->assignRole($companyRole);
 
         // accountant
-        $accountantRole       = Role::create(
+        $accountantRole       = Role::firstOrCreate(
             [
                 'name' => 'accountant',
                 'created_by' => $company->id,
@@ -3917,7 +3917,7 @@ class UsersTableSeeder extends Seeder
         );
 
         // accountant
-        $clientRole       = Role::create(
+        $clientRole       = Role::firstOrCreate(
             [
                 'name' => 'client',
                 'created_by' => $company->id,

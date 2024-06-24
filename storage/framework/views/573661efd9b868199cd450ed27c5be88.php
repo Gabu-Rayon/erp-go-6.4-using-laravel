@@ -22,31 +22,20 @@
                             <thead>
                             <tr>
                                 <th><?php echo e(__('Name')); ?></th>
-                                <th><?php echo e(__('Sku')); ?></th>
-                                <th><?php echo e(__('Current Quantity')); ?></th>
-                                <th><?php echo e(__('Action')); ?></th>
+                                <th><?php echo e(__('Code')); ?></th>
+                                <th><?php echo e(__('Quantity')); ?></th>
+                                <th><?php echo e(__('Package Quantity')); ?></th>
                             </tr>
                             </thead>
                             <tbody>
                             <?php $__currentLoopData = $productServices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $productService): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr class="font-style">
-                                    <td><?php echo e($productService->name); ?></td>
-                                    <td><?php echo e($productService->sku); ?></td>
+                                    <td><?php echo e($productService->itemName); ?></td>
+                                    <td><?php echo e($productService->itemCode); ?></td>
                                     <td><?php echo e($productService->quantity); ?></td>
-
-                                    <td class="Action">
-                                        <div class="action-btn bg-info ms-2">
-                                            <a data-size="md" href="#" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-url="<?php echo e(route('productstock.edit', $productService->id)); ?>" data-ajax-popup="true"  data-size="xl" data-bs-toggle="tooltip" title="<?php echo e(__('Update Quantity')); ?>">
-                                                <i class="ti ti-plus text-white"></i>
-                                            </a>
-                                        </div>
-
-
-                                    </td>
-
+                                    <td><?php echo e($productService->packageQuantity); ?></td>
                                 </tr>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
                             </tbody>
                         </table>
                     </div>
