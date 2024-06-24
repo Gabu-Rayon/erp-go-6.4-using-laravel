@@ -1394,88 +1394,65 @@
                      $role->hasPermissionTo('manage purchase') ||
                      $role->hasPermissionTo('manage pos') ||
                      $role->hasPermissionTo('manage print settings'))
-                <li
-                    class="dash-item dash-hasmenu {{ Request::segment(1) == 'warehouse' || Request::segment(1) == 'purchase'|| Request::segment(1) == 'quotation' || Request::route()->getName() == 'pos.barcode' || Request::route()->getName() == 'pos.print' || Request::route()->getName() == 'pos.show' ? ' active dash-trigger' : '' }}">
-                    <a href="#!" class="dash-link"><span class="dash-micon"><i
-                                class="ti ti-layers-difference"></i></span><span
-                            class="dash-mtext">{{ __('POS System') }}</span><span class="dash-arrow"><i
-                                data-feather="chevron-right"></i></span></a>
-                    <ul
-                        class="dash-submenu {{ Request::segment(1) == 'warehouse' ||
-                        Request::segment(1) == 'purchase' ||
-                        Request::route()->getName() == 'pos.barcode' ||
-                        Request::route()->getName() == 'pos.print' ||
-                        Request::route()->getName() == 'pos.show'
-                            ? 'show'
-                            : '' }}">
-
-                         @if ($role->hasPermissionTo('manage warehouse'))
-                            <li
-                                class="dash-item {{ Request::route()->getName() == 'warehouse.index' || Request::route()->getName() == 'warehouse.show' ? ' active' : '' }}">
+                <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'warehouse' || Request::segment(1) == 'purchase' || Request::segment(1) == 'quotation' || in_array(Request::route()->getName(), ['pos.barcode', 'pos.print', 'pos.show']) ? ' active dash-trigger' : '' }}">
+                    <a href="#!" class="dash-link">
+                        <span class="dash-micon"><i class="ti ti-layers-difference"></i></span>
+                        <span class="dash-mtext">{{ __('POS System') }}</span>
+                        <span class="dash-arrow"><i data-feather="chevron-right"></i></span>
+                    </a>
+                    <ul class="dash-submenu {{ Request::segment(1) == 'warehouse' || Request::segment(1) == 'purchase' || in_array(Request::route()->getName(), ['pos.barcode', 'pos.print', 'pos.show']) ? 'show' : '' }}">
+                
+                        @if ($role->hasPermissionTo('manage warehouse'))
+                            <li class="dash-item {{ in_array(Request::route()->getName(), ['warehouse.index', 'warehouse.show']) ? ' active' : '' }}">
                                 <a class="dash-link" href="{{ route('warehouse.index') }}">{{ __('Warehouse') }}</a>
                             </li>
                         @endif
+                        
                         @if ($role->hasPermissionTo('manage purchase'))
-                            <li
-                                class="dash-item {{ Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : '' }}">
-                                <a class="dash-link" href="{{ route('purchase.index') }}">{{ __('Get Purchase List') }}</a>
+                            <li class="dash-item {{ Request::route()->getName() == 'purchase.index' ? ' active' : '' }}">
+                                <a class="dash-link" href="{{ route('purchase.index') }}">{{ __('Purchase') }}</a>
                             </li>
-                        @endif
-                         @if ($role->hasPermissionTo('manage purchase'))
-                            <li
-                                class="dash-item {{ Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : '' }}">
-                                <a class="dash-link" href="{{ route('purchase.create', 0) }}">{{ __('Purchase') }}</a>
-                            </li>
-                        @endif
-
-                          @if ($role->hasPermissionTo('manage purchase'))
-                            <li
-                                class="dash-item {{ Request::route()->getName() == 'purchase.index' || Request::route()->getName() == 'purchase.create' || Request::route()->getName() == 'purchase.edit' || Request::route()->getName() == 'purchase.show' ? ' active' : '' }}">
+                            <li class="dash-item {{ Request::route()->getName() == 'purchase.mappedPurchases' ? ' active' : '' }}">
                                 <a class="dash-link" href="{{ route('purchase.mappedPurchases') }}">{{ __('Mapped Purchase') }}</a>
                             </li>
                         @endif
-
-                          @if ($role->hasPermissionTo('manage quotation'))
-                        <li
-                            class="dash-item {{ Request::route()->getName() == 'quotation.index' || Request::route()->getName() == 'quotations.create' || Request::route()->getName() == 'quotation.edit' || Request::route()->getName() == 'quotation.show' ? ' active' : '' }}">
-                            <a class="dash-link" href="{{ route('quotation.index') }}">{{ __('Quotation') }}</a>
-                        </li>
-                    @endif
-                         @if ($role->hasPermissionTo('manage pos'))
+                
+                        @if ($role->hasPermissionTo('manage quotation'))
+                            <li class="dash-item {{ in_array(Request::route()->getName(), ['quotation.index', 'quotation.create', 'quotation.edit', 'quotation.show']) ? ' active' : '' }}">
+                                <a class="dash-link" href="{{ route('quotation.index') }}">{{ __('Quotation') }}</a>
+                            </li>
+                        @endif
+                
+                        @if ($role->hasPermissionTo('manage pos'))
                             <li class="dash-item {{ Request::route()->getName() == 'pos.index' ? ' active' : '' }}">
                                 <a class="dash-link" href="{{ route('pos.index') }}">{{ __(' Add POS') }}</a>
                             </li>
-                            <li
-                                class="dash-item {{ Request::route()->getName() == 'pos.report' || Request::route()->getName() == 'pos.show' ? ' active' : '' }}">
+                            <li class="dash-item {{ in_array(Request::route()->getName(), ['pos.report', 'pos.show']) ? ' active' : '' }}">
                                 <a class="dash-link" href="{{ route('pos.report') }}">{{ __('POS') }}</a>
                             </li>
                         @endif
-
-                         @if ($role->hasPermissionTo('manage warehouse'))
-                            <li
-                                class="dash-item {{ Request::route()->getName() == 'warehouse-transfer.index' || Request::route()->getName() == 'warehouse-transfer.show' ? ' active' : '' }}">
-                                <a class="dash-link"
-                                    href="{{ route('warehouse-transfer.index') }}">{{ __('Transfer') }}</a>
+                
+                        @if ($role->hasPermissionTo('manage warehouse'))
+                            <li class="dash-item {{ in_array(Request::route()->getName(), ['warehouse-transfer.index', 'warehouse-transfer.show']) ? ' active' : '' }}">
+                                <a class="dash-link" href="{{ route('warehouse-transfer.index') }}">{{ __('Transfer') }}</a>
                             </li>
                         @endif
-
-                           @if ($role->hasPermissionTo('create barcode'))
-                            <li
-                                class="dash-item {{ Request::route()->getName() == 'pos.barcode' || Request::route()->getName() == 'pos.print' ? ' active' : '' }}">
+                
+                        @if ($role->hasPermissionTo('create barcode'))
+                            <li class="dash-item {{ in_array(Request::route()->getName(), ['pos.barcode', 'pos.print']) ? ' active' : '' }}">
                                 <a class="dash-link" href="{{ route('pos.barcode') }}">{{ __('Print Barcode') }}</a>
                             </li>
                         @endif
-
-                          @if ($role->hasPermissionTo('manage pos'))
-                            <li
-                                class="dash-item {{ Request::route()->getName() == 'pos-print-setting' ? ' active' : '' }}">
-                                <a class="dash-link"
-                                    href="{{ route('pos.print.setting') }}">{{ __('Print Settings') }}</a>
+                
+                        @if ($role->hasPermissionTo('manage pos'))
+                            <li class="dash-item {{ Request::route()->getName() == 'pos.print.setting' ? ' active' : '' }}">
+                                <a class="dash-link" href="{{ route('pos.print.setting') }}">{{ __('Print Settings') }}</a>
                             </li>
                         @endif
-
+                
                     </ul>
                 </li>
+                
             @endif
         @endif
         <!--------------------- End POs System ----------------------------------->
