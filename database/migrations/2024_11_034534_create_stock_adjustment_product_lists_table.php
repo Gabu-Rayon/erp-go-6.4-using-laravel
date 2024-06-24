@@ -16,10 +16,12 @@ return new class extends Migration
     {
         Schema::create('stock_adjustment_product_lists', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('stock_adjustments_id');
+            $table->unsignedBigInteger('stock_adjustments_id');
             $table->string('itemCode');
             $table->integer('packageQuantity');
             $table->integer('quantity');
+
+            $table->foreign('stock_adjustments_id')->references('id')->on('stock_adjustments')->onDelete('cascade');
             $table->timestamps();
         });
     }

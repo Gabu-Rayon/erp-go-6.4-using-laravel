@@ -1559,7 +1559,7 @@
 
          <!-- @if (\Auth::user()->type == 'company')
             <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'iteminfomation' ? 'active' : '' }}">
-                <a href="{{ route('iteminformation.index') }}" class="dash-link">
+                <a href="{{ route('productservice.index') }}" class="dash-link">
                     <span class="dash-micon"><i class="ti ti-notification"></i></span><span
                         class="dash-mtext">{{ __('Items Information') }}</span>
                 </a>

@@ -18,6 +18,6 @@ class StockAdjustmentProductList extends Model
 
     public function stockAdjustment()
     {
-        return $this->belongsTo(StockAdjustment::class);
+        return $this->belongsTo(StockAdjustment::class, 'stock_adjustments_id');
     }
 }

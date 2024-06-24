@@ -18,7 +18,7 @@ return new class extends Migration
             $table->id();
             $table->string('storeReleaseTypeCode')->nullable();
             $table->text('remark')->nullable();
-            $table->integer('productCount')->nullable();
+            $table->integer('rsdQty')->nullable();
             $table->timestamps();
         });
     }

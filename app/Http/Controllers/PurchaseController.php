@@ -50,7 +50,7 @@ class PurchaseController extends Controller
 
         try {
             if (\Auth::user()->type == 'company') {
-                $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+                $vender = Vender::all()->pluck('name', 'id');
                 $vender->prepend('Select Vendor', '');
                 $status = Purchase::$statues;
                 $purchases = Purchase::all();
@@ -845,10 +845,13 @@ class PurchaseController extends Controller
         $category->prepend('Select Category', '');
 
         $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
-        $venders = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'spplrNm');
+        $venders = Vender::all()->pluck('name', 'spplrNm');
         $venders->prepend('Select Vender', '');
         $suppliers = Vender::all()->pluck('name', 'id');
         $suppliers->prepend('Select Supplier', '');
+
+        \Log::info('Venders:');
+        \Log::info($suppliers);
 
         $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
         $warehouse->prepend('Select Warehouse', '');

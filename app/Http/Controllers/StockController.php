@@ -10,50 +10,45 @@ use App\Models\StockMoveList;
 use App\Models\ProductService;
 use App\Models\StockAdjustment;
 use App\Models\StockReleaseType;
-use App\Models\WarehouseProduct;
+use Illuminate\Support\Facades\Validator;
 use App\Models\StockMoveListItem;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use App\Models\StockAdjustmentProductList;
 
 class StockController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function stockIdjustmentIndex()
-    {
-
-        if (\Auth::user()->type == 'company') {
-
-
+    public function stockAdjustmentIndex(){
             try {
-                return view('stockadjustment.index');
+                $stockadjustments = StockAdjustmentProductList::all();
+                return view('stockadjustment.index', compact('stockadjustments'));
             } catch (\Exception $e) {
-                \Log::info($e);
-                return redirect()->to('stockinfo.index')->with('error', $e);
+                Log::error($e);
+                return redirect()->back()->with('error', $e->getMessage());
             }
-        } else {
-            return redirect()->back()->with('error', __('Permission Denied.'));
         }
-    }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function stockIdjustmentCreate()
+    public function stockAdjustmentCreate()
     {
 
         if (\Auth::user()->type == 'company') {
-
             try {
-                $items = ProductService::all()->pluck('itemNm', 'itemCd');
-                $releaseTypes = ReleaseType::all()->pluck('type', 'id');
+                $items = ProductService::where('created_by', \Auth::user()->id)->get()->pluck('itemName', 'itemCode');
+                $releaseTypes = ReleaseType::all()->pluck('type', 'code');
                 return view('stockadjustment.create', compact('items', 'releaseTypes'));
             } catch (\Exception $e) {
-                \Log::info($e);
-                return redirect()->to('stockinfo.index')->with('error', $e . getMessage());
+                Log::info('STOCK ADJUSTMENT CREATE ERROR');
+                Log::info($e);
+                return redirect()->to('stockinfo.index')->with('error', $e->getMessage());
             }
-
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
         }
@@ -64,74 +59,89 @@ class StockController extends Controller
      * 
      */
 
-    public function stockIdjustmentStore(Request $request)
-    {
-        if (\Auth::user()->type == 'company') {
-            try {
-                $data = $request->all();
-                \Log::info('STOCK ADJUSTMENT data from the Form to adjust the Stock:');
-                \Log::info(json_encode($data));
+    public function stockAdjustmentStore(Request $request) {
+        try {
 
-                $url = 'https://etims.your-apps.biz/api/StockAdjustment';
+            $data = $request->all();
+            
+            $validator = Validator::make($data, [
+                'storeReleaseTypeCode' => 'required',
+                'stockItemList' => 'required|array',
+                'stockItemList.*.itemCode' => 'required',
+                'stockItemList.*.packageQuantity' => 'required|numeric',
+                'stockItemList.*.quantity' => 'required|numeric',
+            ]);
 
-                $response = Http::withOptions(['verify' => false])->withHeaders([
-                    'key' => '123456',
-                    'accept' => '*/*',
-                    'Content-Type' => 'application/json'
-                ])->post($url, [
-                            'storeReleaseTypeCode' => $request['storeReleaseTypeCode'],
-                            'remark' => $request['remark'],
-                            'stockItemList' => $request['items']
-                        ]);
-
-                \Log::info('STOCK ADJ API RESPONSE');
-                \Log::info($response['data']);
-
-                // Parse API response and store relevant data locally
-                $responseData = $response->json();
-                $stockAdjustment = new StockAdjustment();
-                $stockAdjustment->storeReleaseTypeCode = $request['storeReleaseTypeCode'];
-                $stockAdjustment->remark = $request['remark'];
-                $stockAdjustment->save();
-
-                foreach ($responseData['stockItemList'] as $item) {
-                    // Update ProductService quantity
-                    $productService = ProductService::where('itemCd', $item['itemCode'])->first();
-                    if ($productService) {
-                        $productService->quantity += $item['quantity'];
-                        $productService->save();
-                    }
-
-                    // Update WarehouseProduct quantity
-                    $warehouseProduct = WarehouseProduct::where('product_id', $productService->id)->first();
-                    if ($warehouseProduct && $warehouseProduct->quantity !== null) {
-                        $warehouseProduct->quantity += $item['quantity'];
-                        // $warehouseProduct->pkgQuantity  -= $item['pkgQuantity'];
-                        $warehouseProduct->save();
-                    }
-
-                    // Update quantity in warehouse_products
-                    // $warehouseProduct = WarehouseProduct::where('product_id', $productService->id)->first();
-                    // if ($warehouseProduct && $warehouseProduct->quantity !== null) {
-                    //     $warehouseProduct->quantity -= $item['quantity'];
-                    //     // $warehouseProduct->pkgQuantity  -= $item['pkgQuantity'];
-                    //     $warehouseProduct->save();
-                    // }
-                }
-
-                return redirect()->route('stockadjustment.index')->with('success', 'Stock Adjustment Added.');
-            } catch (\Exception $e) {
-                return redirect()->back()->with('error', $e->getMessage());
+            
+            if ($validator->fails()) {
+                return redirect()->back()->with('error', $validator->errors()->first());
             }
-        } else {
-            return redirect()->back()->with('errors', __('Permission denied.'));
+
+            $url = 'https://etims.your-apps.biz/api/StockAdjustment';
+
+            $response = Http::withOptions(['verify' => false])->withHeaders([
+                'key' => '123456',
+            ])->post($url, [
+                'storeReleaseTypeCode' => $data['storeReleaseTypeCode'],
+                'remark' => $data['remark'],
+                'stockItemList' => $data['stockItemList']
+            ]);
+
+            if ($response['statusCode'] !== 200) {
+                return redirect()->back()->with('error', 'Check your credentials and try again');
+            }
+
+            $updatedItems = [];
+
+            DB::beginTransaction();
+
+            foreach ($data['stockItemList'] as $item) {
+                $productService = ProductService::where('itemCode', $item['itemCode'])->first();
+
+                if ($productService) {
+                    $productService->quantity += $item['quantity'];
+                    $productService->packageQuantity += $item['packageQuantity'];
+                    $productService->save();
+
+                    array_push($updatedItems, $productService);
+                } else {
+                    return redirect()->back()->with('error', 'Product(s) not found');
+                }
+            }
+
+            $rsdQty = array_sum(array_column($updatedItems, 'quantity'));
+
+            $stockAdjustment = StockAdjustment::create([
+                'storeReleaseTypeCode' => $data['storeReleaseTypeCode'],
+                'remark' => $data['remark'],
+                'rsdQty' => $rsdQty,
+            ]);
+
+            foreach ($updatedItems as $item) {
+                StockAdjustmentProductList::create([
+                    'stock_adjustments_id' => $stockAdjustment->id,
+                    'itemCode' => $item->itemCode,
+                    'packageQuantity' => $item->packageQuantity,
+                    'quantity' => $item->quantity,
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('stockadjustment.index')->with('success', 'Stock Adjustment Added.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::info('STOCK ADJUSTMENT STORE ERROR');
+            \Log::info($e);
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
     /**
      * Display the specified resource.
      */
-    public function stockIdjustmentShow(StockAdjustment $stockAdjustmentList)
+    public function stockAdjustmentShow(StockAdjustment $stockAdjustmentList)
     {
         //
     }
@@ -139,7 +149,7 @@ class StockController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function stockIdjustmentEdit(StockAdjustment $stockAdjustmentList)
+    public function stockAdjustmentEdit(StockAdjustment $stockAdjustmentList)
     {
         //
     }
@@ -147,7 +157,7 @@ class StockController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function stockIdjustmentUpdate(Request $request, StockAdjustment $stockAdjustmentList)
+    public function stockAdjustmentUpdate(Request $request, StockAdjustment $stockAdjustmentList)
     {
         //
     }
@@ -155,7 +165,7 @@ class StockController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function stockIdjustmentDestroy(StockAdjustment $stockAdjustmentList)
+    public function stockAdjustmentDestroy(StockAdjustment $stockAdjustmentList)
     {
         //
     }

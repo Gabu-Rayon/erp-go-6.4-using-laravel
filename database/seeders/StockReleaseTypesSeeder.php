@@ -12,9 +12,8 @@ class StockReleaseTypesSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
-    {
-        DB::table('stock_release_types')->insert([
+    public function run() {
+    DB::table('stock_release_types')->insert([
             [
                 'id' => 1,
                 'code' => '01',

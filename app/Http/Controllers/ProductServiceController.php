@@ -7,22 +7,14 @@ use Carbon\Carbon;
 use App\Models\Tax;
 use App\Models\Code;
 use App\Models\User;
-use App\Models\Vender;
-use GuzzleHttp\Client;
 use App\Models\Details;
-use App\Models\Product;
 use App\Models\Utility;
 use App\Models\ItemType;
-use App\Models\Countries;
 use App\Models\CustomField;
 use Illuminate\Http\Request;
 use App\Models\ChartOfAccount;
-use App\Models\CodeListDetail;
 use App\Models\ProductService;
-use App\Models\CodeListClasses;
-use Illuminate\Validation\Rule;
 use App\Models\WarehouseProduct;
-use App\Models\ChartOfAccountType;
 use App\Models\ProductServiceUnit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -32,54 +24,42 @@ use App\Exports\ProductServiceExport;
 use App\Imports\ProductServiceImport;
 use App\Models\ProductServiceCategory;
 use Illuminate\Support\Facades\Storage;
-use GuzzleHttp\Exception\RequestException;
-use App\Models\ProductServicesPackagingUnit;
 use App\Models\ProductsServicesClassification;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class ProductServiceController extends Controller
 {
-    public function index(Request $request)
-    {
-
-        if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
-        ) {
-            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
+    public function index(Request $request){
+        try {
+            $category = ItemType::whereIn('item_type_name', ['Finished Product', 'Service'])->pluck('item_type_name', 'item_type_code');
             $category->prepend('Select Category', '');
 
             if (!empty($request->category)) {
-
-                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', $request->category)->with(['category', 'unit'])->get();
+                $productServices = ProductService::where('created_by', '=', Auth::user()->creatorId())->where('category_id', $request->category)->with(['category', 'unit'])->get();
             } else {
-                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->with(['category', 'unit'])->get();
+                $productServices = ProductService::where('created_by', '=', Auth::user()->creatorId())->with(['category', 'unit'])->get();
             }
 
             return view('productservice.index', compact('productServices', 'category'));
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
+        } catch (Exception $e) {
+            Log::error('PRODUCT / SERVICE INDEX ERROR');
+            Log::error($e);
+            return redirect()->back()->with('error', 'Something Went Wrong');
         }
     }
 
 
-    public function create()
-    {
-        if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
-        ) {
-            $items = ProductService::all()->pluck('itemNm', 'itemCd');
+    /**
+     * Show the form for creating a new resource.
+     */
+
+    public function create() {
+        try {
             $itemclassifications = ProductsServicesClassification::pluck('itemClsNm', 'itemClsCd');
             $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
-            $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
-            $category = ProductServiceCategory::all()->pluck('name', 'id');
-            $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
-            $quantityUnitCode = ProductServiceUnit::pluck('Name', 'code');
-            $productServicesPackagingUnit = ProductServicesPackagingUnit::pluck('Name', 'code');
-
-            $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
-            $unit = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $tax = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $countries = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
+            $taxes = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
             $incomeChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
                 ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
                 ->where('chart_of_account_types.name', 'income')
@@ -111,212 +91,166 @@ class ProductServiceController extends Controller
             $expenseSubAccounts->where('chart_of_accounts.parent', '!=', 0);
             $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
             $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
+            return view('productservice.create', compact(
+                'itemclassifications',
+                'itemtypes',
+                'countries',
+                'taxes',
+                'incomeChartAccounts',
+                'incomeSubAccounts',
+                'expenseChartAccounts',
+                'expenseSubAccounts',
+            ));
+        } catch (Exception $e) {
+            Log::error('CREATE PRODUCT / SERVICE ERROR');
+            Log::error($e);
 
-
-            return view(
-                'productservice.create',
-                compact(
-                    'items',
-                    'category',
-                    'itemclassifications',
-                    'itemtypes',
-                    'countrynames',
-                    'taxationtype',
-                    'unit',
-                    'tax',
-                    'customFields',
-                    'incomeChartAccounts',
-                    'incomeSubAccounts',
-                    'expenseChartAccounts',
-                    'quantityUnitCode',
-                    'expenseSubAccounts',
-                    'productServicesPackagingUnit'
-                )
-            );
-        } else {
-            return response()->json(['error' => __('Permission denied.')], 401);
-        }
-    }
-
-    public function store(Request $request)
-    {
-        \Log::info('CREATE PRODUCT SERVICE REQUEST Clicked :' . $request );
-        try {
-            if (
-                \Auth::user()->type == 'company'
-                || \Auth::user()->type == 'accountant'
-            ) {
-                \Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
-                \Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
-
-                $data = $request->all();
-
-                \Log::info('ITEMS');
-                \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
-
-                $apiData = [];
-
-                // Define the mapping array for taxTypeCode to tax_id
-                $taxTypeMapping = [
-                    'A' => 1,
-                    'B' => 2,
-                    'C' => 3,
-                    'D' => 4,
-                    'E' => 5,
-                    'F' => 6,
-                ];
-
-                foreach ($data['items'] as $index => $item) {
-                    \Log::info('ITEM INDEX: ' . $index);
-
-                    // Determine the tax_id based on taxTypeCode
-                    $taxIdCode = isset($item['taxTypeCode']) && array_key_exists($item['taxTypeCode'], $taxTypeMapping)
-                        ? $taxTypeMapping[$item['taxTypeCode']]
-                        : null;
-
-                    // Handling image upload with storage limit check
-                    if (!empty($item['pro_image']) && $item['pro_image']->isValid()) {
-                        \Log::info('Image File Object for Item ' . ($index + 1));
-                        $image_size = $item['pro_image']->getSize();
-                        $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
-
-                        if ($result == 1) {
-                            $fileName = $item['pro_image']->getClientOriginalName();
-                            $dir = 'uploads/pro_image';
-                            $path = Utility::upload_file($item, 'pro_image', $fileName, $dir, []);
-
-                            \Log::info('product image path:', $path);
-
-                            // Assign the file name to the pro_image field
-                            $item['pro_image'] = $fileName;
-
-                            $productService = ProductService::create([
-                                'name' => $item['itemName'] ?? null,
-                                'sku' => $item['sku'] ?? null,
-                                'sale_price' => $item['sale_price'] ?? null,
-                                'purchase_price' => $item['purchase_price'] ?? null,
-                                'quantity' => $item['quantity'],
-                                'tax_id' => $taxIdCode,
-                                'category_id' => $item['category_id'] ?? null,
-                                'unit_id' => $item['unit_id'] ?? null,
-                                'type' => $item['type'] ?? null,
-                                'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
-                                'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
-                                'description' => $item['description'] ?? null,
-                                'pro_image' => $dir,
-                                'created_by' => \Auth::user()->creatorId(),
-                                'tin' => $item['tin'] ?? null,
-                                'itemCd' => $item['itemCode'],
-                                'itemClsCd' => $item['itemClassifiCode'],
-                                'itemTyCd' => $item['itemTypeCode'],
-                                'itemNm' => $item['itemName'],
-                                'itemStdNm' => $item['itemStrdName'],
-                                'orgnNatCd' => $item['countryCode'] ?? null,
-                                'pkgUnitCd' => $item['pkgUnitCode'] ?? null,
-                                'qtyUnitCd' => $item['qtyUnitCode'] ?? null,
-                                'taxTyCd' => $item['taxTypeCode'] ?? null,
-                                'btchNo' => $item['batchNo'] ?? null,
-                                'regBhfId' => $item['regBhfId'] ?? null,
-                                'bcd' => $item['barcode'] ?? null,
-                                'dftPrc' => $item['unitPrice'] ?? null,
-                                'grpPrcL1' => $item['group1UnitPrice'] ?? null,
-                                'grpPrcL2' => $item['group2UnitPrice'] ?? null,
-                                'grpPrcL3' => $item['group3UnitPrice'] ?? null,
-                                'grpPrcL4' => $item['group4UnitPrice'] ?? null,
-                                'grpPrcL5' => $item['group5UnitPrice'] ?? null,
-                                'addInfo' => $item['additionalInfo'] ?? null,
-                                'sftyQty' => $item['saftyQuantity'] ?? null,
-                                'isrcAplcbYn' => $item['isInrcApplicable'] ?? null,
-                                'rraModYn' => $item['isUsed'] ?? null,
-                                'packageQuantity' => $item['packageQuantity'] ?? null,
-                                'useYn' => $item['useYn'] ?? null,
-                            ]);
-
-                            $productService->save();
-
-                            // Prepare data for the API
-                            $apiData[] = $this->constructProductData($item, $index);
-                        } else {
-                            \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
-                            return redirect()->back()->with('error', 'Storage limit exceeded.');
-                        }
-                    } else {
-                        \Log::info('No valid image uploaded for item ' . ($index + 1));
-                    }
-                }
-
-                // Post data to the external API
-                $response = \Http::withOptions([
-                    'verify' => false
-                ])->withHeaders([
-                            'Accept' => 'application/json',
-                            'Content-Type' => 'application/json',
-                            'key' => '123456'
-                        ])->post('https://etims.your-apps.biz/api/AddItemsList', $apiData);
-
-                // Log response data
-                \Log::info('API Response Status Code For Posting Product Data: ' . $response->status());
-                \Log::info('API Request Product Data Posted: ' . json_encode($apiData));
-                \Log::info('API Response Body For Posting Product Data: ' . $response->body());
-
-                if ($response->successful()) {
-                    \Log::info('Data successfully posted to the API');
-                } else {
-                    \Log::error('Error posting data to the API: ' . $response->body());
-                }
-
-                return redirect()->route('productservice.index')->with('success', 'Product / Service Added Successfully');
-            } else {
-                return redirect()->back()->with('error', __('Permission denied.'));
-            }
-        } catch (\Exception $e) {
-            \Log::error('CREATE PRODUCT SERVICE ERROR');
-            \Log::error($e);
             return redirect()->back()->with('error', 'Something Went Wrong');
         }
     }
 
-    private function constructProductData($item, $key)
-    {
-        return [
-            "itemCode" => $item["itemCode"],
-            "itemClassifiCode" => $item["itemClassifiCode"],
-            "itemTypeCode" => $item["itemTypeCode"],
-            "itemName" => $item["itemName"],
-            "itemStrdName" => $item["itemStrdName"],
-            "countryCode" => $item["countryCode"],
-            "pkgUnitCode" => $item["pkgUnitCode"],
-            "qtyUnitCode" => $item["pkgUnitCode"],
-            "taxTypeCode" => $item["taxTypeCode"],
-            "batchNo" => $item["batchNo"],
-            "barcode" => $item["barcode"],
-            "unitPrice" => $item["unitPrice"],
-            "group1UnitPrice" => $item["group1UnitPrice"],
-            "group2UnitPrice" => $item["group2UnitPrice"],
-            "group3UnitPrice" => $item["group3UnitPrice"],
-            "group4UnitPrice" => $item["group4UnitPrice"],
-            "group5UnitPrice" => $item["group5UnitPrice"],
-            "additionalInfo" => $item["additionalInfo"],
-            "saftyQuantity" => $item["saftyQuantity"],
-            "isInrcApplicable" => $item["isInrcApplicable"],
-            "isUsed" => $item["isUsed"],
-            "quantity" => $item["quantity"],
-            "packageQuantity" => $item["packageQuantity"],
-        ];
+    /**
+     * Store a newly created resource in storage.
+     */
+
+    public function store(Request $request) {
+        try {
+            $url = 'https://etims.your-apps.biz/api/AddItemsList';
+
+            $data = $request->all();
+
+            $validated = Validator::make($data, [
+                'items' => 'required|array',
+                'items.*.itemCode' => 'required|unique:product_services,itemCode',
+                'items.*.itemClassifiCode' => 'required|exists:productservices_classifications,itemClsCd',
+                'items.*.itemTypeCode' => 'required|exists:item_type,item_type_code',
+                'items.*.itemName' => 'required',
+                'items.*.itemStrdName' => 'required',
+                'items.*.countryCode' => 'required|exists:details,cd',
+                'items.*.pkgUnitCode' => 'required',
+                'items.*.qtyUnitCode' => 'required',
+                'items.*.taxTypeCode' => 'required|exists:details,cd',
+                'items.*.unitPrice' => 'required',
+            ]);
+
+            if ($validated->fails()) {
+                Log::error('STORE PRODUCT / SERVICE VALIDATION ERROR');
+                Log::error($validated->errors());
+                return redirect()->back()->with('error', 'Check your credentials and try again');
+            }
+
+            $apiData = $request->input("items");
+
+            $response = Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
+                'key' => '123456'
+            ])->post($url, $apiData);
+
+            Log::info('RESPONSE');
+            Log::info($response);
+            
+            if (!$response || $response['statusCode'] != 200) {
+                if ($response['statusCode'] == 400) {
+                    return redirect()->back()->with('error', $response['message'] ?? 'Error adding Item(s)');
+                }
+                Log::error('STORE PRODUCT / SERVICE ERROR');
+                Log::error($response);
+                
+                return redirect()->back()->with('error', 'Error adding Item(s)');
+            }
+
+            DB::beginTransaction();
+
+            $dbData = [];
+
+            foreach ($apiData as $index => $item) {
+                if (!empty($item['productImage']) && $item['productImage']->isValid()) {
+                    Log::info('Image File Object for Item ' . ($index + 1));
+            
+                    $image_size = $item['productImage']->getSize();
+                    $result = Utility::updateStorageLimit(Auth::user()->creatorId(), $image_size);
+            
+                    if ($result == 1) {
+                        $fileName = $item['productImage']->getClientOriginalName();
+                        $dir = 'uploads/pro_image';
+                        $path = Utility::upload_file($item, 'productImage', $fileName, $dir, []);
+            
+                        Log::info('Product image path: ' . $path['url']);
+
+                        $item['productImage'] = $path['url'];
+                    }
+                }
+
+                ProductService::create([
+                    'itemCode' => $item['itemCode'],
+                    'itemClassifiCode' => $item['itemClassifiCode'],
+                    'itemTypeCode' => $item['itemTypeCode'],
+                    'itemName' => $item['itemName'],
+                    'itemStrdName' => $item['itemStrdName'],
+                    'countryCode' => $item['countryCode'],
+                    'qtyUnitCode' => $item['qtyUnitCode'],
+                    'pkgUnitCode' => $item['pkgUnitCode'],
+                    'taxTypeCode' => $item['taxTypeCode'],
+                    'batchNo' => $item['batchNo'] ?? null,
+                    'barcode' => $item['barcode'] ?? null,
+                    'purchasePrice' => $item['purchasePrice'] ?? '0.00',
+                    'unitPrice' => $item['unitPrice'],
+                    'group1UnitPrice' => $item['group1UnitPrice'] ?? null,
+                    'group2UnitPrice' => $item['group2UnitPrice'] ?? null,
+                    'group3UnitPrice' => $item['group3UnitPrice'] ?? null,
+                    'group4UnitPrice' => $item['group4UnitPrice'] ?? null,
+                    'group5UnitPrice' => $item['group5UnitPrice'] ?? null,
+                    'additionalInfo' => $item['additionalInfo'] ?? null,
+                    'saftyQuantity' => $item['saftyQuantity'] ?? null,
+                    'isInrcApplicable' => $item['isInrcApplicable'] ?? false,
+                    'isUsed' => $item['isUsed'] ?? false,
+                    'quantity' => $item['quantity'] ?? 0,
+                    'packageQuantity' => $item['packageQuantity'] ?? 0,
+                    'productImage' => $item['productImage'] ?? null,
+                    'created_by' => Auth::user()->creatorId(),
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('productservice.index')->with('success', 'Item(s) added successfully');
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('STORE PRODUCT / SERVICE ERROR');
+            Log::error($e);
+
+            return redirect()->back()->with('error', 'Something Went Wrong');
+        }
     }
 
+    /**
+     * Display the specified resource.
+     */
+    
+    public function show($id){
+        try {
+            $productServiceInfo = ProductService::findOrFail($id);
+            $taxName = Details::where('cdCls', '04')->where('cd', $productServiceInfo->taxTypeCode)->value('cd');
+            $categoryName = DB::table('product_service_categories')->where('id', $productServiceInfo->category_id)->value('name');
+            $unitName = DB::table('product_service_units')->where('id', $productServiceInfo->unit_id)->value('name');
+            $saleChartAccountName = DB::table('chart_of_accounts')->where('id', $productServiceInfo->sale_chartaccount_id)->value('name');
+            $expenseChartAccounName = DB::table('chart_of_accounts')->where('id', $productServiceInfo->expense_chartaccount_id)->value('name');
 
+            return view('productservice.show', compact(
+                'productServiceInfo',
+                'taxName',
+                'categoryName',
+                'unitName',
+                'saleChartAccountName',
+                'expenseChartAccounName'
+            ));
+        } catch (Exception $e) {
+            Log::error('SHOW PRODUCT / SERVICE ERROR');
+            Log::error($e);
 
-    public function show($id)
-    {
-        $productServiceInfo = ProductService::findOrFail($id);
-        $taxName = DB::table('taxes')->where('id', $productServiceInfo->tax_id)->value('name');
-        $categoryName = DB::table('product_service_categories')->where('id', $productServiceInfo->category_id)->value('name');
-        $unitName = DB::table('product_service_units')->where('id', $productServiceInfo->unit_id)->value('name');
-        $saleChartAccountName = DB::table('chart_of_accounts')->where('id', $productServiceInfo->sale_chartaccount_id)->value('name');
-        $expenseChartAccounName = DB::table('chart_of_accounts')->where('id', $productServiceInfo->expense_chartaccount_id)->value('name');
-
-        return view('productservice.show', compact('productServiceInfo', 'taxName', 'categoryName', 'unitName', 'saleChartAccountName', 'expenseChartAccounName'));
+            return redirect()->back()->with('error', 'Something Went Wrong');
+        }
     }
 
     public function getItem($code)

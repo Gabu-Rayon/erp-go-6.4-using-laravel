@@ -338,15 +338,16 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <?php echo e(Form::label('storeReleaseTypeCode', __('Stored/ Release Type Code (*)'), ['class' => 'form-label'])); ?>
+                            <?php echo e(Form::label('storeReleaseTypeCode', __('Stored/ Release Type Code'), ['class' => 'form-label'])); ?>
 
+                            <span class="text-danger">*</span>
                             <?php echo e(Form::select('storeReleaseTypeCode', $releaseTypes, null, ['class' => 'form-control'])); ?>
 
                         </div>
                         <div class="form-group col-md-4">
                             <?php echo e(Form::label('remark', __('Remark'),['class'=>'form-label'])); ?>
 
-                            <?php echo e(Form::text('remark', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+                            <?php echo e(Form::text('remark', '', array('class' => 'form-control'))); ?>
 
                         </div>
                     </div>
@@ -372,7 +373,7 @@
                 </div>
                 <div class="card-body table-border-style">
                     <div class="table-responsive">
-                        <table class="table mb-0" data-repeater-list="items" id="sortable-table">
+                        <table class="table mb-0" data-repeater-list="stockItemList" id="sortable-table">
                             <thead>
                             </thead>
                             <tbody class="ui-sortable" data-repeater-item data-clone>
@@ -380,22 +381,25 @@
                                     <td class="form-group col-md-4">
                                         <?php echo e(Form::label('itemCode', __('Item'), ['class' => 'form-label'])); ?>
 
+                                        <span class="text-danger">*</span>
                                         <?php echo e(Form::select('itemCode', $items, null, ['class' => 'form-control'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-4">
                                         <?php echo e(Form::label('packageQuantity', __('Package Quantity'),['class'=>'form-label'])); ?>
 
-                                        <?php echo e(Form::text('packageQuantity', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+                                        <span class="text-danger">*</span>
+                                        <?php echo e(Form::number('packageQuantity', '', array('class' => 'form-control', 'required' => 'required'))); ?>
 
                                     </td>
                                     <td class="form-group col-md-4">
                                         <?php echo e(Form::label('quantity', __('Quantity'),['class'=>'form-label'])); ?>
 
-                                        <?php echo e(Form::text('quantity', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+                                        <span class="text-danger">*</span>
+                                        <?php echo e(Form::number('quantity', '', array('class' => 'form-control', 'required' => 'required'))); ?>
 
                                     </td>
-                                    <td class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
+                                    <td class="ti ti-trash text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
                                 </tr>
                             </tbody>
                         </table>

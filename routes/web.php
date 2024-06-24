@@ -27,7 +27,6 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CouponController;
-use App\Http\Controllers\NoticeController;
 use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\PaytabController;
 use App\Http\Controllers\ReportController;
@@ -431,7 +430,7 @@ Route::group(['middleware' => ['verified']], function () {
     Route::get('productservice/{id}/detail', [ProductServiceController::class, 'warehouseDetail'])->name('productservice.detail');
     Route::post('empty-cart', [ProductServiceController::class, 'emptyCart'])->middleware(['auth', 'XSS']);
     Route::post('warehouse-empty-cart', [ProductServiceController::class, 'warehouseemptyCart'])->name('warehouse-empty-cart')->middleware(['auth', 'XSS']);
-    Route::resource('productservice', ProductServiceController::class)->middleware(['auth', 'XSS', 'revalidate']);
+    Route::resource('productservice', ProductServiceController::class)->middleware(['auth', 'XSS', 'revalidate', 'can:manage product & service']);
 
     //Product Stock
     Route::resource('productstock', ProductStockController::class)->middleware(['auth', 'XSS']);
@@ -1960,13 +1959,27 @@ Route::any('/getcustomerbypin', [CustomerController::class, 'getCustomerByTin'])
 
 Route::middleware(['auth', 'XSS', 'revalidate'])->group(function () {
     // Routes for stock adjustments
-    Route::get('stockadjustment', [StockController::class, 'stockIdjustmentIndex'])->name('stockadjustment.index');
-    Route::get('stockadjustment/create', [StockController::class, 'stockIdjustmentCreate'])->name('stockadjustment.create');
-    Route::post('stockadjustment', [StockController::class, 'stockIdjustmentStore'])->name('stockadjustment.store');
-    Route::get('stockadjustment/{stockAdjustment}', [StockController::class, 'stockIdjustmentShow'])->name('stockadjustment.show');
-    Route::get('stockadjustment/{stockAdjustment}/edit', [StockController::class, 'stockIdjustmentEdit'])->name('stockadjustment.edit');
-    Route::put('stockadjustment/{stockAdjustment}', [StockController::class, 'stockIdjustmentUpdate'])->name('stockadjustment.update');
-    Route::delete('stockadjustment/{stockAdjustment}', [StockController::class, 'stockIdjustmentDestroy'])->name('stockadjustment.destroy');
+    Route::get('stockadjustment', [StockController::class, 'stockAdjustmentIndex'])
+        ->name('stockadjustment.index')
+        ->middleware(['can:manage product & service']);
+    Route::get('stockadjustment/create', [StockController::class, 'stockAdjustmentCreate'])
+        ->name('stockadjustment.create')
+        ->middleware(['can:create product & service']);
+    Route::post('stockadjustment', [StockController::class, 'stockAdjustmentStore'])
+        ->name('stockadjustment.store')
+        ->middleware(['can:create product & service']);
+    Route::get('stockadjustment/{stockAdjustment}', [StockController::class, 'stockAdjustmentShow'])
+        ->name('stockadjustment.show')
+        ->middleware(['can:manage product & service']);
+    Route::get('stockadjustment/{stockAdjustment}/edit', [StockController::class, 'stockAdjustmentEdit'])
+        ->name('stockadjustment.edit')
+        ->middleware(['can:edit product & service']);
+    Route::put('stockadjustment/{stockAdjustment}', [StockController::class, 'stockAdjustmentUpdate'])
+        ->name('stockadjustment.update')
+        ->middleware(['can:edit product & service']);
+    Route::delete('stockadjustment/{stockAdjustment}', [StockController::class, 'stockAdjustmentDestroy'])
+        ->name('stockadjustment.destroy')
+        ->middleware(['can:delete product & service']);
 
     // Routes for stock moves
     Route::get('stockmove', [StockController::class, 'stockMoveIndex'])->name('stockmove.index');

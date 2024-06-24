@@ -7,3 +7,4 @@ storage\logs\laravel.log
 /vendor/srmklive/paypal/tests/Mocks/samples/sample2.pdf
 /vendor/srmklive/paypal/tests/Mocks/samples/sample.pdf
 .env
+stuff.php

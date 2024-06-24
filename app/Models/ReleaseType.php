@@ -8,7 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class ReleaseType extends Model
 {
     use HasFactory;
+
+    protected $table = 'stock_release_types';
     protected $fillable = [
-        'type'
+        'code',
+        'type',
     ];
 }
