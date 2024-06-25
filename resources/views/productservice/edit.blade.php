@@ -82,13 +82,13 @@
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('group3UnitPrice', __('Group 3 Unit Price'), ['class' => 'form-label']) }}
-                {{ Form::text('grpPrcL1', null, ['class' => 'form-control', 'placeholder' => __('Enter Group 3 Unit Price')]) }}
+                {{ Form::text('grpPrcL3', null, ['class' => 'form-control', 'placeholder' => __('Enter Group 3 Unit Price')]) }}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('group4UnitPrice', __('Group 4 Unit Price'), ['class' => 'form-label']) }}
-                {{ Form::text('grpPrcL3', null, ['class' => 'form-control', 'placeholder' => __('Enter Group 4 Unit Price')]) }}
+                {{ Form::text('grpPrcL4', null, ['class' => 'form-control', 'placeholder' => __('Enter Group 4 Unit Price')]) }}
             </div>
         </div>
         <div class="col-md-6">
@@ -106,19 +106,19 @@
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('packageQuantity', __('Package Quantity'), ['class' => 'form-label']) }}
-                {{ Form::number('quantity', null, ['class' => 'form-control']) }}
+                {{ Form::number('pkgQuantity', null, ['class' => 'form-control', 'placeholder' => __('Enter Item Package Quantity')]) }}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('isrcAplcbYn', __('Insurance Appicable (Y/N) (*)'), ['class' => 'form-label']) }}
-                {{ Form::select('isrcAplcbYn', [true => 'Y', false => 'N'], $productServiceinformation->isrcAplcbYn, ['class' => 'form-control', 'required' => 'required']) }}
+                {{ Form::select('isrcAplcbYn', [true => 'Yes', false => 'No'], $productServiceinformation->isrcAplcbYn, ['class' => 'form-control', 'required' => 'required']) }}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('isUsed', __('Used / UnUsed (Y/N) (*)'), ['class' => 'form-label']) }}
-                {{ Form::select('isUsed', [true => 'true', false => 'false'], $productServiceinformation->isUsed, ['class' => 'form-control', 'required' => 'required']) }}
+                {{ Form::select('isUsed', [true => 'Yes', false => 'Yes'], $productServiceinformation->isUsed, ['class' => 'form-control', 'required' => 'required']) }}
             </div>
         </div>
         <div class="col-md-6">
@@ -141,16 +141,4 @@
         var src = URL.createObjectURL(this.files[0])
         document.getElementById('image').src = src
     }
-    //hide & show quantity
-
-    $(document).on('click', '.type', function() {
-        var type = $(this).val();
-        if (type == 'product') {
-            $('.quantity').removeClass('d-none')
-            $('.quantity').addClass('d-block');
-        } else {
-            $('.quantity').addClass('d-none')
-            $('.quantity').removeClass('d-block');
-        }
-    });
 </script>

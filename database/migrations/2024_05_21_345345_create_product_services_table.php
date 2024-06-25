@@ -16,37 +16,54 @@ return new class extends Migration
     {
         Schema::create('product_services', function (Blueprint $table) {
             $table->id();
-            $table->string('itemCode')->unique();
-            $table->string('itemClassifiCode');
-            $table->string('itemTypeCode');
-            $table->string('itemName');
-            $table->string('itemStrdName')->nullable();
-            $table->string('countryCode');
-            $table->string('qtyUnitCode');
-            $table->string('pkgUnitCode');
-            $table->string('taxTypeCode');
-            $table->string('batchNo')->nullable();
-            $table->string('barcode')->nullable();
-            $table->decimal('purchasePrice', 10, 2);
-            $table->decimal('unitPrice', 10, 2);
-            $table->decimal('group1UnitPrice', 10, 2)->nullable();
-            $table->decimal('group2UnitPrice', 10, 2)->nullable();
-            $table->decimal('group3UnitPrice', 10, 2)->nullable();
-            $table->decimal('group4UnitPrice', 10, 2)->nullable();
-            $table->decimal('group5UnitPrice', 10, 2)->nullable();
-            $table->decimal('saftyQuantity', 10, 2)->nullable();
-            $table->boolean('isInrcApplicable')->default(0);
-            $table->boolean('isUsed')->default(0);
-            $table->decimal('quantity', 10, 2)->default(0);
-            $table->decimal('packageQuantity', 10, 2)->default(0);
-            $table->text('additionalInfo')->nullable();
+            $table->string('name');
+            $table->string('sku')->nullable();
+            $table->decimal('sale_price', 10, 2)->nullable();
+            $table->decimal('purchase_price', 10, 2)->nullable();
+            $table->unsignedBigInteger('tax_id')->nullable();
+            $table->unsignedBigInteger('category_id')->nullable();
+            $table->unsignedBigInteger('unit_id')->nullable();
+            $table->string('type')->nullable();
+            $table->integer('quantity')->nullable();
+            $table->text('description')->nullable();
+            $table->string('pro_image')->nullable();
+            $table->unsignedBigInteger('sale_chartaccount_id')->nullable();
+            $table->unsignedBigInteger('expense_chartaccount_id')->nullable();
             $table->unsignedBigInteger('created_by');
-            $table->string('productImage')->nullable();
-
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('taxTypeCode')->references('cd')->on('details');
-            $table->foreign('itemClassifiCode')->references('itemClsCd')->on('productServices_classifications');
+            $table->string('tin')->nullable();
+            $table->string('itemCd')->nullable();
+            $table->string('itemClsCd')->nullable();
+            $table->string('itemTyCd')->nullable();
+            $table->string('itemNm')->nullable();
+            $table->string('itemStdNm')->nullable();
+            $table->string('orgnNatCd')->nullable();
+            $table->string('pkgUnitCd')->nullable();
+            $table->string('qtyUnitCd')->nullable();
+            $table->string('taxTyCd')->nullable();
+            $table->string('btchNo')->nullable();
+            $table->string('regBhfId')->nullable();
+            $table->string('bcd')->nullable();
+            $table->decimal('dftPrc', 10, 2)->nullable();
+            $table->decimal('grpPrcL1', 10, 2)->nullable();
+            $table->decimal('grpPrcL2', 10, 2)->nullable();
+            $table->decimal('grpPrcL3', 10, 2)->nullable();
+            $table->decimal('grpPrcL4', 10, 2)->nullable();
+            $table->decimal('grpPrcL5', 10, 2)->nullable();
+            $table->text('addInfo')->nullable();
+            $table->integer('sftyQty')->nullable();
+            $table->string('isrcAplcbYn')->nullable();
+            $table->string('rraModYn')->nullable();
+            $table->boolean('useYn')->default(false)->nullable();
+            $table->boolean('isUsed')->default(false)->nullable();
+            $table->integer('pkgQuantity')->default(false)->nullable();
             $table->timestamps();
+
+            // Foreign keys
+            $table->foreign('tax_id')->references('id')->on('taxes')->onDelete('set null');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
+            $table->foreign('unit_id')->references('id')->on('units')->onDelete('set null');
+            $table->foreign('sale_chartaccount_id')->references('id')->on('chart_accounts')->onDelete('set null');
+            $table->foreign('expense_chartaccount_id')->references('id')->on('chart_accounts')->onDelete('set null');
         });
     }
 

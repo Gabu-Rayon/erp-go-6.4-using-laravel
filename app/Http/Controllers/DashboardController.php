@@ -25,7 +25,7 @@ use App\Models\Payment;
 use App\Models\Plan;
 use App\Models\Pos;
 use App\Models\ProductServiceCategory;
-use App\Models\ProductServicesPackagingUnit;
+use App\Models\ProductServiceUnit;
 use App\Models\Project;
 use App\Models\ProjectTask;
 use App\Models\Purchase;
@@ -135,7 +135,7 @@ class DashboardController extends Controller
 
                     $constant['taxes'] = Tax::where('created_by', \Auth::user()->creatorId())->count();
                     $constant['category'] = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->count();
-                    $constant['units'] = ProductServicesPackagingUnit::where('created_by', \Auth::user()->creatorId())->count();
+                    $constant['units'] = ProductServiceUnit::where('created_by', \Auth::user()->creatorId())->count();
                     $constant['bankAccount'] = BankAccount::where('created_by', \Auth::user()->creatorId())->count();
                     $data['constant'] = $constant;
                     $data['bankAccountDetail'] = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get();
