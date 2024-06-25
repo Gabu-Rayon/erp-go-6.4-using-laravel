@@ -27,6 +27,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\ProductsServicesClassification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Models\QuantityUnitCode;
+use App\Models\ProductServicesPackagingUnit;
 
 class ProductServiceController extends Controller
 {
@@ -91,6 +93,8 @@ class ProductServiceController extends Controller
             $expenseSubAccounts->where('chart_of_accounts.parent', '!=', 0);
             $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
             $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
+            $quantityUnitCodes = QuantityUnitCode::all()->pluck('name', 'code');
+            $packagingUnitCodes = ProductServicesPackagingUnit::all()->pluck('name', 'code');
             return view('productservice.create', compact(
                 'itemclassifications',
                 'itemtypes',
@@ -100,6 +104,8 @@ class ProductServiceController extends Controller
                 'incomeSubAccounts',
                 'expenseChartAccounts',
                 'expenseSubAccounts',
+                'quantityUnitCodes',
+                'packagingUnitCodes',
             ));
         } catch (Exception $e) {
             Log::error('CREATE PRODUCT / SERVICE ERROR');

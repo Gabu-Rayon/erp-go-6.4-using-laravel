@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
 use File;
 use App\Models\Plan;
 use App\Models\User;
@@ -16,21 +15,26 @@ use App\Imports\VenderImport;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Crypt;
-
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class VenderController extends Controller
 {
 
     public function dashboard()
     {
-        $data['billChartData'] = \Auth::user()->billChartData();
+        try {
+            $data['billChartData'] = Auth::user()->billChartData();
 
-        return view('vender.dashboard', $data);
+            return view('vender.dashboard', $data);
+        } catch (\Exception $e) {
+            Log::error('VENDER DASHBOARD ERROR');
+            Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function index()
@@ -95,62 +99,66 @@ class VenderController extends Controller
 
                 return redirect()->route('vender.index')->with('error', $messages->first());
             }
-                $objVendor    = \Auth::user();
-                $creator      = User::find($objVendor->creatorId());
-                $total_vendor = $objVendor->countVenders();
-                $plan         = Plan::find($creator->plan);
-                $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->first();
-                if($total_vendor < $plan->max_venders || $plan->max_venders == -1)
-                {
-                    $vender                   = new Vender();
-                    $vender->vender_id        = $this->venderNumber();
-                    $vender->name             = $request->name;
-                    $vender->contact          = $request->contact;
-                    $vender->email            = $request->email;
-                    $vender->tax_number      =$request->tax_number;
-                    $vender->created_by       = \Auth::user()->creatorId();
-                    $vender->billing_name     = $request->billing_name;
-                    $vender->billing_country  = $request->billing_country;
-                    $vender->billing_state    = $request->billing_state;
-                    $vender->billing_city     = $request->billing_city;
-                    $vender->billing_phone    = $request->billing_phone;
-                    $vender->billing_zip      = $request->billing_zip;
-                    $vender->billing_address  = $request->billing_address;
-                    $vender->shipping_name    = $request->shipping_name;
-                    $vender->shipping_country = $request->shipping_country;
-                    $vender->shipping_state   = $request->shipping_state;
-                    $vender->shipping_city    = $request->shipping_city;
-                    $vender->shipping_phone   = $request->shipping_phone;
-                    $vender->shipping_zip     = $request->shipping_zip;
-                    $vender->shipping_address = $request->shipping_address;
-                    $vender->lang             = !empty($default_language) ? $default_language->value : '';
-                    $vender->save();
-                    CustomField::saveData($vender, $request->customField);
-                }
-                else
-                {
-                    return redirect()->back()->with('error', __('Your user limit is over, Please upgrade plan.'));
-                }
-                $role_r = Role::where('name', '=', 'vender')->firstOrFail();
-                $vender->assignRole($role_r); //Assigning role to user
-                $vender->type     = 'Vender';
+
+                $data = $request->all();
+                Log::info('VENDER DATA');
+                Log::info($data);
+            //     $objVendor    = \Auth::user();
+            //     $creator      = User::find($objVendor->creatorId());
+            //     $total_vendor = $objVendor->countVenders();
+            //     $plan         = Plan::find($creator->plan);
+            //     $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->first();
+            //     if($total_vendor < $plan->max_venders || $plan->max_venders == -1)
+            //     {
+            //         $vender                   = new Vender();
+            //         $vender->vender_id        = $this->venderNumber();
+            //         $vender->name             = $request->name;
+            //         $vender->contact          = $request->contact;
+            //         $vender->email            = $request->email;
+            //         $vender->tax_number      =$request->tax_number;
+            //         $vender->created_by       = \Auth::user()->creatorId();
+            //         $vender->billing_name     = $request->billing_name;
+            //         $vender->billing_country  = $request->billing_country;
+            //         $vender->billing_state    = $request->billing_state;
+            //         $vender->billing_city     = $request->billing_city;
+            //         $vender->billing_phone    = $request->billing_phone;
+            //         $vender->billing_zip      = $request->billing_zip;
+            //         $vender->billing_address  = $request->billing_address;
+            //         $vender->shipping_name    = $request->shipping_name;
+            //         $vender->shipping_country = $request->shipping_country;
+            //         $vender->shipping_state   = $request->shipping_state;
+            //         $vender->shipping_city    = $request->shipping_city;
+            //         $vender->shipping_phone   = $request->shipping_phone;
+            //         $vender->shipping_zip     = $request->shipping_zip;
+            //         $vender->shipping_address = $request->shipping_address;
+            //         $vender->lang             = !empty($default_language) ? $default_language->value : '';
+            //         $vender->save();
+            //         CustomField::saveData($vender, $request->customField);
+            //     }
+            //     else
+            //     {
+            //         return redirect()->back()->with('error', __('Your user limit is over, Please upgrade plan.'));
+            //     }
+            //     $role_r = Role::where('name', '=', 'vender')->firstOrFail();
+            //     $vender->assignRole($role_r); //Assigning role to user
+            //     $vender->type     = 'Vender';
 
 
-            //For Notification
-            $setting  = Utility::settings(\Auth::user()->creatorId());
-            $vendorNotificationArr = [
-                'user_name' => \Auth::user()->name,
-                'vendor_name' => $vender->name,
-                'vendor_email' => $vender->email,
-            ];
+            // //For Notification
+            // $setting  = Utility::settings(\Auth::user()->creatorId());
+            // $vendorNotificationArr = [
+            //     'user_name' => \Auth::user()->name,
+            //     'vendor_name' => $vender->name,
+            //     'vendor_email' => $vender->email,
+            // ];
 
-            //Twilio Notification
-            if(isset($setting['twilio_vender_notification']) && $setting['twilio_vender_notification'] ==1)
-            {
-                Utility::send_twilio_msg($request->contact,'new_vendor', $vendorNotificationArr);
-            }
+            // //Twilio Notification
+            // if(isset($setting['twilio_vender_notification']) && $setting['twilio_vender_notification'] ==1)
+            // {
+            //     Utility::send_twilio_msg($request->contact,'new_vendor', $vendorNotificationArr);
+            // }
 
-            return redirect()->route('vender.index')->with('success', __('Vendor successfully created.'));
+            // return redirect()->route('vender.index')->with('success', __('Vendor successfully created.'));
         }
         else
         {

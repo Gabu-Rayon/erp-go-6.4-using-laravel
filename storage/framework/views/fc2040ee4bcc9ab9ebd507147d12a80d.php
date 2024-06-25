@@ -152,7 +152,7 @@
                                             <?php echo e(Form::label('qtyUnitCode', __('Quantity Unit Code'), ['class' => 'form-label'])); ?>
 
                                             <span class="text-danger">*</span>
-                                            <?php echo e(Form::text('qtyUnitCode', '', ['class' => 'form-control', 'required' => 'required'])); ?>
+                                            <?php echo e(Form::select('qtyUnitCode', $quantityUnitCodes, null, ['class' => 'form-control', 'placeholder' => __('Select Quantity Unit Code'), 'required' => 'required'])); ?>
 
                                         </div>
                                     </td>
@@ -161,7 +161,7 @@
                                             <?php echo e(Form::label('pkgUnitCode', __('Package Unit Code'), ['class' => 'form-label'])); ?>
 
                                             <span class="text-danger">*</span>
-                                            <?php echo e(Form::text('pkgUnitCode', '', ['class' => 'form-control', 'required' => 'required'])); ?>
+                                            <?php echo e(Form::select('qtyUnitCode', $packagingUnitCodes, null, ['class' => 'form-control', 'placeholder' => __('Select Package Unit Code'), 'required' => 'required'])); ?>
 
                                         </div>
                                     </td>

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('credit_note_reasons', function (Blueprint $table) {
             $table->id();
+            $table->string('code');
             $table->string('reason');
             $table->timestamps();
         });

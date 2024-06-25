@@ -138,14 +138,14 @@
                                         <div class="form-group">
                                             {{ Form::label('qtyUnitCode', __('Quantity Unit Code'), ['class' => 'form-label']) }}
                                             <span class="text-danger">*</span>
-                                            {{ Form::text('qtyUnitCode', '', ['class' => 'form-control', 'required' => 'required']) }}
+                                            {{ Form::select('qtyUnitCode', $quantityUnitCodes, null, ['class' => 'form-control', 'placeholder' => __('Select Quantity Unit Code'), 'required' => 'required']) }}
                                         </div>
                                     </td>
                                     <td class="form-group col-md-3">
                                         <div class="form-group">
                                             {{ Form::label('pkgUnitCode', __('Package Unit Code'), ['class' => 'form-label']) }}
                                             <span class="text-danger">*</span>
-                                            {{ Form::text('pkgUnitCode', '', ['class' => 'form-control', 'required' => 'required']) }}
+                                            {{ Form::select('qtyUnitCode', $packagingUnitCodes, null, ['class' => 'form-control', 'placeholder' => __('Select Package Unit Code'), 'required' => 'required']) }}
                                         </div>
                                     </td>
                                     <td class="form-group col-md-3">

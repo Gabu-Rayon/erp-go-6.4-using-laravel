@@ -3,14 +3,13 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class Purchase extends Model
 {
     
-     protected $table = 'purchases';
+    protected $table = 'purchases';
     protected $fillable = [
         'purchase_id',
         'vender_id',
