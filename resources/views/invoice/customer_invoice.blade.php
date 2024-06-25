@@ -209,16 +209,11 @@
                                             </small>
                                         </div>
                                     @endif
-                                    <div class="col">
-                                        <div class="float-end mt-3">
-                                            {!! DNS2D::getBarcodeHTML(
-                                                route('invoice.link.copy', \Illuminate\Support\Facades\Crypt::encrypt($invoice->id)),
-                                                'QRCODE',
-                                                2,
-                                                2,
-                                            ) !!}
-                                        </div>
+                                     <div class="col">
+                                    <div class="float-end mt-3">
+                                        {!! DNS2D::getBarcodeHTML($invoice->qrCodeURL, 'QRCODE', 2, 2) !!}
                                     </div>
+                                </div>
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col">

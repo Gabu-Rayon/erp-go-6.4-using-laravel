@@ -23,6 +23,7 @@ class Invoice extends Model
         'orgInvoiceNo',
         'customerTin',
         'customerName',
+        'saleType',
         'receptTypeCode',
         'paymentTypeCode',
         'salesSttsCode',

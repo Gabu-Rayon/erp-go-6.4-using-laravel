@@ -198,7 +198,8 @@ require __DIR__ . '/auth.php';
 
 
 ///copy link
-Route::get('/customer/invoice/{id}/', [InvoiceController::class, 'invoiceLink'])->name('invoice.link.copy');
+Route::get('/customer/invoice/{invoice_id}/', [InvoiceController::class, 'invoiceLink'])->name('invoice.link.copy');
+
 Route::get('/vender/bill/{id}/', [BillController::class, 'invoiceLink'])->name('bill.link.copy');
 Route::get('/vendor/purchase/{id}/', [PurchaseController::class, 'purchaseLink'])->name('purchase.link.copy');
 Route::get('/customer/proposal/{id}/', [ProposalController::class, 'invoiceLink'])->name('proposal.link.copy');
@@ -296,6 +297,7 @@ Route::get('timesheet-table-view', [TimesheetController::class, 'filterTimesheet
 
 // Invoice Payment Gateways
 Route::post('customer/{id}/payment', [StripePaymentController::class, 'addpayment'])->name('customer.payment');
+
 Route::get('invoice/pdf/{id}', [InvoiceController::class, 'invoice'])->name('invoice.pdf')->middleware(['XSS', 'revalidate']);
 
 Route::get('users/{id}/login-with-company', [UserController::class, 'LoginWithCompany'])->name('login.with.company')->middleware(['auth']);

@@ -74,7 +74,11 @@
                     <div class="row">
                         <div class="form-group col-md-12">
                             {{ Form::label('mainItemCode', __('Main Item Code (*)'), ['class' => 'form-label']) }}
-                            {{ Form::select('mainItemCode', $mainItemCode, null, ['class' => 'form-control']) }}
+                            @if($mainItemCode->isNotEmpty())
+                                {{ Form::select('mainItemCode', $mainItemCode, null, ['class' => 'form-control select2']) }}
+                            @else
+                                <p>{{ __('You have  Finish Products or Service s') }}</p>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -88,8 +92,7 @@
                     <div class="row justify-content-between align-items-center">
                         <div class="col-md-12 d-flex align-items-center justify-content-between justify-content-md-end">
                             <div class="all-button-box me-2">
-                                <a href="#" data-repeater-create="" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-target="#add-bank">
+                                <a href="#" data-repeater-create="" class="btn btn-primary" data-bs-toggle="modal" data-target="#add-bank">
                                     <i class="ti ti-plus"></i> {{ __('Add item') }}
                                 </a>
                             </div>
@@ -100,18 +103,27 @@
                     <div class="table-responsive">
                         <table class="table mb-0" data-repeater-list="items" id="sortable-table">
                             <thead>
+                                <tr>
+                                    <th>{{ __('Composition Item Code') }}</th>
+                                    <th>{{ __('Quantity') }}</th>
+                                    <th>{{ __('Action') }}</th>
+                                </tr>
                             </thead>
                             <tbody class="ui-sortable" data-repeater-item data-clone>
                                 <tr>
                                     <td class="form-group col-md-4">
                                         {{ Form::label('compoItemCode', __('Composition Item Code'), ['class' => 'form-label']) }}
-                                        {{ Form::select('compoItemCode', $mainItemCode, null, ['class' => 'form-control']) }}
+                                        @if($compoItemCode->isNotEmpty())
+                                            {{ Form::select('compoItemCode', $compoItemCode, null, ['class' => 'form-control select2']) }}
+                                        @else
+                                            <p>{{ __('You have No Raw Material Products !') }}</p>
+                                        @endif
                                     </td>
                                     <td class="form-group col-md-4">
                                         {{ Form::label('quantity', __('Quantity'),['class'=>'form-label']) }}
-                                        {{ Form::number('compoItemQty', '', array('class' => 'form-control', 'required' => 'required')) }}
+                                        {{ Form::number('compoItemQty', '', ['class' => 'form-control', 'required' => 'required']) }}
                                     </td>
-                                    <td class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
+                                    <td class="ti ti-trash text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -121,10 +133,10 @@
         </div>
 
         <div class="modal-footer">
-            <input type="button" value="{{ __('Cancel') }}" onclick="location.href = '{{ route('compositionlist.index') }}';"
-                class="btn btn-light">
+            <input type="button" value="{{ __('Cancel') }}" onclick="location.href = '{{ route('compositionlist.index') }}';" class="btn btn-light">
             <input type="submit" value="{{ __('Create') }}" class="btn  btn-primary">
         </div>
         {{ Form::close() }}
     </div>
 @endsection
+

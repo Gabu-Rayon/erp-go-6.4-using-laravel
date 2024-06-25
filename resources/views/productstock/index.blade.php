@@ -23,16 +23,16 @@
                                 <th>{{ __('Name') }}</th>
                                 <th>{{ __('Code') }}</th>
                                 <th>{{ __('Quantity') }}</th>
-                                <th>{{ __('Package Quantity') }}</th>
+                                <th>{{ __('Package Unit Code') }}</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach ($productServices as $productService)
                                 <tr class="font-style">
-                                    <td>{{ $productService->itemName }}</td>
-                                    <td>{{ $productService->itemCode }}</td>
+                                    <td>{{ $productService->itemNm }}</td>
+                                    <td>{{ $productService->itemCd }}</td>
                                     <td>{{ $productService->quantity }}</td>
-                                    <td>{{ $productService->packageQuantity }}</td>
+                                    <td>{{ $productService->pkgUnitCd }}</td>
                                 </tr>
                             @endforeach
                             </tbody>
