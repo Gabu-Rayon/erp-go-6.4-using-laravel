@@ -358,7 +358,7 @@ class ProductServiceController extends Controller
                 'taxTyCd' => 'required',
                 'dftPrc' => 'required',
                 'isrcAplcbYn' => 'required',
-                'useYn' => 'required',
+                'isUsed' => 'required',
             ]);
 
             $data = $request->all();
@@ -385,7 +385,7 @@ class ProductServiceController extends Controller
                 "additionalInfo" => $data['addInfo'],
                 "saftyQuantity" => $data['saftyQuantity'],
                 "isInrcApplicable" => (boolean) $data['isrcAplcbYn'],
-                "isUsed" => (boolean) $data['useYn'],
+                "isUsed" => (boolean) $data['isUsed'],
                 "packageQuantity" => $data['packageQuantity'],
             ];
 
@@ -587,7 +587,6 @@ class ProductServiceController extends Controller
                     'itemtypes',
                     'countrynames',
                     'taxationtype',
-
                     'category',
                     'unit',
                     'tax',
