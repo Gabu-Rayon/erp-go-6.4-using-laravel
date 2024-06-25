@@ -10,19 +10,6 @@ use Illuminate\Support\Facades\DB;
 class ProductService extends Model
 {
     protected $fillable = [
-        'name',
-        'sku',
-        'sale_price',
-        'purchase_price',
-        'tax_id',
-        'category_id',
-        'unit_id',
-        'type',
-        'quantity',
-        'description',
-        'pro_image',
-        'sale_chartaccount_id',
-        'expense_chartaccount_id',
         'itemCode',
         'itemClassifiCode',
         'itemTypeCode',
@@ -58,7 +45,7 @@ class ProductService extends Model
 
     public function unit()
     {
-        return $this->hasOne('App\Models\ProductServiceUnit', 'id', 'unit_id');
+        return $this->hasOne('App\Models\QuantityUnitCode', 'code', 'qtyUnitCode');
     }
 
     public function category()

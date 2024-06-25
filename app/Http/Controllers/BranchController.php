@@ -70,7 +70,25 @@ class BranchController extends Controller
                 return redirect()->back()->with('error', $e->getMessage());
             }
     }
-    public function show(Branch $branch)
+
+    /**
+     * Synchronize Branches from API
+     */
+
+    public function sync() {
+        try {
+
+            $url = 'https://etims.your-apps.biz/api/GetBranchList';
+        } catch (\Exception $e) {
+            \Log::info('Sync Branches Error');
+            \Log::info($e);
+            return redirect()->back()->with('error', 'An Error Occurred');
+        }
+    }
+
+
+
+    public function show(BranchesList $branch)
     {
         return redirect()->route('branch.index');
     }

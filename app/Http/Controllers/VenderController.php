@@ -3,23 +3,23 @@
 namespace App\Http\Controllers;
 
 use File;
-use App\Models\Plan;
-use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use App\Models\Vender;
-use App\Models\Utility;
+use App\Models\User;
+use App\Models\Plan;
+use Spatie\Permission\Models\Role;
 use App\Models\CustomField;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Exports\VenderExport;
 use App\Imports\VenderImport;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class VenderController extends Controller
 {
@@ -45,7 +45,8 @@ class VenderController extends Controller
         )
         {
             $venders = Vender::where('created_by', \Auth::user()->creatorId())->get();
-
+            Log::info('VENDERS');
+            Log::info($venders);
             return view('vender.index', compact('venders'));
         }
         else
@@ -72,100 +73,97 @@ class VenderController extends Controller
         }
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
 
-    public function store(Request $request)
-    {
-        if(
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
-        )
-        {
+    public function store (Request $request) {
+        try {
             $rules = [
-                'name' => 'required',
+                'spplrNm' => 'required',
                 'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
                 'email' => [
                     'required',
                     Rule::unique('venders')->where(function ($query) {
-                        return $query->where('created_by', \Auth::user()->id);
+                        return $query->where('created_by', Auth::user()->id);
                     })
                 ],
             ];
-
-            $validator = \Validator::make($request->all(), $rules);
-
-            if($validator->fails())
-            {
+            
+            $validator = Validator::make($request->all(), $rules);
+            
+            if($validator->fails()){
                 $messages = $validator->getMessageBag();
-
                 return redirect()->route('vender.index')->with('error', $messages->first());
             }
+            
+            $data = $request->all();
 
-                $data = $request->all();
-                Log::info('VENDER DATA');
-                Log::info($data);
-            //     $objVendor    = \Auth::user();
-            //     $creator      = User::find($objVendor->creatorId());
-            //     $total_vendor = $objVendor->countVenders();
-            //     $plan         = Plan::find($creator->plan);
-            //     $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->first();
-            //     if($total_vendor < $plan->max_venders || $plan->max_venders == -1)
-            //     {
-            //         $vender                   = new Vender();
-            //         $vender->vender_id        = $this->venderNumber();
-            //         $vender->name             = $request->name;
-            //         $vender->contact          = $request->contact;
-            //         $vender->email            = $request->email;
-            //         $vender->tax_number      =$request->tax_number;
-            //         $vender->created_by       = \Auth::user()->creatorId();
-            //         $vender->billing_name     = $request->billing_name;
-            //         $vender->billing_country  = $request->billing_country;
-            //         $vender->billing_state    = $request->billing_state;
-            //         $vender->billing_city     = $request->billing_city;
-            //         $vender->billing_phone    = $request->billing_phone;
-            //         $vender->billing_zip      = $request->billing_zip;
-            //         $vender->billing_address  = $request->billing_address;
-            //         $vender->shipping_name    = $request->shipping_name;
-            //         $vender->shipping_country = $request->shipping_country;
-            //         $vender->shipping_state   = $request->shipping_state;
-            //         $vender->shipping_city    = $request->shipping_city;
-            //         $vender->shipping_phone   = $request->shipping_phone;
-            //         $vender->shipping_zip     = $request->shipping_zip;
-            //         $vender->shipping_address = $request->shipping_address;
-            //         $vender->lang             = !empty($default_language) ? $default_language->value : '';
-            //         $vender->save();
-            //         CustomField::saveData($vender, $request->customField);
-            //     }
-            //     else
-            //     {
-            //         return redirect()->back()->with('error', __('Your user limit is over, Please upgrade plan.'));
-            //     }
-            //     $role_r = Role::where('name', '=', 'vender')->firstOrFail();
-            //     $vender->assignRole($role_r); //Assigning role to user
-            //     $vender->type     = 'Vender';
+            DB::beginTransaction();
+            
+            $objVendor = Auth::user();
+            $creator = User::find($objVendor->creatorId());
+            $total_vendor = $objVendor->countVenders();
+            $plan = Plan::find($creator->plan);
+            $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->first();
+            if($total_vendor < $plan->max_venders || $plan->max_venders == -1) {
+                // store the vender image
+                $filename = null;
+                if($request->hasFile('avatar')) {
+                    $avatar = $request->file('avatar');
+                    $filename = time() . '.' . $avatar->getClientOriginalExtension();
+                    $avatar->move(public_path('uploads/vendor_avatar/'), $filename);
+                }
+
+                $vender = Vender::create([
+                    'spplrNm' => $data['spplrNm'],
+                    'spplrTin' => $data['spplrTin'],
+                    'spplrBhfId' => $data['spplrBhfId'],
+                    'spplrSdcId' => $data['spplrSdcId'],
+                    'spplrMrcNo' => $data['spplrMrcNo'],
+                    'email' => $data['email'],
+                    'contact' => $data['contact'],
+                    'avatar' => $filename ?? null,
+                    'is_active' => true,
+                    'created_by' => Auth::user()->creatorId(),
+                    'billing_name' => $data['billing_name'] ?? null,
+                    'billing_country' => $data['billing_country'] ?? null,
+                    'billing_state' => $data['billing_state'] ?? null,
+                    'billing_city' => $data['billing_city'] ?? null,
+                    'billing_phone' => $data['billing_phone'] ?? null,
+                    'billing_zip' => $data['billing_zip'] ?? null,
+                    'billing_address' => $data['billing_address'] ?? null,
+                    'shipping_name' => $data['shipping_name'] ?? null,
+                    'shipping_country' => $data['shipping_country'] ?? null,
+                    'shipping_state' => $data['shipping_state'] ?? null,
+                    'shipping_city' => $data['shipping_city'] ?? null,
+                    'shipping_phone' => $data['shipping_phone'] ?? null,
+                    'shipping_zip' => $data['shipping_zip'] ?? null,
+                    'shipping_address' => $data['shipping_address'] ?? null,
+                ]);
+            } else {
+                return redirect()->back()->with('error', __('Your user limit is over, Please upgrade plan.'));
+            }
+
+            CustomField::saveData($vender, $request->customField);
+
+            $role_r = Role::where('name', '=', 'vender')->firstOrFail();
+            $vender->assignRole($role_r);
+
+            $vender->type = 'Vender';
+
+            DB::commit();
+
+            return redirect()->route('vender.index')->with('success', __('Vendor successfully created.'));
 
 
-            // //For Notification
-            // $setting  = Utility::settings(\Auth::user()->creatorId());
-            // $vendorNotificationArr = [
-            //     'user_name' => \Auth::user()->name,
-            //     'vendor_name' => $vender->name,
-            //     'vendor_email' => $vender->email,
-            // ];
-
-            // //Twilio Notification
-            // if(isset($setting['twilio_vender_notification']) && $setting['twilio_vender_notification'] ==1)
-            // {
-            //     Utility::send_twilio_msg($request->contact,'new_vendor', $vendorNotificationArr);
-            // }
-
-            // return redirect()->route('vender.index')->with('success', __('Vendor successfully created.'));
-        }
-        else
-        {
-            return redirect()->back()->with('error', __('Permission denied.'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('VENDER STORE ERROR');
+            Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
-
 
     public function show($ids)
     {

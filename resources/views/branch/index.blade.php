@@ -16,6 +16,11 @@
                 class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
+            <a href="#" data-url="{{ route('branch.sync') }}" data-ajax-popup="true"
+                data-title="{{ __('Synchronize') }}" data-bs-toggle="tooltip" title="{{ __('Synchronize') }}"
+                class="btn btn-sm btn-primary">
+                Synchronize
+            </a>
         @endcan
     </div>
 @endsection

@@ -463,7 +463,7 @@ Route::group(['middleware' => ['verified']], function () {
         ],
         function () {
             Route::get('vender/{id}/show', [VenderController::class, 'show'])->name('vender.show');
-            Route::resource('vender', VenderController::class);
+            Route::resource('vender', VenderController::class)->middleware(['can:manage vender']);
         }
     );
     //  getSuppliersDetailsFromApi
@@ -903,6 +903,7 @@ Route::group(['middleware' => ['verified']], function () {
     Route::resource('designation', DesignationController::class)->middleware(['auth', 'XSS']);
     Route::resource('document', DocumentController::class)->middleware(['auth', 'XSS']);
     Route::resource('branch', BranchController::class)->middleware(['auth', 'XSS']);
+    Route::get('branch/sync', [BranchController::class, 'sync'])->name('branch.sync')->middleware(['auth', 'XSS']);
     Route::resource('branchuser', BranchUserController::class);
 
     // Hrm EmployeeController
