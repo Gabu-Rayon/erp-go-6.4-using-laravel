@@ -289,39 +289,47 @@
                                         </div>
                                     </td>
                                     <td class="form-group col-md-3">
-                                        <?php echo e(Form::label('sale_chartaccount_id', __('Income Account'), ['class' => 'form-label'])); ?>
+                                        <div class="form-group">
+                                            <?php echo e(Form::label('sale_chartaccount_id', __('Income Account'), ['class' => 'form-label'])); ?>
 
-                                        <select name="sale_chartaccount_id" class="form-control" required="required">
-                                            <?php $__currentLoopData = $incomeChartAccounts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $chartAccount): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                <option value="<?php echo e($key); ?>" class="subAccount"><?php echo e($chartAccount); ?>
+                                            <span class="text-danger">*</span>
+                                            <?php echo e(Form::select('sale_chartaccount_id', 
+                                                $incomeChartAccounts->mapWithKeys(function ($chartAccount, $key) use ($incomeSubAccounts) {
+                                                    $options = [$key => $chartAccount];
+                                                    foreach ($incomeSubAccounts as $subAccount) {
+                                                        if ($key == $subAccount['account']) {
+                                                            $options[$subAccount['id']] = '    ' . $subAccount['code_name'];
+                                                        }
+                                                    }
+                                                    return $options;
+                                                })->toArray(),
+                                                null,
+                                                ['class' => 'form-control select2', 'required' => 'required']
+                                            )); ?>
 
-                                                </option>
-                                                <?php $__currentLoopData = $incomeSubAccounts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subAccount): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <?php if($key == $subAccount['account']): ?>
-                                                        <option value="<?php echo e($subAccount['id']); ?>" class="ms-5"> &nbsp;
-                                                            &nbsp;&nbsp; <?php echo e($subAccount['code_name']); ?></option>
-                                                    <?php endif; ?>
-                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                        </select>
-                                    </td>
+                                        </div>
+                                    </td>                                    
                                     <td class="form-group col-md-3">
-                                        <?php echo e(Form::label('expense_chartaccount_id', __('Expense Account'), ['class' => 'form-label'])); ?>
+                                        <div class="form-group">
+                                            <?php echo e(Form::label('expense_chartaccount_id', __('Expense Account'), ['class' => 'form-label'])); ?>
 
-                                        <select name="expense_chartaccount_id" class="form-control" required="required">
-                                            <?php $__currentLoopData = $expenseChartAccounts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $chartAccount): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                <option value="<?php echo e($key); ?>" class="subAccount"><?php echo e($chartAccount); ?>
+                                            <span class="text-danger">*</span>
+                                            <?php echo e(Form::select('expense_chartaccount_id', 
+                                                $expenseChartAccounts->mapWithKeys(function ($chartAccount, $key) use ($expenseSubAccounts) {
+                                                    $options = [$key => $chartAccount];
+                                                    foreach ($expenseSubAccounts as $subAccount) {
+                                                        if ($key == $subAccount['account']) {
+                                                            $options[$subAccount['id']] = '    ' . $subAccount['code_name'];
+                                                        }
+                                                    }
+                                                    return $options;
+                                                })->toArray(),
+                                                null,
+                                                ['class' => 'form-control select2', 'required' => 'required']
+                                            )); ?>
 
-                                                </option>
-                                                <?php $__currentLoopData = $expenseSubAccounts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subAccount): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <?php if($key == $subAccount['account']): ?>
-                                                        <option value="<?php echo e($subAccount['id']); ?>" class="ms-5"> &nbsp;
-                                                            &nbsp;&nbsp; <?php echo e($subAccount['code_name']); ?></option>
-                                                    <?php endif; ?>
-                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                        </select>
-                                    </td>
+                                        </div>
+                                    </td>                                    
                                     <td class="form-group col-md-12">
                                         <div class="form-group">
                                             <?php echo e(Form::label('productImage', __('Product Image'), ['class' => 'form-label'])); ?>

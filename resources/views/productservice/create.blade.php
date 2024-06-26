@@ -242,35 +242,43 @@
                                         </div>
                                     </td>
                                     <td class="form-group col-md-3">
-                                        {{ Form::label('sale_chartaccount_id', __('Income Account'), ['class' => 'form-label']) }}
-                                        <select name="sale_chartaccount_id" class="form-control" required="required">
-                                            @foreach ($incomeChartAccounts as $key => $chartAccount)
-                                                <option value="{{ $key }}" class="subAccount">{{ $chartAccount }}
-                                                </option>
-                                                @foreach ($incomeSubAccounts as $subAccount)
-                                                    @if ($key == $subAccount['account'])
-                                                        <option value="{{ $subAccount['id'] }}" class="ms-5"> &nbsp;
-                                                            &nbsp;&nbsp; {{ $subAccount['code_name'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            @endforeach
-                                        </select>
-                                    </td>
+                                        <div class="form-group">
+                                            {{ Form::label('sale_chartaccount_id', __('Income Account'), ['class' => 'form-label']) }}
+                                            <span class="text-danger">*</span>
+                                            {{ Form::select('sale_chartaccount_id', 
+                                                $incomeChartAccounts->mapWithKeys(function ($chartAccount, $key) use ($incomeSubAccounts) {
+                                                    $options = [$key => $chartAccount];
+                                                    foreach ($incomeSubAccounts as $subAccount) {
+                                                        if ($key == $subAccount['account']) {
+                                                            $options[$subAccount['id']] = '    ' . $subAccount['code_name'];
+                                                        }
+                                                    }
+                                                    return $options;
+                                                })->toArray(),
+                                                null,
+                                                ['class' => 'form-control select2', 'required' => 'required']
+                                            ) }}
+                                        </div>
+                                    </td>                                    
                                     <td class="form-group col-md-3">
-                                        {{ Form::label('expense_chartaccount_id', __('Expense Account'), ['class' => 'form-label']) }}
-                                        <select name="expense_chartaccount_id" class="form-control" required="required">
-                                            @foreach ($expenseChartAccounts as $key => $chartAccount)
-                                                <option value="{{ $key }}" class="subAccount">{{ $chartAccount }}
-                                                </option>
-                                                @foreach ($expenseSubAccounts as $subAccount)
-                                                    @if ($key == $subAccount['account'])
-                                                        <option value="{{ $subAccount['id'] }}" class="ms-5"> &nbsp;
-                                                            &nbsp;&nbsp; {{ $subAccount['code_name'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            @endforeach
-                                        </select>
-                                    </td>
+                                        <div class="form-group">
+                                            {{ Form::label('expense_chartaccount_id', __('Expense Account'), ['class' => 'form-label']) }}
+                                            <span class="text-danger">*</span>
+                                            {{ Form::select('expense_chartaccount_id', 
+                                                $expenseChartAccounts->mapWithKeys(function ($chartAccount, $key) use ($expenseSubAccounts) {
+                                                    $options = [$key => $chartAccount];
+                                                    foreach ($expenseSubAccounts as $subAccount) {
+                                                        if ($key == $subAccount['account']) {
+                                                            $options[$subAccount['id']] = '    ' . $subAccount['code_name'];
+                                                        }
+                                                    }
+                                                    return $options;
+                                                })->toArray(),
+                                                null,
+                                                ['class' => 'form-control select2', 'required' => 'required']
+                                            ) }}
+                                        </div>
+                                    </td>                                    
                                     <td class="form-group col-md-12">
                                         <div class="form-group">
                                             {{ Form::label('productImage', __('Product Image'), ['class' => 'form-label']) }}

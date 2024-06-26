@@ -308,6 +308,8 @@ Route::post('/form_view_store', [FormBuilderController::class, 'formViewStore'])
 
 Route::get('/', [DashboardController::class, 'landingpage'])->middleware(['XSS', 'revalidate']);
 
+Route::get('branches/sync', [BranchController::class, 'sync'])->middleware(['auth', 'XSS'])->name('branches.sync');
+
 //================================= Invoice Payment Gateways  ====================================//
 Route::group(['middleware' => ['verified']], function () {
 
@@ -903,7 +905,6 @@ Route::group(['middleware' => ['verified']], function () {
     Route::resource('designation', DesignationController::class)->middleware(['auth', 'XSS']);
     Route::resource('document', DocumentController::class)->middleware(['auth', 'XSS']);
     Route::resource('branch', BranchController::class)->middleware(['auth', 'XSS']);
-    Route::get('branch/sync', [BranchController::class, 'sync'])->name('branch.sync')->middleware(['auth', 'XSS']);
     Route::resource('branchuser', BranchUserController::class);
 
     // Hrm EmployeeController

@@ -71,7 +71,7 @@ $profile = asset(Storage::url('uploads/avatar/'));
                                                 </a>
                                             <?php endif; ?>
                                         </td>
-                                        <td><?php echo e($Vender['name']); ?></td>
+                                        <td><?php echo e($Vender['spplrNm']); ?></td>
                                         <td><?php echo e($Vender['contact']); ?></td>
                                         <td><?php echo e($Vender['email']); ?></td>
                                         <td><?php echo e(\Auth::user()->priceFormat($Vender['balance'])); ?></td>
@@ -85,7 +85,7 @@ $profile = asset(Storage::url('uploads/avatar/'));
                                                                 <a href="<?php echo e(route('vender.show', \Crypt::encrypt($Vender['id']))); ?>"
                                                                     class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip"
                                                                     title="<?php echo e(__('View')); ?>">
-                                                                    <i class="ti ti-eye text-white text-white"></i>
+                                                                    <i class="ti ti-eye text-white"></i>
                                                                 </a>
                                                             </div>
                                                         <?php endif; ?>
@@ -108,7 +108,7 @@ $profile = asset(Storage::url('uploads/avatar/'));
                                                                            data-original-title="<?php echo e(__('Delete')); ?>" title="<?php echo e(__('Delete')); ?>"
                                                                            data-confirm="<?php echo e(__('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?')); ?>"
                                                                            data-confirm-yes="document.getElementById('delete-form-<?php echo e($Vender['id']); ?>').submit();">
-                                                                        <i class="ti ti-trash text-white text-white"></i>
+                                                                        <i class="ti ti-trash text-white"></i>
                                                                     </a>
                                                                 <?php echo Form::close(); ?>
 

@@ -9,6 +9,7 @@ use App\Models\BranchesList;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class BranchController extends Controller
 {
@@ -78,10 +79,43 @@ class BranchController extends Controller
     public function sync() {
         try {
 
-            $url = 'https://etims.your-apps.biz/api/GetBranchList';
+            $date = date('YmdHis');
+            $url = 'https://etims.your-apps.biz/api/GetBranchList?date=20210101120000';
+
+            $response = Http::withOptions([
+                'verify' => false,
+            ])->withHeaders([
+                'key' => '123456',
+            ])->get($url);
+
+            $branches = $response['data']['data']['bhfList'];
+
+            Log::info('BRANCHES');
+            Log::info($branches);
+
+            foreach ($branches as $branch) {
+                BranchesList::updateOrCreate([
+                    'bhfId' => $branch['bhfId'],
+                ], [
+                    'bhfNm' => $branch['bhfNm'],
+                    'tin' => $branch['tin'],
+                    'bhfSttsCd' => $branch['bhfSttsCd'],
+                    'prvncNm' => $branch['prvncNm'],
+                    'dstrtNm' => $branch['dstrtNm'],
+                    'sctrNm' => $branch['sctrNm'],
+                    'locDesc' => $branch['locDesc'],
+                    'mgrNm' => $branch['mgrNm'],
+                    'mgrTelNo' => $branch['mgrTelNo'],
+                    'mgrEmail' => $branch['mgrEmail'],
+                    'hqYn' => $branch['hqYn'],
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Branches Synced Successfully');
+
         } catch (\Exception $e) {
-            \Log::info('Sync Branches Error');
-            \Log::info($e);
+            Log::info('Sync Branches Error');
+            Log::info($e);
             return redirect()->back()->with('error', 'An Error Occurred');
         }
     }

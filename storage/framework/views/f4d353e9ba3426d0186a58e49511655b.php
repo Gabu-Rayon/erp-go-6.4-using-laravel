@@ -7,7 +7,6 @@
                 <div class="form-group">
                     <?php echo e(Form::label('spplrNm',__('Name'),array('class'=>'form-label'))); ?>
 
-                    <span class="text-danger">*</span>
                     <?php echo e(Form::text('spplrNm',null,array('class'=>'form-control','required'=>'required'))); ?>
 
                 </div>
@@ -16,25 +15,22 @@
                 <div class="form-group">
                     <?php echo e(Form::label('spplrTin',__('Tax Number'),['class'=>'form-label'])); ?>
 
-                    <span class="text-danger">*</span>
-                    <?php echo e(Form::text('spplrTin',null,array('class'=>'form-control', 'required'=>'required'))); ?>
+                    <?php echo e(Form::text('spplrTin',null,array('class'=>'form-control'))); ?>
 
                 </div>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-6">
                 <div class="form-group">
-                    <?php echo e(Form::label('spplrBhfId',__('Branch'),['class'=>'form-label'])); ?>
+                    <?php echo e(Form::label('spplrBhfId', __('Branch'), ['class' => 'form-label'])); ?>
 
-                    <span class="text-danger">*</span>
-                    <?php echo e(Form::text('spplrBhfId',null,array('class'=>'form-control', 'required'=>'required'))); ?>
+                    <?php echo e(Form::select('spplrBhfId', $branches, null, ['class' => 'form-control select2', 'placeholder' => __('Select Branch')])); ?>
 
-                </div>
+                </div>                
             </div>
             <div class="col-lg-4 col-md-4 col-sm-6">
                 <div class="form-group">
                     <?php echo e(Form::label('spplrSdcId',__('SDC ID'),['class'=>'form-label'])); ?>
 
-                    <span class="text-danger">*</span>
                     <?php echo e(Form::text('spplrSdcId',null,array('class'=>'form-control','required'=>'required'))); ?>
 
                 </div>
@@ -43,7 +39,6 @@
                 <div class="form-group">
                     <?php echo e(Form::label('spplrMrcNo',__('MRC Number'),['class'=>'form-label'])); ?>
 
-                    <span class="text-danger">*</span>
                     <?php echo e(Form::text('spplrMrcNo',null,array('class'=>'form-control','required'=>'required'))); ?>
 
                 </div>
@@ -52,7 +47,6 @@
                 <div class="form-group">
                     <?php echo e(Form::label('email',__('Email'),['class'=>'form-label'])); ?>
 
-                    <span class="text-danger">*</span>
                     <?php echo e(Form::text('email',null,array('class'=>'form-control','required'=>'required'))); ?>
 
                 </div>
@@ -61,7 +55,6 @@
                 <div class="form-group">
                     <?php echo e(Form::label('contact',__('Contact'),['class'=>'form-label'])); ?>
 
-                    <span class="text-danger">*</span>
                     <?php echo e(Form::number('contact',null,array('class'=>'form-control','required'=>'required'))); ?>
 
                 </div>
@@ -70,10 +63,11 @@
                 <div class="form-group">
                     <?php echo e(Form::label('avatar', __('Avatar'), ['class' => 'form-label'])); ?>
 
-                    <?php echo e(Form::file('avatar', ['class' => 'form-control'])); ?>
+                    <span class="text-danger">*</span>
+                    <?php echo e(Form::file('avatar', ['class' => 'form-control', 'required' => 'required'])); ?>
 
                 </div>
-            </div>            
+            </div>
             <?php if(!$customFields->isEmpty()): ?>
                 <div class="col-lg-4 col-md-4 col-sm-6">
                     <div class="tab-pane fade show" id="tab-2" role="tabpanel">

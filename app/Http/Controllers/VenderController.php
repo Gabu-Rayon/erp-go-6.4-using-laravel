@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Models\BranchesList;
 
 class VenderController extends Controller
 {
@@ -64,8 +65,9 @@ class VenderController extends Controller
         )
         {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'vendor')->get();
+            $branches = BranchesList::all()->pluck('bhfNm', 'bhfId');
 
-            return view('vender.create', compact('customFields'));
+            return view('vender.create', compact('customFields', 'branches'));
         }
         else
         {

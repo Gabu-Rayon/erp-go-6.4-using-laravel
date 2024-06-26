@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class ProductService extends Model
 {
+    protected $table = 'product_services';
     protected $fillable = [
         'itemCode',
         'itemClassifiCode',

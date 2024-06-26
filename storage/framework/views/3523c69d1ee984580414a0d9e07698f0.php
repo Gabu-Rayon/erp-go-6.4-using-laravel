@@ -17,9 +17,7 @@
                 class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-            <a href="#" data-url="<?php echo e(route('branch.sync')); ?>" data-ajax-popup="true"
-                data-title="<?php echo e(__('Synchronize')); ?>" data-bs-toggle="tooltip" title="<?php echo e(__('Synchronize')); ?>"
-                class="btn btn-sm btn-primary">
+            <a href="<?php echo e(route('branches.sync')); ?>" class="btn btn-sm btn-primary">
                 Synchronize
             </a>
         <?php endif; ?>
@@ -75,7 +73,7 @@
                                                                 data-original-title="<?php echo e(__('Delete')); ?>"
                                                                 data-confirm="<?php echo e(__('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?')); ?>"
                                                                 data-confirm-yes="document.getElementById('delete-form-<?php echo e($branch['bhfId']); ?>').submit();"><i
-                                                                    class="ti ti-trash text-white text-white"></i></a>
+                                                                    class="ti ti-trash text-white"></i></a>
                                                             <?php echo Form::close(); ?>
 
                                                         </div>
