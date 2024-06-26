@@ -4,7 +4,7 @@
         <div class="col-12">
             <div class="form-group">
                 {{Form::label('branch_id',__('Branch'),['class'=>'form-label'])}}
-                {{Form::select('branch_id',$branch,null,array('class'=>'form-control select','placeholder'=>__('Select Branch')))}}
+                {{Form::select('branch_id',$branch,null,array('class'=>'form-control select2','placeholder'=>__('Select Branch')))}}
             </div>
         </div>
         <div class="col-12">

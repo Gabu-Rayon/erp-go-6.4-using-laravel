@@ -262,63 +262,23 @@ class PurchaseController extends Controller
         }
     }
 
-    public function synchronize(Request $request)
-    {
-        // Log the request from the form
-        \Log::info('Synchronization request received from Searching the Purchase Search By Date Form:', $request->all());
-
-        // Validate the date input
-        $request->validate([
-            'getpurchaseByDate' => 'required|date_format:Y-m-d',
-        ], [
-            'getpurchaseByDate.required' => __('Date is required for synchronization Search for Purchase SearchByDate.'),
-            'getpurchaseByDate.date_format' => __('Invalid date format.'),
-        ]);
-
-        // Get and format the date
-        $date = $request->input('getpurchaseByDate');
-        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
-        \Log::info('Date formatted from synchronization request:', ['formattedDate' => $formattedDate]);
-
+    public function synchronize(Request $request){
         try {
-            // Make the API call
+            $request->validate([
+                'getpurchaseByDate' => 'required|date_format:Y-m-d',
+            ], [
+                'getpurchaseByDate.required' => __('Date is required for synchronization Search for Purchase SearchByDate.'),
+                'getpurchaseByDate.date_format' => __('Invalid date format.'),
+            ]);
+    
+            $date = $request->input('getpurchaseByDate');
+            $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
             $response = Http::withOptions(['verify' => false])
                 ->withHeaders(['key' => '123456'])
                 ->get("https://etims.your-apps.biz/api/GetPurchaseList?date={$formattedDate}");
 
-            $data = $response->json();
-            if (!isset($data['data'])) {
-                return redirect()->back()->with('error', __('There is no search result.'));
-            }
-
-            $remotePurchaseSearchByDateinfo = $data['data'];
-            \Log::info('Remote Purchase info:', $remotePurchaseSearchByDateinfo);
-
-            // Prepare data for synchronization
-            $remotePurchaseSearchByDateinfoToSync = [];
-            $remotePurchaseItemListsToSync = [];
-            foreach ($remotePurchaseSearchByDateinfo as $remoteItem) {
-                $item = $this->preparePurchaseData($remoteItem);
-                $remotePurchaseSearchByDateinfoToSync[] = $item;
-
-                if (isset($remoteItem['PurchaseItemList']) && is_array($remoteItem['PurchaseItemList'])) {
-                    foreach ($remoteItem['PurchaseItemList'] as $itemList) {
-                        $remotePurchaseItemListsToSync[] = $this->preparePurchaseItemListData($itemList, $remoteItem['spplrInvcNo']);
-                    }
-                }
-            }
-
-            \Log::info('Remote purchase search by date info to sync:', $remotePurchaseSearchByDateinfoToSync);
-            \Log::info('Remote purchase item lists to sync:', $remotePurchaseItemListsToSync);
-
-            // Synchronize the purchases
-            $syncedCount = $this->synchronizePurchases($remotePurchaseSearchByDateinfoToSync, $remotePurchaseItemListsToSync);
-
-            if ($syncedCount > 0) {
-                return redirect()->back()->with('success', __('Synced ' . $syncedCount . ' Purchases successfully.'));
-            } else {
-                return redirect()->back()->with('success', __('Purchases up to date.'));
-            }
+            Log::info('API RESPONSE');
+            Log::info($response);
         } catch (\Exception $e) {
             \Log::error('Error syncing purchases:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', __('Error syncing purchases.'));

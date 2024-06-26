@@ -13,13 +13,10 @@ class RoleController extends Controller
 
     public function index()
     {
-        if(
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'super admin'
-        )
+        if(\Auth::user()->type == 'super admin')
         {
 
-            $roles = Role::where('created_by', '=', \Auth::user()->creatorId())->where('created_by', '=', \Auth::user()->creatorId())->get();
+            $roles = Role::all();
 
             return view('role.index')->with('roles', $roles);
         }
