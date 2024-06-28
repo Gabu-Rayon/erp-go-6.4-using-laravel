@@ -81,7 +81,7 @@ class InvoiceController extends Controller
             $invoice_number = \Auth::user()->invoiceNumberFormat($this->invoiceNumber());
             $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customers->prepend('Select Customer', '');
-            $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'income')->get()->pluck('name', 'id');
+            $category = ProductServiceCategory::all();
             $category->prepend('Select Category', '');
             $product_services = ProductService::all()->pluck('itemNm', 'itemCd');
             $product_services->prepend('--', '');
@@ -89,6 +89,9 @@ class InvoiceController extends Controller
             $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'code');
             $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusCode', 'code');
             $taxationtype = Details::where('cdCls', '04')->pluck('userDfnCd1', 'cd');
+
+            Log::info('CUSTOMERS');
+            Log::info($category);
 
             return view(
                 'invoice.create',

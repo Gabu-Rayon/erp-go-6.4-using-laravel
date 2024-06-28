@@ -493,7 +493,7 @@ class PurchaseController extends Controller
         } catch (\Exception $e) {
             Log::error('STORE PURCHASE ERROR');
             Log::error($e);
-            return redirect()->back()->with('error', __('Error creating purchase.'));
+            return redirect()->back()->with('error', __('Something went wrong'));
         }
     }
 
