@@ -63,28 +63,24 @@ $profile=\App\Models\Utility::get_file('uploads/avatar/');
                             <?php $__currentLoopData = $customers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $k=>$customer): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr class="cust_tr" id="cust_detail" data-url="<?php echo e(route('customer.show',$customer['id'])); ?>" data-id="<?php echo e($customer['id']); ?>">
                                     <td class="Id">
-                                            <a href="<?php echo e(route('customer.show',\Crypt::encrypt($customer['id']))); ?>" class="btn btn-outline-primary">
-                                                <?php echo e(AUth::user()->customerNumberFormat($customer['customer_id'])); ?>
+                                        <a href="<?php echo e(route('customer.show',\Crypt::encrypt($customer['id']))); ?>" class="btn btn-outline-primary">
+                                            <?php echo e(AUth::user()->customerNumberFormat($customer['customerNo'])); ?>
 
-                                            </a>
-                                            <a href="#" class="btn btn-outline-primary">
-                                                <?php echo e(AUth::user()->customerNumberFormat($customer['customer_id'])); ?>
-
-                                            </a>
+                                        </a>
                                     </td>
-                                    <td class="font-style"><?php echo e($customer['name']); ?></td>
-                                    <td><?php echo e($customer['contact']); ?></td>
-                                    <td><?php echo e($customer['email']); ?></td>
+                                    <td class="font-style"><?php echo e($customer['customerName']); ?></td>
+                                    <td><?php echo e($customer['telNo'] ?? '-'); ?></td>
+                                    <td><?php echo e($customer['email'] ?? '-'); ?></td>
                                     <td><?php echo e(\Auth::user()->priceFormat($customer['balance'])); ?></td>
                                     <td class="Action">
                                         <span>
-                                        <?php if($customer['is_active']==0): ?>
+                                        <?php if($customer['isUsed']==0): ?>
                                                 <i class="ti ti-lock" title="Inactive"></i>
                                             <?php else: ?>
                                                 <div class="action-btn bg-info ms-2">
                                                     <a href="<?php echo e(route('customer.show',\Crypt::encrypt($customer['id']))); ?>" class="mx-3 btn btn-sm align-items-center"
                                                        data-bs-toggle="tooltip" title="<?php echo e(__('View')); ?>">
-                                                        <i class="ti ti-eye text-white text-white"></i>
+                                                        <i class="ti ti-eye text-white"></i>
                                                     </a>
                                                 </div>
                                                         <div class="action-btn bg-primary ms-2">
@@ -95,7 +91,7 @@ $profile=\App\Models\Utility::get_file('uploads/avatar/');
                                                     <div class="action-btn bg-danger ms-2">
                                                         <?php echo Form::open(['method' => 'DELETE', 'route' => ['customer.destroy', $customer['id']],'id'=>'delete-form-'.$customer['id']]); ?>
 
-                                                        <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="<?php echo e(__('Delete')); ?>" ><i class="ti ti-trash text-white text-white"></i></a>
+                                                        <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="<?php echo e(__('Delete')); ?>" ><i class="ti ti-trash text-white"></i></a>
                                                         <?php echo Form::close(); ?>
 
                                                     </div>

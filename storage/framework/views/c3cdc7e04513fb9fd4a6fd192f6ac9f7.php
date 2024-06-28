@@ -6,17 +6,28 @@
     <div class="row">
         <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
-                <?php echo e(Form::label('customer_tin',__('Customer Tin'),array('class'=>'form-label'))); ?>
+                <?php echo e(Form::label('customerNo',__('Customer Number'),['class'=>'form-label'])); ?>
 
-                <?php echo e(Form::text('customertin',null,array('class'=>'form-control','required'=>'required'))); ?>
+                <span class="text-danger">*</span>
+                <?php echo e(Form::text('customerNo',null,array('class'=>'form-control', 'required'=>'required'))); ?>
 
             </div>
         </div>
         <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
-                <?php echo e(Form::label('name',__('Name'),['class'=>'form-label'])); ?>
+                <?php echo e(Form::label('customerTin',__('Tin'),array('class'=>'form-label'))); ?>
 
-                <?php echo e(Form::text('name',null,array('class'=>'form-control','required'=>'required'))); ?>
+                <span class="text-danger">*</span>
+                <?php echo e(Form::text('customerTin',null,array('class'=>'form-control','required'=>'required'))); ?>
+
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-6">
+            <div class="form-group">
+                <?php echo e(Form::label('customerName',__('Name'),['class'=>'form-label'])); ?>
+
+                <span class="text-danger">*</span>
+                <?php echo e(Form::text('customerName',null,array('class'=>'form-control','required'=>'required'))); ?>
 
             </div>
         </div>
@@ -24,15 +35,15 @@
             <div class="form-group">
                 <?php echo e(Form::label('address',__('Address'),array('class'=>'form-label'))); ?>
 
-                <?php echo e(Form::text('address',null,array('class'=>'form-control','required'=>'required'))); ?>
+                <?php echo e(Form::text('address',null,array('class'=>'form-control'))); ?>
 
             </div>
         </div>
         <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
-                <?php echo e(Form::label('telno',__('Tel No'),['class'=>'form-label'])); ?>
+                <?php echo e(Form::label('telNo',__('Tel No'),['class'=>'form-label'])); ?>
 
-                <?php echo e(Form::number('telno',null,array('class'=>'form-control','required'=>'required'))); ?>
+                <?php echo e(Form::text('telNo',null,array('class'=>'form-control'))); ?>
 
             </div>
         </div>
@@ -40,39 +51,31 @@
             <div class="form-group">
                 <?php echo e(Form::label('email',__('Email'),array('class'=>'form-label'))); ?>
 
-                <?php echo e(Form::text('email',null,array('class'=>'form-control','required'=>'required'))); ?>
+                <?php echo e(Form::text('email',null,array('class'=>'form-control'))); ?>
 
             </div>
         </div>
         <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
-                <?php echo e(Form::label('fax_no',__('Fax No'),['class'=>'form-label'])); ?>
+                <?php echo e(Form::label('faxNo',__('Fax No'),['class'=>'form-label'])); ?>
 
-                <?php echo e(Form::number('faxno',null,array('class'=>'form-control','required'=>'required'))); ?>
+                <?php echo e(Form::text('faxNo',null,array('class'=>'form-control'))); ?>
 
             </div>
         </div>
-         <div class="col-lg-4 col-md-4 col-sm-6">
+        <div class="col-lg-4 col-md-4 col-sm-6">
+            <div class="form-group">
+                <?php echo e(Form::label('isUsed',__('Is Used'),['class'=>'form-label'])); ?>
+
+                <?php echo e(Form::select('isUsed', [true => 'Yes', false => 'No'], null, ['class' => 'form-control select2'])); ?>
+
+            </div>
+        </div>
+         <div class="col-lg-12 col-md-12 col-sm-12">
             <div class="form-group">
                 <?php echo e(Form::label('remark',__('Remark'),array('class'=>'form-label'))); ?>
 
-                <?php echo e(Form::text('remark',null,array('class'=>'form-control','required'=>'required'))); ?>
-
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-4 col-sm-6">
-            <div class="form-group">
-                <?php echo e(Form::label('contact',__('Contact'),array('class'=>'form-label'))); ?>
-
-                <?php echo e(Form::number('contact',null,array('class'=>'form-control','required'=>'required'))); ?>
-
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-4 col-sm-6">
-            <div class="form-group">
-                <?php echo e(Form::label('tax_number',__('Tax Number'),['class'=>'form-label'])); ?>
-
-                <?php echo e(Form::text('tax_number',null,array('class'=>'form-control'))); ?>
+                <?php echo e(Form::textarea('remark',null,array('class'=>'form-control','rows'=>3))); ?>
 
             </div>
         </div>

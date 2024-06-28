@@ -79,11 +79,11 @@ class InvoiceController extends Controller
         ) {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
             $invoice_number = \Auth::user()->invoiceNumberFormat($this->invoiceNumber());
-            $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('customerName', 'customerTin');
             $customers->prepend('Select Customer', '');
             $category = ProductServiceCategory::all();
             $category->prepend('Select Category', '');
-            $product_services = ProductService::all()->pluck('itemNm', 'itemCd');
+            $product_services = ProductService::all()->pluck('itemName', 'itemCode');
             $product_services->prepend('--', '');
             $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'code');
             $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'code');

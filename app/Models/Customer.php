@@ -16,21 +16,16 @@ class Customer extends Authenticatable
     protected $guard_name = 'web';
 
     protected $fillable = [
-        'customer_id',
         'customerNo',
         'customerTin',
-        'name',
-        'email',
+        'customerName',
         'address',
-        'tax_number',
-        'contact',
+        'telNo',
+        'email',
         'faxNo',
         'isUsed',
         'remark',
-        'avatar',
         'created_by',
-        'is_active',
-        'email_verified_at',
         'billing_name',
         'billing_country',
         'billing_state',
@@ -47,7 +42,6 @@ class Customer extends Authenticatable
         'shipping_address',
         'lang',
         'balance',
-        'remember_token',
     ];
 
 
@@ -142,16 +136,16 @@ class Customer extends Authenticatable
 
         $data['currentYear'] = date('M-Y');
 
-        $totalInvoice = Invoice::where('customer_id', \Auth::user()->id)->count();
+        $totalInvoice = Invoice::where('customerNo', \Auth::user()->id)->count();
         $unpaidArr    = array();
 
 
         for($i = 1; $i <= 12; $i++)
         {
-            $unpaidInvoice  = Invoice:: where('customer_id', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->whereRaw('month(`send_date`) = ?', $i)->where('status', '1')->where('due_date', '>', date('Y-m-d'))->get();
-            $paidInvoice    = Invoice:: where('customer_id', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->whereRaw('month(`send_date`) = ?', $i)->where('status', '4')->get();
-            $partialInvoice = Invoice:: where('customer_id', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->whereRaw('month(`send_date`) = ?', $i)->where('status', '3')->get();
-            $dueInvoice     = Invoice:: where('customer_id', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->whereRaw('month(`send_date`) = ?', $i)->where('status', '1')->where('due_date', '<', date('Y-m-d'))->get();
+            $unpaidInvoice  = Invoice:: where('customerNo', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->whereRaw('month(`send_date`) = ?', $i)->where('status', '1')->where('due_date', '>', date('Y-m-d'))->get();
+            $paidInvoice    = Invoice:: where('customerNo', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->whereRaw('month(`send_date`) = ?', $i)->where('status', '4')->get();
+            $partialInvoice = Invoice:: where('customerNo', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->whereRaw('month(`send_date`) = ?', $i)->where('status', '3')->get();
+            $dueInvoice     = Invoice:: where('customerNo', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->whereRaw('month(`send_date`) = ?', $i)->where('status', '1')->where('due_date', '<', date('Y-m-d'))->get();
 
 
             $totalUnpaid = 0;
@@ -200,12 +194,12 @@ class Customer extends Authenticatable
         $data['data'] = $statusData;
 
 
-        $unpaidInvoice  = Invoice:: where('customer_id', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->where('status', '1')->where('due_date', '>', date('Y-m-d'))->get();
-        $paidInvoice    = Invoice:: where('customer_id', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->where('status', '4')->get();
-        $partialInvoice = Invoice:: where('customer_id', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->where('status', '3')->get();
-        $dueInvoice     = Invoice:: where('customer_id', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->where('status', '1')->where('due_date', '<', date('Y-m-d'))->get();
+        $unpaidInvoice  = Invoice:: where('customerNo', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->where('status', '1')->where('due_date', '>', date('Y-m-d'))->get();
+        $paidInvoice    = Invoice:: where('customerNo', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->where('status', '4')->get();
+        $partialInvoice = Invoice:: where('customerNo', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->where('status', '3')->get();
+        $dueInvoice     = Invoice:: where('customerNo', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->where('status', '1')->where('due_date', '<', date('Y-m-d'))->get();
 
-        $progressData['totalInvoice']        = $totalInvoice = Invoice:: where('customer_id', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->count();
+        $progressData['totalInvoice']        = $totalInvoice = Invoice:: where('customerNo', \Auth::user()->id)->whereRaw('year(`send_date`) = ?', array(date('Y')))->count();
         $progressData['totalUnpaidInvoice']  = $totalUnpaidInvoice = count($unpaidInvoice);
         $progressData['totalPaidInvoice']    = $totalPaidInvoice = count($paidInvoice);
         $progressData['totalPartialInvoice'] = $totalPartialInvoice = count($partialInvoice);
@@ -230,21 +224,21 @@ class Customer extends Authenticatable
 
     public function customerInvoice($customerId)
     {
-        $invoices  = Invoice:: where('customer_id', $customerId)->orderBy('issue_date', 'desc')->get();
+        $invoices  = Invoice:: where('customerNo', $customerId)->orderBy('issue_date', 'desc')->get();
 
         return $invoices;
     }
 
     public function customerProposal($customerId)
     {
-        $proposals = Proposal:: where('customer_id', $customerId)->orderBy('issue_date', 'desc')->get();
+        $proposals = Proposal:: where('customerNo', $customerId)->orderBy('issue_date', 'desc')->get();
 
         return $proposals;
     }
 
     public function customerOverdue($customerId)
     {
-        $dueInvoices = Invoice:: where('customer_id', $customerId)->whereNotIn(
+        $dueInvoices = Invoice:: where('customerNo', $customerId)->whereNotIn(
             'status', [
                         '0',
                         '4',
@@ -261,7 +255,7 @@ class Customer extends Authenticatable
 
     public function invoices()
     {
-        return $this->hasMany(Invoice::class, 'customer_id');
+        return $this->hasMany(Invoice::class, 'customerNo');
     }
 
     public function customerTotalInvoiceSum($customerId)
@@ -274,7 +268,7 @@ class Customer extends Authenticatable
 
     // public function customerTotalInvoiceSum($customerId)
     // {
-    //     $invoices = Invoice:: where('customer_id', $customerId)->get();
+    //     $invoices = Invoice:: where('customerNo', $customerId)->get();
     //     $total    = 0;
     //     foreach($invoices as $invoice)
     //     {
@@ -285,7 +279,7 @@ class Customer extends Authenticatable
     // }
     public function customerTotalInvoice($customerId)
     {
-        $invoices = Invoice:: where('customer_id', $customerId)->count();
+        $invoices = Invoice:: where('customerNo', $customerId)->count();
 
         return $invoices;
     }

@@ -5,56 +5,59 @@
     <div class="row">
         <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
-                {{Form::label('customer_tin',__('Customer Tin'),array('class'=>'form-label')) }}
-                {{Form::text('customertin',null,array('class'=>'form-control','required'=>'required'))}}
+                {{Form::label('customerNo',__('Customer Number'),['class'=>'form-label'])}}
+                <span class="text-danger">*</span>
+                {{Form::text('customerNo',null,array('class'=>'form-control', 'required'=>'required'))}}
             </div>
         </div>
         <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
-                {{Form::label('name',__('Name'),['class'=>'form-label'])}}
-                {{Form::text('name',null,array('class'=>'form-control','required'=>'required'))}}
+                {{Form::label('customerTin',__('Tin'),array('class'=>'form-label')) }}
+                <span class="text-danger">*</span>
+                {{Form::text('customerTin',null,array('class'=>'form-control','required'=>'required'))}}
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-6">
+            <div class="form-group">
+                {{Form::label('customerName',__('Name'),['class'=>'form-label'])}}
+                <span class="text-danger">*</span>
+                {{Form::text('customerName',null,array('class'=>'form-control','required'=>'required'))}}
             </div>
         </div>
          <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
                 {{Form::label('address',__('Address'),array('class'=>'form-label')) }}
-                {{Form::text('address',null,array('class'=>'form-control','required'=>'required'))}}
+                {{Form::text('address',null,array('class'=>'form-control'))}}
             </div>
         </div>
         <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
-                {{Form::label('telno',__('Tel No'),['class'=>'form-label'])}}
-                {{Form::number('telno',null,array('class'=>'form-control','required'=>'required'))}}
+                {{Form::label('telNo',__('Tel No'),['class'=>'form-label'])}}
+                {{Form::text('telNo',null,array('class'=>'form-control'))}}
             </div>
         </div>
          <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
                 {{Form::label('email',__('Email'),array('class'=>'form-label')) }}
-                {{Form::text('email',null,array('class'=>'form-control','required'=>'required'))}}
+                {{Form::text('email',null,array('class'=>'form-control'))}}
             </div>
         </div>
         <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
-                {{Form::label('fax_no',__('Fax No'),['class'=>'form-label'])}}
-                {{Form::number('faxno',null,array('class'=>'form-control','required'=>'required'))}}
+                {{Form::label('faxNo',__('Fax No'),['class'=>'form-label'])}}
+                {{Form::text('faxNo',null,array('class'=>'form-control'))}}
             </div>
         </div>
-         <div class="col-lg-4 col-md-4 col-sm-6">
+        <div class="col-lg-4 col-md-4 col-sm-6">
+            <div class="form-group">
+                {{Form::label('isUsed',__('Is Used'),['class'=>'form-label'])}}
+                {{Form::select('isUsed', [true => 'Yes', false => 'No'], null, ['class' => 'form-control select2'])}}
+            </div>
+        </div>
+         <div class="col-lg-12 col-md-12 col-sm-12">
             <div class="form-group">
                 {{Form::label('remark',__('Remark'),array('class'=>'form-label')) }}
-                {{Form::text('remark',null,array('class'=>'form-control','required'=>'required'))}}
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-4 col-sm-6">
-            <div class="form-group">
-                {{Form::label('contact',__('Contact'),array('class'=>'form-label')) }}
-                {{Form::number('contact',null,array('class'=>'form-control','required'=>'required'))}}
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-4 col-sm-6">
-            <div class="form-group">
-                {{Form::label('tax_number',__('Tax Number'),['class'=>'form-label'])}}
-                {{Form::text('tax_number',null,array('class'=>'form-control'))}}
+                {{Form::textarea('remark',null,array('class'=>'form-control','rows'=>3))}}
             </div>
         </div>
         @if(!$customFields->isEmpty())

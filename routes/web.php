@@ -449,8 +449,10 @@ Route::group(['middleware' => ['verified']], function () {
             ],
         ],
         function () {
-            Route::get('customer/{id}/show', [CustomerController::class, 'show'])->name('customer.show');
-            Route::resource('customer', CustomerController::class);
+            Route::get('customer/{id}/show', [CustomerController::class, 'show'])
+                ->name('customer.show')
+                ->middleware(['can:manage customer']);
+            Route::resource('customer', CustomerController::class)->middleware(['can:manage customer']);
         }
     );
 
