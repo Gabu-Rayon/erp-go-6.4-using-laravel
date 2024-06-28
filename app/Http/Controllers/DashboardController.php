@@ -65,8 +65,8 @@ class DashboardController extends Controller
         $adminSettings = Utility::settings();
         if ($adminSettings['display_landing_page'] == 'on' && \Schema::hasTable('landing_page_settings')) {
 
-            return view('landingpage::layouts.landingpage' , compact('adminSettings'));
-            
+            return view('landingpage::layouts.landingpage', compact('adminSettings'));
+
         } else {
             return redirect('login');
         }
@@ -87,7 +87,7 @@ class DashboardController extends Controller
             } elseif (Auth::user()->type == 'client') {
                 return redirect()->route('client.dashboard.view');
             } else {
-                if(
+                if (
                     \Auth::user()->type == 'company'
                     || \Auth::user()->type == 'accountant'
                 ) {
@@ -149,11 +149,11 @@ class DashboardController extends Controller
                     $data['weeklyInvoice'] = \Auth::user()->weeklyInvoice();
                     $data['monthlyInvoice'] = \Auth::user()->monthlyInvoice();
                     $data['recentBill'] = Bill::join('venders', 'bills.vender_id', '=', 'venders.id')
-                    ->where('bills.created_by', '=', \Auth::user()->creatorId())
-                    ->orderBy('bills.id', 'desc')
-                    ->limit(5)
-                    ->select('bills.*', 'venders.name as vender_name')
-                    ->get();
+                        ->where('bills.created_by', '=', \Auth::user()->creatorId())
+                        ->orderBy('bills.id', 'desc')
+                        ->limit(5)
+                        ->select('bills.*', 'venders.name as vender_name')
+                        ->get();
 
                     $data['weeklyBill'] = \Auth::user()->weeklyBill();
                     $data['monthlyBill'] = \Auth::user()->monthlyBill();
@@ -175,11 +175,11 @@ class DashboardController extends Controller
 
             }
         } else {
-                return redirect('login');
+            return redirect('login');
 
-            }
         }
-    
+    }
+
 
     public function project_dashboard_index()
     {
@@ -190,7 +190,7 @@ class DashboardController extends Controller
                 return view('admin.dashboard');
             } else {
                 $home_data = [];
-//                dd($user->projects());
+                //                dd($user->projects());
 
                 $user_projects = $user->projects()->pluck('project_id')->toArray();
 
@@ -251,7 +251,7 @@ class DashboardController extends Controller
                 foreach (Project::$project_status as $k => $v) {
 
                     $project_status[$k]['total'] = $user->projects->where('status', 'LIKE', $k)->count();
-//                    dd($project_status[$k]['total']    );
+                    //                    dd($project_status[$k]['total']    );
                     $project_status[$k]['percentage'] = Utility::getPercentage($project_status[$k]['total'], $total_project);
                 }
                 $home_data['project_status'] = $project_status;
@@ -277,7 +277,7 @@ class DashboardController extends Controller
 
         if (Auth::check()) {
 
-            if (\Auth::user()->type == 'company'){
+            if (\Auth::user()->type == 'company') {
 
                 $user = Auth::user();
 
@@ -311,7 +311,7 @@ class DashboardController extends Controller
 
                     $date = date("Y-m-d");
                     $time = date("H:i:s");
-                    $employeeAttendance = AttendanceEmployee::orderBy('id', 'desc')->where('employee_id', '=', !empty(\Auth::user()->employee)?\Auth::user()->employee->id : 0)->where('date', '=', $date)->first();
+                    $employeeAttendance = AttendanceEmployee::orderBy('id', 'desc')->where('employee_id', '=', !empty(\Auth::user()->employee) ? \Auth::user()->employee->id : 0)->where('date', '=', $date)->first();
 
                     $officeTime['startTime'] = Utility::getValByName('company_start_time');
                     $officeTime['endTime'] = Utility::getValByName('company_end_time');
@@ -671,7 +671,8 @@ class DashboardController extends Controller
             'project_id' => 'required|integer',
         ];
         $validator = Validator::make(
-            $request->all(), $validatorArray
+            $request->all(),
+            $validatorArray
         );
         if ($validator->fails()) {
             return Utility::error_res($validator->errors()->first());
