@@ -143,7 +143,7 @@ class DashboardController extends Controller
                         ->where('invoices.created_by', '=', \Auth::user()->creatorId())
                         ->orderBy('invoices.id', 'desc')
                         ->limit(5)
-                        ->select('invoices.*', 'customers.name as customer_name')
+                        ->select('invoices.*', 'customers.customerName as customer_name')
                         ->get();
 
                     $data['weeklyInvoice'] = \Auth::user()->weeklyInvoice();

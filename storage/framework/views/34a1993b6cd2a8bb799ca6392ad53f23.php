@@ -1,33 +1,37 @@
-@extends('layouts.admin')
-@section('page-title')
-    {{__('Manage Lead')}}
-@endsection
 
-@section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
-    <li class="breadcrumb-item">{{__('Lead Report')}}</li>
-@endsection
-@section('action-btn')
+<?php $__env->startSection('page-title'); ?>
+    <?php echo e(__('Manage Lead')); ?>
+
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('breadcrumb'); ?>
+    <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
+    <li class="breadcrumb-item"><?php echo e(__('Lead Report')); ?></li>
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
-        <a href="#" class="btn btn-sm btn-primary" onclick="saveAsPDF()"data-bs-toggle="tooltip" title="{{__('Download')}}" data-original-title="{{__('Download')}}">
+        <a href="#" class="btn btn-sm btn-primary" onclick="saveAsPDF()"data-bs-toggle="tooltip" title="<?php echo e(__('Download')); ?>" data-original-title="<?php echo e(__('Download')); ?>">
             <span class="btn-inner--icon"><i class="ti ti-download"></i></span>
         </a>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="row" id="printableArea">
         <div class="col-sm-12">
-            <input type="hidden" value="{{__('Lead Report')}}" id="filename">
+            <input type="hidden" value="<?php echo e(__('Lead Report')); ?>" id="filename">
             <div class="row">
                 <div class="col-xl-3">
                     <div class="card sticky-top" style="top:30px">
                         <div class="list-group list-group-flush" id="useradd-sidenav">
-                            <a href="#general-report" class="list-group-item list-group-item-action border-0">{{ __('General Report') }}
+                            <a href="#general-report" class="list-group-item list-group-item-action border-0"><?php echo e(__('General Report')); ?>
+
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
-                            <a href="#staff-report" class="list-group-item list-group-item-action border-0">{{ __('Staff Report') }}
+                            <a href="#staff-report" class="list-group-item list-group-item-action border-0"><?php echo e(__('Staff Report')); ?>
+
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
-                            <a href="#pipeline-report" class="list-group-item list-group-item-action border-0">{{ __('Pipelines Report') }}
+                            <a href="#pipeline-report" class="list-group-item list-group-item-action border-0"><?php echo e(__('Pipelines Report')); ?>
+
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
                         </div>
                     </div>
@@ -37,7 +41,7 @@
                     <div id="general-report">
                         <div class="card">
                             <div class="card-header">
-                                <h5>{{ __('This Week Leads Conversions') }}</h5>
+                                <h5><?php echo e(__('This Week Leads Conversions')); ?></h5>
                             </div>
                             <div class="card-body pt-0 ">
                                 <div id="leads-this-week"
@@ -47,7 +51,7 @@
                         </div>
                         <div class="card">
                             <div class="card-header">
-                                <h5>{{ __('Sources Conversion') }}</h5>
+                                <h5><?php echo e(__('Sources Conversion')); ?></h5>
                             </div>
                             <div class="card-body pt-0">
                                 <div class="leads-sources-report" id="leads-sources-report"
@@ -59,23 +63,23 @@
                             <div class="card-header">
                                 <div class="row">
                                     <div class="col-9">
-                                        <h5>{{ __('Monthly') }}</h5>
+                                        <h5><?php echo e(__('Monthly')); ?></h5>
                                     </div>
                                     <div class="col-3 float-right">
                                         <select name="month" class="form-control selectpicker select2 col-6" id="selectmonth" data-none-selected-text="Nothing selected" >
-                                            <option value=" ">{{__('Select Month')}}</option>
-                                            <option value="1">{{__('January')}}</option>
-                                            <option value="2">{{__('February')}}</option>
-                                            <option value="3">{{__('March')}}</option>
-                                            <option value="4">{{__('April')}}</option>
-                                            <option value="5">{{__('May')}}</option>
-                                            <option value="6">{{__('June')}}</option>
-                                            <option value="7">{{__('July')}}</option>
-                                            <option value="8">{{__('August')}}</option>
-                                            <option value="9">{{__('September')}}</option>
-                                            <option value="10">{{__('October')}}</option>
-                                            <option value="11">{{__('November')}}</option>
-                                            <option value="12">{{__('December')}}</option>
+                                            <option value=" "><?php echo e(__('Select Month')); ?></option>
+                                            <option value="1"><?php echo e(__('January')); ?></option>
+                                            <option value="2"><?php echo e(__('February')); ?></option>
+                                            <option value="3"><?php echo e(__('March')); ?></option>
+                                            <option value="4"><?php echo e(__('April')); ?></option>
+                                            <option value="5"><?php echo e(__('May')); ?></option>
+                                            <option value="6"><?php echo e(__('June')); ?></option>
+                                            <option value="7"><?php echo e(__('July')); ?></option>
+                                            <option value="8"><?php echo e(__('August')); ?></option>
+                                            <option value="9"><?php echo e(__('September')); ?></option>
+                                            <option value="10"><?php echo e(__('October')); ?></option>
+                                            <option value="11"><?php echo e(__('November')); ?></option>
+                                            <option value="12"><?php echo e(__('December')); ?></option>
                                         </select>
 
                                     </div>
@@ -92,22 +96,26 @@
                     </div>
                     <div id="staff-report" class="card">
                         <div class="card-header">
-                            <h5>{{ __('Staff Report') }}</h5>
+                            <h5><?php echo e(__('Staff Report')); ?></h5>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-4">
-                                    {{ Form::label('From Date', __('From Date'),['class'=>'col-form-label']) }}
-                                    {{ Form::date('From Date',null, array('class' => 'form-control from_date','id'=>'data_picker1',)) }}
+                                    <?php echo e(Form::label('From Date', __('From Date'),['class'=>'col-form-label'])); ?>
+
+                                    <?php echo e(Form::date('From Date',null, array('class' => 'form-control from_date','id'=>'data_picker1',))); ?>
+
                                     <span id="fromDate" style="color: red;"></span>
                                 </div>
                                 <div class="col-md-4">
-                                    {{ Form::label('To Date', __('To Date'),['class'=>'col-form-label']) }}
-                                    {{ Form::date('To Date',null, array('class' => 'form-control to_date','id'=>'data_picker2',)) }}
+                                    <?php echo e(Form::label('To Date', __('To Date'),['class'=>'col-form-label'])); ?>
+
+                                    <?php echo e(Form::date('To Date',null, array('class' => 'form-control to_date','id'=>'data_picker2',))); ?>
+
                                     <span id="toDate"  style="color: red;"></span>
                                 </div>
                                 <div class="col-md-4" id="filter_type" style="padding-top : 38px;">
-                                    <button  class="btn btn-primary label-margin generate_button" >{{__('Generate')}}</button>
+                                    <button  class="btn btn-primary label-margin generate_button" ><?php echo e(__('Generate')); ?></button>
                                 </div>
                             </div>
                             <div id="leads-staff-report" class="mt-3"
@@ -117,7 +125,7 @@
                     </div>
                     <div id="pipeline-report" class="card">
                         <div class="card-header">
-                            <h5>{{ __('Pipeline Report') }}</h5>
+                            <h5><?php echo e(__('Pipeline Report')); ?></h5>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -131,10 +139,10 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('script-page')
-    <script type="text/javascript" src="{{ asset('js/html2pdf.bundle.min.js') }}"></script>
+<?php $__env->startPush('script-page'); ?>
+    <script type="text/javascript" src="<?php echo e(asset('js/html2pdf.bundle.min.js')); ?>"></script>
     <script>
         var filename = $('#filename').val();
 
@@ -184,13 +192,13 @@
                 $("#toDate").empty();
             }
             $.ajax({
-                url: "{{ route('report.lead') }}",
+                url: "<?php echo e(route('report.lead')); ?>",
                 type: "get",
                 data: {
                     "From_Date": from_date,
                     "To_Date": to_date,
                     "type": 'staff_repport',
-                    "_token": "{{ csrf_token() }}",
+                    "_token": "<?php echo e(csrf_token()); ?>",
                 },
 
                 cache: false,
@@ -260,11 +268,11 @@
                 var selectedVal = $("#selectmonth option:selected").val();
                 var start_month = $('.selectpicker').val();
                 $.ajax({
-                    url:  "{{route('report.lead')}}",
+                    url:  "<?php echo e(route('report.lead')); ?>",
                     type: "get",
                     data:{
                         "start_month": start_month,
-                        "_token": "{{ csrf_token() }}",
+                        "_token": "<?php echo e(csrf_token()); ?>",
                     },
                     cache: false,
                     success: function(data){
@@ -306,7 +314,7 @@
                                 categories:data.name,
 
                                 title: {
-                                    text: '{{ __("Lead Per Month") }}'
+                                    text: '<?php echo e(__("Lead Per Month")); ?>'
                                 }
                             },
                             colors: ['#6fd944', '#6fd944'],
@@ -338,17 +346,17 @@
             $(id).addClass('active');
         });
     </script>
-    <script src="{{asset('assets/js/plugins/apexcharts.min.js')}}"></script>
+    <script src="<?php echo e(asset('assets/js/plugins/apexcharts.min.js')); ?>"></script>
     <script>
         var options = {
-            series: {!! json_encode($devicearray['data']) !!},
+            series: <?php echo json_encode($devicearray['data']); ?>,
             chart: {
                 width: 350,
                 type: 'pie',
             },
 
             colors: ["#35abb6","#ffa21d","#ff3a6e","#6fd943","#5c636a","#181e28","#0288d1"],
-            labels: {!! json_encode($devicearray['label']) !!},
+            labels: <?php echo json_encode($devicearray['label']); ?>,
             responsive: [{
                 breakpoint: 480,
                 options: {
@@ -368,7 +376,7 @@
             var chartBarOptions = {
                 series: [{
                     name: 'Source',
-                    data: {!! json_encode($leadsourceeData) !!},
+                    data: <?php echo json_encode($leadsourceeData); ?>,
                 }],
 
                 chart: {
@@ -398,10 +406,10 @@
                     align: 'left'
                 },
                 xaxis: {
-                    categories: {!! json_encode($leadsourceName) !!},
+                    categories: <?php echo json_encode($leadsourceName); ?>,
 
                     title: {
-                        text: '{{ __("Source") }}'
+                        text: '<?php echo e(__("Source")); ?>'
                     }
                 },
                 colors: ['#ffa21d', '#ffa21d'],
@@ -423,7 +431,7 @@
             var chartBarOptions = {
                 series: [{
                     name: 'Lead',
-                    data: {!! json_encode($data) !!},
+                    data: <?php echo json_encode($data); ?>,
                 }],
 
                 chart: {
@@ -453,10 +461,10 @@
                     align: 'left'
                 },
                 xaxis: {
-                    categories: {!! json_encode($labels) !!},
+                    categories: <?php echo json_encode($labels); ?>,
 
                     title: {
-                        text: '{{ __("Lead Per Month") }}'
+                        text: '<?php echo e(__("Lead Per Month")); ?>'
                     }
                 },
                 colors: ['#6fd944', '#6fd944'],
@@ -478,7 +486,7 @@
             var chartBarOptions = {
                 series: [{
                     name: 'Lead',
-                    data: {!! json_encode($leadusereData) !!},
+                    data: <?php echo json_encode($leadusereData); ?>,
                 }],
 
                 chart: {
@@ -508,9 +516,9 @@
                     align: 'left'
                 },
                 xaxis: {
-                    categories: {!! json_encode($leaduserName) !!},
+                    categories: <?php echo json_encode($leaduserName); ?>,
                     title: {
-                        text: '{{ __("User") }}'
+                        text: '<?php echo e(__("User")); ?>'
                     }
                 },
                 colors: ['#6fd944', '#6fd944'],
@@ -532,7 +540,7 @@
             var chartBarOptions = {
                 series: [{
                     name: 'Pipeline',
-                    data: {!! json_encode($leadpipelineeData) !!},
+                    data: <?php echo json_encode($leadpipelineeData); ?>,
                 }],
 
                 chart: {
@@ -562,15 +570,15 @@
                     align: 'left'
                 },
                 xaxis: {
-                    categories: {!! json_encode($leadpipelineName) !!},
+                    categories: <?php echo json_encode($leadpipelineName); ?>,
 
                     title: {
-                        text: '{{ __("Pipelines") }}'
+                        text: '<?php echo e(__("Pipelines")); ?>'
                     }
                 },
                 yaxis: {
                     title: {
-                        text: '{{ __("Leads") }}'
+                        text: '<?php echo e(__("Leads")); ?>'
                     }
                 },
                 colors: ['#6fd944', '#6fd944'],
@@ -589,5 +597,7 @@
         })();
 
     </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
+
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/report/lead.blade.php ENDPATH**/ ?>

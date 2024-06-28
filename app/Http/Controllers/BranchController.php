@@ -108,6 +108,7 @@ class BranchController extends Controller
                     'mgrTelNo' => $branch['mgrTelNo'],
                     'mgrEmail' => $branch['mgrEmail'],
                     'hqYn' => $branch['hqYn'],
+                    'created_by' => \Auth::user()->creatorId(),
                 ]);
             }
 

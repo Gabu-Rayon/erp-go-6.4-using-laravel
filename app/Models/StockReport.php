@@ -18,15 +18,13 @@ class StockReport extends Model
     ];
 
 
-    public function product()
-    {
+    public function product(){
         return $this->hasOne('App\Models\ProductService', 'id', 'product_id');
     }
 
 
     //for export
-    public static function products($product)
-    {
+    public static function products($product){
         $categoryArr  = explode(',', $product);
 
         foreach ($categoryArr as $product)
