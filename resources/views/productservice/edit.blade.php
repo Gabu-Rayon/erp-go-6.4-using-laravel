@@ -63,6 +63,12 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
+                {{ Form::label('batchNo', __('Item Bar Code'), ['class' => 'form-label']) }}
+                {{ Form::text('bcd', null, ['class' => 'form-control', 'placeholder' => __('Enter Item Batch No')]) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
                 {{ Form::label('unitPrice', __('Default Unit Price (*)'), ['class' => 'form-label']) }}
                 {{ Form::text('dftPrc', null, ['class' => 'form-control', 'placeholder' => __('Enter Default Unit Price'), 'required' => 'required']) }}
             </div>
@@ -82,13 +88,13 @@
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('group3UnitPrice', __('Group 3 Unit Price'), ['class' => 'form-label']) }}
-                {{ Form::text('grpPrcL1', null, ['class' => 'form-control', 'placeholder' => __('Enter Group 3 Unit Price')]) }}
+                {{ Form::text('grpPrcL3', null, ['class' => 'form-control', 'placeholder' => __('Enter Group 3 Unit Price')]) }}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('group4UnitPrice', __('Group 4 Unit Price'), ['class' => 'form-label']) }}
-                {{ Form::text('grpPrcL3', null, ['class' => 'form-control', 'placeholder' => __('Enter Group 4 Unit Price')]) }}
+                {{ Form::text('grpPrcL4', null, ['class' => 'form-control', 'placeholder' => __('Enter Group 4 Unit Price')]) }}
             </div>
         </div>
         <div class="col-md-6">
@@ -99,26 +105,26 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                {{ Form::label('saftyQuantity', __('Safty Quantity'), ['class' => 'form-label']) }}
-                {{ Form::number('sftyQty', $productServiceinformation->sftyQty, ['class' => 'form-control', 'placeholder' => __('Enter Safty Quantity')]) }}
+                {{ Form::label('saftyQuantity', __('Safety Quantity'), ['class' => 'form-label']) }}
+                {{ Form::number('saftyQuantity', $productServiceinformation->sftyQty, ['class' => 'form-control', 'placeholder' => __('Enter Safty Quantity')]) }}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('packageQuantity', __('Package Quantity'), ['class' => 'form-label']) }}
-                {{ Form::number('quantity', null, ['class' => 'form-control']) }}
+                {{ Form::number('packageQuantity', null, ['class' => 'form-control']) }}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('isrcAplcbYn', __('Insurance Appicable (Y/N) (*)'), ['class' => 'form-label']) }}
-                {{ Form::select('isrcAplcbYn', [true => 'Y', false => 'N'], $productServiceinformation->isrcAplcbYn, ['class' => 'form-control', 'required' => 'required']) }}
+                {{ Form::select('isrcAplcbYn', [true => 'Yes', false => 'No'], $productServiceinformation->isrcAplcbYn, ['class' => 'form-control select2', 'required' => 'required']) }}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('isUsed', __('Used / UnUsed (Y/N) (*)'), ['class' => 'form-label']) }}
-                {{ Form::select('isUsed', [true => 'true', false => 'false'], $productServiceinformation->isUsed, ['class' => 'form-control', 'required' => 'required']) }}
+                {{ Form::select('isUsed', [true => 'Yes', false => 'No'], $productServiceinformation->isUsed, ['class' => 'form-control select2', 'required' => 'required']) }}
             </div>
         </div>
         <div class="col-md-6">

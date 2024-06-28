@@ -8,8 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ProductService extends Model
-{
-    protected $fillable = [
+{ protected $fillable = [
         'name',
         'sku',
         'sale_price',
@@ -18,38 +17,35 @@ class ProductService extends Model
         'category_id',
         'unit_id',
         'type',
-        'quantity',
         'description',
-        'pro_image',
         'sale_chartaccount_id',
         'expense_chartaccount_id',
-        'itemCode',
-        'itemClassifiCode',
-        'itemTypeCode',
-        'itemName',
-        'itemStrdName',
-        'countryCode',
-        'qtyUnitCode',
-        'pkgUnitCode',
-        'taxTypeCode',
-        'batchNo',
-        'barcode',
-        'purchasePrice',
-        'unitPrice',
-        'group1UnitPrice',
-        'group2UnitPrice',
-        'group3UnitPrice',
-        'group4UnitPrice',
-        'group5UnitPrice',
-        'saftyQuantity',
-        'isInrcApplicable',
-        'isUsed',
-        'quantity',
-        'packageQuantity',
-        'additionalInfo',
+        'pro_image',
         'created_by',
-        'productImage'
-    ];
+        'tin',
+        'itemCd',
+        'itemClsCd',
+        'itemTyCd',
+        'itemNm',
+        'quantity',
+        'itemStdNm',
+        'orgnNatCd',
+        'pkgUnitCd',
+        'qtyUnitCd',
+        'taxTyCd',
+        'btchNo',
+        'regBhfId',
+        'bcd',
+        'dftPrc',
+        'grpPrcL1',
+        'grpPrcL2',
+        'grpPrcL3',
+        'grpPrcL4',
+        'grpPrcL5',
+        'sftyQty',
+        'packageQuantity',
+        'addInfo',
+];
 
     public function taxes()
     {
