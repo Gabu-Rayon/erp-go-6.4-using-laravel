@@ -235,7 +235,7 @@
                                         {{ Form::number('saftyQuantity', '', ['class' => 'form-control', 'required' => 'required']) }}
                                     </td>
                                     <td class="form-group col-md-3">
-                                        {{ Form::label('isInrcApplicable', __('Is Inrc Applicable'), ['class' => 'form-label']) }}
+                                        {{ Form::label('isInrcApplicable', __('Is Insurance Applicable'), ['class' => 'form-label']) }}
                                         {{ Form::select('isInrcApplicable', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2', 'required' => 'required']) }}
                                     </td>
                                     <td class="form-group col-md-3">
