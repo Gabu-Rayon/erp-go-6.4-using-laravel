@@ -8,36 +8,44 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ProductService extends Model
-{
-    protected $table = 'product_services';
-    protected $fillable = [
-        'itemCode',
-        'itemClassifiCode',
-        'itemTypeCode',
-        'itemName',
-        'itemStrdName',
-        'countryCode',
-        'qtyUnitCode',
-        'pkgUnitCode',
-        'taxTypeCode',
-        'batchNo',
-        'barcode',
-        'purchasePrice',
-        'unitPrice',
-        'group1UnitPrice',
-        'group2UnitPrice',
-        'group3UnitPrice',
-        'group4UnitPrice',
-        'group5UnitPrice',
-        'saftyQuantity',
-        'isInrcApplicable',
-        'isUsed',
-        'quantity',
-        'packageQuantity',
-        'additionalInfo',
+{ protected $fillable = [
+        'name',
+        'sku',
+        'sale_price',
+        'purchase_price',
+        'tax_id',
+        'category_id',
+        'unit_id',
+        'type',
+        'description',
+        'sale_chartaccount_id',
+        'expense_chartaccount_id',
+        'pro_image',
         'created_by',
-        'productImage'
-    ];
+        'tin',
+        'itemCd',
+        'itemClsCd',
+        'itemTyCd',
+        'itemNm',
+        'quantity',
+        'itemStdNm',
+        'orgnNatCd',
+        'pkgUnitCd',
+        'qtyUnitCd',
+        'taxTyCd',
+        'btchNo',
+        'regBhfId',
+        'bcd',
+        'dftPrc',
+        'grpPrcL1',
+        'grpPrcL2',
+        'grpPrcL3',
+        'grpPrcL4',
+        'grpPrcL5',
+        'sftyQty',
+        'packageQuantity',
+        'addInfo',
+];
 
     public function taxes()
     {
@@ -46,7 +54,7 @@ class ProductService extends Model
 
     public function unit()
     {
-        return $this->hasOne('App\Models\QuantityUnitCode', 'code', 'qtyUnitCode');
+        return $this->hasOne('App\Models\ProductServiceUnit', 'id', 'unit_id');
     }
 
     public function category()

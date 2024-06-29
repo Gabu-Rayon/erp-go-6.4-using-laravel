@@ -103,7 +103,7 @@
                                         <div class="form-group">
                                             {{ Form::label('itemCode', __('Item Code'), ['class' => 'form-label']) }}
                                             <span class="text-danger">*</span>
-                                            {{ Form::text('itemCode', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'A001']) }}
+                                            {{ Form::text('itemCode', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'A001,A002']) }}
                                         </div>
                                     </td>                                    
                                     <td class="form-group col-md-3">
@@ -156,13 +156,6 @@
                                         <div class="form-group">
                                             {{ Form::label('barcode', __('Bar Code'), ['class' => 'form-label']) }}
                                             {{ Form::text('barcode', '', ['class' => 'form-control']) }}
-                                        </div>
-                                    </td>
-                                    <td class="form-group col-md-3">
-                                        <div class="form-group">
-                                            {{ Form::label('purchasePrice', __('Purchase Price'), ['class' => 'form-label']) }}
-                                            <span class="text-danger">*</span>
-                                            {{ Form::number('purchasePrice', '', ['class' => 'form-control', 'required' => 'required']) }}
                                         </div>
                                     </td>
                                     <td class="form-group col-md-3">
@@ -227,10 +220,6 @@
                                         {{ Form::text('batchNo', '', ['class' => 'form-control', 'required' => 'required']) }}
                                     </td>
                                     <td class="form-group col-md-3">
-                                        {{ Form::label('barcode', __('Bar Code'), ['class' => 'form-label']) }}
-                                        {{ Form::text('barcode', '', ['class' => 'form-control', 'required' => 'required','placeholder' =>'9347408001101']) }}
-                                    </td>
-                                    <td class="form-group col-md-3">
                                         {{ Form::label('saftyQuantity', __('Safety Quantity'), ['class' => 'form-label']) }}
                                         {{ Form::number('saftyQuantity', '', ['class' => 'form-control', 'required' => 'required']) }}
                                     </td>
@@ -241,10 +230,6 @@
                                     <td class="form-group col-md-3">
                                         {{ Form::label('isUsed', __('Is Used'), ['class' => 'form-label']) }}
                                         {{ Form::select('isUsed', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2', 'required' => 'required']) }}
-                                    </td>
-                                    <td class="form-group col-md-3">
-                                        {{ Form::label('packageQuantity', __('Package Quantity'), ['class' => 'form-label']) }}
-                                        {{ Form::number('packageQuantity', '', ['class' => 'form-control', 'required' => 'required']) }}
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('category_id', __('Category'), ['class' => 'form-label']) }}<span

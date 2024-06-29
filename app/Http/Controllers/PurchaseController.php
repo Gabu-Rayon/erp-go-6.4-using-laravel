@@ -352,20 +352,18 @@ class PurchaseController extends Controller
             $category->prepend('Select Category', '');
 
             $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
-            $venders = Vender::all()->pluck('spplrNm', 'spplrTin');
+            $venders = Vender::all()->pluck( 'name','spplrTin');
             $venders->prepend('Select Vender', '');
-            $suppliers = Vender::all()->pluck('name', 'id');
-            $suppliers->prepend('Select Supplier', '');
 
             \Log::info('Venders:');
-            \Log::info($suppliers);
+            \Log::info($venders);
 
             $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $warehouse->prepend('Select Warehouse', '');
 
             // $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->where('type','!=', 'service')->get()->pluck('name', 'id');
             // $product_services->prepend('--', '');
-            $items = ProductService::where('created_by', \Auth::user()->creatorId())->pluck('itemName', 'itemCode');
+            $items = ProductService::where('created_by', \Auth::user()->creatorId())->pluck('itemNm', 'itemCd');
             $items->prepend('Select Item', '');
             Log::info('Items');
             Log::info($items);
@@ -386,7 +384,6 @@ class PurchaseController extends Controller
                 'purchaseTypeCodes',
                 'purchaseStatusCodes',
                 'ReceiptTypesCodes',
-                'suppliers',
                 'purchase_number',
                 'items',
                 'category',
@@ -434,9 +431,16 @@ class PurchaseController extends Controller
 
             $apiData = [];
             $items = [];
+             \Log::info('Purchase FoRM Data being Posted  : ');
+             \Log::info($data);
+
+            
 
             if ($data['supplierTin']) {
                 $supplier = Vender::where('spplrTin', $data['supplierTin'])->first();
+                \Log::info('Supplier Info  : ');
+                \Log::info($supplier);
+
                 $apiData['supplierTin'] = $data['supplierTin'];
                 $apiData['supplierBhfId'] = $supplier->spplrBhfId;
                 $apiData['supplierName'] = $supplier->spplrNm;
@@ -475,6 +479,10 @@ class PurchaseController extends Controller
             }
 
             $apiData['itemsDataList'] = $items;
+
+            \Log::info('Api Data Info Being Posted : ');
+            \Log::info($apiData);
+            
             
             $url = 'https://etims.your-apps.biz/api/AddPurchase';
 
@@ -1305,7 +1313,7 @@ class PurchaseController extends Controller
     public function getItem($itemCd)
     {
         try {
-            $itemInfo = ProductService::where('itemCode', $itemCd)->first();
+            $itemInfo = ProductService::where('itemCd', $itemCd)->first();
             return response()->json([
                 'message' => 'success',
                 'data' => $itemInfo

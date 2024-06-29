@@ -144,12 +144,40 @@ class ProductServiceController extends Controller
         \Log::info('CREATE PRODUCT SERVICE REQUEST Clicked :' . $request);
         try {
 
-            $validator = \Validator::make(
-                $request->all(),
+             $data = $request->all();
+
+            $validator = \Validator::make($data,
                 [
-                    'name' => 'required|max:200',
-                    'type' => 'required',
-                    'color' => 'required',
+                    'items'=> 'required|array',
+                    'items.*.itemCode' => 'required',
+                    'items.*.itemClassifiCode' => 'required',
+                    'items.*.itemTypeCode' => 'required',
+                    'items.*.itemName' => 'required',
+                    'items.*.sale_price' => 'required',
+                    'items.*.purchase_price' => 'required',
+                    'items.*.itemStrdName' => 'required',
+                    'items.*.countryCode' => 'required',
+                    'items.*.pkgUnitCode' => 'required',
+                    'items.*.qtyUnitCode' => 'required',
+                    'items.*.taxTypeCode' => 'required',
+                    'items.*.batchNo' => 'nullable',
+                    'items.*.barcode' => 'nullable',
+                    'items.*.saftyQuantity' => 'required',
+                    'items.*.isInrcApplicable' => 'required',
+                    'items.*.isUsed' => 'required',
+                    'items.*.packageQuantity' => 'required',
+                    'items.*.category_id' => 'required',
+                    'items.*.sale_chartaccount_id' => 'required',
+                    'items.*.expense_chartaccount_id' => 'required',
+                    'items.*.pro_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                    'items.*.additionalInfo' => 'required',
+                    'items.*.quantity' => 'nullable',
+                    'items.*.unitPrice' =>'required',
+                    'items.*.group1UnitPrice' => 'nullable',
+                    'items.*.group2UnitPrice' => 'nullable',
+                    'items.*.roup3UnitPrice' => 'nullable',
+                    'items.*.group4UnitPrice' => 'nullable',
+                    'items.*.group5UnitPrice' => 'nullable',
                 ]
             );
             if ($validator->fails()) {
@@ -165,7 +193,7 @@ class ProductServiceController extends Controller
                 \Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
                 \Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
 
-                $data = $request->all();
+               
 
                 \Log::info('ITEMS');
                 \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
@@ -280,24 +308,24 @@ class ProductServiceController extends Controller
                 }
 
                 // Post data to the external API
-                // $response = \Http::withOptions([
-                //     'verify' => false
-                // ])->withHeaders([
-                //             'Accept' => 'application/json',
-                //             'Content-Type' => 'application/json',
-                //             'key' => '123456'
-                //         ])->post('https://etims.your-apps.biz/api/AddItemsList', $apiData);
+                $response = \Http::withOptions([
+                    'verify' => false
+                ])->withHeaders([
+                            'Accept' => 'application/json',
+                            'Content-Type' => 'application/json',
+                            'key' => '123456'
+                        ])->post('https://etims.your-apps.biz/api/AddItemsList', $apiData);
 
-                // // Log response data
-                // \Log::info('API Response Status Code For Posting Product Data: ' . $response->status());
-                // \Log::info('API Request Product Data Posted: ' . json_encode($apiData));
-                // \Log::info('API Response Body For Posting Product Data: ' . $response->body());
+                // Log response data
+                \Log::info('API Response Status Code For Posting Product Data: ' . $response->status());
+                \Log::info('API Request Product Data Posted: ' . json_encode($apiData));
+                \Log::info('API Response Body For Posting Product Data: ' . $response->body());
 
-                // if ($response->successful()) {
-                //     \Log::info('Data successfully posted to the API');
-                // } else {
-                //     \Log::error('Error posting data to the API: ' . $response->body());
-                // }
+                if ($response->successful()) {
+                    \Log::info('Data successfully posted to the API');
+                } else {
+                    \Log::error('Error posting data to the API: ' . $response->body());
+                }
 
                 return redirect()->route('productservice.index')->with('success', 'Product / Service Added Successfully');
             } else {
