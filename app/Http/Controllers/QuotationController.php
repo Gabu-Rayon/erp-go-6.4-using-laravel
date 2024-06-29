@@ -139,7 +139,7 @@ class QuotationController extends Controller
     public function show($ids)
     {
 
-        if (|| \Auth::user()->type == 'company') {
+        if (\Auth::user()->type == 'company') {
             try {
                 $id = Crypt::decrypt($ids);
             } catch (\Throwable $th) {

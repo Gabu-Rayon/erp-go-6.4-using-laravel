@@ -13,7 +13,7 @@ class RoleController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->type == 'super admin')
+        if(\Auth::user()->type == 'super admin' || 'company')
         {
 
             $roles = Role::all();
@@ -31,12 +31,10 @@ class RoleController extends Controller
     public function create()
     {
         if(
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'super admin'
-        )
+            \Auth::user()->type == 'super admin' || 'company')
         {
             $user = \Auth::user();
-            if($user->type == 'super admin')
+            if($user->type == 'super admin' || 'company')
             {
                 $permissions = Permission::all()->pluck('name', 'id')->toArray();
             }
@@ -63,8 +61,7 @@ class RoleController extends Controller
     public function store(Request $request)
     {
         if(
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'super admin'
+            \Auth::user()->type == 'super admin' || 'company'
         )
         {
             $validator = \Validator::make(
@@ -109,13 +106,12 @@ class RoleController extends Controller
     public function edit(Role $role)
     {
         if(
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'super admin'
+            \Auth::user()->type == 'super admin' || 'company'
         )
         {
 
             $user = \Auth::user();
-            if($user->type == 'super admin')
+            if($user->type == 'super admin' || 'company')
             {
                 $permissions = Permission::all()->pluck('name', 'id')->toArray();
             }
@@ -143,8 +139,7 @@ class RoleController extends Controller
     {
 
         if(
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'super admin'
+            \Auth::user()->type == 'super admin' || 'company'
         )
         {
             $validator = \Validator::make(
@@ -193,8 +188,7 @@ class RoleController extends Controller
     public function destroy(Role $role)
     {
         if(
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'super admin'
+            \Auth::user()->type == 'super admin' || 'company'
         )
         {
             $role->delete();
