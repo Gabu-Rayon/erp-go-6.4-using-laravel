@@ -1639,6 +1639,8 @@ class PurchaseController extends Controller
 
                 if (isset($remoteItem['mapPurchaseItemList']) && is_array($remoteItem['mapPurchaseItemList'])) {
                     foreach ($remoteItem['mapPurchaseItemList'] as $itemList) {
+                        \Log::info('Remote item list::');
+                        \Log::info($itemList);
                         $remoteMapPurchaseItemListsToSync[] = $this->prepareMapPurchaseItemListData($itemList);
                     }
                 }
@@ -1767,7 +1769,7 @@ class PurchaseController extends Controller
                         WarehouseProduct::create([
                             'warehouse_id' => 1,
                             'product_id' => null,
-                            'itemCd' => $itemList['itemCd'],
+                            'itemCd' => $itemList['mapping'],
                             'quantity' => $itemList['qty'],
                             'packageQuantity' => $itemList['pkg'],
                             'created_by' => \Auth::user()->creatorId()
