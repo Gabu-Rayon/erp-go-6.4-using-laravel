@@ -36,6 +36,8 @@ class CustomerController extends Controller
             \Auth::user()->type == 'accountant'
             || \Auth::user()->type == 'company'
         ){
+            \Log::info('CREATOR');
+            \Log::info(\Auth::user()->creatorId());
             $customers = Customer::where('created_by', \Auth::user()->creatorId())->get();
 
             return view('customer.index', compact('customers'));
@@ -59,6 +61,7 @@ class CustomerController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * 
      */
 
     public function store(Request $request) {
@@ -97,19 +100,23 @@ class CustomerController extends Controller
             \Log::info('API DATA');
             \Log::info($apiData);
 
-            $url = 'https://etims.your-apps.biz/api/AddCustomer';
+            // $url = 'https://etims.your-apps.biz/api/AddCustomer';
 
-            $response = Http::withHeaders([
-                'key' => '123456',
-            ])->withOptions([
-                'verify' => false,
-            ])->post($url, $apiData);
+            // $response = Http::withHeaders([
+            //     'key' => '123456',
+            // ])->withOptions([
+            //     'verify' => false,
+            // ])->post($url, $apiData);
 
-            if (!$response['statusCode'] || $response['statusCode'] != 200) {
-                return redirect()->back()->with('error', 'Error in creating customer');
-            }
+            // if (!$response['statusCode'] || $response['statusCode'] != 200) {
+            //     return redirect()->back()->with('error', 'Error in creating customer');
+            // }
 
             \DB::beginTransaction();
+
+
+            \Log::info('CREATOR Creating   Customer ');
+            \Log::info(\Auth::user()->creatorId());
 
             $customer = Customer::create([
                 'customerNo' => $data['customerNo'],
