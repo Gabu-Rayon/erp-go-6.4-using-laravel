@@ -1584,6 +1584,7 @@ class PurchaseController extends Controller
                                 'totAmt' => $item['totAmt'],
                                 'itemExprDt' => $item['itemExprDt'],
                             ]);
+
                         }
                     }
                 }
@@ -1598,7 +1599,7 @@ class PurchaseController extends Controller
 
      ///search MapPurchase  by Date Code Here 
 
-    public function searchByDate(Request $request)
+    public function mapPurchaseSearchByDate(Request $request)
     {
         // Log the request from the form
         \Log::info('Synchronization request received from Searching the MapPurchase SearchByDate Form:', $request->all());
@@ -1622,10 +1623,10 @@ class PurchaseController extends Controller
                 ->withHeaders(['key' => '123456'])
                 ->get("https://etims.your-apps.biz/api/MapPurchase/SearchByDate?date={$formattedDate}");
 
-            $data = $response->json()['data'];
-            if (!isset($data['data'])) {
-                return redirect()->back()->with('error', __('There is no search result.'));
-            }
+            $data = $response->json();
+            // if (!isset($data['data'])) {
+            //     return redirect()->back()->with('error', __('There is no search result.'));
+            // }
 
             $remoteMapPurchaseSearchByDateinfo = $data['data'];
             \Log::info('Remote item info:', $remoteMapPurchaseSearchByDateinfo);
@@ -1666,6 +1667,7 @@ class PurchaseController extends Controller
         return [
             'mappedPurchaseId' => $remoteItem['id'],
             'invcNo' => $remoteItem['invcNo'],
+            'created_by' => \Auth::user()->creatorId(),
             'orgInvcNo' => $remoteItem['orgInvcNo'],
             'supplrTin' => $remoteItem['supplrTin'],
             'supplrBhfId' => $remoteItem['supplrBhfId'],
@@ -1758,6 +1760,16 @@ class PurchaseController extends Controller
 
                         // Create the mapped purchase item list
                         MappedPurchaseItemList::create($itemList);
+
+                        //Also creating  new product for the warehouse 
+                        WarehouseProduct::create([
+                            'warehouse_id' => 1,
+                            'product_id' => null,
+                            'itemCd' => $itemList['itemCd'],
+                            'quantity' => $itemList['qty'],
+                            'packageQuantity' => $itemList['pkg'],
+                            'created_by' => \Auth::user()->creatorId()
+                        ]);
                         $syncedPurchaseItemCount++;
                     }
                 }
@@ -1768,7 +1780,5 @@ class PurchaseController extends Controller
 
         return $syncedCount;
     }
-
-
 
 }

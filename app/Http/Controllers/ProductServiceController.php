@@ -144,11 +144,12 @@ class ProductServiceController extends Controller
         \Log::info('CREATE PRODUCT SERVICE REQUEST Clicked :' . $request);
         try {
 
-             $data = $request->all();
+            $data = $request->all();
 
-            $validator = \Validator::make($data,
+            $validator = \Validator::make(
+                $data,
                 [
-                    'items'=> 'required|array',
+                    'items' => 'required|array',
                     'items.*.itemCode' => 'required',
                     'items.*.itemClassifiCode' => 'required',
                     'items.*.itemTypeCode' => 'required',
@@ -172,7 +173,7 @@ class ProductServiceController extends Controller
                     'items.*.pro_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
                     'items.*.additionalInfo' => 'required',
                     'items.*.quantity' => 'nullable',
-                    'items.*.unitPrice' =>'required',
+                    'items.*.unitPrice' => 'required',
                     'items.*.group1UnitPrice' => 'nullable',
                     'items.*.group2UnitPrice' => 'nullable',
                     'items.*.roup3UnitPrice' => 'nullable',
@@ -193,7 +194,7 @@ class ProductServiceController extends Controller
                 \Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
                 \Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
 
-               
+
 
                 \Log::info('ITEMS');
                 \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
@@ -296,8 +297,15 @@ class ProductServiceController extends Controller
 
                             $productService->save();
 
-                            // Prepare data for the API
+                            // Prepare data for the API to post product $  service 
                             $apiData[] = $this->constructProductData($item, $index);
+
+                            //Prepare data to post Product Service Opeing Stock 
+                            // $openingStockData['openingItemsLists'][] = [
+                            //     "itemCode" => $item['itemCode'],
+                            //     "quantity" => $item['quantity'] ?? 0,
+                            //     "packageQuantity" => $item['packageQuantity'] ?? 0
+                            // ];
                         } else {
                             \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
                             return redirect()->back()->with('error', 'Storage limit exceeded.');
@@ -326,6 +334,27 @@ class ProductServiceController extends Controller
                 } else {
                     \Log::error('Error posting data to the API: ' . $response->body());
                 }
+
+
+                // Post data to the ItemOpeningStock API
+                // $openingStockResponse = \Http::withOptions([
+                //     'verify' => false
+                // ])->withHeaders([
+                //             'Accept' => 'application/json',
+                //             'Content-Type' => 'application/json',
+                //             'key' => '123456'
+                //         ])->post('https://etims.your-apps.biz/api/ItemOpeningStock', $openingStockData);
+
+                // \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $openingStockResponse->status());
+                // \Log::info('API Request Opening Stock Data Posted: ' . json_encode($openingStockData));
+                // \Log::info('API Response Body For Posting Opening Stock Data: ' . $openingStockResponse->body());
+
+                // if ($openingStockResponse->successful()) {
+                //     \Log::info('Opening stock data successfully posted to the API');
+                // } else {
+                //     \Log::error('Error posting opening stock data to the API: ' . $openingStockResponse->body());
+                // }
+
 
                 return redirect()->route('productservice.index')->with('success', 'Product / Service Added Successfully');
             } else {

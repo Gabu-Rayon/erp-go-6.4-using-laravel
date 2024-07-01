@@ -46,24 +46,18 @@
                                     <td><?php echo e($warehouse->city); ?></td>
                                     <td><?php echo e($warehouse->city_zip); ?></td>
 
-                                    <?php if(Gate::check('show warehouse') || Gate::check('edit warehouse') || Gate::check('delete warehouse')): ?>
                                         <td class="Action">
-                                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('show warehouse')): ?>
                                                 <div class="action-btn bg-warning ms-2">
 
                                                     <a href="<?php echo e(route('warehouse.show',$warehouse->id)); ?>" class="mx-3 btn btn-sm d-inline-flex align-items-center"
                                                        data-bs-toggle="tooltip" title="<?php echo e(__('View')); ?>"><i class="ti ti-eye text-white"></i></a>
 
                                                 </div>
-                                            <?php endif; ?>
-                                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit warehouse')): ?>
                                                 <div class="action-btn bg-info ms-2">
                                                     <a href="#" class="mx-3 btn btn-sm  align-items-center" data-url="<?php echo e(route('warehouse.edit',$warehouse->id)); ?>" data-ajax-popup="true"  data-size="lg " data-bs-toggle="tooltip" title="<?php echo e(__('Edit')); ?>"  data-title="<?php echo e(__('Edit Warehouse')); ?>">
                                                         <i class="ti ti-pencil text-white"></i>
                                                     </a>
                                                 </div>
-                                            <?php endif; ?>
-                                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete warehouse')): ?>
                                                 <div class="action-btn bg-danger ms-2">
                                                     <?php echo Form::open(['method' => 'DELETE', 'route' => ['warehouse.destroy', $warehouse->id],'id'=>'delete-form-'.$warehouse->id]); ?>
 
@@ -71,9 +65,7 @@
                                                     <?php echo Form::close(); ?>
 
                                                 </div>
-                                            <?php endif; ?>
                                         </td>
-                                    <?php endif; ?>
                                 </tr>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 

@@ -10,13 +10,14 @@ class WarehouseProduct extends Model
         'warehouse_id',
         'product_id',
         'quantity',
+        'packageQuantity',
         'created_by',
     ];
 
 
     public function product()
     {
-        return $this->hasOne('App\Models\ItemInformation', 'id', 'product_id');
+        return $this->hasOne('App\Models\ProductService', 'id', 'product_id');
     }
     public function warehouse()
     {

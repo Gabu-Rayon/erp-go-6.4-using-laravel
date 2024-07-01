@@ -1624,7 +1624,7 @@ Route::group(['middleware' => ['verified']], function () {
     // purchase.mapPurchase
     Route::any('map-purchase', [PurchaseController::class, 'mapPurchase'])->name('purchase.mapPurchase');
     //  purchase.SearchByDate
-    Route::post('/searchByDate', [PurchaseController::class, 'searchByDate'])->name('purchase.searchByDate');
+    Route::post('Map-purchase/SearchByDate', [PurchaseController::class, 'mapPurchaseSearchByDate'])->name('mappedPurchases.sync');
     // mapPurchase blade
     Route::any('/mappedpurchases', [PurchaseController::class, 'mappedPurchases'])->name('purchase.mappedPurchases');
     //  getMapPurchaseSearchByDate
