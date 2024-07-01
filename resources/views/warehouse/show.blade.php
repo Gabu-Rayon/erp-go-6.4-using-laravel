@@ -27,6 +27,8 @@
                             </thead>
                             <tbody>
 
+                                {{ \Log::info('WAREHOUSE') }}
+                                {{ \Log::info($warehouse) }}
                             @foreach ($warehouse as $warehouses)
                                 <tr class="font-style">
                                     @if(!empty($warehouses->product))
@@ -35,7 +37,6 @@
                                     @endif
                                 </tr>
                             @endforeach
-
                             </tbody>
                         </table>
                     </div>

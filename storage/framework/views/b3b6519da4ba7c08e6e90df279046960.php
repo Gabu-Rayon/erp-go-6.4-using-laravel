@@ -47,7 +47,7 @@
                         <div class="form-group col-md-4">
                             <strong>Supplier Invoice No</strong> : <?php echo e($purchase->spplrInvcNo); ?>
 
-                            <?php echo e(Form::text('supplierInvcNo', $purchase->spplrInvcNo, ['class' => 'form-control', 'required' => 'required'])); ?>
+                            <?php echo e(Form::text('supplierInvcNo', $purchase->spplrInvcNo, ['class' => 'form-control'])); ?>
 
                         </div>
                         <div class="form-group col-md-4">
@@ -68,12 +68,12 @@
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Purchase Type Code</strong> :
-                            <?php echo e(Form::text('purchaseTypeCode', null, ['class' => 'form-control', 'required' => 'required'])); ?>
+                            <?php echo e(Form::text('purchaseTypeCode', null, ['class' => 'form-control'])); ?>
 
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Purchase Status Code</strong> :
-                            <?php echo e(Form::text('purchaseStatusCode', null, ['class' => 'form-control', 'required' => 'required'])); ?>
+                            <?php echo e(Form::text('purchaseStatusCode', null, ['class' => 'form-control'])); ?>
 
                         </div>
                         <div class="form-group col-md-4">
@@ -198,7 +198,7 @@
                                         <div class="form-group col-md-4">
                                             <strong>Item Code</strong> : <?php echo e($item->itemCd); ?>
 
-                                            <?php echo e(Form::text('itemCode[]', $item->itemCd, ['class' => 'form-control', 'required' => 'required'])); ?>
+                                            <?php echo e(Form::text('itemCode[]', $item->itemCd, ['class' => 'form-control'])); ?>
 
                                         </div>
                                         <div class="form-group col-md-4">
@@ -220,7 +220,7 @@
                                         <div class="form-group col-md-4">
                                             <strong>Supplier Item Code</strong> : <?php echo e($item->spplrItemCd); ?>
 
-                                            <?php echo e(Form::text('supplierItemCode[]', $item->spplrItemCd, ['class' => 'form-control', 'required' => 'required'])); ?>
+                                            <?php echo e(Form::text('supplierItemCode[]', $item->spplrItemCd, ['class' => 'form-control'])); ?>
 
                                         </div>
                                         <div class="form-group col-md-4">

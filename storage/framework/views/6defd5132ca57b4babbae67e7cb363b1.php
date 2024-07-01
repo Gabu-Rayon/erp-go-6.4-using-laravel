@@ -29,14 +29,14 @@
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
         <div class="d-inline-block mb-4">
-            <?php echo e(Form::open(['route' => 'importeditems.sync', 'method' => 'POST', 'class' => 'w-100'])); ?>
+            <?php echo e(Form::open(['route' => 'mappedPurchases.sync', 'method' => 'POST', 'class' => 'w-100'])); ?>
 
             <?php echo csrf_field(); ?>
             <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
             <div class="form-group">
-                <?php echo e(Form::label('importedItemDate', __('Search Date (ex- 01-Dec-2021)'), ['class' => 'form-label'])); ?>
+                <?php echo e(Form::label('searchByDate', __('Search Date (ex- 01-Dec-2021)'), ['class' => 'form-label'])); ?>
 
-                <?php echo e(Form::date('importedItemDate', null, ['class' => 'form-control', 'required' => 'required'])); ?>
+                <?php echo e(Form::date('searchByDate', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
             </div>
             <button type="submit" class="btn btn-primary  sync"><?php echo e(__('Search')); ?></button>

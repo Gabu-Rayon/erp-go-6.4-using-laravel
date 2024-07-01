@@ -1843,6 +1843,7 @@ Route::group(
     ],
     function () {
         Route::resource('brancheslist', BranchesListController::class);
+        Route::get('branches/sync', [BranchController::class, 'sync'])->name('branches.sync');
         Route::get('getbranchbyname/{name}', [BranchesListController::class, 'getBranchByName'])->name('brancheslist.getbranchbyname');
     }
 );

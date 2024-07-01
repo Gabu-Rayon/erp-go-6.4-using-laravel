@@ -43,7 +43,6 @@ class PurchaseController extends Controller
      */
     public function index(Request $request)
     {
-
         try {
             if (\Auth::user()->type == 'company') {
                 $vender = Vender::all()->pluck('name', 'id');
@@ -1760,6 +1759,9 @@ class PurchaseController extends Controller
 
                         // Create the mapped purchase item list
                         MappedPurchaseItemList::create($itemList);
+
+                        \Log::info('ITEMS LIST');
+                        \Log::info($itemList);
 
                         //Also creating  new product for the warehouse 
                         WarehouseProduct::create([
