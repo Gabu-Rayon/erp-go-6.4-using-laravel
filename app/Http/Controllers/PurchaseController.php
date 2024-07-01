@@ -1337,11 +1337,12 @@ class PurchaseController extends Controller
 
             if (\Auth::user()->type == 'company') {
                 $rules = [
-                    'supplierInvcNo' => 'required',
-                    'purchaseTypeCode' => 'required',
-                    'purchaseStatusCode' => 'required',
-                    'itemCode.*' => 'required',
-                    'supplierItemCode.*' => 'required',
+                    'supplierInvcNo' => 'nullable|string',
+                    'purchaseTypeCode' => 'nullable|string',
+                    'purchaseStatusCode' => 'nullable|string',
+                    'itemCode.*' => 'nullable|string|exists:product_services,itemCd',
+                    'supplierItemCode.*' => 'nullable|string',
+                    'mapQuantity.*' => 'nullable|numeric',
                 ];
 
                 // Validate request data
@@ -1358,6 +1359,7 @@ class PurchaseController extends Controller
                     $itemPurchases[] = [
                         'supplierItemCode' => $request->input('supplierItemCode')[$key],
                         'itemCode' => $itemCode,
+                        'mapQuantity' => $request->input('mapQuantity')[$key],
                     ];
                 }
 

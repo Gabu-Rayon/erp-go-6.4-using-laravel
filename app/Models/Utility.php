@@ -66,7 +66,6 @@ class Utility extends Model
     {
         if (\Auth::check()) {
             $data = Utility::getSettingById(\Auth::user()->creatorId());
-            //        $data=$data->where('created_by','=',\Auth::user()->creatorId())->get();
             if (count($data) == 0) {
                 $data = Utility::getSetting();
             }
@@ -75,8 +74,8 @@ class Utility extends Model
         }
 
         $settings = [
-            "site_currency" => "USD",
-            "site_currency_symbol" => "$",
+            "site_currency" => "KES",
+            "site_currency_symbol" => "KES ",
             "site_currency_symbol_position" => "pre",
             "site_date_format" => "M j, Y",
             "site_time_format" => "g:i A",
