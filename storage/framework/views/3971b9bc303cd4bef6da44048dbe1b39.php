@@ -42,14 +42,6 @@
                                 <tr class="font-style">
                                     <td><?php echo e($warehouse->name); ?></td>
                                     <td><?php echo e($warehouse->address); ?></td>
-                                    <?php echo e(\Log::info('WAREHOUSE')); ?>
-
-                                    <?php echo e(\Log::info($warehouse)); ?>
-
-                                    <?php echo e(\Log::info('BRANCHES')); ?>
-
-                                    <?php echo e(\Log::info($branches)); ?>
-
                                     <td><?php echo e($branches[$warehouse->branch_id]); ?></td>
                                     <td><?php echo e($warehouse->city); ?></td>
                                     <td><?php echo e($warehouse->city_zip); ?></td>
