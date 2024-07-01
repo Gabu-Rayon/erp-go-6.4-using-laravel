@@ -1548,7 +1548,7 @@
             <?php endif; ?>
 
 
-            <?php if(\Auth::user()->type == 'company'): ?>
+            <?php if(\Auth::user()->type == 'super admin'): ?>
                 <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'api-initialization' ? 'active' : ''); ?>">
                     <a href="<?php echo e(route('apiinitialization.index')); ?>" class="dash-link">
                         <span class="dash-micon">

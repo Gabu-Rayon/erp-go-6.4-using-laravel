@@ -4665,6 +4665,9 @@ class Utility extends Model
         $user = User::find(\Auth::user()->creatorId());
         $plan = \App\Models\Plan::find($user->plan);
 
+        \Log::info('USERRR');
+        \Log::info($user);
+
         return $plan;
     }
     //start for chartOfAccount data show
