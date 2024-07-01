@@ -55,7 +55,7 @@ class PurchaseController extends Controller
                 return redirect()->back()->with('error', 'Permission Denied');
             }
         } catch (\Exception $e) {
-            \Log::info('RENDER PURCHASE INDEX ERROR');
+            \Log::info('RENDER PURCHASE INDEX ERROR : ');
             \Log::info($e);
 
             return redirect()->back()->with('error', $e->getMessage());
