@@ -7,7 +7,10 @@ use App\Imports\CustomerImport;
 use App\Models\Customer;
 use App\Models\CustomField;
 use App\Models\Transaction;
+use App\Models\Utility;
 use Auth;
+use App\Models\User;
+use App\Models\Plan;
 use File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\Response;
@@ -36,8 +39,6 @@ class CustomerController extends Controller
             \Auth::user()->type == 'accountant'
             || \Auth::user()->type == 'company'
         ){
-            \Log::info('CREATOR');
-            \Log::info(\Auth::user()->creatorId());
             $customers = Customer::where('created_by', \Auth::user()->creatorId())->get();
 
             return view('customer.index', compact('customers'));
@@ -59,107 +60,207 @@ class CustomerController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * 
-     */
+/***
+    public function store(Request $request)
+    {
+        if (\Auth::user()->can('create customer')) {
 
-    public function store(Request $request) {
-        try {
-
-            $data = $request->all();
-
-            $validator = \Validator::make($data, [
-                'customerNo' => 'required|unique:customers|min:1|max:9',
-                'customerTin' => 'required|unique:customers|min:1|max:11',
-                'customerName' => 'required|min:1|max:60',
-                'address' => 'string|nullable',
-                'telNo' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'email' => 'nullable|email|unique:customers',
-                'faxNo' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'isUsed' => 'boolean|nullable',
-                'remark' => 'string|nullable',
-            ]);
-
-            if ($validator->fails()) {
-                return redirect()->back()->with('error', $validator->errors()->first());
-            }
-
-            $apiData = [
-                "customerNo"=> $data['customerNo'],
-                "customerTin"=> $data['customerTin'],
-                "customerName"=> $data['customerName'],
-                "address"=> $data['address'],
-                "telNo"=> $data['telNo'],
-                "email"=> $data['email'],
-                "faxNo"=> $data['faxNo'],
-                "isUsed"=> $data['isUsed'] == '1' ? true : false,
-                "remark"=> $data['remark'],
+            $rules = [
+                'customertin' => 'required',
+                'name' => 'required',
+                'address' => 'required',
+                'telno' => 'required',
+                'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
+                'email' => [
+                    'required',
+                    Rule::unique('customers')->where(function ($query) {
+                        return $query->where('created_by', \Auth::user()->id);
+                    }),
+                    'faxno' => 'required',
+                    'remark' => 'required',
+                ],
             ];
 
-            \Log::info('API DATA');
-            \Log::info($apiData);
 
-            // $url = 'https://etims.your-apps.biz/api/AddCustomer';
+            $validator = \Validator::make($request->all(), $rules);
 
-            // $response = Http::withHeaders([
-            //     'key' => '123456',
-            // ])->withOptions([
-            //     'verify' => false,
-            // ])->post($url, $apiData);
+            if ($validator->fails()) {
+                $messages = $validator->getMessageBag();
+                return redirect()->route('customer.index')->with('error', $messages->first());
+            }
 
-            // if (!$response['statusCode'] || $response['statusCode'] != 200) {
-            //     return redirect()->back()->with('error', 'Error in creating customer');
-            // }
+            $objCustomer = \Auth::user();
+            $creator = User::find($objCustomer->creatorId());
+            $total_customer = $objCustomer->countCustomers();
+            $plan = Plan::find($creator->plan);
 
-            \DB::beginTransaction();
+            $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->first();
+            if ($total_customer < $plan->max_customers || $plan->max_customers == -1) {
+                $customer = new Customer();
+                $customer->customer_id = $this->customerNumber();
+                $customer->customertin = $request->customertin;
+                $customer->name = $request->name;
+                $customer->address = $request->address;
+                $customer->telno = $request->telno;
+                $customer->email = $request->email;
+                $customer->faxno = $request->faxno;
+                $customer->remark = $request->remark;
+                $customer->tax_number = $request->tax_number;
+                $customer->contact = $request->contact;
+                $customer->created_by = \Auth::user()->creatorId();
+                $customer->billing_name = $request->billing_name;
+                $customer->billing_country = $request->billing_country;
+                $customer->billing_state = $request->billing_state;
+                $customer->billing_city = $request->billing_city;
+                $customer->billing_phone = $request->billing_phone;
+                $customer->billing_zip = $request->billing_zip;
+                $customer->billing_address = $request->billing_address;
 
+                $customer->shipping_name = $request->shipping_name;
+                $customer->shipping_country = $request->shipping_country;
+                $customer->shipping_state = $request->shipping_state;
+                $customer->shipping_city = $request->shipping_city;
+                $customer->shipping_phone = $request->shipping_phone;
+                $customer->shipping_zip = $request->shipping_zip;
+                $customer->shipping_address = $request->shipping_address;
 
-            \Log::info('CREATOR Creating   Customer ');
-            \Log::info(\Auth::user()->creatorId());
+                $customer->lang = !empty($default_language) ? $default_language->value : '';
 
-            $customer = Customer::create([
-                'customerNo' => $data['customerNo'],
-                'customerTin' => $data['customerTin'],
-                'customerName' => $data['customerName'],
-                'address' => $data['address'],
-                'telNo' => $data['telNo'],
-                'email' => $data['email'],
-                'faxNo' => $data['faxNo'],
-                'isUsed' => $data['isUsed'] == '1' ? true : false,
-                'remark' => $data['remark'],
-                'created_by' => \Auth::user()->creatorId(),
-                'billing_name' => $data['billing_name'],
-                'billing_country' => $data['billing_country'],
-                'billing_state' => $data['billing_state'],
-                'billing_city' => $data['billing_city'],
-                'billing_phone' => $data['billing_phone'],
-                'billing_zip' => $data['billing_zip'],
-                'billing_address' => $data['billing_address'],
-                'shipping_name' => $data['shipping_name'],
-                'shipping_country' => $data['shipping_country'],
-                'shipping_state' => $data['shipping_state'],
-                'shipping_city' => $data['shipping_city'],
-                'shipping_phone' => $data['shipping_phone'],
-                'shipping_zip' => $data['shipping_zip'],
-                'shipping_address' => $data['shipping_address'],
-                'lang' => $data['lang'] ?? 'en',
-                'balance' => $data['balance'] ?? 0,
-            ]);
+                $customer->save();
+                CustomField::saveData($customer, $request->customField);
+            } else {
+                return redirect()->back()->with('error', __('Your user limit is over, Please upgrade plan.'));
+            }
 
-            CustomField::saveData($customer, $request->customField);
+            //For Notification
+            $setting = Utility::settings(\Auth::user()->creatorId());
+            $customerNotificationArr = [
+                'user_name' => \Auth::user()->name,
+                'customer_name' => $customer->name,
+                'customer_email' => $customer->email,
+            ];
 
-            \DB::commit();
+            //Twilio Notification
+            if (isset($setting['twilio_customer_notification']) && $setting['twilio_customer_notification'] == 1) {
+                Utility::send_twilio_msg($request->contact, 'new_customer', $customerNotificationArr);
+            }
+
 
             return redirect()->route('customer.index')->with('success', __('Customer successfully created.'));
-        } catch (\Exception $e) {
-            \DB::rollBack();
-            \Log::error('STORE CUSTOMER ERROR');
-            \Log::error($e);
-
-            return redirect()->back()->with('error', $e->getMessage());
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
+****/
+    public function store(Request $request)
+    {
+
+
+        \Log::info('creacting customer Request : ');
+        \Log::info($request);
+        if(
+            \Auth::user()->type == 'accountant'
+            || \Auth::user()->type == 'company'
+        ){
+
+            $rules = [
+                'customerTin' => 'required|between:9,15',
+                'customerName' => 'required',
+                'address' => 'required',
+                'telNo' => 'required',
+                'email' => [
+                    'required',
+                    Rule::unique('customers')->where(function ($query) {
+                        return $query->where('created_by', \Auth::user()->id);
+                    }),
+                    'faxNo' => 'required',
+                    'remark' => 'required',
+                ],
+            ];
+            
+            $validator = \Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                $messages = $validator->getMessageBag();
+                return redirect()->route('customer.index')->with('error', $messages->first());
+            }
+
+
+            // Create a new customer instance
+            $customer = new Customer();
+            $customer->customer_id = $this->customerNumber();
+            $customer->customerNo = $this->customerNumber();
+            $customer->customerTin = $request->customerTin;
+            $customer->name = $request->customerName;
+            $customer->email = $request->email;
+            $customer->address = $request->address;
+            $customer->tax_number = $request->customerTin;
+            $customer->contact = $request->contact;
+            $customer->faxNo = $request->faxNo;
+            $customer->isUsed = $request->isUsed;
+            $customer->remark = $request->remark;
+            $customer->avatar = $request->avatar;
+            $customer->created_by = \Auth::user()->creatorId();
+            $customer->billing_name = $request->billing_name;
+            $customer->billing_country = $request->billing_country;
+            $customer->billing_state = $request->billing_state;
+            $customer->billing_city = $request->billing_city;
+            $customer->billing_phone = $request->billing_phone;
+            $customer->billing_zip = $request->billing_zip;
+            $customer->billing_address = $request->billing_address;
+
+            $customer->shipping_name = $request->shipping_name;
+            $customer->shipping_country = $request->shipping_country;
+            $customer->shipping_state = $request->shipping_state;
+            $customer->shipping_city = $request->shipping_city;
+            $customer->shipping_phone = $request->shipping_phone;
+            $customer->shipping_zip = $request->shipping_zip;
+            $customer->shipping_address = $request->shipping_address;
+
+            $customer->lang = !empty($default_language) ? $default_language->value : '';
+            // Save customer to local database
+            $customer->save();
+            CustomField::saveData($customer, $request->customField);
+
+            //array containing the data to be sent to the API
+            $requestData = [
+                'customerNo' => $this->customerNumber(),
+                'customerTin' => $request->customerTin,
+                'customerName' => $request->customerName,
+                'address' => $request->address,
+                'telNo' => $request->telNo,
+                'email' => $request->email,
+                'faxNo' => $request->faxNo,
+                'isUsed' => true,
+                'remark' => $request->remark,
+            ];
+            $response = Http::withOptions(['verify' => false])->withHeaders([
+                'accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'key' => '123456', 
+            ])->post('https://etims.your-apps.biz/api/AddCustomer', $requestData);
+
+
+            // Log the response status code
+            \Log::info('API Response Status Code: ' . $response->status());
+            \Log::info('API Request Data: ' . json_encode($requestData));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+
+
+            // Check if API call was successful
+            if ($response->successful()) {
+                return redirect()->route('customer.index')->with('success', __('Customer successfully created.'));
+            } else {
+                // If API call failed, return with error message
+                return redirect()->back()->with('error', __('Failed to create customer.'));
+            }
+
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
+
 
     public function show($ids)
     {
