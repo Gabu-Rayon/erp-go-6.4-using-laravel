@@ -29,26 +29,17 @@
 
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
-        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create invoice')): ?>
             <a href="<?php echo e(route('invoice.create',$customer->id)); ?>" class="btn btn-sm btn-primary">
                 <?php echo e(__('Create Invoice')); ?>
 
             </a>
-        <?php endif; ?>
-        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create proposal')): ?>
             <a href="<?php echo e(route('proposal.create',$customer->id)); ?>" class="btn btn-sm btn-primary">
                 <?php echo e(__('Create Proposal')); ?>
 
             </a>
-        <?php endif; ?>
-
-        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('edit customer')): ?>
             <a href="#" data-size="lg" data-url="<?php echo e(route('customer.edit',$customer['id'])); ?>" data-ajax-popup="true" title="<?php echo e(__('Edit Customer')); ?>" data-bs-toggle="tooltip" data-original-title="<?php echo e(__('Edit')); ?>" class="btn btn-sm btn-primary">
                 <i class="ti ti-pencil"></i>
             </a>
-        <?php endif; ?>
-
-        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('delete customer')): ?>
             <?php echo Form::open(['method' => 'DELETE','class' => 'delete-form-btn', 'route' => ['customer.destroy', $customer['id']]]); ?>
 
                 <a href="#" data-bs-toggle="tooltip" title="<?php echo e(__('Delete Customer')); ?>" data-confirm="<?php echo e(__('Are You Sure?').'|'.__('This action can not be undone. Do you want to continue?')); ?>" data-confirm-yes="document.getElementById('delete-form-<?php echo e($customer['id']); ?>').submit();" class="btn btn-sm btn-danger bs-pass-para">
@@ -56,7 +47,6 @@
                 </a>
             <?php echo Form::close(); ?>
 
-        <?php endif; ?>
     </div>
 <?php $__env->stopSection(); ?>
 

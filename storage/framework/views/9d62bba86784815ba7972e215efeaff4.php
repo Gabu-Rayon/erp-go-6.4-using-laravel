@@ -69,7 +69,7 @@ $profile=\App\Models\Utility::get_file('uploads/avatar/');
                                         </a>
                                     </td>
                                     <td class="font-style"><?php echo e($customer['name']); ?></td>
-                                    <td><?php echo e($customer['contact'] ?? '-'); ?></td>
+                                    <td><?php echo e($customer['faxNo'] ?? '-'); ?></td>
                                     <td><?php echo e($customer['email'] ?? '-'); ?></td>
                                     <td><?php echo e(\Auth::user()->priceFormat($customer['balance'])); ?></td>
                                     <td class="Action">
