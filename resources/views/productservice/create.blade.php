@@ -146,7 +146,7 @@
                                         <div class="form-group">
                                             {{ Form::label('pkgUnitCode', __('Package Unit Code'), ['class' => 'form-label']) }}
                                             <span class="text-danger">*</span>
-                                            {{ Form::select('qtyUnitCode', $packagingUnitCodes, null, ['class' => 'form-control', 'placeholder' => __('Select Package Unit Code'), 'required' => 'required']) }}
+                                            {{ Form::select('qtyUnitCode', $packagingUnitCodes, null, ['class' => 'form-control select2', 'placeholder' => __('Select Package Unit Code'), 'required' => 'required']) }}
                                         </div>
                                     </td>
                                     <td class="form-group col-md-3">

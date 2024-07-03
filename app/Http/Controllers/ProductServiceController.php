@@ -120,7 +120,6 @@ class ProductServiceController extends Controller
                     'packagingUnitCodes',
                     'countrynames',
                     'productServicesPackagingUnit',
-                    'quantityUnitCode',
                     'taxationtype',
                     'category',
                     'customFields'
@@ -142,6 +141,11 @@ class ProductServiceController extends Controller
     {
         try {
             $data = $request->all();
+
+
+            \Log::info("Data from the Form creating new Product and Service : ");
+            \Log::info($data);
+
 
             $validator = \Validator::make(
                 $data,
