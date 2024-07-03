@@ -41,7 +41,7 @@ class StockController extends Controller
 
         if (\Auth::user()->type == 'company') {
             try {
-                $items = ProductService::where('created_by', \Auth::user()->id)->get()->pluck('itemName', 'itemCode');
+                $items = ProductService::where('created_by', \Auth::user()->id)->get()->pluck('itemNm', 'itemCd');
                 $releaseTypes = ReleaseType::all()->pluck('type', 'code');
                 return view('stockadjustment.create', compact('items', 'releaseTypes'));
             } catch (\Exception $e) {
@@ -63,13 +63,15 @@ class StockController extends Controller
         try {
 
             $data = $request->all();
+            \Log::info("Data  from the form  Adjust Stock :" );
+            \Log::info($data);
             
             $validator = Validator::make($data, [
                 'storeReleaseTypeCode' => 'required',
-                'stockItemList' => 'required|array',
-                'stockItemList.*.itemCode' => 'required',
-                'stockItemList.*.packageQuantity' => 'required|numeric',
-                'stockItemList.*.quantity' => 'required|numeric',
+                'items' => 'required|array',
+                'items.*.itemCode' => 'required',
+                'items.*.packageQuantity' => 'required|numeric',
+                'items.*.quantity' => 'required|numeric',
             ]);
 
             
@@ -84,19 +86,23 @@ class StockController extends Controller
             ])->post($url, [
                 'storeReleaseTypeCode' => $data['storeReleaseTypeCode'],
                 'remark' => $data['remark'],
-                'stockItemList' => $data['stockItemList']
+                'stockItemList' => $data['items']
             ]);
 
             if ($response['statusCode'] !== 200) {
                 return redirect()->back()->with('error', 'Check your credentials and try again');
             }
+            // Log response data
+            \Log::info('API Response Status Code For Posting Stock Adjustment : ' . $response->status());
+            \Log::info('API Request  Stock Adjustment Data Posted: ' . json_encode($response));
+            \Log::info('API Response Body For Posting  Stock Adjustment Data: ' . $response->body());
 
             $updatedItems = [];
 
             DB::beginTransaction();
 
-            foreach ($data['stockItemList'] as $item) {
-                $productService = ProductService::where('itemCode', $item['itemCode'])->first();
+            foreach ($data['items'] as $item) {
+                $productService = ProductService::where('itemCd', $item['itemCode'])->first();
 
                 if ($productService) {
                     $productService->quantity += $item['quantity'];
@@ -120,7 +126,7 @@ class StockController extends Controller
             foreach ($updatedItems as $item) {
                 StockAdjustmentProductList::create([
                     'stock_adjustments_id' => $stockAdjustment->id,
-                    'itemCode' => $item->itemCode,
+                    'itemCode' => $item->itemCd,
                     'packageQuantity' => $item->packageQuantity,
                     'quantity' => $item->quantity,
                 ]);
