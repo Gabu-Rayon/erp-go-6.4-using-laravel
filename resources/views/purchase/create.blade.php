@@ -209,15 +209,18 @@
                                 </tr>
                                 <tr>
                                     <td class="col-md-4">
-                                        {{ Form::label('supplrItemCode', __('Supplier Item Code'), ['class' => 'form-label']) }}
+                                        {{ Form::label('supplrItemCode', __('Supplier Item Code'), ['class' => 'form-label']) }}<span
+                                                class="text-success">(Optional)</span>
                                         {{ Form::text('supplrItemCode', null, ['class' => 'form-control']) }}
                                     </td>
                                     <td class="col-md-4">
-                                        {{ Form::label('supplrItemClsCode', __('Supplier Item Class Code'), ['class' => 'form-label']) }}
+                                        {{ Form::label('supplrItemClsCode', __('Supplier Item Class Code'), ['class' => 'form-label']) }}<span
+                                                class="text-success">(Optional)</span>
                                         {{ Form::text('supplrItemClsCode', null, ['class' => 'form-control']) }}
                                     </td>
                                     <td class="col-md-4">
-                                        {{ Form::label('supplrItemName', __('Supplier Item Name'), ['class' => 'form-label']) }}
+                                        {{ Form::label('supplrItemName', __('Supplier Item Name'), ['class' => 'form-label']) }}<span
+                                                class="text-success">(Optional)</span>
                                         {{ Form::text('supplrItemName', null, ['class' => 'form-control']) }}
                                     </td>
                                 </tr>

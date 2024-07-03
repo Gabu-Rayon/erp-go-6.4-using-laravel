@@ -26,8 +26,8 @@ return new class extends Migration{
             $table->unsignedBigInteger('shipping_display')->nullable();
             $table->unsignedBigInteger('discount_apply')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
-            $table->string('trderInvoiceNo')->nullable();
-            $table->string('invoiceNo')->nullable();
+            $table->string('response_trderInvoiceNo')->nullable();
+            $table->string('response_invoiceNo')->nullable();
             $table->string('orgInvoiceNo')->nullable();
             $table->string('customerTin')->nullable();
             $table->string('customerName')->nullable();

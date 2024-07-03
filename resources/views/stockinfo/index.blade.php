@@ -26,9 +26,9 @@
             <button type="submit" class="btn btn-primary sync">{{ __('Search') }}</button>
             {{ Form::close() }}
         </div>
-         <a href="#" data-url="{{ route('stockinfo.create') }}" class="btn btn-sm btn-primary" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Update Stock By Invoice Number')}}">
+         <!-- <a href="#" data-url="{{ route('stockinfo.create') }}" class="btn btn-sm btn-primary" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Update Stock By Invoice Number')}}">
             Update Stock By Invoice Number
-        </a>
+        </a> -->
     </div>
 @endsection
 

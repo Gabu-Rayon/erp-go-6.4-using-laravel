@@ -336,10 +336,10 @@
                                             </label>
                                         </div>
                                     </td>
-                                    <td class="form-group col-md-6">
+                                    <td class="form-group col-md-12">
                                         <?php echo e(Form::label('additionalInfo', __('Additional Info'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::textarea('additionalInfo', '', ['class' => 'form-control', 'required' => 'required'])); ?>
+                                        <?php echo e(Form::textarea('additionalInfo', '', ['class' => 'form-control', 'required' => 'required', 'rows' => '3'])); ?>
 
                                     </td>
                                     <?php if(!$customFields->isEmpty()): ?>
