@@ -14,10 +14,19 @@ class CreateTaxesTable extends Migration
     public function up()
     {
         Schema::create('taxes', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->id();
             $table->string('name');
-            $table->text('rate');
-            $table->integer('created_by');
+            $table->string('rate');
+            $table->string('cdCls');
+            $table->string('cd');
+            $table->string('cdNm');
+            $table->string('cdDesc');
+            $table->char('useYn', 1);
+            $table->integer('srtOrd');
+            $table->string('useDfnCd1')->nullable();
+            $table->string('useDfnCd2')->nullable();
+            $table->string('useDfnCd3')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
         });
     }

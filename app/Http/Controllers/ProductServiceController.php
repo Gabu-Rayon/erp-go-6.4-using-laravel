@@ -1678,6 +1678,33 @@ class ProductServiceController extends Controller
                     'F' => 6,
                 ];
 
+
+                /**
+                 * for Product type Mapping we will check again these parameter when getting item Information form the Api 
+                 * if "itemTyCd": "1", then Raw Material 
+                 * if "itemTyCd": "2", then Finished Product 
+                 * if "itemTyCd": "3", then Service  
+                 * using the model of ItemType   where it has two fillable  (item_type_code,item_type_name)
+                 */
+                  $productTypeMapping = [
+                    1 => 'Raw Material',
+                    2 => 'Finished Product',
+                    3 => 'Service',
+                ];
+                /**
+                 * for UnitId Mapping we will check again these parameter when getting item Information form the Api 
+                 * if "itemTyCd": "1", then Raw Material 
+                 * if "itemTyCd": "2", then Finished Product 
+                 * if "itemTyCd": "3", then Service  
+                 * using the model of ItemType   where it has two fillable  (item_type_code,item_type_name)
+                 */
+
+                 $unitId = null;
+                            if (isset($item['qtyUnitCode'])) {
+                                $unit = ProductServiceUnit::where('code', $item['qtyUnitCode'])->first();
+                                $unitId = $unit ? $unit->id : null;
+                            }
+
                 foreach ($data['data']['itemList'] as $item) {
                     // Determine the tax_id based on taxTyCd
                     $taxIdCode = isset($item['taxTyCd']) && array_key_exists($item['taxTyCd'], $taxTypeMapping)
@@ -1691,7 +1718,7 @@ class ProductServiceController extends Controller
                         'quantity' => null,
                         'tax_id' => $taxIdCode,
                         'category_id' => null,
-                        'unit_id' => null,
+                        'unit_id' => $unitId,
                         'type' => 'product',  // Set the type to 'product'
                         'sale_chartaccount_id' => null,
                         'expense_chartaccount_id' => null,
