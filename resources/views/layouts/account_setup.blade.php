@@ -1,7 +1,14 @@
 <div class="card sticky-top" style="top:30px">
     <div class="list-group list-group-flush" id="useradd-sidenav">
-        <a href="{{route('taxes.index')}}" class="list-group-item list-group-item-action border-0 {{ (Request::route()->getName() == 'taxes.index' ) ? ' active' : '' }}">{{__('Taxes')}} <div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
-
+        <a
+            href="{{route('taxes.index')}}"
+            class="list-group-item list-group-item-action border-0 {{ (Request::route()->getName() == 'taxes.index' ) ? ' active' : '' }}"
+            >
+                {{__('Taxes')}}
+                <div class="float-end">
+                    <i class="ti ti-chevron-right"></i>
+                </div>
+            </a>
         <a
             href="{{route('details.countries')}}"
             class="list-group-item list-group-item-action border-0
@@ -72,6 +79,21 @@
                 }}"
             >
                 {{__('Languages')}}
+                <div class="float-end">
+                    <i class="ti ti-chevron-right"></i>
+                </div>
+        </a>
+
+        <a
+            href="{{route('details.payment-types')}}"
+            class="list-group-item list-group-item-action border-0
+                {{
+                    (Request::route()->getName() == 'details.payment-types' )
+                    ? ' active'
+                    : ''
+                }}"
+            >
+                {{__('Payment Types')}}
                 <div class="float-end">
                     <i class="ti ti-chevron-right"></i>
                 </div>

@@ -153,6 +153,10 @@
                                         </div>
                                     </td>
                                     <td class="form-group col-md-3">
+                                        {{ Form::label('qtyUnitCode', __('Quantity Unit Code'), ['class' => 'form-label']) }}
+                                        {{ Form::select('qtyUnitCode', $quantityUnitCode, null, ['class' => 'form-control select2', 'placeholder' => __('Select Quantity Unit Code'), 'required' => 'required']) }}
+                                    </td>
+                                    <td class="form-group col-md-3">
                                         <div class="form-group">
                                             {{ Form::label('barcode', __('Bar Code'), ['class' => 'form-label']) }}
                                             {{ Form::text('barcode', '', ['class' => 'form-control']) }}
@@ -206,10 +210,6 @@
                                             {{ Form::label('packageQuantity', __('Package Quantity'), ['class' => 'form-label']) }}
                                             {{ Form::number('packageQuantity', '', ['class' => 'form-control']) }}
                                         </div>
-                                    </td>
-                                    <td class="form-group col-md-3">
-                                        {{ Form::label('qtyUnitCode', __('Quantity Unit Code'), ['class' => 'form-label']) }}
-                                        {{ Form::select('qtyUnitCode', $quantityUnitCode, null, ['class' => 'form-control select2', 'placeholder' => __('Select Quantity Unit Code'), 'required' => 'required']) }}
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('taxTypeCode', __('Tax Type Code'), ['class' => 'form-label']) }}
