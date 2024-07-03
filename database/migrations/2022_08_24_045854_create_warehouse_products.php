@@ -15,10 +15,12 @@ class CreateWarehouseProducts extends Migration
     {
         Schema::create('warehouse_products', function (Blueprint $table) {
             $table->id();
-            $table->integer('warehouse_id')->default(0);
-            $table->integer('product_id')->default(0);
-            $table->integer('quantity')->default('0');
-            $table->integer('created_by')->default('0');
+            $table->integer('warehouse_id')->default(0)->nullable();
+            $table->integer('product_id')->default(0)->nullable();
+            $table->string('itemCd');
+            $table->integer('quantity')->default('0')->nullable();            
+            $table->integer('packageQuantity')->default('0')->nullable();
+            $table->integer('created_by')->default('0')->nullable();
             $table->timestamps();
         });
     }

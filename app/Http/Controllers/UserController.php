@@ -45,7 +45,7 @@ class UserController extends Controller
     public function create()
     {
 
-        if (\Auth::user()->type == 'super admin') {
+        if (\Auth::user()->type == 'super admin' || 'company') {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'user')->get();
             $user = \Auth::user();
             $roles = Role::where('created_by', '=', $user->creatorId())->where('name', '!=', 'client')->get()->pluck('name', 'id');

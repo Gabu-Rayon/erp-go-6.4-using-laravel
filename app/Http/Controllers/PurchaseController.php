@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Exception;
 use Carbon\Carbon;
-use App\Models\Bill;
 use App\Models\User;
 use App\Models\Vender;
 use App\Models\Details;
@@ -13,11 +12,8 @@ use App\Models\Purchase;
 use App\Models\warehouse;
 use App\Models\BankAccount;
 use App\Models\CustomField;
-use App\Models\StockReport;
 use App\Models\Transaction;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\Models\Purchase_Sales;
 use App\Models\ProductService;
 use App\Models\mappedPurchases;
 use App\Models\PurchasePayment;
@@ -29,12 +25,12 @@ use App\Models\PurchaseTypeCodes;
 use App\Models\WarehouseTransfer;
 use Illuminate\Support\Facades\DB;
 use App\Models\PurchaseStatusCodes;
-use App\Models\Purchase_Sales_Items;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\ProductServiceCategory;
 use App\Models\MappedPurchaseItemList;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -47,7 +43,6 @@ class PurchaseController extends Controller
      */
     public function index(Request $request)
     {
-
         try {
             if (\Auth::user()->type == 'company') {
                 $vender = Vender::all()->pluck('name', 'id');
@@ -60,184 +55,12 @@ class PurchaseController extends Controller
                 return redirect()->back()->with('error', 'Permission Denied');
             }
         } catch (\Exception $e) {
-            \Log::info('RENDER PURCHASE INDEX ERROR');
+            \Log::info('RENDER PURCHASE INDEX ERROR : ');
             \Log::info($e);
 
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
-
-
-    /**
-     * Using Api Endpoint
-     * 
-     *  */
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    // public function create($vendorId)
-    // {
-    //     if (\Auth::user()->can('create purchase')) {
-    //         $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
-    //         $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
-    //         $category->prepend('Select Category', '');
-
-    //         $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
-    //         $suppliers = Vender::all()->pluck('name', 'id');
-    //         $suppliers->prepend('Select Supplier', '');
-
-    //         $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-    //         $warehouse->prepend('Select Warehouse', '');
-
-    //         $product_services = ProductService::get()->pluck('itemNm', 'id');
-    //         $product_services_Codes = ProductService::get()->pluck('itemNm', 'itemCd');
-    //         $product_services_Codes->prepend('--', '');
-    //         $product_services->prepend('--', '');
-    //         // Fetch countries code  from the details model
-    //         $countries = Details::where('cdCls', '05')->get();
-    //         // Fetch countries data from the Details model where cdCls is 05
-    //         $countries = Details::where('cdCls', '05')->get()->pluck('cdNm', 'cdVal');
-    //         $paymentTypeCodes = PaymentTypeCodes::get()->pluck('payment_type_code');
-    //         $purchaseTypeCodes = PurchaseTypeCodes::get()->pluck('purchase_type_code');
-    //         $purchaseStatusCodes = PurchaseStatusCodes::get()->pluck('purchase_status_code');
-    //         $ReceiptTypesCodes = ReceiptTypeCodes::get()->pluck('receipt_type_code');
-    //         return view('purchase.create', compact('product_services_Codes','paymentTypeCodes', 'purchaseTypeCodes', 'purchaseStatusCodes', 'ReceiptTypesCodes', 'suppliers', 'purchase_number', 'product_services', 'category', 'customFields', 'vendorId', 'warehouse', 'countries'));
-    //     } else {
-    //         return response()->json(['error' => __('Permission denied.')], 401);
-    //     }
-    // }
-    /********************** 
- 
-  * Add Purchase to API END POINT 
-  * 
-  ********************************************/
-    // public function getPurchaseSalesItemsFromApi()
-    // {
-    //     try {
-    //         if (\Auth::user()->type == 'company') {
-    //             ini_set('max_execution_time', 300);
-
-    //             $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
-
-    //             // $response = Http::withHeaders([
-    //             //     'key' => '123456'
-    //             // ])->get($url);
-
-    //             $response = Http::withHeaders([
-    //                 'key' => '123456'
-    //             ])->timeout(300)->get($url);
-
-    //             //  $response = retry(3, function () use ($url) {
-    //             //  return Http::withHeaders([
-    //             //  'key' => '123456'
-    //             //  ])->timeout(60000)->get($url); 
-    //             // }, 100); 
-
-
-    //             $data = $response->json();
-    //             $purchaseSalesList = $data['data']['data']['saleList'];
-
-    //             \Log::info('API Request Data  of Sales and Purchases: ' . json_encode($purchaseSalesList));
-    //             \Log::info('API Response: ' . $response->body());
-    //             \Log::info('API Response Status Code: ' . $response->status());
-
-    //             // Initialize purchase_id counter
-    //             $purchaseId = 1;
-
-    //             // Divide the data into batches of 100 items each
-    //             if (isset($purchaseSalesList)) {
-    //                 foreach ($purchaseSalesList as $class) {
-    //                     // Initialize    $saleItemCode as null
-    //                     $saleItemCode = null;
-
-    //                     if (isset($class['spplrInvcNo'])) {
-    //                         $saleItemCode = $class['spplrInvcNo'];
-    //                     }
-    //                     \Log::info('API Request Data of Sales and Purchases All Invoices No: ' . json_encode($saleItemCode));
-    //                     $itemlists = $class['itemList'];
-    //                     if (isset($itemlists)) {
-    //                         $batches = array_chunk($itemlists, 100);
-    //                         foreach ($batches as $batch) {
-    //                             foreach ($batch as $item) {
-    //                                 \Log::info('Processing item with spplrInvcNo: ' . $saleItemCode . ' and item: ' . json_encode($item));
-    //                                 if (!empty($saleItemCode)) {
-
-    //                                     // Initialize the tax code variable
-    //                                     $taxCode = null;
-    //                                     // Map the tax type code to the tax code
-    //                                     switch ($item['taxTyCd']) {
-    //                                         case 'A':
-    //                                             $taxCode = 1;
-    //                                             break;
-    //                                         case 'B':
-    //                                             $taxCode = 2;
-    //                                             break;
-    //                                         case 'C':
-    //                                             $taxCode = 3;
-    //                                             break;
-    //                                         case 'D':
-    //                                             $taxCode = 4;
-    //                                             break;
-    //                                         case 'E':
-    //                                             $taxCode = 5;
-    //                                             break;
-    //                                         case 'F':
-    //                                             $taxCode = 6;
-    //                                             break;
-    //                                         default:
-    //                                             $taxCode = null;
-    //                                             break;
-    //                                     }
-
-    //                                     PurchaseProduct::create([
-    //                                         'purchase_id' => $purchaseId,
-    //                                         'quantity' => $item['totAmt'],
-    //                                         'tax' => $taxCode,
-    //                                         'price' => $item['prc'],
-    //                                         'discount' => $item['prc'] * $item['dcRt'] / 100,
-    //                                         'saleItemCode' => $saleItemCode,
-    //                                         'itemSeq' => $item['itemSeq'],
-    //                                         'itemCd' => $item['itemCd'],
-    //                                         'itemClsCd' => $item['itemClsCd'],
-    //                                         'itemNm' => $item['itemNm'],
-    //                                         'bcd' => $item['bcd'],
-    //                                         'spplrItemClsCd' => $item['spplrItemClsCd'],
-    //                                         'spplrItemCd' => $item['spplrItemCd'],
-    //                                         'spplrItemNm' => $item['spplrItemNm'],
-    //                                         'pkgUnitCd' => $item['pkgUnitCd'],
-    //                                         'pkg' => $item['pkg'],
-    //                                         'qtyUnitCd' => $item['qtyUnitCd'],
-    //                                         'qty' => $item['qty'],
-    //                                         'prc' => $item['prc'],
-    //                                         'splyAmt' => $item['splyAmt'],
-    //                                         'dcRt' => $item['dcRt'],
-    //                                         'taxTyCd' => $item['taxTyCd'],
-    //                                         'taxblAmt' => $item['taxblAmt'],
-    //                                         'taxAmt' => $item['taxAmt'],
-    //                                         'totAmt' => $item['totAmt'],
-    //                                         'itemExprDt' => $item['itemExprDt']
-    //                                     ]);
-
-    //                                 }
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //             return redirect()->route('purchase.index')->with('success', __('Sales Items Lists Details successfully created from Api.'));
-    //         } else {
-    //             return redirect()->route('purchase.index')->with('error', __('Permission Denied'));
-    //         }
-    //     } catch (\Exception $e) {
-    //         \Log::error('Error adding Item Information from the API: ' . $e->getMessage());
-    //         \Log::info($e);
-    //         return redirect()->route('purchase.index')->with('error', __('Error adding Sales Items Lists Details  from the API.'));
-    //     }
-    // }
-
 
     public function getPurchaseSalesItemsFromApi()
     {
@@ -438,341 +261,26 @@ class PurchaseController extends Controller
         }
     }
 
-    // public function synchronize()
-    // {
-    //     \Log::info('Purchase synchronize button clicked to get all  the purchase lists from the Etims  ');
-
-    //     if (\Auth::user()->type == 'company') {
-    //         try {
-    //             // Check if the user is a company type
-    //             if (\Auth::user()->type == 'company') {
-    //                 ini_set('max_execution_time', 300);
-
-    //                 $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
-
-    //                 // Fetch data from API
-    //                 $response = Http::withHeaders([
-    //                     'key' => '123456'
-    //                 ])->timeout(300)->get($url);
-
-    //                 // Check if the response is failed
-    //                 if ($response->failed()) {
-    //                     throw new \Exception('Failed to fetch data from the API. Status: ' . $response->status());
-    //                 }
-
-    //                 $data = $response->json();
-    //                 $purchaseSalesList = $data['data']['data']['saleList'];
-
-    //                 // Log the response details
-    //                 \Log::info('API Request Data of Sales and Purchases: ' . json_encode($purchaseSalesList));
-    //                 \Log::info('API Response: ' . $response->body());
-    //                 \Log::info('API Response Status Code: ' . $response->status());
-
-    //                 // Initialize purchase_id counter
-    //                 $purchaseId = 1;
-
-    //                 if (isset($purchaseSalesList)) {
-    //                     foreach ($purchaseSalesList as $class) {
-    //                         // Initialize variables
-    //                         $saleItemCode = $class['spplrInvcNo'] ?? null;
-    //                         \Log::info('API Request Data of Sales and Purchases All Invoices No: ' . json_encode($saleItemCode));
-
-    //                         // Process supplier details
-    //                         Purchase::create([
-    //                             'purchase_id' => $purchaseId++,
-    //                             'vender_id' => null,
-    //                             'warehouse_id' => 1,
-    //                             'purchase_date' => $class['salesDt'],
-    //                             'purchase_number' => null,
-    //                             'discount_apply' => null,
-    //                             'category_id' => null,
-    //                             'created_by' => \Auth::user()->creatorId(),
-    //                             'spplrTin' => $class['spplrTin'],
-    //                             'spplrNm' => $class['spplrNm'],
-    //                             'spplrBhfId' => $class['spplrBhfId'],
-    //                             'spplrInvcNo' => $class['spplrInvcNo'],
-    //                             'spplrSdcId' => $class['spplrSdcId'],
-    //                             'spplrMrcNo' => $class['spplrMrcNo'],
-    //                             'rcptTyCd' => $class['rcptTyCd'],
-    //                             'pmtTyCd' => $class['pmtTyCd'],
-    //                             'cfmDt' => $class['cfmDt'],
-    //                             'salesDt' => $class['salesDt'],
-    //                             'stockRlsDt' => $class['stockRlsDt'],
-    //                             'totItemCnt' => $class['totItemCnt'],
-    //                             'taxblAmtA' => $class['taxblAmtA'],
-    //                             'taxblAmtB' => $class['taxblAmtB'],
-    //                             'taxblAmtC' => $class['taxblAmtC'],
-    //                             'taxblAmtD' => $class['taxblAmtD'],
-    //                             'taxblAmtE' => $class['taxblAmtE'],
-    //                             'taxRtA' => $class['taxRtA'],
-    //                             'taxRtB' => $class['taxRtB'],
-    //                             'taxRtC' => $class['taxRtC'],
-    //                             'taxRtD' => $class['taxRtD'],
-    //                             'taxRtE' => $class['taxRtE'],
-    //                             'taxAmtA' => $class['taxAmtA'],
-    //                             'taxAmtB' => $class['taxAmtB'],
-    //                             'taxAmtC' => $class['taxAmtC'],
-    //                             'taxAmtD' => $class['taxAmtD'],
-    //                             'taxAmtE' => $class['taxAmtE'],
-    //                             'totTaxblAmt' => $class['totTaxblAmt'],
-    //                             'totTaxAmt' => $class['totTaxAmt'],
-    //                             'totAmt' => $class['totAmt'],
-    //                             'remark' => $class['remark']
-    //                         ]);
-
-    //                         if (!empty($saleItemCode)) {
-    //                             $purchase = Purchase::where('spplrInvcNo', $saleItemCode)->first();
-
-    //                             if ($purchase) {
-    //                                 $purchaseId = $purchase->id;
-
-    //                                 $itemlists = $class['itemList'];
-    //                                 if (isset($itemlists)) {
-    //                                     $batches = array_chunk($itemlists, 100);
-    //                                     foreach ($batches as $batch) {
-    //                                         foreach ($batch as $item) {
-    //                                             \Log::info('Processing item with spplrInvcNo: ' . $saleItemCode . ' and item: ' . json_encode($item));
-
-    //                                             // Map tax type code to tax code
-    //                                             $taxCode = null;
-    //                                             switch ($item['taxTyCd']) {
-    //                                                 case 'A':
-    //                                                     $taxCode = 1;
-    //                                                     break;
-    //                                                 case 'B':
-    //                                                     $taxCode = 2;
-    //                                                     break;
-    //                                                 case 'C':
-    //                                                     $taxCode = 3;
-    //                                                     break;
-    //                                                 case 'D':
-    //                                                     $taxCode = 4;
-    //                                                     break;
-    //                                                 case 'E':
-    //                                                     $taxCode = 5;
-    //                                                     break;
-    //                                                 case 'F':
-    //                                                     $taxCode = 6;
-    //                                                     break;
-    //                                                 default:
-    //                                                     $taxCode = null;
-    //                                                     break;
-    //                                             }
-
-    //                                             // Create purchase product record
-    //                                             PurchaseProduct::create([
-    //                                                 'purchase_id' => $purchaseId,
-    //                                                 'quantity' => $item['totAmt'],
-    //                                                 'tax' => $taxCode,
-    //                                                 'price' => $item['prc'],
-    //                                                 'discount' => $item['prc'] * $item['dcRt'] / 100,
-    //                                                 'saleItemCode' => $saleItemCode,
-    //                                                 'itemSeq' => $item['itemSeq'],
-    //                                                 'itemCd' => $item['itemCd'],
-    //                                                 'itemClsCd' => $item['itemClsCd'],
-    //                                                 'itemNm' => $item['itemNm'],
-    //                                                 'bcd' => $item['bcd'],
-    //                                                 'spplrItemClsCd' => $item['spplrItemClsCd'],
-    //                                                 'spplrItemCd' => $item['spplrItemCd'],
-    //                                                 'spplrItemNm' => $item['spplrItemNm'],
-    //                                                 'pkgUnitCd' => $item['pkgUnitCd'],
-    //                                                 'pkg' => $item['pkg'],
-    //                                                 'qtyUnitCd' => $item['qtyUnitCd'],
-    //                                                 'qty' => $item['qty'],
-    //                                                 'prc' => $item['prc'],
-    //                                                 'splyAmt' => $item['splyAmt'],
-    //                                                 'dcRt' => $item['dcRt'],
-    //                                                 'taxTyCd' => $item['taxTyCd'],
-    //                                                 'taxblAmt' => $item['taxblAmt'],
-    //                                                 'taxAmt' => $item['taxAmt'],
-    //                                                 'totAmt' => $item['totAmt'],
-    //                                                 'itemExprDt' => $item['itemExprDt']
-    //                                             ]);
-    //                                         }
-    //                                     }
-    //                                 }
-    //                             } else {
-    //                                 \Log::warning('No matching Purchase found for spplrInvcNo: ' . $saleItemCode);
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-
-    //                 return redirect()->route('purchase.index')->with('success', __('Sales Items Lists and Suppliers Details successfully created from API.'));
-    //             } else {
-    //                 return redirect()->route('purchase.index')->with('error', __('Permission Denied'));
-    //             }
-    //         } catch (\Exception $e) {
-    //             \Log::error('Error adding Item Information and Supplier Details from the API: ' . $e->getMessage());
-    //             \Log::info($e);
-    //             return redirect()->route('purchase.index')->with('error', __('Error adding Sales Items and Suppliers Details from the API.'));
-    //         }
-
-    //     } else {
-    //         return redirect()->back()->with('error', __('Permission denied.'));
-    //     }
-    // }
-
-
-    public function synchronize(Request $request)
-    {
-        // Log the request from the form
-        \Log::info('Synchronization request received from Searching the Purchase Search By Date Form:', $request->all());
-
-        // Validate the date input
-        $request->validate([
-            'getpurchaseByDate' => 'required|date_format:Y-m-d',
-        ], [
-            'getpurchaseByDate.required' => __('Date is required for synchronization Search for Purchase SearchByDate.'),
-            'getpurchaseByDate.date_format' => __('Invalid date format.'),
-        ]);
-
-        // Get and format the date
-        $date = $request->input('getpurchaseByDate');
-        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
-        \Log::info('Date formatted from synchronization request:', ['formattedDate' => $formattedDate]);
-
+    public function synchronize(Request $request){
         try {
-            // Make the API call
+            $request->validate([
+                'getpurchaseByDate' => 'required|date_format:Y-m-d',
+            ], [
+                'getpurchaseByDate.required' => __('Date is required for synchronization Search for Purchase SearchByDate.'),
+                'getpurchaseByDate.date_format' => __('Invalid date format.'),
+            ]);
+    
+            $date = $request->input('getpurchaseByDate');
+            $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
             $response = Http::withOptions(['verify' => false])
                 ->withHeaders(['key' => '123456'])
                 ->get("https://etims.your-apps.biz/api/GetPurchaseList?date={$formattedDate}");
 
-            $data = $response->json();
-            if (!isset($data['data'])) {
-                return redirect()->back()->with('error', __('There is no search result.'));
-            }
-
-            $remotePurchaseSearchByDateinfo = $data['data'];
-            \Log::info('Remote Purchase info:', $remotePurchaseSearchByDateinfo);
-
-            // Prepare data for synchronization
-            $remotePurchaseSearchByDateinfoToSync = [];
-            $remotePurchaseItemListsToSync = [];
-            foreach ($remotePurchaseSearchByDateinfo as $remoteItem) {
-                $item = $this->preparePurchaseData($remoteItem);
-                $remotePurchaseSearchByDateinfoToSync[] = $item;
-
-                if (isset($remoteItem['PurchaseItemList']) && is_array($remoteItem['PurchaseItemList'])) {
-                    foreach ($remoteItem['PurchaseItemList'] as $itemList) {
-                        $remotePurchaseItemListsToSync[] = $this->preparePurchaseItemListData($itemList, $remoteItem['spplrInvcNo']);
-                    }
-                }
-            }
-
-            \Log::info('Remote purchase search by date info to sync:', $remotePurchaseSearchByDateinfoToSync);
-            \Log::info('Remote purchase item lists to sync:', $remotePurchaseItemListsToSync);
-
-            // Synchronize the purchases
-            $syncedCount = $this->synchronizePurchases($remotePurchaseSearchByDateinfoToSync, $remotePurchaseItemListsToSync);
-
-            if ($syncedCount > 0) {
-                return redirect()->back()->with('success', __('Synced ' . $syncedCount . ' Purchases successfully.'));
-            } else {
-                return redirect()->back()->with('success', __('Purchases up to date.'));
-            }
+            Log::info('API RESPONSE');
+            Log::info($response);
         } catch (\Exception $e) {
             \Log::error('Error syncing purchases:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', __('Error syncing purchases.'));
-        }
-    }
-
-    private function preparePurchaseData($remoteItem)
-    {
-        static $purchaseId = 1;
-        return [
-            'purchase_id' => $purchaseId++,
-            'vender_id' => null,
-            'warehouse_id' => 1,
-            'purchase_date' => $remoteItem['salesDt'],
-            'purchase_number' => null,
-            'discount_apply' => null,
-            'category_id' => null,
-            'created_by' => \Auth::user()->creatorId(),
-            'spplrTin' => $remoteItem['spplrTin'],
-            'spplrNm' => $remoteItem['spplrNm'],
-            'spplrBhfId' => $remoteItem['spplrBhfId'],
-            'spplrInvcNo' => $remoteItem['spplrInvcNo'],
-            'spplrSdcId' => $remoteItem['spplrSdcId'],
-            'spplrMrcNo' => $remoteItem['spplrMrcNo'],
-            'rcptTyCd' => $remoteItem['rcptTyCd'],
-            'pmtTyCd' => $remoteItem['pmtTyCd'],
-            'cfmDt' => $remoteItem['cfmDt'],
-            'salesDt' => $remoteItem['salesDt'],
-            'stockRlsDt' => $remoteItem['stockRlsDt'],
-            'totItemCnt' => $remoteItem['totItemCnt'],
-            'taxblAmtA' => $remoteItem['taxblAmtA'],
-            'taxblAmtB' => $remoteItem['taxblAmtB'],
-            'taxblAmtC' => $remoteItem['taxblAmtC'],
-            'taxblAmtD' => $remoteItem['taxblAmtD'],
-            'taxblAmtE' => $remoteItem['taxblAmtE'],
-            'taxRtA' => $remoteItem['taxRtA'],
-            'taxRtB' => $remoteItem['taxRtB'],
-            'taxRtC' => $remoteItem['taxRtC'],
-            'taxRtD' => $remoteItem['taxRtD'],
-            'taxRtE' => $remoteItem['taxRtE'],
-            'taxAmtA' => $remoteItem['taxAmtA'],
-            'taxAmtB' => $remoteItem['taxAmtB'],
-            'taxAmtC' => $remoteItem['taxAmtC'],
-            'taxAmtD' => $remoteItem['taxAmtD'],
-            'taxAmtE' => $remoteItem['taxAmtE'],
-            'totTaxblAmt' => $remoteItem['totTaxblAmt'],
-            'totTaxAmt' => $remoteItem['totTaxAmt'],
-            'totAmt' => $remoteItem['totAmt'],
-            'remark' => $remoteItem['remark'],
-        ];
-    }
-
-    private function preparePurchaseItemListData($itemList, $saleItemCode)
-    {
-        $taxCode = $this->mapTaxTypeCode($itemList['taxTyCd']);
-        return [
-            'purchase_id' => null, // to be set later
-            'quantity' => $itemList['totAmt'],
-            'tax' => $taxCode,
-            'price' => $itemList['prc'],
-            'discount' => $itemList['prc'] * $itemList['dcRt'] / 100,
-            'saleItemCode' => $saleItemCode,
-            'itemSeq' => $itemList['itemSeq'],
-            'itemCd' => $itemList['itemCd'],
-            'itemClsCd' => $itemList['itemClsCd'],
-            'itemNm' => $itemList['itemNm'],
-            'bcd' => $itemList['bcd'],
-            'spplrItemClsCd' => $itemList['spplrItemClsCd'],
-            'spplrItemCd' => $itemList['spplrItemCd'],
-            'spplrItemNm' => $itemList['spplrItemNm'],
-            'pkgUnitCd' => $itemList['pkgUnitCd'],
-            'pkg' => $itemList['pkg'],
-            'qtyUnitCd' => $itemList['qtyUnitCd'],
-            'qty' => $itemList['qty'],
-            'prc' => $itemList['prc'],
-            'splyAmt' => $itemList['splyAmt'],
-            'dcRt' => $itemList['dcRt'],
-            'taxTyCd' => $itemList['taxTyCd'],
-            'taxblAmt' => $itemList['taxblAmt'],
-            'taxAmt' => $itemList['taxAmt'],
-            'totAmt' => $itemList['totAmt'],
-            'itemExprDt' => $itemList['itemExprDt'],
-        ];
-    }
-
-    private function mapTaxTypeCode($taxTyCd)
-    {
-        switch ($taxTyCd) {
-            case 'A':
-                return 1;
-            case 'B':
-                return 2;
-            case 'C':
-                return 3;
-            case 'D':
-                return 4;
-            case 'E':
-                return 5;
-            case 'F':
-                return 6;
-            default:
-                return null;
         }
     }
 
@@ -836,63 +344,164 @@ class PurchaseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create($vendorId)
-    {
-        // if(\Auth::user()->can('create purchase'))
-        // {
-        $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
-        $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
-        $category->prepend('Select Category', '');
+    public function create($vendorId){
+        try {
+            $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
+            $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
+            $category->prepend('Select Category', '');
 
-        $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
-        $venders = Vender::all()->pluck('name', 'spplrNm');
-        $venders->prepend('Select Vender', '');
-        $suppliers = Vender::all()->pluck('name', 'id');
-        $suppliers->prepend('Select Supplier', '');
+            $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
+            $venders = Vender::all()->pluck( 'name','spplrTin');
+            $venders->prepend('Select Vender', '');
 
-        \Log::info('Venders:');
-        \Log::info($suppliers);
+            \Log::info('Venders:');
+            \Log::info($venders);
 
-        $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-        $warehouse->prepend('Select Warehouse', '');
+            $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $warehouse->prepend('Select Warehouse', '');
 
-        // $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->where('type','!=', 'service')->get()->pluck('name', 'id');
-        // $product_services->prepend('--', '');
-        $product_services = ProductService::get()->pluck('itemNm', 'itemCd');
-        $product_services_Codes = ProductService::get()->pluck('itemNm', 'itemCd');
-        $product_services_Codes->prepend('--', '');
-        $product_services->prepend('--', '');
+            // $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->where('type','!=', 'service')->get()->pluck('name', 'id');
+            // $product_services->prepend('--', '');
+            $items = ProductService::where('created_by', \Auth::user()->creatorId())->pluck('itemNm', 'itemCd');
+            $items->prepend('Select Item', '');
+            Log::info('Items');
+            Log::info($items);
+            $countries = Details::where('cdCls', '05')->get()->pluck('cdNm', 'cd');
+            $countries->prepend('Select Country', '');
+            $taxes = Details::where('cdCls', '04')->get()->pluck('cdNm', 'cd');
+            $taxes->prepend('Select Tax', '');
+            $paymentTypeCodes = PaymentTypeCodes::get()->pluck('payment_type_code', 'code');
+            $purchaseTypeCodes = PurchaseTypeCodes::get()->pluck('purchase_type_code', 'code');
+            $purchaseStatusCodes = PurchaseStatusCodes::get()->pluck('purchase_status_code', 'code');
+            $ReceiptTypesCodes = ReceiptTypeCodes::get()->pluck('receipt_type_code', 'receipt_type_code');
+            $taxationtype = Details::where('cdCls', '04')->pluck('userDfnCd1', 'cd');
 
-        // Fetch countries code  from the details model
-        $countries = Details::where('cdCls', '05')->get();
-        // Fetch countries data from the Details model where cdCls is 05
-        $countries = Details::where('cdCls', '05')->get()->pluck('cdNm', 'cdVal');
-        $paymentTypeCodes = PaymentTypeCodes::get()->pluck('payment_type_code', 'code');
-        $purchaseTypeCodes = PurchaseTypeCodes::get()->pluck('purchase_type_code', 'code');
-        $purchaseStatusCodes = PurchaseStatusCodes::get()->pluck('purchase_status_code', 'code');
-        $ReceiptTypesCodes = ReceiptTypeCodes::get()->pluck('receipt_type_code', 'receipt_type_code');
-        $taxationtype = Details::where('cdCls', '04')->pluck('userDfnCd1', 'cd');
-
-        return view(
-            'purchase.create',
-            compact(
+            return view('purchase.create', compact(
                 'taxationtype',
                 'venders',
-                'product_services_Codes',
                 'paymentTypeCodes',
                 'purchaseTypeCodes',
                 'purchaseStatusCodes',
                 'ReceiptTypesCodes',
-                'suppliers',
                 'purchase_number',
-                'product_services',
+                'items',
                 'category',
                 'customFields',
                 'vendorId',
                 'warehouse',
-                'countries'
-            )
-        );
+                'countries',
+                'taxes'
+                ));
+        } catch (\Exception $e) {
+            Log::error('CREATE PURCHASE ERROR');
+            Log::error($e);
+            return redirect()->back()->with('error', __('Error creating purchase.'));
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+
+    public function store(Request $request) {
+        try {
+
+            $data = $request->all();
+
+            $validator = \Validator::make($data, [
+                'purchTypeCode' => 'required|string|min:1|max:1',
+                'purchStatusCode' => 'required|string|min:2|max:2',
+                'pmtTypeCode' => 'required|string|min:2|max:2',
+                'purchDate' => 'required|date',
+                'occurredDate' => 'required|date',
+                'items' => 'required',
+                'items.*.itemCode' => 'required|string',
+                'items.*.quantity' => 'required|numeric',
+                'items.*.pkgQuantity' => 'required|numeric',
+                'items.*.unitPrice' => 'required|numeric',
+                'items.*.discountRate' => 'required|numeric',
+                ]);
+
+            if ($validator->fails()) {
+                Log::info('VALIDATION ERRORS');
+                Log::info($validator->errors());
+                return redirect()->back()->with('error', __('Error creating purchase.'));
+            }
+
+            $apiData = [];
+            $items = [];
+             \Log::info('Purchase FoRM Data being Posted  : ');
+             \Log::info($data);
+
+            
+
+            if ($data['supplierTin']) {
+                $supplier = Vender::where('spplrTin', $data['supplierTin'])->first();
+                \Log::info('Supplier Info  : ');
+                \Log::info($supplier);
+
+                $apiData['supplierTin'] = $data['supplierTin'];
+                $apiData['supplierBhfId'] = $supplier->spplrBhfId;
+                $apiData['supplierName'] = $supplier->spplrNm;
+            } else {
+                $apiData['supplierTin'] = null;
+                $apiData['supplierBhfId'] = null;
+                $apiData['supplierName'] = null;
+            }
+
+            $apiData['supplierInvcNo'] = $data['supplierInvcNo'] ?? null;
+            $apiData['purchTypeCode'] = $data['purchTypeCode'];
+            $apiData['purchStatusCode'] = $data['purchStatusCode'];
+            $apiData['pmtTypeCode'] = $data['pmtTypeCode'];
+            $apiData['purchDate'] = date('Ymd', strtotime($data['purchDate']));
+            $apiData['occurredDate'] = date('Ymd', strtotime($data['occurredDate']));
+            $apiData['confirmDate'] = $data['confirmDate'] ? date('YmdHis', strtotime($data['confirmDate'])) : null;
+            $apiData['warehouseDate'] = $data['warehouseDate'] ? date('YmdHis', strtotime($data['warehouseDate'])) : null;
+            $apiData['remark'] = $data['remark'] ?? null;
+            $apiData['mapping'] = $data['mapping'] ?? null;
+
+            foreach($data['items'] as $givenItem) {
+                $discountRate = $givenItem['discountRate'] ?? 0;
+                $discountAmt = $givenItem['unitPrice'] * $givenItem['quantity'] * $discountRate / 100; 
+                array_push($items, [
+                    'itemCode' => $givenItem['itemCode'],
+                    'quantity' => $givenItem['quantity'],
+                    'unitPrice' => $givenItem['unitPrice'],
+                    'pkgQuantity' => $givenItem['pkgQuantity'],
+                    'discountRate' => $discountRate,
+                    'discountAmt' => $discountAmt,
+                    'itemExprDt' => $givenItem['itemExprDt'] ? date('Ymd', strtotime($givenItem['itemExprDt'])) : null,
+                    'supplrItemName' => $givenItem['supplrItemName'] ?? null,
+                    'supplrItemCode' => $givenItem['supplrItemCode'] ?? null,
+                    'supplrItemClsCd' => $givenItem['supplrItemClsCd'] ?? null,
+                ]);
+            }
+
+            $apiData['itemsDataList'] = $items;
+
+            \Log::info('Api Data Info Being Posted : ');
+            \Log::info($apiData);
+            
+            
+            $url = 'https://etims.your-apps.biz/api/AddPurchase';
+
+            $response = Http::withHeaders([
+                'key' => '123456'
+            ])->withOptions(['verify' => false])->post($url, $apiData);
+
+            Log::info('API RESPONSE');
+            Log::info($response);
+            if ($response['statusCode'] == 200) {
+                return redirect()->route('purchase.index')->with('success', __('Purchase successfully created.'));
+            } else {
+                return redirect()->back()->with('error', __('Error creating purchase.'));
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('STORE PURCHASE ERROR');
+            Log::error($e);
+            return redirect()->back()->with('error', __('Something went wrong'));
+        }
     }
 
 
@@ -910,283 +519,6 @@ class PurchaseController extends Controller
         return json_encode($data);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    // public function store(Request $request)
-    // {
-
-    //     if(\Auth::user()->can('create purchase'))
-    //     {
-    //         $validator = \Validator::make(
-    //             $request->all(), [
-    //                 'vender_id' => 'required',
-    //                 'warehouse_id' => 'required',
-    //                 'purchase_date' => 'required',
-    //                 'category_id' => 'required',
-    //                 'items' => 'required',
-    //             ]
-    //         );
-    //         if($validator->fails())
-    //         {
-    //             $messages = $validator->getMessageBag();
-
-    //             return redirect()->back()->with('error', $messages->first());
-    //         }
-    //         $purchase                 = new Purchase();
-    //         $purchase->purchase_id    = $this->purchaseNumber();
-    //         $purchase->vender_id      = $request->vender_id;
-    //         $purchase->warehouse_id      = $request->warehouse_id;
-    //         $purchase->purchase_date  = $request->purchase_date;
-    //         $purchase->purchase_number   = !empty($request->purchase_number) ? $request->purchase_number : 0;
-    //         $purchase->status         =  0;
-    //         //            $purchase->discount_apply = isset($request->discount_apply) ? 1 : 0;
-    //         $purchase->category_id    = $request->category_id;
-    //         $purchase->created_by     = \Auth::user()->creatorId();
-    //         $purchase->save();
-
-    //         $products = $request->items;
-
-    //         for($i = 0; $i < count($products); $i++)
-    //         {
-    //             $purchaseProduct              = new PurchaseProduct();
-    //             $purchaseProduct->purchase_id     = $purchase->id;
-    //             $purchaseProduct->product_id  = $products[$i]['item'];
-    //             $purchaseProduct->quantity    = $products[$i]['quantity'];
-    //             $purchaseProduct->tax         = $products[$i]['tax'];
-    //         //                $purchaseProduct->discount    = isset($products[$i]['discount']) ? $products[$i]['discount'] : 0;
-    //             $purchaseProduct->discount    = $products[$i]['discount'];
-    //             $purchaseProduct->price       = $products[$i]['price'];
-    //             $purchaseProduct->description = $products[$i]['description'];
-    //             $purchaseProduct->save();
-
-    //             //inventory management (Quantity)
-    //             Utility::total_quantity('plus',$purchaseProduct->quantity,$purchaseProduct->product_id);
-
-    //             //Product Stock Report
-    //             $type='purchase';
-    //             $type_id = $purchase->id;
-    //             $description=$products[$i]['quantity'].'  '.__(' quantity add in purchase').' '. \Auth::user()->purchaseNumberFormat($purchase->purchase_id);
-    //             Utility::addProductStock( $products[$i]['item'],$products[$i]['quantity'],$type,$description,$type_id);
-
-    //             //Warehouse Stock Report
-    //             if(isset($products[$i]['item']))
-    //             {
-    //                 Utility::addWarehouseStock( $products[$i]['item'],$products[$i]['quantity'],$request->warehouse_id);
-    //             }
-
-    //         }
-
-    //         return redirect()->route('purchase.index', $purchase->id)->with('success', __('Purchase successfully created.'));
-    //     }
-    //     else
-    //     {
-    //         return redirect()->back()->with('error', __('Permission denied.'));
-    //     }
-    // }
-
-
-
-    public function store(Request $request)
-    {
-        try {
-
-            $data = $request->all();
-            \Log::info('STORE PURCHASE REQUEST DATA');
-            \Log::info($data);
-
-            $validator = \Validator::make($data, [
-                'supplierInvcNo' => 'required',
-                'purchTypeCode' => 'required',
-                'purchStatusCode' => 'required',
-                'pmtTypeCode' => 'required',
-                'purchDate' => 'required',
-                'occurredDate' => 'required',
-            ]);
-
-            if ($validator->fails()) {
-                $messages = $validator->getMessageBag();
-                return redirect()->back()->with('error', $messages->first());
-            }
-
-            $occurredDt = str_replace('-', '', $data['occurredDate']);
-            $occurredDate = date('Ymd', strtotime($occurredDt));
-            $purchaseDate = str_replace('-', '', $data['purchDate']);
-            $purchDate = date('Ymd', strtotime($purchaseDate));
-            $confirmDate = date('YmdHis', strtotime($request->input('confirmDate')));
-            $warehouseDate = date('YmdHis', strtotime($request->input('receiptPublishDate')));
-
-            $apiRequestData = [
-                'supplierTin' => $request->input('supplierTin'),
-                'supplierBhfId' => $request->input('supplierBhfId'),
-                'supplierName' => $request->input('supplierName'),
-                'supplierInvcNo' => $request->input('supplierInvcNo'),
-                'purchTypeCode' => $request->input('purchTypeCode'),
-                'purchStatusCode' => $request->input('purchStatusCode'),
-                'pmtTypeCode' => $request->input('pmtTypeCode'),
-                'purchDate' => $purchDate,
-                'occurredDate' => $occurredDate,
-                'confirmDate' => $confirmDate,
-                'warehouseDate' => $warehouseDate,
-                'remark' => $request->input('remark'),
-                'mapping' => $request->input('mapping'),
-            ];
-
-            $purchaseItemsList = [];
-
-            foreach ($data['items'] as $item) {
-                $itemDetails = ProductService::where('itemCd', $item['item'])->first();
-                $itemExprDt = str_replace('-', '', $item['itemExprDate']);
-                $itemExprDate = date('Ymd', strtotime($itemExprDt));
-
-                $itemData = [
-                    "itemCode" => $itemDetails->itemCd,
-                    "supplrItemClsCode" => $item['supplrItemClsCode'],
-                    "supplrItemCode" => $item['supplrItemCode'],
-                    "supplrItemName" => $item['supplrItemName'],
-                    "quantity" => $item['quantity'],
-                    "unitPrice" => $item['price'],
-                    "pkgQuantity" => $item['pkgQuantity'],
-                    "discountRate" => $item['discount'],
-                    "discountAmt" => $item['discountAmount'],
-                    "itemExprDt" => $itemExprDate,
-                ];
-
-                array_push($purchaseItemsList, $itemData);
-            }
-
-            // $apiRequestData['itemsDataList'] = $purchaseItemsList;
-
-            // $response = Http::withOptions([
-            //     'verify' => false
-            // ])->withHeaders([
-            //     'accept' => 'application/json',
-            //     'key' => '123456',
-            //     'Content-Type' => 'application/json',
-            // ])->post('https://etims.your-apps.biz/api/AddPurchase', $apiRequestData);
-
-            // \Log::info('ADD PURCHASE API RESPONSE');
-            // \Log::info($response);
-
-            // if ($response['statusCode'] != 200) {
-            //     return redirect()->back()->with('error', $response['message']);
-            // }
-
-            $discount_apply = false;
-            $totTaxblAmt = 0;
-            $totTaxAmt = 0;
-            $totAmt = 0;
-
-            foreach ($data['items'] as $item) {
-                if (isset($item['discountAmount']) && $item['discountAmount'] > 0) {
-                    $discount_apply = true;
-                    break;
-                }
-            }
-
-            foreach ($data['items'] as $item) {
-                $totTaxblAmt += (($item['price'] * $item['pkgQuantity'] * $item['quantity']) - $item['discountAmount']);
-                $totTaxAmt += $item['taxAmount'];
-            }
-
-            $totAmt += ($totTaxblAmt + $totTaxAmt);
-
-            $purchaseData = [
-                'purchase_id' => $this->purchaseNumber(),
-                'vender_id' => $data['supplier_id'],
-                'warehouse_id' => $data['warehouse'],
-                'purchase_date' => $data['purchDate'],
-                'purchase_number ' => $this->purchaseNumber(),
-                'status' => 0,
-                'shipping_display' => null,
-                'send_date' => null,
-                'discount_apply' => $discount_apply,
-                'category_id' => $data['category_id'],
-                'created_by' => \Auth::user()->creatorId(),
-                'spplrTin' => $data['supplierTin'],
-                'spplrNm' => $data['supplierName'],
-                'spplrBhfId' => $data['supplierBhfId'],
-                'spplrInvcNo' => $data['supplierInvcNo'],
-                'spplrSdcId' => $data['spplrSdcId'] ?? null,
-                'spplrMrcNo' => $data['spplrMrcNo'] ?? null,
-                'rcptTyCd' => $data['rcptTyCd'] ?? null,
-                'pmtTyCd' => $data['pmtTypeCode'] ?? null,
-                'cfmDt' => $data['confirmDate'] ?? null,
-                'salesDt' => $data['purchDate'] ?? null,
-                'stockRlsDt' => $data['warehouseDate'] ?? null,
-                'warehouseDate' => $data['warehouseDate'] ?? null,
-                'warehouse' => $data['warehouse'] ?? null,
-                'totItemCnt' => count($purchaseItemsList),
-                'taxblAmtA' => $data['taxblAmtA'] ?? null,
-                'taxblAmtB' => $data['taxblAmtB'] ?? null,
-                'taxblAmtC' => $data['taxblAmtB'] ?? null,
-                'taxblAmtD' => $data['taxblAmtD'] ?? null,
-                'taxblAmtE' => $data['taxblAmtE'] ?? null,
-                'taxRtA' => $data['taxRtA'] ?? null,
-                'taxRtB' => $data['taxRtB'] ?? null,
-                'taxRtC' => $data['taxRtC'] ?? null,
-                'taxRtD' => $data['taxRtD'] ?? null,
-                'taxRtE' => $data['taxRtE'] ?? null,
-                'taxAmtA' => $data['taxAmtA'] ?? null,
-                'taxAmtB' => $data['taxAmtB'] ?? null,
-                'taxAmtC' => $data['taxAmtC'] ?? null,
-                'taxAmtD' => $data['taxAmtD'] ?? null,
-                'taxAmtE' => $data['taxAmtE'] ?? null,
-                'totTaxblAmt' => $totTaxblAmt,
-                'totTaxAmt' => $totTaxAmt,
-                'totAmt' => $totAmt,
-                'remark' => $data['remark'],
-            ];
-            $purchase = Purchase::create($purchaseData);
-
-            foreach ($data['items'] as $index => $item) {
-                $itemDetails = ProductService::where('itemCd', $item['item'])->first();
-                PurchaseProduct::create([
-                    'purchase_id' => $purchase->id,
-                    'product_id' => $itemDetails->id,
-                    'quantity' => $item['quantity'],
-                    'tax' => $item['taxAmount'],
-                    'discount' => $item['discountAmount'],
-                    'price' => $item['price'],
-                    'description' => $item['description'],
-                    'saleItemCode' => null,
-                    'itemSeq' => $index,
-                    'itemCd' => $itemDetails['itemCd'],
-                    'itemClsCd' => $itemDetails['itemClsCd'],
-                    'itemNm' => $itemDetails['itemNm'],
-                    'bcd' => $itemDetails['bcd'],
-                    'supplrItemClsCd' => $item['supplrItemClsCode'],
-                    'supplrItemCd' => $item['supplrItemCode'],
-                    'supplrIteNm' => $item['supplrItemName'],
-                    'pkgUnitCd' => $itemDetails['pkgUnitCd'],
-                    'pkg' => $item['pkgQuantity'],
-                    'qtyUnitCd' => $itemDetails['qtyUnitCd'],
-                    'qty' => $item['quantity'],
-                    'prc' => $item['price'],
-                    'splyAmt' => null,
-                    'dcAmt' => null,
-                    'taxTyCd' => $itemDetails['taxTyCd'],
-                    'taxblAmt' => ($item['quantity'] * $item['price'] * $item['pkgQuantity']) - $item['discountAmount'],
-                    'taxAmt' => $item['taxAmount'],
-                    'totAmt' => (($item['quantity'] * $item['price'] * $item['pkgQuantity']) - $item['discountAmount']) + $item['taxAmount'],
-                    'itemExprDt' => $item['itemExprDate'],
-                ]);
-                Utility::addWarehouseStock($itemDetails->id, $item['quantity'], $data['warehouse']);
-            }
-
-            return redirect()->to('purchase')->with('success', __('Purchase Added'));
-
-        } catch (\Exception $e) {
-            \Log::info('ADD PURCHASE ERROR');
-            \Log::info($e);
-
-            return redirect()->to('purchase')->with('error', $e->getMessage());
-        }
-    }
-
     public function show($ids)
     {
 
@@ -1199,7 +531,6 @@ class PurchaseController extends Controller
                 $id = Crypt::decrypt($ids);
 
             } catch (\Throwable $e) {
-
                 \Log::info('Exception Error if the Purchase is not Found :');
 
                 \Log::info($e);
@@ -2005,11 +1336,12 @@ class PurchaseController extends Controller
 
             if (\Auth::user()->type == 'company') {
                 $rules = [
-                    'supplierInvcNo' => 'required',
-                    'purchaseTypeCode' => 'required',
-                    'purchaseStatusCode' => 'required',
-                    'itemCode.*' => 'required',
-                    'supplierItemCode.*' => 'required',
+                    'supplierInvcNo' => 'nullable|string',
+                    'purchaseTypeCode' => 'nullable|string',
+                    'purchaseStatusCode' => 'nullable|string',
+                    'itemCode.*' => 'nullable|string|exists:product_services,itemCd',
+                    'supplierItemCode.*' => 'nullable|string',
+                    'mapQuantity.*' => 'nullable|numeric',
                 ];
 
                 // Validate request data
@@ -2026,6 +1358,7 @@ class PurchaseController extends Controller
                     $itemPurchases[] = [
                         'supplierItemCode' => $request->input('supplierItemCode')[$key],
                         'itemCode' => $itemCode,
+                        'mapQuantity' => $request->input('mapQuantity')[$key],
                     ];
                 }
 
@@ -2250,6 +1583,7 @@ class PurchaseController extends Controller
                                 'totAmt' => $item['totAmt'],
                                 'itemExprDt' => $item['itemExprDt'],
                             ]);
+
                         }
                     }
                 }
@@ -2264,7 +1598,7 @@ class PurchaseController extends Controller
 
      ///search MapPurchase  by Date Code Here 
 
-    public function searchByDate(Request $request)
+    public function mapPurchaseSearchByDate(Request $request)
     {
         // Log the request from the form
         \Log::info('Synchronization request received from Searching the MapPurchase SearchByDate Form:', $request->all());
@@ -2288,10 +1622,10 @@ class PurchaseController extends Controller
                 ->withHeaders(['key' => '123456'])
                 ->get("https://etims.your-apps.biz/api/MapPurchase/SearchByDate?date={$formattedDate}");
 
-            $data = $response->json()['data'];
-            if (!isset($data['data'])) {
-                return redirect()->back()->with('error', __('There is no search result.'));
-            }
+            $data = $response->json();
+            // if (!isset($data['data'])) {
+            //     return redirect()->back()->with('error', __('There is no search result.'));
+            // }
 
             $remoteMapPurchaseSearchByDateinfo = $data['data'];
             \Log::info('Remote item info:', $remoteMapPurchaseSearchByDateinfo);
@@ -2305,6 +1639,8 @@ class PurchaseController extends Controller
 
                 if (isset($remoteItem['mapPurchaseItemList']) && is_array($remoteItem['mapPurchaseItemList'])) {
                     foreach ($remoteItem['mapPurchaseItemList'] as $itemList) {
+                        \Log::info('Remote item list::');
+                        \Log::info($itemList);
                         $remoteMapPurchaseItemListsToSync[] = $this->prepareMapPurchaseItemListData($itemList);
                     }
                 }
@@ -2332,6 +1668,7 @@ class PurchaseController extends Controller
         return [
             'mappedPurchaseId' => $remoteItem['id'],
             'invcNo' => $remoteItem['invcNo'],
+            'created_by' => \Auth::user()->creatorId(),
             'orgInvcNo' => $remoteItem['orgInvcNo'],
             'supplrTin' => $remoteItem['supplrTin'],
             'supplrBhfId' => $remoteItem['supplrBhfId'],
@@ -2424,6 +1761,19 @@ class PurchaseController extends Controller
 
                         // Create the mapped purchase item list
                         MappedPurchaseItemList::create($itemList);
+
+                        \Log::info('ITEMS LIST');
+                        \Log::info($itemList);
+
+                        //Also creating  new product for the warehouse 
+                        WarehouseProduct::create([
+                            'warehouse_id' => 1,
+                            'product_id' => null,
+                            'itemCd' => $itemList['mapping'],
+                            'quantity' => $itemList['qty'],
+                            'packageQuantity' => $itemList['pkg'],
+                            'created_by' => \Auth::user()->creatorId()
+                        ]);
                         $syncedPurchaseItemCount++;
                     }
                 }
@@ -2434,7 +1784,5 @@ class PurchaseController extends Controller
 
         return $syncedCount;
     }
-
-
 
 }

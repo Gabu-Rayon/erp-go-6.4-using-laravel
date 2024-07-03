@@ -35,28 +35,34 @@
                                     <th>{{__('Date')}}</th>
                                     <th>{{__('Action')}}</th>
 
-                                </tr>
+                                </tr>7
                                 </thead>
 
                                     <tr>
                                         <td>
                                             <div class="font-style ">{{ $prequest->user->name }}</div>
                                         </td>
+
                                         <td>
                                             <div class="font-style ">{{ $prequest->plan->name }}</div>
                                         </td>
+
                                         <td>
                                             <div class="">{{ $prequest->plan->max_users }}</div>
                                         </td>
+
                                         <td>
                                             <div class="">{{ $prequest->plan->max_customers }}</div>
                                         </td>
+
                                         <td>
                                             <div class="">{{ $prequest->plan->max_venders }}</div>
                                         </td>
+
                                         <td>
                                             <div class="">{{ $prequest->plan->max_clients }}</div>
                                         </td>
+
                                         <td>
                                             @if($prequest->duration == "year")
                                             <div class="font-style ">{{ __('Yearly') }}</div>

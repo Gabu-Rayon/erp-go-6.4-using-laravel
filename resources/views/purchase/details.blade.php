@@ -41,8 +41,7 @@
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Supplier Invoice No</strong> : {{ $purchase->spplrInvcNo }}
-                            {{ Form::text('supplierInvcNo', $purchase->spplrInvcNo, ['class' => 'form-control', 'required' => 'required']) }}
-
+                            {{ Form::text('supplierInvcNo', $purchase->spplrInvcNo, ['class' => 'form-control']) }}
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Supplier Sdcld</strong> : {{ $purchase->spplrSdcld }}
@@ -58,11 +57,11 @@
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Purchase Type Code</strong> :
-                            {{ Form::text('purchaseTypeCode', null, ['class' => 'form-control', 'required' => 'required']) }}
+                            {{ Form::text('purchaseTypeCode', null, ['class' => 'form-control']) }}
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Purchase Status Code</strong> :
-                            {{ Form::text('purchaseStatusCode', null, ['class' => 'form-control', 'required' => 'required']) }}
+                            {{ Form::text('purchaseStatusCode', null, ['class' => 'form-control']) }}
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Confirmed Date</strong> : {{ $purchase->cfmDt }}
@@ -159,7 +158,7 @@
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>Item Code</strong> : {{ $item->itemCd }}
-                                            {{ Form::text('itemCode[]', $item->itemCd, ['class' => 'form-control', 'required' => 'required']) }}
+                                            {{ Form::text('itemCode[]', $item->itemCd, ['class' => 'form-control']) }}
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>item Class Code</strong> : {{ $item->itemClsCd }}
@@ -175,7 +174,7 @@
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>Supplier Item Code</strong> : {{ $item->spplrItemCd }}
-                                            {{ Form::text('supplierItemCode[]', $item->spplrItemCd, ['class' => 'form-control', 'required' => 'required']) }}
+                                            {{ Form::text('supplierItemCode[]', $item->spplrItemCd, ['class' => 'form-control']) }}
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>Supplier Item Name</strong> : {{ $item->spplrItemNm }}
@@ -220,8 +219,8 @@
                                             <strong>Item Expire Date</strong> : {{ $item->itemExprDt }}
                                         </div>
                                         <div class="form-group col-md-4">
-                                            {{ Form::label('mappingProduct', __('Mapp Purchase Product To Your Product Stock'), ['class' => 'form-label']) }}
-                                            {{ Form::select('productItem', $ProductService, null, ['class' => 'form-control select2 productItem', 'required' => 'required']) }}
+                                            {{ Form::label('mapQuantity', __('Map Quantity'), ['class' => 'form-label']) }}
+                                            {{ Form::number('mapQuantity', null, ['class' => 'form-control productItem']) }}
                                         </div>
                                     </div>
                                 </div>

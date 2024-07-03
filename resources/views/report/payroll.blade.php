@@ -95,7 +95,7 @@
                 success: function (data) {
                     $('#department_id').empty();
                     $("#department_div").html('');
-                    $('#department_div').append('<label for="department" class="form-label">{{__('Department')}}</label><select class="form-control" id="department_id" name="department_id"  ></select>');
+                    $('#department_div').append('<label for="department" class="form-label">{{__('Department')}}</label><select class="form-control select2" id="department_id" name="department_id"  ></select>');
                     $('#department_id').append('<option value="">{{__('Select Department')}}</option>');
                     $.each(data, function (key, value) {
                         $('#department_id').append('<option value="' + key + '">' + value + '</option>');
@@ -122,7 +122,7 @@
                 success: function (data) {
                     $('#employee_id').empty();
                     $("#employee_div").html('');
-                    $('#employee_div').append('<label for="employee" class="form-label">{{__('Employee')}}</label><select class="form-control" id="employee_id" name="employee_id"></select>');
+                    $('#employee_div').append('<label for="employee" class="form-label">{{__('Employee')}}</label><select class="form-control select2" id="employee_id" name="employee_id"></select>');
                     $('#employee_id').append('<option value="">{{__('Select Employee')}}</option>');
 
                     $.each(data, function (key, value) {
@@ -157,7 +157,7 @@
                     <div class="card-body">
                         {{ Form::open(array('route' => array('report.payroll'),'method'=>'get','id'=>'report_payroll')) }}
                         <div class="row align-items-center justify-content-end">
-                            <div class="col-2 mt-2">
+                            <div class="col-4 mt-2">
                                 <label class="form-label">{{__('Type')}}</label> <br>
                                 <div class="form-check form-check-inline form-group">
                                     <input type="radio" id="monthly" value="monthly" name="type" class="form-check-input" {{isset($_GET['type']) && $_GET['type']=='monthly' ?'checked':'checked'}}>
@@ -168,45 +168,45 @@
                                     <label class="form-check-label" for="daily">{{__('Daily')}}</label>
                                 </div>
                             </div>
-                            <div class="col-2 month">
+                            <div class="col-4 month">
                                 <div class="btn-box">
                                     {{Form::label('month',__('Month'),['class'=>'form-label'])}}
                                     {{Form::month('month',isset($_GET['month'])?$_GET['month']:date('Y-m'),array('class'=>'month-btn form-control'))}}
                                 </div>
                             </div>
-                            <div class="col-2 year d-none">
+                            <div class="col-4 year d-none">
                                 <div class="btn-box">
                                     {{ Form::label('year', __('Year'),['class'=>'form-label']) }}
-                                    <select class="form-control select" id="year" name="year" tabindex="-1" aria-hidden="true">
+                                    <select class="form-control select2" id="year" name="year" tabindex="-1" aria-hidden="true">
                                         @for($filterYear['starting_year']; $filterYear['starting_year'] <= $filterYear['ending_year']; $filterYear['starting_year']++)
                                             <option {{(isset($_GET['year']) && $_GET['year'] == $filterYear['starting_year'] ?'selected':'')}} {{(!isset($_GET['year']) && date('Y') == $filterYear['starting_year'] ?'selected':'')}} value="{{$filterYear['starting_year']}}">{{$filterYear['starting_year']}}</option>
                                         @endfor
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-2">
+                            <div class="col-4">
                                 <div class="btn-box">
                                     {{ Form::label('branch', __('Branch'),['class'=>'form-label']) }}
-                                    <select class="form-control select" name="branch_id" id="branch_id"  placeholder="Select Branch" required>
+                                    <select class="form-control select2" name="branch_id" id="branch_id"  placeholder="Select Branch" required>
                                         <option value="">{{__('Select Branch')}}</option>
                                         @foreach($branch as $branch)
-                                            <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                            <option value="{{ $branch->bhfId }}">{{ $branch->bhfNm }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-2">
+                            <div class="col-4">
                                 <div class="btn-box" id="department_div">
                                     {{ Form::label('department', __('Department'),['class'=>'form-label'])}}
-                                    <select class="form-control select" name="department_id" id="department_id" required="required">
+                                    <select class="form-control select2" name="department_id" id="department_id" required="required">
                                         <option value="">{{__('Select Department')}}</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-3">
+                            <div class="col-4">
                                 <div class="btn-box" id="employee_div">
                                     {{ Form::label('employee', __('Employee'),['class'=>'form-label'])}}
-                                    <select class="form-control select" name="employee_id" id="employee_id">
+                                    <select class="form-control select2" name="employee_id" id="employee_id">
                                         <option value="">{{__('Select Employee')}}</option>
                                     </select>
                                 </div>

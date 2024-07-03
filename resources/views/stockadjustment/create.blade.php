@@ -342,7 +342,7 @@
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('remark', __('Remark'),['class'=>'form-label']) }}
-                            {{ Form::text('remark', '', array('class' => 'form-control')) }}
+                            {{ Form::textarea('remark', '', array('class' => 'form-control', 'rows' => '3')) }}
                         </div>
                     </div>
                 </div>
@@ -365,7 +365,7 @@
                     </div>
                 </div>
                 <div class="card-body table-border-style">
-                    <div class="table-responsive">
+                    <div class="#">
                         <table class="table mb-0" data-repeater-list="items" id="sortable-table">
                             <thead>
                             </thead>

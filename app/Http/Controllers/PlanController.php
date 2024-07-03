@@ -166,7 +166,8 @@ class PlanController extends Controller
                     || $admin_payment_setting['is_paytab_enabled'] == 'on' || $admin_payment_setting['is_benefit_enabled'] == 'on'
                     || $admin_payment_setting['is_cashfree_enabled'] == 'on' || $admin_payment_setting['is_aamarpay_enabled'] == 'on'
                     || $admin_payment_setting['is_paytr_enabled'] == 'on')
-            ) {
+            ) 
+            {
                 $plan = Plan::find($plan_id);
                 if (!empty($plan)) {
                     $validation = [];

@@ -21,6 +21,7 @@ class BranchesList extends Model
         'mgrTelNo',
         'mgrEmail',
         'hqYn',
+        'created_by',
     ];
 
     protected $table = 'branches';

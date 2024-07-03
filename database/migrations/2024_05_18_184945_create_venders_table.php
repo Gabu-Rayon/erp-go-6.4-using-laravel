@@ -46,6 +46,8 @@ return new class extends Migration
             $table->string('type')->default('vender');
             $table->string('lang')->default('en');
             $table->float('balance')->default('0.00');
+
+            $table->foreign('spplrBhfId')->references('bhfId')->on('branches');
             $table->rememberToken();
             $table->timestamps();
         });

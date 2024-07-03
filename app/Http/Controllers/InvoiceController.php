@@ -150,7 +150,6 @@ class InvoiceController extends Controller
                     $messages = $validator->getMessageBag();
                     return redirect()->back()->with('error', $messages->first());
                 }
-
                 $data = $request->all();
                 $customer = Customer::find($data['customer_id']);
                 \Log::info('Invoice Customer', ['customer' => $customer]);
@@ -257,7 +256,16 @@ class InvoiceController extends Controller
             'due_date' => 'required',
             'category_id' => 'required',
             'traderInvoiceNo' => 'required|max:50|min:1',
-            'items' => 'required'
+            'items' => 'required|array',
+            'items.*.itemCode' => 'required',
+            'items.*.quantity' => 'required',
+            'items.*.pkgQauntity' => 'required',
+            'items.*.price' => 'required',
+            'items.*.discount' => 'required',
+            'items.*.tax' => 'required',
+            'items.*.taxAmount' => 'required',
+            'items.*.description' => 'required',
+            'items.*.itemExpDate' => 'nullable',
         ]);
     }
 
@@ -279,8 +287,13 @@ class InvoiceController extends Controller
             "invoiceStatusCode" => $data['invoiceStatusCode'],
             "remark" => $data['remark'],
             "isPurchaseAccept" => $data['isPurchaseAccept'],
-            "isStockIOUpdate" => $data['isStockIOUpdate'],
-            "mapping" => $data['mapping'],
+            //is Stock IO Update should always be true 
+            "isStockIOUpdate" => true,
+            // "isStockIOUpdate" => $data['isStockIOUpdate'],
+            
+            //Mapping will be the id of the Invoice_id autogenrated by the system 
+            // "mapping" => $data['mapping'],
+            "mapping" => $this->invoiceNumber(),
             "saleItemList" => []
         ];
     }
@@ -374,9 +387,9 @@ class InvoiceController extends Controller
             'shipping_display' => null,
             'discount_apply' => null,
             'created_by' => \Auth::user()->creatorId(),
-            'trderInvoiceNo' => $data['traderInvoiceNo'],
-            'invoiceNo' => $data['traderInvoiceNo'],
-            'orgInvoiceNo' => $data['traderInvoiceNo'],
+            'response_trderInvoiceNo' => $apiResponseData['data']['tranderInvoiceNo'],
+            'response_invoiceNo' => $apiResponseData['data']['invoiceNo'],
+            'orgInvoiceNo' => $data['orgInvoiceNo'] ?? null,
             'customerTin' => $customer->customerTin,
             'customerName' => $customer->name,
             'saleType' => $data['salesType'],

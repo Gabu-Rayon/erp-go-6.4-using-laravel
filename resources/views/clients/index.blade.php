@@ -42,14 +42,10 @@
 {{--                                                <span>{{__('Show')}}</span>--}}
 {{--                                            </a>--}}
 
-                                            @can('edit client')
                                                 <a href="#!" data-size="md" data-url="{{ route('clients.edit',$client->id) }}" data-ajax-popup="true" class="dropdown-item" data-bs-original-title="{{__('Edit User')}}">
                                                     <i class="ti ti-pencil"></i>
                                                     <span>{{__('Edit')}}</span>
                                                 </a>
-                                            @endcan
-
-                                            @can('delete client')
                                                 {!! Form::open(['method' => 'DELETE', 'route' => ['clients.destroy', $client['id']],'id'=>'delete-form-'.$client['id']]) !!}
                                                 <a href="#!"  class="dropdown-item bs-pass-para">
                                                     <i class="ti ti-archive"></i>
@@ -57,7 +53,6 @@
                                                 </a>
 
                                                 {!! Form::close() !!}
-                                            @endcan
 
                                             <a href="#!" data-url="{{route('clients.reset',\Crypt::encrypt($client->id))}}" data-ajax-popup="true" class="dropdown-item" data-bs-original-title="{{__('Reset Password')}}">
                                                 <i class="ti ti-adjustments"></i>

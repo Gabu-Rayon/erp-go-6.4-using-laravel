@@ -83,7 +83,7 @@ class InsurancePlansController extends Controller
             // Check if the request was successful
             if ($response->successful()) {
                 if ($response['data']['resultCd'] == 910) {
-                    return redirect()->back()->with('error', __('Invalid Credentials'));
+                    return redirect()->back()->with('error', __('Rate must be between 0 and 100.'));
                 }
                 $insurance = Insurance::create($requestData);                
                 $insurance->save();

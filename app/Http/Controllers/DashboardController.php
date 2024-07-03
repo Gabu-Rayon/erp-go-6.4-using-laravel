@@ -25,7 +25,7 @@ use App\Models\Payment;
 use App\Models\Plan;
 use App\Models\Pos;
 use App\Models\ProductServiceCategory;
-use App\Models\ProductServicesPackagingUnit;
+use App\Models\ProductServiceUnit;
 use App\Models\Project;
 use App\Models\ProjectTask;
 use App\Models\Purchase;
@@ -135,7 +135,7 @@ class DashboardController extends Controller
 
                     $constant['taxes'] = Tax::where('created_by', \Auth::user()->creatorId())->count();
                     $constant['category'] = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->count();
-                    $constant['units'] = ProductServicesPackagingUnit::where('created_by', \Auth::user()->creatorId())->count();
+                    $constant['units'] = ProductServiceUnit::where('created_by', \Auth::user()->creatorId())->count();
                     $constant['bankAccount'] = BankAccount::where('created_by', \Auth::user()->creatorId())->count();
                     $data['constant'] = $constant;
                     $data['bankAccountDetail'] = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get();
@@ -143,17 +143,17 @@ class DashboardController extends Controller
                         ->where('invoices.created_by', '=', \Auth::user()->creatorId())
                         ->orderBy('invoices.id', 'desc')
                         ->limit(5)
-                        ->select('invoices.*', 'customers.name as customer_name')
+                        ->select('invoices.*', 'customers.name as customerName')
                         ->get();
 
                     $data['weeklyInvoice'] = \Auth::user()->weeklyInvoice();
                     $data['monthlyInvoice'] = \Auth::user()->monthlyInvoice();
                     $data['recentBill'] = Bill::join('venders', 'bills.vender_id', '=', 'venders.id')
-                        ->where('bills.created_by', '=', \Auth::user()->creatorId())
-                        ->orderBy('bills.id', 'desc')
-                        ->limit(5)
-                        ->select('bills.*', 'venders.name as vender_name')
-                        ->get();
+                    ->where('bills.created_by', '=', \Auth::user()->creatorId())
+                    ->orderBy('bills.id', 'desc')
+                    ->limit(5)
+                    ->select('bills.*', 'venders.name as vender_name')
+                    ->get();
 
                     $data['weeklyBill'] = \Auth::user()->weeklyBill();
                     $data['monthlyBill'] = \Auth::user()->monthlyBill();

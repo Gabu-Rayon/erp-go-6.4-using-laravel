@@ -14,7 +14,7 @@ use App\Models\AttendanceEmployee;
 use App\Models\BankAccount;
 use App\Models\Bill;
 use App\Models\BillProduct;
-use App\Models\Branch;
+use App\Models\BranchesList;
 use App\Models\Budget;
 use App\Models\ChartOfAccount;
 use App\Models\ChartOfAccountParent;
@@ -2014,7 +2014,7 @@ if(
 
         if(\Auth::user()->type == 'company'){
 
-            $branch = Branch::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $branch = BranchesList::where('created_by', \Auth::user()->creatorId())->get()->pluck('bhfNm', 'bhfId');
             $branch->prepend('Select Branch', '');
 
             $department = Department::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -2027,7 +2027,7 @@ if(
             $employees = Employee::where('created_by', \Auth::user()->creatorId());
             if (!empty($request->branch)) {
                 $employees->where('branch_id', $request->branch);
-                $filterYear['branch'] = !empty(Branch::find($request->branch)) ? Branch::find($request->branch)->name : '';
+                $filterYear['branch'] = !empty(BranchesList::find($request->branch)) ? BranchesList::find($request->branch)->bhfNm : '';
             }
             if (!empty($request->department)) {
                 $employees->where('department_id', $request->department);
@@ -2157,7 +2157,7 @@ if(
     public function monthlyAttendance(Request $request)
     {
         if (\Auth::user()->type == 'company') {
-            $branch = Branch::where('created_by', '=', \Auth::user()->creatorId())->get();
+            $branch = BranchesList::where('created_by', '=', \Auth::user()->creatorId())->get();
             $department = Department::where('created_by', '=', \Auth::user()->creatorId())->get();
 
             $data['branch'] = __('All');
@@ -2171,7 +2171,7 @@ if(
 
             if (!empty($request->branch)) {
                 $employees->where('branch_id', $request->branch);
-                $data['branch'] = !empty(Branch::find($request->branch)) ? Branch::find($request->branch)->name : '';
+                $data['branch'] = !empty(BranchesList::find($request->branch)) ? BranchesList::find($request->branch)->bhfNm : '';
             }
 
             if (!empty($request->department)) {
@@ -2266,7 +2266,7 @@ if(
     {
 
         if (\Auth::user()->type == 'company') {
-            $branch = Branch::where('created_by', '=', \Auth::user()->creatorId())->get();
+            $branch = BranchesList::where('created_by', '=', \Auth::user()->creatorId())->get();
             $department = Department::where('created_by', '=', \Auth::user()->creatorId())->get();
             $employees = Employee::select('id', 'name');
             if (!empty($request->employee_id) && $request->employee_id[0] != 0) {
@@ -2310,7 +2310,7 @@ if(
             if (!empty($request->branch)) {
                 $payslips->where('employees.branch_id', $request->branch);
 
-                $filterYear['branch'] = !empty(Branch::find($request->branch)) ? Branch::find($request->branch)->name : '';
+                $filterYear['branch'] = !empty(BranchesList::find($request->branch)) ? BranchesList::find($request->branch)->bhfNm : '';
             }
 
             if (!empty($request->department)) {
@@ -2420,7 +2420,7 @@ if(
         $employees = Employee::select('id', 'name')->where('created_by', \Auth::user()->creatorId());
         if ($branch != 0) {
             $employees->where('branch_id', $branch);
-            $data['branch'] = !empty(Branch::find($branch)) ? Branch::find($branch)->name : '';
+            $data['branch'] = !empty(BranchesList::find($branch)) ? BranchesList::find($branch)->bhfNm : '';
         }
 
         if ($department != 0) {
@@ -2504,6 +2504,8 @@ if(
             || \Auth::user()->type == 'accountant'
         ){
             $stocks = StockReport::with(['product'])->where('created_by', '=', \Auth::user()->creatorId())->get();
+            \Log::info('PRODUCT STOCK');
+            \Log::info($stocks);
             return view('report.product_stock_report', compact('stocks'));
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
@@ -4792,7 +4794,7 @@ if(
         \Log::info($invoiceItems);
 
 
-        $invoiceCustomeres = Invoice::select('customers.name', \DB::raw('count(DISTINCT invoices.customer_id, invoice_products.invoice_id) as invoice_count'))
+        $invoiceCustomeres = Invoice::select('customers.customerName', \DB::raw('count(DISTINCT invoices.customer_id, invoice_products.invoice_id) as invoice_count'))
             ->selectRaw('sum((invoice_products.price * invoice_products.quantity) - invoice_products.discount) as price')
             ->selectRaw('(SELECT SUM((price * quantity - discount) * (taxes.rate / 100)) FROM invoice_products
              LEFT JOIN taxes ON FIND_IN_SET(taxes.id, invoice_products.tax) > 0
@@ -4851,7 +4853,7 @@ if(
 
             $reportName = 'Item';
         } else {
-            $invoiceCustomeres = Invoice::select('customers.name', \DB::raw('count(DISTINCT invoices.customer_id, invoice_products.invoice_id) as invoice_count'))
+            $invoiceCustomeres = Invoice::select('customers.customerName', \DB::raw('count(DISTINCT invoices.customer_id, invoice_products.invoice_id) as invoice_count'))
                 ->selectRaw('sum((invoice_products.price * invoice_products.quantity) - invoice_products.discount) as price')
                 ->selectRaw('(SELECT SUM((price * quantity - discount) * (taxes.rate / 100)) FROM invoice_products
              LEFT JOIN taxes ON FIND_IN_SET(taxes.id, invoice_products.tax) > 0
@@ -4906,7 +4908,7 @@ if(
             $end = date('Y-m-d', strtotime('+1 day'));
         }
 
-        $receivableCustomers = Invoice::select('customers.name')
+        $receivableCustomers = Invoice::select('customers.customerName')
             ->selectRaw('sum((invoice_products.price * invoice_products.quantity) - invoice_products.discount) as price')
             ->selectRaw('sum((invoice_payments.amount)) as pay_price')
             ->selectRaw('(SELECT SUM((price * quantity - discount) * (taxes.rate / 100)) FROM invoice_products
@@ -4924,7 +4926,7 @@ if(
             ->get()
             ->toArray();
 
-        $receivableSummariesInvoice = Invoice::select('customers.name')
+        $receivableSummariesInvoice = Invoice::select('customers.customerName')
             ->selectRaw('(invoices.invoice_id) as invoice')
             ->selectRaw('sum((invoice_products.price * invoice_products.quantity) - invoice_products.discount) as price')
             ->selectRaw('sum((invoice_payments.amount)) as pay_price')
@@ -4943,7 +4945,7 @@ if(
             ->get()
             ->toArray();
 
-        $receivableSummariesCredit = CreditNote::select('customers.name')
+        $receivableSummariesCredit = CreditNote::select('customers.customerName')
             ->selectRaw('null as invoice')
             ->selectRaw('(credit_notes.amount) as price')
             ->selectRaw('0 as pay_price')
@@ -4962,7 +4964,7 @@ if(
 
         $receivableSummaries = (array_merge($receivableSummariesCredit, $receivableSummariesInvoice));
 
-        $receivableDetailsInvoice = Invoice::select('customers.name')
+        $receivableDetailsInvoice = Invoice::select('customers.customerName')
             ->selectRaw('(invoices.invoice_id) as invoice')
             ->selectRaw('sum(invoice_products.price) as price')
             ->selectRaw('(invoice_products.quantity) as quantity')
@@ -4982,7 +4984,7 @@ if(
             \Log::info('RECEIVABLE DETAILS INVOICE');
             \Log::info($receivableDetailsInvoice);
 
-        $receivableDetailsCredit = CreditNote::select('customers.name')
+        $receivableDetailsCredit = CreditNote::select('customers.customerName')
             ->selectRaw('null as invoice')
             ->selectRaw('(credit_notes.id) as invoices')
             ->selectRaw('(credit_notes.amount) as price')
@@ -5037,7 +5039,7 @@ if(
         \Log::info('RECEIVABLE DETAILS');
         \Log::info($receivableDetails);
 
-        $agingSummary = Invoice::select('customers.name', 'invoices.due_date as due_date', 'invoices.status as status', 'invoices.invoice_id as invoice_id')
+        $agingSummary = Invoice::select('customers.customerName', 'invoices.due_date as due_date', 'invoices.status as status', 'invoices.invoice_id as invoice_id')
             ->selectRaw('sum((invoice_products.price * invoice_products.quantity) - invoice_products.discount) as price')
             ->selectRaw('sum((invoice_payments.amount)) as pay_price')
             ->selectRaw('(SELECT SUM((price * quantity - discount) * (taxes.rate / 100)) FROM invoice_products
@@ -5152,7 +5154,7 @@ if(
             $end = date('Y-m-d', strtotime('+1 day'));
         }
 
-        $receivableCustomers = Invoice::select('customers.name')
+        $receivableCustomers = Invoice::select('customers.customerName')
             ->selectRaw('sum((invoice_products.price * invoice_products.quantity) - invoice_products.discount) as price')
             ->selectRaw('sum((invoice_payments.amount)) as pay_price')
             ->selectRaw('(SELECT SUM((price * quantity - discount) * (taxes.rate / 100)) FROM invoice_products
@@ -5190,7 +5192,7 @@ if(
             $end = date('Y-m-d', strtotime('+1 day'));
         }
 
-        $payableVendors = Bill::select('venders.name')
+        $payableVendors = Bill::select('venders.spplrNm')
             ->selectRaw('sum((bill_products.price * bill_products.quantity) - bill_products.discount) as price')
             ->selectRaw('sum((bill_payments.amount)) as pay_price')
             ->selectRaw('(SELECT SUM((price * quantity - discount) * (taxes.rate / 100)) FROM bill_products
@@ -5209,7 +5211,7 @@ if(
             ->get()
             ->toArray();
 
-        $payableSummariesBill = Bill::select('venders.name')
+        $payableSummariesBill = Bill::select('venders.spplrNm')
             ->selectRaw('(bills.bill_id) as bill')
             ->selectRaw('(bills.type) as type')
             ->selectRaw('sum((bill_products.price * bill_products.quantity) - bill_products.discount) as price')
@@ -5230,7 +5232,7 @@ if(
             ->get()
             ->toArray();
 
-        $payableSummariesDebit = DebitNote::select('venders.name')
+        $payableSummariesDebit = DebitNote::select('venders.spplrNm')
             ->selectRaw('null as bill')
             ->selectRaw('debit_notes.amount as price')
             ->selectRaw('0 as pay_price')
@@ -5249,7 +5251,7 @@ if(
 
         $payableSummaries = (array_merge($payableSummariesDebit, $payableSummariesBill));
 
-        $payableDetailsBill = Bill::select('venders.name')
+        $payableDetailsBill = Bill::select('venders.spplrNm')
             ->selectRaw('(bills.bill_id) as bill')
             ->selectRaw('(bills.type) as type')
             ->selectRaw('sum(bill_products.price) as price')
@@ -5268,7 +5270,7 @@ if(
             ->get()
             ->toArray();
 
-        $payableDetailsDebit = DebitNote::select('venders.name')
+        $payableDetailsDebit = DebitNote::select('venders.spplrNm')
             ->selectRaw('null as bill')
             ->selectRaw('(debit_notes.id) as bills')
             ->selectRaw('(debit_notes.amount) as price')

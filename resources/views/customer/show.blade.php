@@ -28,30 +28,20 @@
 
 @section('action-btn')
     <div class="float-end">
-        @can('create invoice')
             <a href="{{ route('invoice.create',$customer->id) }}" class="btn btn-sm btn-primary">
                 {{__('Create Invoice')}}
             </a>
-        @endcan
-        @can('create proposal')
             <a href="{{ route('proposal.create',$customer->id) }}" class="btn btn-sm btn-primary">
                 {{__('Create Proposal')}}
             </a>
-        @endcan
-
-        @can('edit customer')
             <a href="#" data-size="lg" data-url="{{ route('customer.edit',$customer['id']) }}" data-ajax-popup="true" title="{{__('Edit Customer')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}" class="btn btn-sm btn-primary">
                 <i class="ti ti-pencil"></i>
             </a>
-        @endcan
-
-        @can('delete customer')
             {!! Form::open(['method' => 'DELETE','class' => 'delete-form-btn', 'route' => ['customer.destroy', $customer['id']]]) !!}
                 <a href="#" data-bs-toggle="tooltip" title="{{__('Delete Customer')}}" data-confirm="{{__('Are You Sure?').'|'.__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{ $customer['id']}}').submit();" class="btn btn-sm btn-danger bs-pass-para">
                     <i class="ti ti-trash text-white"></i>
                 </a>
             {!! Form::close() !!}
-        @endcan
     </div>
 @endsection
 

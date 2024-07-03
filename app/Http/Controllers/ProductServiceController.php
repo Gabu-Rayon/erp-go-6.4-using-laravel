@@ -141,23 +141,8 @@ class ProductServiceController extends Controller
 
     public function store(Request $request)
     {
-        \Log::info('CREATE PRODUCT SERVICE REQUEST Clicked :' . $request);
+        \Log::info('CREATE PRODUCT SERVICE REQUEST Clicked :' . $request );
         try {
-
-            $validator = \Validator::make(
-                $request->all(),
-                [
-                    'name' => 'required|max:200',
-                    'type' => 'required',
-                    'color' => 'required',
-                ]
-            );
-            if ($validator->fails()) {
-                $messages = $validator->getMessageBag();
-
-                return redirect()->back()->with('error', $messages->first());
-            }
-
             if (
                 \Auth::user()->type == 'company'
                 || \Auth::user()->type == 'accountant'
@@ -165,7 +150,7 @@ class ProductServiceController extends Controller
                 \Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
                 \Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
 
-                $data = $request->all();
+
 
                 \Log::info('ITEMS');
                 \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
@@ -268,8 +253,15 @@ class ProductServiceController extends Controller
 
                             $productService->save();
 
-                            // Prepare data for the API
+                            // Prepare data for the API to post product $  service 
                             $apiData[] = $this->constructProductData($item, $index);
+
+                            //Prepare data to post Product Service Opeing Stock 
+                            // $openingStockData['openingItemsLists'][] = [
+                            //     "itemCode" => $item['itemCode'],
+                            //     "quantity" => $item['quantity'] ?? 0,
+                            //     "packageQuantity" => $item['packageQuantity'] ?? 0
+                            // ];
                         } else {
                             \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
                             return redirect()->back()->with('error', 'Storage limit exceeded.');
@@ -293,11 +285,11 @@ class ProductServiceController extends Controller
                 // \Log::info('API Request Product Data Posted: ' . json_encode($apiData));
                 // \Log::info('API Response Body For Posting Product Data: ' . $response->body());
 
-                // if ($response->successful()) {
-                //     \Log::info('Data successfully posted to the API');
-                // } else {
-                //     \Log::error('Error posting data to the API: ' . $response->body());
-                // }
+                if ($response->successful()) {
+                    \Log::info('Data successfully posted to the API');
+                } else {
+                    \Log::error('Error posting data to the API: ' . $response->body());
+                }
 
                 return redirect()->route('productservice.index')->with('success', 'Product / Service Added Successfully');
             } else {
@@ -391,38 +383,19 @@ class ProductServiceController extends Controller
         $iteminformation = ProductService::find($id);
         \Log::info('Product Service INFO being edited :', ['item' => $iteminformation]);
         try {
-
-            $validator = \Validator::make(
-                $request->all(),
-                [
-                    'itemCd' => 'required',
-                    'itemClsCd' => 'required',
-                    'itemTyCd' => 'required',
-                    'itemNm' => 'required',
-                    'itemStdNm' => 'required',
-                    'orgnNatCd' => 'required',
-                    'pkgUnitCd' => 'required',
-                    'qtyUnitCd' => 'required',
-                    'taxTyCd' => 'required',
-                    'dftPrc' => 'required',
-                    'isrcAplcbYn' => 'required',
-                    'bcd' => 'required',
-                    'isUsed' => 'required',
-                    'grpPrcL1' => 'required',
-                    'grpPrcL2' => 'required',
-                    'grpPrcL3' => 'required',
-                    'grpPrcL4' => 'required',
-                    'grpPrcL5' => 'required',
-                    'packageQuantity' => 'required',
-                    'saftyQuantity' => 'required'
-                ]
-            );
-            if ($validator->fails()) {
-                $messages = $validator->getMessageBag();
-
-                return redirect()->back()->with('error', $messages->first());
-            }
-
+            $request->validate([
+                'itemCd' => 'required',
+                'itemClsCd' => 'required',
+                'itemTyCd' => 'required',
+                'itemNm' => 'required',
+                'orgnNatCd' => 'required',
+                'pkgUnitCd' => 'required',
+                'qtyUnitCd' => 'required',
+                'taxTyCd' => 'required',
+                'dftPrc' => 'required',
+                'isrcAplcbYn' => 'required',
+                'isUsed' => 'required',
+            ]);
 
             $data = $request->all();
             \Log::info('Product Service INFO being edited and posted to the API:', $data);
@@ -446,7 +419,7 @@ class ProductServiceController extends Controller
                 "group4UnitPrice" => $data['grpPrcL4'],
                 "group5UnitPrice" => $data['grpPrcL5'],
                 "additionalInfo" => $data['addInfo'],
-                "saftyQuantity" => $data['saftyQuantity'],
+                "saftyQuantity" => $data['sftyQty'],
                 "isInrcApplicable" => (boolean) $data['isrcAplcbYn'],
                 "isUsed" => (boolean) $data['isUsed'],
                 "packageQuantity" => $data['packageQuantity'],
@@ -533,26 +506,25 @@ class ProductServiceController extends Controller
                         'itemTyCd' => $data['itemTyCd'],
                         'itemNm' => $data['itemNm'],
                         'itemStdNm' => $data['itemStdNm'],
-                        'orgnNatCd' => $data['orgnNatCd'] ?? null,
-                        'pkgUnitCd' => $data['pkgUnitCd'] ?? null,
-                        'qtyUnitCd' => $data['qtyUnitCd'] ?? null,
-                        'taxTyCd' => $data['taxTypCd'] ?? null,
-                        'btchNo' => $data['btchNo'] ?? null,
-                        'regBhfId' => $data['regBhfId'] ?? null,
-                        'bcd' => $data['bcd'] ?? null,
-                        'dftPrc' => $data['dftPrc'] ?? null,
-                        'grpPrcL1' => $data['grpPrcL1'] ?? null,
-                        'grpPrcL2' => $data['grpPrcL2'] ?? null,
-                        'grpPrcL3' => $data['grpPrcL3'] ?? null,
-                        'grpPrcL4' => $data['grpPrcL4'] ?? null,
-                        'grpPrcL5' => $data['grpPrcL5'] ?? null,
-                        'addInfo' => $data['addInfo'] ?? null,
-                        'sftyQty' => $data['saftyQuantity'] ?? null,
-                        'isrcAplcbYn' => $data['isrcAplcbYn'] ?? null,
-                        'rraModYn' => $data['rraModYn'] ?? null,
-                        'packageQuantity' => $data['packageQuantity'] ?? null,
-                        'useYn' => $data['useYn'] ?? null,
-                        'isUsed' => $data['isUsed'] ?? null,
+                        'orgnNatCd' => $data['orgnNatCd'],
+                        'pkgUnitCd' => $data['pkgUnitCd'],
+                        'qtyUnitCd' => $data['qtyUnitCd'],
+                        'taxTyCd' => $data['taxTyCd'],
+                        'btchNo' => $data['btchNo'],
+                        'regBhfId' => $data['regBhfId'],
+                        'bcd' => $data['bcd'],
+                        'dftPrc' => $data['dftPrc'],
+                        'grpPrcL1' => $data['grpPrcL1'],
+                        'grpPrcL2' => $data['grpPrcL2'],
+                        'grpPrcL3' => $data['grpPrcL3'],
+                        'grpPrcL4' => $data['grpPrcL4'],
+                        'grpPrcL5' => $data['grpPrcL5'],
+                        'addInfo' => $data['addInfo'],
+                        'sftyQty' => $data['sftyQty'],
+                        'isrcAplcbYn' => $data['isrcAplcbYn'],
+                        'rraModYn' => $data['isUsed'],
+                        'packageQuantity' => $data['packageQuantity'],
+                        'useYn' => $data['useYn'],
                     ]);
                 } else {
                     \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
@@ -580,26 +552,25 @@ class ProductServiceController extends Controller
                     'itemTyCd' => $data['itemTyCd'],
                     'itemNm' => $data['itemNm'],
                     'itemStdNm' => $data['itemStdNm'],
-                    'orgnNatCd' => $data['orgnNatCd'] ?? null,
-                    'pkgUnitCd' => $data['pkgUnitCd'] ?? null,
-                    'qtyUnitCd' => $data['qtyUnitCd'] ?? null,
-                    'taxTyCd' => $data['taxTypCd'] ?? null,
-                    'btchNo' => $data['btchNo'] ?? null,
-                    'regBhfId' => $data['regBhfId'] ?? null,
-                    'bcd' => $data['bcd'] ?? null,
-                    'dftPrc' => $data['dftPrc'] ?? null,
-                    'grpPrcL1' => $data['grpPrcL1'] ?? null,
-                    'grpPrcL2' => $data['grpPrcL2'] ?? null,
-                    'grpPrcL3' => $data['grpPrcL3'] ?? null,
-                    'grpPrcL4' => $data['grpPrcL4'] ?? null,
-                    'grpPrcL5' => $data['grpPrcL5'] ?? null,
-                    'addInfo' => $data['addInfo'] ?? null,
-                    'sftyQty' => $data['saftyQuantity'] ?? null,
-                    'isrcAplcbYn' => $data['isrcAplcbYn'] ?? null,
-                    'rraModYn' => $data['rraModYn'] ?? null,
-                    'packageQuantity' => $data['packageQuantity'] ?? null,
-                    'useYn' => $data['useYn'] ?? null,
-                    'isUsed' => $data['isUsed'] ?? null,
+                    'orgnNatCd' => $data['orgnNatCd'],
+                    'pkgUnitCd' => $data['pkgUnitCd'],
+                    'qtyUnitCd' => $data['qtyUnitCd'],
+                    'taxTyCd' => $data['taxTyCd'],
+                    'btchNo' => $data['btchNo'],
+                    'regBhfId' => $data['regBhfId'],
+                    'bcd' => $data['bcd'],
+                    'dftPrc' => $data['dftPrc'],
+                    'grpPrcL1' => $data['grpPrcL1'],
+                    'grpPrcL2' => $data['grpPrcL2'],
+                    'grpPrcL3' => $data['grpPrcL3'],
+                    'grpPrcL4' => $data['grpPrcL4'],
+                    'grpPrcL5' => $data['grpPrcL5'],
+                    'addInfo' => $data['addInfo'],
+                    'sftyQty' => $data['sftyQty'],
+                    'isrcAplcbYn' => $data['isrcAplcbYn'],
+                    'rraModYn' => $data['isUsed'],
+                    'packageQuantity' => $data['packageQuantity'],
+                    'useYn' => $data['useYn'],
                 ]);
             }
 
@@ -1383,7 +1354,7 @@ class ProductServiceController extends Controller
             $remoteCodes = $data['data']['clsList'];
 
             \Log::info('REMOTE CODES');
-            \Log::info($remoteCodes);
+            \Log::info(json_encode($remoteCodes));
 
             $codesToSync = [];
 

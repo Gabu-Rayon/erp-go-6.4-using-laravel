@@ -27,15 +27,14 @@
                             </thead>
                             <tbody>
 
+                                {{ \Log::info('WAREHOUSE') }}
+                                {{ \Log::info($warehouse) }}
                             @foreach ($warehouse as $warehouses)
                                 <tr class="font-style">
-                                    @if(!empty($warehouses->product))
-                                        <td>{{ !empty($warehouses->product)? $warehouses->product->itemNm:'' }}</td>
-                                        <td>{{ $warehouses->quantity }}</td>
-                                    @endif
+                                    <td>{{ $warehouses->itemCd }}</td>
+                                    <td>{{ $warehouses->quantity }}</td>
                                 </tr>
                             @endforeach
-
                             </tbody>
                         </table>
                     </div>

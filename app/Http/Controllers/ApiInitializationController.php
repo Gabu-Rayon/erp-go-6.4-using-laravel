@@ -16,7 +16,7 @@ class ApiInitializationController extends Controller
      */
     public function index() {
         try {
-            if (\Auth::user()->type == 'company') {
+            if (\Auth::user()->type == 'super admin') {
                 $apiinitializations = ApiInitialization::all();
                 return view('apiinitialization.index', compact('apiinitializations'));
             } else {
@@ -35,7 +35,7 @@ class ApiInitializationController extends Controller
     public function create()
     {
         try {
-            if (\Auth::user()->type == 'company') {
+            if (\Auth::user()->type == 'super admin') {
                 return view('apiinitialization.create');
             } else {
                 return redirect()->back()->with('error', 'Permission Denied');
@@ -51,6 +51,8 @@ class ApiInitializationController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request) {
+
+        if (\Auth::user()->type == 'super admin') {
         
         $validator = \Validator::make($request->all(), [
             'taxpayeridno' => 'required',
@@ -123,15 +125,17 @@ class ApiInitializationController extends Controller
         
         
         return redirect()->route('apiinitialization.index')->with('success', __('Successfully Initialized.'));
+    } else {
+        return redirect()->back()->with('error', 'Permission Denied');
     }
-
+    }
     /**
      * Display the specified resource.
      */
     public function show(ApiInitialization $apiinitialization)
     {
         try {
-            if (\Auth::user()->type == 'company') {
+            if (\Auth::user()->type == 'super admin') {
                 return view('apiinitialization.show', compact('apiinitialization'));
             } else {
                 return redirect()->back()->with('error', 'Permission Denied');
@@ -149,7 +153,7 @@ class ApiInitializationController extends Controller
     public function edit(ApiInitialization $apiinitialization)
     {
         try {
-            if (\Auth::user()->type == 'company') {
+            if (\Auth::user()->type == 'superadmin') {
                 $branches = BranchesList::all()->pluck('bhfNm', 'bhfNm');
                 return view('apiinitialization.edit', compact('apiinitialization', 'branches'));
             } else {
@@ -168,7 +172,7 @@ class ApiInitializationController extends Controller
     public function update(Request $request, ApiInitialization $apiinitialization)
     {
         try {
-            if (\Auth::user()->type == 'company') {
+            if (\Auth::user()->type == 'super admin') {
                 $data = $request->all();
                 \Log::info('STORE EXISTING INITIALIZATION REQUEST DATA');
                 \Log::info($data);
@@ -188,8 +192,19 @@ class ApiInitializationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        //
+    public function destroy(string $id){
+        try {
+            if (\Auth::user()->type == 'super admin') {
+                $apiInitialization = ApiInitialization::find($id);
+                $apiInitialization->delete();
+                return redirect()->route('apiinitialization.index')->with('success', 'Initialization Deleted');
+            } else {
+                return redirect()->back()->with('error', 'Permission Denied');
+            }
+        } catch (\Exception $e) {
+            \Log::error('DELETE API INITIALIZATION ERROR');
+            \Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 }

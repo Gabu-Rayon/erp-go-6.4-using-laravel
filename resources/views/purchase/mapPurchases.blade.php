@@ -28,12 +28,12 @@
 @section('action-btn')
     <div class="float-end">
         <div class="d-inline-block mb-4">
-            {{ Form::open(['route' => 'importeditems.sync', 'method' => 'POST', 'class' => 'w-100']) }}
+            {{ Form::open(['route' => 'mappedPurchases.sync', 'method' => 'POST', 'class' => 'w-100']) }}
             @csrf
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <div class="form-group">
-                {{ Form::label('importedItemDate', __('Search Date (ex- 01-Dec-2021)'), ['class' => 'form-label']) }}
-                {{ Form::date('importedItemDate', null, ['class' => 'form-control', 'required' => 'required']) }}
+                {{ Form::label('searchByDate', __('Search Date (ex- 01-Dec-2021)'), ['class' => 'form-label']) }}
+                {{ Form::date('searchByDate', null, ['class' => 'form-control', 'required' => 'required']) }}
             </div>
             <button type="submit" class="btn btn-primary  sync">{{ __('Search') }}</button>
             {{ Form::close() }}

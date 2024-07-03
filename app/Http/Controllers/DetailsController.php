@@ -11,373 +11,117 @@ class DetailsController extends Controller
 {
     //
 
-    public function synchronize (Request $request) {
-        try {
-            
-            $detailToSync = array_keys($request->all())[0];
+    public function synchronize(Request $request) {
+    try {
+        $detailToSync = array_keys($request->all())[0];
 
-            \Log::info('DETAILS TO SYNC');
-            \Log::info($detailToSync);
+        $now = now();
+        $url = 'https://etims.your-apps.biz/api/GetCodeList?date=20240201000000';
 
-            $url = 'https://etims.your-apps.biz/api/GetCodeList?date=20210101120000';
+        $response = Http::withOptions([
+            'verify' => false
+        ])->withHeaders([
+            'key' => '123456'
+        ])->get($url);
 
-            $response = Http::withOptions([
-                'verify' => false
-            ])->withHeaders([
-                'key' => '123456'
-            ])->get($url);
-            $data = $response->json();
-            $classList = $data['data']['data']['clsList'];
+        $data = $response->json();
+        $classList = $data['data']['data']['clsList'];
 
+        \Log::info('CLASSLIST');
+        \Log::info(json_encode($classList));
 
-            \Log::info('CLASSLIST');
-            \Log::info($classList);
+        $syncMap = [
+            'bank' => '36',
+            'taxes' => '04',
+            'countries' => '05',
+            'refundreasons' => '32',
+            'currencies' => '33',
+            'languages' => '48',
+            'paymenttypes' => '07'
+        ];
 
-            if ($detailToSync == 'bank') {
-                // Filter banks with 'cdCls' value equal to '36'
-                $banks = array_filter($classList, function ($item) {
-                    return $item['cdCls'] === '36';
-                });
+        if (!isset($syncMap[$detailToSync])) {
+            return redirect()->back()->with('error', __('Invalid detail to sync.'));
+        }
 
-                \Log::info('FILTERED BANKS');
-                \Log::info($banks);
+        $cdClsValue = $syncMap[$detailToSync];
 
-                Code::firstOrCreate([
-                    'cdCls' => $banks[4]['cdCls'],
-                    'cdClsNm' => $banks[4]['cdClsNm'],
-                    'cdClsDesc' => $banks[4]['cdClsDesc'],
-                    'useYn' => $banks[4]['useYn'],
-                    'userDfnNm1' => $banks[4]['userDfnNm1'],
-                    'userDfnNm2' => $banks[4]['userDfnNm2'],
-                    'userDfnNm3' => $banks[4]['userDfnNm3'],
-                ]);
-            
-                $syncedDetails = 0;
-            
-                foreach ($banks as $bank) {
-                    // Ensure 'dtlList' key exists in the current bank array
-                    if (isset($bank['dtlList'])) {
-                        \Log::info('GIVEN BANK');
-                        \Log::info($bank);                    
-                        foreach ($bank['dtlList'] as $detail) {
-                            \Log::info('GIVEN BANK');
-                            \Log::info($detail);
-                            $exists = (boolean) Details::where('cd', $detail['cd'])->exists();
-                            if (!$exists) {
-                                Details::create([
-                                    'cdCls' => $bank['cdCls'],
-                                    'cd' => $detail['cd'],
-                                    'cdNm' => $detail['cdNm'],
-                                    'cdDesc' => $detail['cdDesc'],
-                                    'useYn' => $detail['useYn'],
-                                    'srtOrd' => $detail['srtOrd'],
-                                    'userDfnCd1' => $detail['userDfnCd1'],
-                                    'userDfnCd2' => $detail['userDfnCd2'],
-                                    'userDfnCd3' => $detail['userDfnCd3'],
-                                ]);
-                                $syncedDetails++;
-                            }
-                        }
-                    } else {
-                        \Log::info('No dtlList found for bank:');
-                        \Log::info($bank);
-                    }
-                }
-            
-                if ($syncedDetails > 0) {
-                    return redirect()->back()->with('success', __('Synced ' . $syncedDetails . ' Banks Successfully'));
-                } else {
-                    return redirect()->back()->with('success', __('Banks Up To Date'));
-                }
-            }
-            
+        $filteredItems = array_filter($classList, function ($item) use ($cdClsValue) {
+            return $item['cdCls'] === $cdClsValue;
+        });
 
-            if ($detailToSync == 'taxes') {
-                // Filter banks with 'cdCls' value equal to '36'
-                $banks = array_filter($classList, function ($item) {
-                    return $item['cdCls'] === '04';
-                });
-            
-                \Log::info('FILTERED TAXES');
-                \Log::info($banks);
+        \Log::info('FILTERED ITEMS');
+        \Log::info($filteredItems);
 
-                Code::firstOrCreate([
-                    'cdCls' => $banks[0]['cdCls'],
-                    'cdClsNm' => $banks[0]['cdClsNm'],
-                    'cdClsDesc' => $banks[0]['cdClsDesc'],
-                    'useYn' => $banks[0]['useYn'],
-                    'userDfnNm1' => $banks[0]['userDfnNm1'],
-                    'userDfnNm2' => $banks[0]['userDfnNm2'],
-                    'userDfnNm3' => $banks[0]['userDfnNm3'],
-                ]);
+        if (empty($filteredItems)) {
+            return redirect()->back()->with('error', __('No items found to sync.'));
+        }
 
+        // Assuming that $filteredItems is not empty and has the required structure.
+        $this->syncCodes($filteredItems, $detailToSync);
+        $syncedDetails = $this->syncDetails($filteredItems);
 
-                $syncedDetails = 0;
-            
-                foreach ($banks as $bank) {
-                    // Ensure 'dtlList' key exists in the current bank array
-                    if (isset($bank['dtlList'])) {
-                        foreach ($bank['dtlList'] as $detail) {
-                            \Log::info('GIVEN TAX');
-                            \Log::info($detail);
-                            $exists = (boolean) Details::where('cd', $detail['cd'])->exists();
-                            if (!$exists) {
-                                Details::create([
-                                    'cdCls' => $bank['cdCls'],
-                                    'cd' => $detail['cd'],
-                                    'cdNm' => $detail['cdNm'],
-                                    'cdDesc' => $detail['cdDesc'],
-                                    'useYn' => $detail['useYn'],
-                                    'srtOrd' => $detail['srtOrd'],
-                                    'userDfnCd1' => $detail['userDfnCd1'],
-                                    'userDfnCd2' => $detail['userDfnCd2'],
-                                    'userDfnCd3' => $detail['userDfnCd3'],
-                                ]);
-                                $syncedDetails++;
-                            }
-                        }
-                    } else {
-                        \Log::info('No dtlList found for tax:');
-                        \Log::info($bank);
-                    }
-                }
-            
-                if ($syncedDetails > 0) {
-                    return redirect()->back()->with('success', __('Synced ' . $syncedDetails . ' Taxes Successfully'));
-                } else {
-                    return redirect()->back()->with('success', __('Taxes Up To Date'));
+        if ($syncedDetails > 0) {
+            return redirect()->back()->with('success', __('Synced ' . $syncedDetails . ' ' . ucfirst($detailToSync) . ' Successfully'));
+        } else {
+            return redirect()->back()->with('success', __(ucfirst($detailToSync) . ' Up To Date'));
+        }
+
+    } catch (\Exception $e) {
+        \Log::error('Synchronization failed: ' . $e->getMessage());
+        return redirect()->back()->with('error', __('Synchronization failed. Please try again.'));
+    }
+}
+
+private function syncCodes(array $filteredItems, string $detailType)
+{
+    $firstItem = reset($filteredItems);
+
+    Code::firstOrCreate([
+        'cdCls' => $firstItem['cdCls'],
+        'cdClsNm' => $firstItem['cdClsNm'],
+        'cdClsDesc' => $firstItem['cdClsDesc'],
+        'useYn' => $firstItem['useYn'],
+        'userDfnNm1' => $firstItem['userDfnNm1'],
+        'userDfnNm2' => $firstItem['userDfnNm2'],
+        'userDfnNm3' => $firstItem['userDfnNm3'],
+    ]);
+}
+
+private function syncDetails(array $filteredItems)
+{
+    $syncedDetails = 0;
+
+    foreach ($filteredItems as $item) {
+        if (isset($item['dtlList'])) {
+            foreach ($item['dtlList'] as $detail) {
+                \Log::info('SYNCING DETAIL');
+                \Log::info($detail);
+
+                if (!Details::where('cd', $detail['cd'])->exists()) {
+                    Details::create([
+                        'cdCls' => $item['cdCls'],
+                        'cd' => $detail['cd'],
+                        'cdNm' => $detail['cdNm'],
+                        'cdDesc' => $detail['cdDesc'],
+                        'useYn' => $detail['useYn'],
+                        'srtOrd' => $detail['srtOrd'],
+                        'userDfnCd1' => $detail['userDfnCd1'],
+                        'userDfnCd2' => $detail['userDfnCd2'],
+                        'userDfnCd3' => $detail['userDfnCd3'],
+                    ]);
+                    $syncedDetails++;
                 }
             }
-
-            if ($detailToSync == 'countries') {
-                // Filter banks with 'cdCls' value equal to '36'
-                $banks = array_filter($classList, function ($item) {
-                    return $item['cdCls'] === '05';
-                });
-            
-                \Log::info('FILTERED COUNTRIES');
-                \Log::info($banks);
-
-                Code::firstOrCreate([
-                    'cdCls' => $banks[1]['cdCls'],
-                    'cdClsNm' => $banks[1]['cdClsNm'],
-                    'cdClsDesc' => $banks[1]['cdClsDesc'],
-                    'useYn' => $banks[1]['useYn'],
-                    'userDfnNm1' => $banks[1]['userDfnNm1'],
-                    'userDfnNm2' => $banks[1]['userDfnNm2'],
-                    'userDfnNm3' => $banks[1]['userDfnNm3'],
-                ]);
-            
-                $syncedDetails = 0;
-            
-                foreach ($banks as $bank) {
-                    // Ensure 'dtlList' key exists in the current bank array
-                    if (isset($bank['dtlList'])) {
-                        foreach ($bank['dtlList'] as $detail) {
-                            \Log::info('GIVEN COUNTRY');
-                            \Log::info($detail);
-                            $exists = (boolean) Details::where('cd', $detail['cd'])->exists();
-                            if (!$exists) {
-                                Details::create([
-                                    'cdCls' => $bank['cdCls'],
-                                    'cd' => $detail['cd'],
-                                    'cdNm' => $detail['cdNm'],
-                                    'cdDesc' => $detail['cdDesc'],
-                                    'useYn' => $detail['useYn'],
-                                    'srtOrd' => $detail['srtOrd'],
-                                    'userDfnCd1' => $detail['userDfnCd1'],
-                                    'userDfnCd2' => $detail['userDfnCd2'],
-                                    'userDfnCd3' => $detail['userDfnCd3'],
-                                ]);
-                                $syncedDetails++;
-                            }
-                        }
-                    } else {
-                        \Log::info('No dtlList found for country:');
-                        \Log::info($bank);
-                    }
-                }
-            
-                if ($syncedDetails > 0) {
-                    return redirect()->back()->with('success', __('Synced ' . $syncedDetails . ' Countries Successfully'));
-                } else {
-                    return redirect()->back()->with('success', __('Countries Up To Date'));
-                }
-            }
-
-            if ($detailToSync == 'refundreasons') {
-                $banks = array_filter($classList, function ($item) {
-                    return $item['cdCls'] === '32';
-                });
-            
-                \Log::info('FILTERED REFUND REASONS');
-                \Log::info($banks);
-
-                Code::firstOrCreate([
-                    'cdCls' => $banks[2]['cdCls'],
-                    'cdClsNm' => $banks[2]['cdClsNm'],
-                    'cdClsDesc' => $banks[2]['cdClsDesc'],
-                    'useYn' => $banks[2]['useYn'],
-                    'userDfnNm1' => $banks[2]['userDfnNm1'],
-                    'userDfnNm2' => $banks[2]['userDfnNm2'],
-                    'userDfnNm3' => $banks[2]['userDfnNm3'],
-                ]);
-            
-                $syncedDetails = 0;
-            
-                foreach ($banks as $bank) {
-
-                    if (isset($bank['dtlList'])) {
-                        foreach ($bank['dtlList'] as $detail) {
-                            \Log::info('GIVEN REFUND REASON');
-                            \Log::info($detail);
-                            $exists = (boolean) Details::where('cd', $detail['cd'])->exists();
-                            if (!$exists) {
-                                Details::create([
-                                    'cdCls' => $bank['cdCls'],
-                                    'cd' => $detail['cd'],
-                                    'cdNm' => $detail['cdNm'],
-                                    'cdDesc' => $detail['cdDesc'],
-                                    'useYn' => $detail['useYn'],
-                                    'srtOrd' => $detail['srtOrd'],
-                                    'userDfnCd1' => $detail['userDfnCd1'],
-                                    'userDfnCd2' => $detail['userDfnCd2'],
-                                    'userDfnCd3' => $detail['userDfnCd3'],
-                                ]);
-                                $syncedDetails++;
-                            }
-                        }
-                    } else {
-                        \Log::info('No dtlList found for refund reason:');
-                        \Log::info($bank);
-                    }
-                }
-            
-                if ($syncedDetails > 0) {
-                    return redirect()->back()->with('success', __('Synced ' . $syncedDetails . ' Refund Reasons Successfully'));
-                } else {
-                    return redirect()->back()->with('success', __('Refund Reasons Up To Date'));
-                }
-            }
-
-            if ($detailToSync == 'currencies') {
-                $banks = array_filter($classList, function ($item) {
-                    return $item['cdCls'] === '33';
-                });
-            
-                \Log::info('FILTERED CURRENCIES');
-                \Log::info($banks);
-
-                Code::firstOrCreate([
-                    'cdCls' => $banks[3]['cdCls'],
-                    'cdClsNm' => $banks[3]['cdClsNm'],
-                    'cdClsDesc' => $banks[3]['cdClsDesc'],
-                    'useYn' => $banks[3]['useYn'],
-                    'userDfnNm1' => $banks[3]['userDfnNm1'],
-                    'userDfnNm2' => $banks[3]['userDfnNm2'],
-                    'userDfnNm3' => $banks[3]['userDfnNm3'],
-                ]);
-            
-                $syncedDetails = 0;
-            
-                foreach ($banks as $bank) {
-
-                    if (isset($bank['dtlList'])) {
-                        foreach ($bank['dtlList'] as $detail) {
-                            \Log::info('GIVEN CURRENCY');
-                            \Log::info($detail);
-                            $exists = (boolean) Details::where('cd', $detail['cd'])->exists();
-                            if (!$exists) {
-                                Details::create([
-                                    'cdCls' => $bank['cdCls'],
-                                    'cd' => $detail['cd'],
-                                    'cdNm' => $detail['cdNm'],
-                                    'cdDesc' => $detail['cdDesc'],
-                                    'useYn' => $detail['useYn'],
-                                    'srtOrd' => $detail['srtOrd'],
-                                    'userDfnCd1' => $detail['userDfnCd1'],
-                                    'userDfnCd2' => $detail['userDfnCd2'],
-                                    'userDfnCd3' => $detail['userDfnCd3'],
-                                ]);
-                                $syncedDetails++;
-                            }
-                        }
-                    } else {
-                        \Log::info('No dtlList found for currency:');
-                        \Log::info($bank);
-                    }
-                }
-            
-                if ($syncedDetails > 0) {
-                    return redirect()->back()->with('success', __('Synced ' . $syncedDetails . ' Currencies Successfully'));
-                } else {
-                    return redirect()->back()->with('success', __('Currencies Up To Date'));
-                }
-            }
-
-            if ($detailToSync == 'languages') {
-                $banks = array_filter($classList, function ($item) {
-                    return $item['cdCls'] === '48';
-                });
-            
-                \Log::info('FILTERED LANGUAGES');
-                \Log::info($banks);
-
-                Code::firstOrCreate([
-                    'cdCls' => $banks[5]['cdCls'],
-                    'cdClsNm' => $banks[5]['cdClsNm'],
-                    'cdClsDesc' => $banks[5]['cdClsDesc'],
-                    'useYn' => $banks[5]['useYn'],
-                    'userDfnNm1' => $banks[5]['userDfnNm1'],
-                    'userDfnNm2' => $banks[5]['userDfnNm2'],
-                    'userDfnNm3' => $banks[5]['userDfnNm3'],
-                ]);
-            
-                $syncedDetails = 0;
-            
-                foreach ($banks as $bank) {
-
-                    if (isset($bank['dtlList'])) {
-                        foreach ($bank['dtlList'] as $detail) {
-                            \Log::info('GIVEN LANGUAGE');
-                            \Log::info($detail);
-                            $exists = (boolean) Details::where('cd', $detail['cd'])->exists();
-                            if (!$exists) {
-                                Details::create([
-                                    'cdCls' => $bank['cdCls'],
-                                    'cd' => $detail['cd'],
-                                    'cdNm' => $detail['cdNm'],
-                                    'cdDesc' => $detail['cdDesc'],
-                                    'useYn' => $detail['useYn'],
-                                    'srtOrd' => $detail['srtOrd'],
-                                    'userDfnCd1' => $detail['userDfnCd1'],
-                                    'userDfnCd2' => $detail['userDfnCd2'],
-                                    'userDfnCd3' => $detail['userDfnCd3'],
-                                ]);
-                                $syncedDetails++;
-                            }
-                        }
-                    } else {
-                        \Log::info('No dtlList found for language:');
-                        \Log::info($bank);
-                    }
-                }
-            
-                if ($syncedDetails > 0) {
-                    return redirect()->back()->with('success', __('Synced ' . $syncedDetails . ' Languages Successfully'));
-                } else {
-                    return redirect()->back()->with('success', __('Languages Up To Date'));
-                }
-            }
-            
-
-        } catch (\Exception $e) {
-            \Log::info('SYNC DETAILS ERROR');
-            \Log::info($e);
-
-            return redirect()->back()->with('error', __('Something Went Wrong'));
+        } else {
+            \Log::info('No dtlList found for item:');
+            \Log::info($item);
         }
     }
+
+    return $syncedDetails;
+}
+
 
     public function countries () {
         $countries = Details::where('cdCls', '=', '05')->get();
@@ -410,5 +154,11 @@ class DetailsController extends Controller
         $languages = Details::where('cdCls', '=', '48')->get();
         
         return view('details.languages')->with('languages', $languages);
+    }
+
+    public function paymentTypes () {
+        $paymentTypes = Details::where('cdCls', '=', '07')->get();
+        
+        return view('details.payment-types', compact('paymentTypes'));
     }
 }

@@ -17,20 +17,15 @@ class Customer extends Authenticatable
 
     protected $fillable = [
         'customer_id',
-        'customerNo',
         'customerTin',
-        'name',
-        'email',
+        'customerName',
         'address',
-        'tax_number',
-        'contact',
+        'telNo',
+        'email',
         'faxNo',
         'isUsed',
         'remark',
-        'avatar',
         'created_by',
-        'is_active',
-        'email_verified_at',
         'billing_name',
         'billing_country',
         'billing_state',
@@ -47,7 +42,6 @@ class Customer extends Authenticatable
         'shipping_address',
         'lang',
         'balance',
-        'remember_token',
     ];
 
 
