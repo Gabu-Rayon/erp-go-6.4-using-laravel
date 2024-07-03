@@ -63,8 +63,6 @@ class ProductServiceController extends Controller
             $itemclassifications = ProductsServicesClassification::pluck('itemClsNm', 'itemClsCd');
             $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
             $countries = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
-            $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
-            $taxes = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
             $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
 
 
@@ -112,7 +110,6 @@ class ProductServiceController extends Controller
                     'itemclassifications',
                     'itemtypes',
                     'countries',
-                    'taxes',
                     'incomeChartAccounts',
                     'incomeSubAccounts',
                     'expenseChartAccounts',
@@ -121,7 +118,6 @@ class ProductServiceController extends Controller
                     'packagingUnitCodes',
                     'countrynames',
                     'productServicesPackagingUnit',
-                    'quantityUnitCode',
                     'taxationtype',
                     'category',
                     'customFields'
@@ -141,8 +137,55 @@ class ProductServiceController extends Controller
 
     public function store(Request $request)
     {
-        \Log::info('CREATE PRODUCT SERVICE REQUEST Clicked :' . $request );
         try {
+            $data = $request->all();
+
+
+            \Log::info("Data from the Form creating new Product and Service : ");
+            \Log::info($data);
+
+
+            $validator = \Validator::make(
+                $data,
+                [
+                    'items' => 'required|array',
+                    'items.*.itemCode' => 'required',
+                    'items.*.itemClassifiCode' => 'required',
+                    'items.*.itemTypeCode' => 'required',
+                    'items.*.itemName' => 'required',
+                    'items.*.sale_price' => 'required',
+                    'items.*.purchase_price' => 'required',
+                    'items.*.itemStrdName' => 'required',
+                    'items.*.countryCode' => 'required',
+                    'items.*.pkgUnitCode' => 'required',
+                    'items.*.qtyUnitCode' => 'required',
+                    'items.*.taxTypeCode' => 'required',
+                    'items.*.batchNo' => 'nullable',
+                    'items.*.barcode' => 'nullable',
+                    'items.*.saftyQuantity' => 'required',
+                    'items.*.isInrcApplicable' => 'required',
+                    'items.*.isUsed' => 'required',
+                    'items.*.packageQuantity' => 'required',
+                    'items.*.category_id' => 'required',
+                    'items.*.sale_chartaccount_id' => 'required',
+                    'items.*.expense_chartaccount_id' => 'required',
+                    'items.*.pro_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                    'items.*.additionalInfo' => 'required',
+                    'items.*.quantity' => 'nullable',
+                    'items.*.unitPrice' => 'required',
+                    'items.*.group1UnitPrice' => 'nullable',
+                    'items.*.group2UnitPrice' => 'nullable',
+                    'items.*.roup3UnitPrice' => 'nullable',
+                    'items.*.group4UnitPrice' => 'nullable',
+                    'items.*.group5UnitPrice' => 'nullable',
+                ]
+            );
+            if ($validator->fails()) {
+                $messages = $validator->getMessageBag();
+
+                return redirect()->back()->with('error', $messages->first());
+            }
+
             if (
                 \Auth::user()->type == 'company'
                 || \Auth::user()->type == 'accountant'
