@@ -230,87 +230,87 @@ class ProductServiceController extends Controller
                     \Log::info('Product Type selected for this Product : ' . $productType);
 
                     // Handling image upload with storage limit check
-                    // if (!empty($item['pro_image']) && $item['pro_image']->isValid()) {
-                    //     \Log::info('Image File Object for Item ' . ($index + 1));
-                    //     $image_size = $item['pro_image']->getSize();
-                    //     $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
+                    if (!empty($item['pro_image']) && $item['pro_image']->isValid()) {
+                        \Log::info('Image File Object for Item ' . ($index + 1));
+                        $image_size = $item['pro_image']->getSize();
+                        $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
 
-                    //     if ($result == 1) {
-                    //         $fileName = $item['pro_image']->getClientOriginalName();
-                    //         $dir = 'uploads/pro_image';
-                    //         $path = Utility::upload_file($item, 'pro_image', $fileName, $dir, []);
+                        if ($result == 1) {
+                            $fileName = $item['pro_image']->getClientOriginalName();
+                            $dir = 'uploads/pro_image';
+                            $path = Utility::upload_file($item, 'pro_image', $fileName, $dir, []);
 
-                    //         \Log::info('product image path:', $path);
+                            \Log::info('product image path:', $path);
 
-                    //         // Assign the file name to the pro_image field
-                    //         $item['pro_image'] = $fileName;
+                            // Assign the file name to the pro_image field
+                            $item['pro_image'] = $fileName;
 
-                    //         // Determine the unit_id from qtyUnitCode
-                    //         $unitId = null;
-                    //         if (isset($item['qtyUnitCode'])) {
-                    //             $unit = ProductServiceUnit::where('code', $item['qtyUnitCode'])->first();
-                    //             $unitId = $unit ? $unit->id : null;
-                    //         }
-                    //         // $productService = ProductService::create([
-                    //         //     'name' => $item['itemName'] ?? null,
-                    //         //     'sku' => $item['itemCode'] ?? null,
-                    //         //     'sale_price' => $item['sale_price'] ?? null,
-                    //         //     'purchase_price' => $item['purchase_price'] ?? null,
-                    //         //     'tax_id' => $taxIdCode,
-                    //         //     'category_id' => $item['category_id'] ?? null,
-                    //         //     'unit_id' => $unitId ?? null,
-                    //         //     'type' => $productType ?? null,
-                    //         //     'quantity' => $item['quantity'],
-                    //         //     'description' => $item['additionalInfo'] ?? null,
-                    //         //     'pro_image' => $dir . '/' . $fileName,
-                    //         //     'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
-                    //         //     'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
-                    //         //     'created_by' => \Auth::user()->creatorId(),
-                    //         //     'tin' => $item['tin'] ?? null,
-                    //         //     'itemCd' => $item['itemCode'],
-                    //         //     'itemClsCd' => $item['itemClassifiCode'],
-                    //         //     'itemTyCd' => $item['itemTypeCode'],
-                    //         //     'itemNm' => $item['itemName'],
-                    //         //     'itemStdNm' => $item['itemStrdName'],
-                    //         //     'orgnNatCd' => $item['countryCode'] ?? null,
-                    //         //     'pkgUnitCd' => $item['pkgUnitCode'] ?? null,
-                    //         //     'qtyUnitCd' => $item['qtyUnitCode'] ?? null,
-                    //         //     'taxTyCd' => $item['taxTypeCode'] ?? null,
-                    //         //     'btchNo' => $item['batchNo'] ?? null,
-                    //         //     'regBhfId' => $item['regBhfId'] ?? null,
-                    //         //     'bcd' => $item['barcode'] ?? null,
-                    //         //     'dftPrc' => $item['unitPrice'] ?? null,
-                    //         //     'grpPrcL1' => $item['group1UnitPrice'] ?? null,
-                    //         //     'grpPrcL2' => $item['group2UnitPrice'] ?? null,
-                    //         //     'grpPrcL3' => $item['group3UnitPrice'] ?? null,
-                    //         //     'grpPrcL4' => $item['group4UnitPrice'] ?? null,
-                    //         //     'grpPrcL5' => $item['group5UnitPrice'] ?? null,
-                    //         //     'addInfo' => $item['additionalInfo'] ?? null,
-                    //         //     'sftyQty' => $item['saftyQuantity'] ?? null,
-                    //         //     'isrcAplcbYn' => $item['isInrcApplicable'] ?? null,
-                    //         //     'rraModYn' => $item['rraModYn'] ?? null,
-                    //         //     'packageQuantity' => $item['packageQuantity'] ?? null,
-                    //         //     'isUsed' => $item['isUsed'] ?? null,
-                    //         // ]);
+                            // Determine the unit_id from qtyUnitCode
+                            $unitId = null;
+                            if (isset($item['qtyUnitCode'])) {
+                                $unit = ProductServiceUnit::where('code', $item['qtyUnitCode'])->first();
+                                $unitId = $unit ? $unit->id : null;
+                            }
+                            $productService = ProductService::create([
+                                'name' => $item['itemName'] ?? null,
+                                'sku' => $item['itemCode'] ?? null,
+                                'sale_price' => $item['sale_price'] ?? null,
+                                'purchase_price' => $item['purchase_price'] ?? null,
+                                'tax_id' => $taxIdCode,
+                                'category_id' => $item['category_id'] ?? null,
+                                'unit_id' => $unitId ?? null,
+                                'type' => $productType ?? null,
+                                'quantity' => $item['quantity'],
+                                'description' => $item['additionalInfo'] ?? null,
+                                'pro_image' => $dir . '/' . $fileName,
+                                'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
+                                'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
+                                'created_by' => \Auth::user()->creatorId(),
+                                'tin' => $item['tin'] ?? null,
+                                'itemCd' => $item['itemCode'],
+                                'itemClsCd' => $item['itemClassifiCode'],
+                                'itemTyCd' => $item['itemTypeCode'],
+                                'itemNm' => $item['itemName'],
+                                'itemStdNm' => $item['itemStrdName'],
+                                'orgnNatCd' => $item['countryCode'] ?? null,
+                                'pkgUnitCd' => $item['pkgUnitCode'] ?? null,
+                                'qtyUnitCd' => $item['qtyUnitCode'] ?? null,
+                                'taxTyCd' => $item['taxTypeCode'] ?? null,
+                                'btchNo' => $item['batchNo'] ?? null,
+                                'regBhfId' => $item['regBhfId'] ?? null,
+                                'bcd' => $item['barcode'] ?? null,
+                                'dftPrc' => $item['unitPrice'] ?? null,
+                                'grpPrcL1' => $item['group1UnitPrice'] ?? null,
+                                'grpPrcL2' => $item['group2UnitPrice'] ?? null,
+                                'grpPrcL3' => $item['group3UnitPrice'] ?? null,
+                                'grpPrcL4' => $item['group4UnitPrice'] ?? null,
+                                'grpPrcL5' => $item['group5UnitPrice'] ?? null,
+                                'addInfo' => $item['additionalInfo'] ?? null,
+                                'sftyQty' => $item['saftyQuantity'] ?? null,
+                                'isrcAplcbYn' => $item['isInrcApplicable'] ?? null,
+                                'rraModYn' => $item['rraModYn'] ?? null,
+                                'packageQuantity' => $item['packageQuantity'] ?? null,
+                                'isUsed' => $item['isUsed'] ?? null,
+                            ]);
 
-                    //         // $productService->save();
+                            $productService->save();
 
-                    //         // Prepare data for the API to post product $  service 
-                    //         $apiData[] = $this->constructProductData($item, $index);
+                            // Prepare data for the API to post product $  service 
+                            $apiData[] = $this->constructProductData($item, $index);
 
-                    //         //Prepare data to post Product Service Opeing Stock 
-                    //         // $openingStockData['openingItemsLists'][] = [
-                    //         //     "itemCode" => $item['itemCode'],
-                    //         //     "quantity" => $item['quantity'] ?? 0,
-                    //         //     "packageQuantity" => $item['packageQuantity'] ?? 0
-                    //         // ];
-                    //     } else {
-                    //         \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
-                    //         return redirect()->back()->with('error', 'Storage limit exceeded.');
-                    //     }
-                    // } else {
-                    //     \Log::info('No valid image uploaded for item ' . ($index + 1));
-                    // }
+                            //Prepare data to post Product Service Opeing Stock 
+                            // $openingStockData['openingItemsLists'][] = [
+                            //     "itemCode" => $item['itemCode'],
+                            //     "quantity" => $item['quantity'] ?? 0,
+                            //     "packageQuantity" => $item['packageQuantity'] ?? 0
+                            // ];
+                        } else {
+                            \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
+                            return redirect()->back()->with('error', 'Storage limit exceeded.');
+                        }
+                    } else {
+                        \Log::info('No valid image uploaded for item ' . ($index + 1));
+                    }
                 }
 
                 // Post data to the external API
@@ -461,7 +461,8 @@ class ProductServiceController extends Controller
                     'taxTyCd' => 'required',
                     'dftPrc' => 'required',
                     'isrcAplcbYn' => 'required',
-                    'bcd' => 'required',
+                    'bcd' => 'nullable',
+                    'btchNo' => 'required',
                     'isUsed' => 'required',
                     'grpPrcL1' => 'required',
                     'grpPrcL2' => 'required',
@@ -469,7 +470,7 @@ class ProductServiceController extends Controller
                     'grpPrcL4' => 'required',
                     'grpPrcL5' => 'required',
                     'packageQuantity' => 'required',
-                    'saftyQuantity' => 'required'
+                    'sftyQty' => 'required'
                 ]
             );
             if ($validator->fails()) {
@@ -501,28 +502,28 @@ class ProductServiceController extends Controller
                 "group4UnitPrice" => $data['grpPrcL4'],
                 "group5UnitPrice" => $data['grpPrcL5'],
                 "additionalInfo" => $data['addInfo'],
-                "saftyQuantity" => $data['saftyQuantity'],
+                "saftyQuantity" => $data['sftyQty'],
                 "isInrcApplicable" => (boolean) $data['isrcAplcbYn'],
                 "isUsed" => (boolean) $data['isUsed'],
                 "packageQuantity" => $data['packageQuantity'],
             ];
 
-            // $response = Http::withOptions([
-            //     'verify' => false
-            // ])->withHeaders([
-            //             'Accept' => 'application/json',
-            //             'Content-Type' => 'application/json',
-            //             'key' => '123456'
-            //         ])->post('https://etims.your-apps.biz/api/UpdateItem', $reqData);
+            $response = Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                        'key' => '123456'
+                    ])->post('https://etims.your-apps.biz/api/UpdateItem', $reqData);
 
-            // $res = $response->json();
+            $res = $response->json();
 
-            // \Log::info('API Request Data: ' . json_encode($reqData));
-            // \Log::info('API RESPONSE when posting the Product Details When being Edited: ', ['response' => $res]);
+            \Log::info('API Request Data: ' . json_encode($reqData));
+            \Log::info('API RESPONSE when posting the Product Details When being Edited: ', ['response' => $res]);
 
-            // if ($res['statusCode'] != 200) {
-            //     return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
-            // }
+            if ($res['statusCode'] != 200) {
+                return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
+            }
 
             // Mapping array for taxTypeCode to tax_id
             $taxTypeMapping = [
@@ -602,7 +603,7 @@ class ProductServiceController extends Controller
                         'grpPrcL4' => $data['grpPrcL4'] ?? null,
                         'grpPrcL5' => $data['grpPrcL5'] ?? null,
                         'addInfo' => $data['addInfo'] ?? null,
-                        'sftyQty' => $data['saftyQuantity'] ?? null,
+                        'sftyQty' => $data['sftyQty'] ?? null,
                         'isrcAplcbYn' => $data['isrcAplcbYn'] ?? null,
                         'rraModYn' => $data['rraModYn'] ?? null,
                         'packageQuantity' => $data['packageQuantity'] ?? null,
@@ -649,7 +650,7 @@ class ProductServiceController extends Controller
                     'grpPrcL4' => $data['grpPrcL4'] ?? null,
                     'grpPrcL5' => $data['grpPrcL5'] ?? null,
                     'addInfo' => $data['addInfo'] ?? null,
-                    'sftyQty' => $data['saftyQuantity'] ?? null,
+                    'sftyQty' => $data['sftyQty'] ?? null,
                     'isrcAplcbYn' => $data['isrcAplcbYn'] ?? null,
                     'rraModYn' => $data['rraModYn'] ?? null,
                     'packageQuantity' => $data['packageQuantity'] ?? null,
