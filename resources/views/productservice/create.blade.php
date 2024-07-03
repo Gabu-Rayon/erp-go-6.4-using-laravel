@@ -281,9 +281,9 @@
                                             </label>
                                         </div>
                                     </td>
-                                    <td class="form-group col-md-6">
+                                    <td class="form-group col-md-12">
                                         {{ Form::label('additionalInfo', __('Additional Info'), ['class' => 'form-label']) }}
-                                        {{ Form::textarea('additionalInfo', '', ['class' => 'form-control', 'required' => 'required']) }}
+                                        {{ Form::textarea('additionalInfo', '', ['class' => 'form-control', 'required' => 'required', 'rows' => '3']) }}
                                     </td>
                                     @if (!$customFields->isEmpty())
                                         <td class="form-group col-md-3">
