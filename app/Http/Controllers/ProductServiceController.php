@@ -99,7 +99,6 @@ class ProductServiceController extends Controller
             $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
             $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
             $quantityUnitCodes = QuantityUnitCode::all()->pluck('name', 'code');
-            $quantityUnitCode = QuantityUnitCode::all()->pluck('name', 'code');
             $packagingUnitCodes = ProductServicesPackagingUnit::all()->pluck('name', 'code');
             $productServicesPackagingUnit = ProductServicesPackagingUnit::all()->pluck('name', 'code');
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
@@ -315,24 +314,45 @@ class ProductServiceController extends Controller
                 }
 
                 // Post data to the external API
-                // $response = \Http::withOptions([
-                //     'verify' => false
-                // ])->withHeaders([
-                //             'Accept' => 'application/json',
-                //             'Content-Type' => 'application/json',
-                //             'key' => '123456'
-                //         ])->post('https://etims.your-apps.biz/api/AddItemsList', $apiData);
+                $response = \Http::withOptions([
+                    'verify' => false
+                ])->withHeaders([
+                            'Accept' => 'application/json',
+                            'Content-Type' => 'application/json',
+                            'key' => '123456'
+                        ])->post('https://etims.your-apps.biz/api/AddItemsList', $apiData);
 
-                // // Log response data
-                // \Log::info('API Response Status Code For Posting Product Data: ' . $response->status());
-                // \Log::info('API Request Product Data Posted: ' . json_encode($apiData));
-                // \Log::info('API Response Body For Posting Product Data: ' . $response->body());
+                // Log response data
+                \Log::info('API Response Status Code For Posting Product Data: ' . $response->status());
+                \Log::info('API Request Product Data Posted: ' . json_encode($apiData));
+                \Log::info('API Response Body For Posting Product Data: ' . $response->body());
 
                 if ($response->successful()) {
                     \Log::info('Data successfully posted to the API');
                 } else {
                     \Log::error('Error posting data to the API: ' . $response->body());
                 }
+
+
+                // Post data to the ItemOpeningStock API
+                // $openingStockResponse = \Http::withOptions([
+                //     'verify' => false
+                // ])->withHeaders([
+                //             'Accept' => 'application/json',
+                //             'Content-Type' => 'application/json',
+                //             'key' => '123456'
+                //         ])->post('https://etims.your-apps.biz/api/ItemOpeningStock', $openingStockData);
+
+                // \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $openingStockResponse->status());
+                // \Log::info('API Request Opening Stock Data Posted: ' . json_encode($openingStockData));
+                // \Log::info('API Response Body For Posting Opening Stock Data: ' . $openingStockResponse->body());
+
+                // if ($openingStockResponse->successful()) {
+                //     \Log::info('Opening stock data successfully posted to the API');
+                // } else {
+                //     \Log::error('Error posting opening stock data to the API: ' . $openingStockResponse->body());
+                // }
+
 
                 return redirect()->route('productservice.index')->with('success', 'Product / Service Added Successfully');
             } else {
@@ -426,19 +446,39 @@ class ProductServiceController extends Controller
         $iteminformation = ProductService::find($id);
         \Log::info('Product Service INFO being edited :', ['item' => $iteminformation]);
         try {
-            $request->validate([
-                'itemCd' => 'required',
-                'itemClsCd' => 'required',
-                'itemTyCd' => 'required',
-                'itemNm' => 'required',
-                'orgnNatCd' => 'required',
-                'pkgUnitCd' => 'required',
-                'qtyUnitCd' => 'required',
-                'taxTyCd' => 'required',
-                'dftPrc' => 'required',
-                'isrcAplcbYn' => 'required',
-                'isUsed' => 'required',
-            ]);
+
+            $validator = \Validator::make(
+                $request->all(),
+                [
+                    'itemCd' => 'required',
+                    'itemClsCd' => 'required',
+                    'itemTyCd' => 'required',
+                    'itemNm' => 'required',
+                    'itemStdNm' => 'required',
+                    'orgnNatCd' => 'required',
+                    'pkgUnitCd' => 'required',
+                    'qtyUnitCd' => 'required',
+                    'taxTyCd' => 'required',
+                    'dftPrc' => 'required',
+                    'isrcAplcbYn' => 'required',
+                    'bcd' => 'nullable',
+                    'btchNo' => 'required',
+                    'isUsed' => 'required',
+                    'grpPrcL1' => 'required',
+                    'grpPrcL2' => 'required',
+                    'grpPrcL3' => 'required',
+                    'grpPrcL4' => 'required',
+                    'grpPrcL5' => 'required',
+                    'packageQuantity' => 'required',
+                    'sftyQty' => 'required'
+                ]
+            );
+            if ($validator->fails()) {
+                $messages = $validator->getMessageBag();
+
+                return redirect()->back()->with('error', $messages->first());
+            }
+
 
             $data = $request->all();
             \Log::info('Product Service INFO being edited and posted to the API:', $data);
@@ -468,22 +508,22 @@ class ProductServiceController extends Controller
                 "packageQuantity" => $data['packageQuantity'],
             ];
 
-            // $response = Http::withOptions([
-            //     'verify' => false
-            // ])->withHeaders([
-            //             'Accept' => 'application/json',
-            //             'Content-Type' => 'application/json',
-            //             'key' => '123456'
-            //         ])->post('https://etims.your-apps.biz/api/UpdateItem', $reqData);
+            $response = Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                        'key' => '123456'
+                    ])->post('https://etims.your-apps.biz/api/UpdateItem', $reqData);
 
-            // $res = $response->json();
+            $res = $response->json();
 
-            // \Log::info('API Request Data: ' . json_encode($reqData));
-            // \Log::info('API RESPONSE when posting the Product Details When being Edited: ', ['response' => $res]);
+            \Log::info('API Request Data: ' . json_encode($reqData));
+            \Log::info('API RESPONSE when posting the Product Details When being Edited: ', ['response' => $res]);
 
-            // if ($res['statusCode'] != 200) {
-            //     return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
-            // }
+            if ($res['statusCode'] != 200) {
+                return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
+            }
 
             // Mapping array for taxTypeCode to tax_id
             $taxTypeMapping = [
@@ -549,25 +589,26 @@ class ProductServiceController extends Controller
                         'itemTyCd' => $data['itemTyCd'],
                         'itemNm' => $data['itemNm'],
                         'itemStdNm' => $data['itemStdNm'],
-                        'orgnNatCd' => $data['orgnNatCd'],
-                        'pkgUnitCd' => $data['pkgUnitCd'],
-                        'qtyUnitCd' => $data['qtyUnitCd'],
-                        'taxTyCd' => $data['taxTyCd'],
-                        'btchNo' => $data['btchNo'],
-                        'regBhfId' => $data['regBhfId'],
-                        'bcd' => $data['bcd'],
-                        'dftPrc' => $data['dftPrc'],
-                        'grpPrcL1' => $data['grpPrcL1'],
-                        'grpPrcL2' => $data['grpPrcL2'],
-                        'grpPrcL3' => $data['grpPrcL3'],
-                        'grpPrcL4' => $data['grpPrcL4'],
-                        'grpPrcL5' => $data['grpPrcL5'],
-                        'addInfo' => $data['addInfo'],
-                        'sftyQty' => $data['sftyQty'],
-                        'isrcAplcbYn' => $data['isrcAplcbYn'],
-                        'rraModYn' => $data['isUsed'],
-                        'packageQuantity' => $data['packageQuantity'],
-                        'useYn' => $data['useYn'],
+                        'orgnNatCd' => $data['orgnNatCd'] ?? null,
+                        'pkgUnitCd' => $data['pkgUnitCd'] ?? null,
+                        'qtyUnitCd' => $data['qtyUnitCd'] ?? null,
+                        'taxTyCd' => $data['taxTypCd'] ?? null,
+                        'btchNo' => $data['btchNo'] ?? null,
+                        'regBhfId' => $data['regBhfId'] ?? null,
+                        'bcd' => $data['bcd'] ?? null,
+                        'dftPrc' => $data['dftPrc'] ?? null,
+                        'grpPrcL1' => $data['grpPrcL1'] ?? null,
+                        'grpPrcL2' => $data['grpPrcL2'] ?? null,
+                        'grpPrcL3' => $data['grpPrcL3'] ?? null,
+                        'grpPrcL4' => $data['grpPrcL4'] ?? null,
+                        'grpPrcL5' => $data['grpPrcL5'] ?? null,
+                        'addInfo' => $data['addInfo'] ?? null,
+                        'sftyQty' => $data['sftyQty'] ?? null,
+                        'isrcAplcbYn' => $data['isrcAplcbYn'] ?? null,
+                        'rraModYn' => $data['rraModYn'] ?? null,
+                        'packageQuantity' => $data['packageQuantity'] ?? null,
+                        'useYn' => $data['useYn'] ?? null,
+                        'isUsed' => $data['isUsed'] ?? null,
                     ]);
                 } else {
                     \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
@@ -595,25 +636,26 @@ class ProductServiceController extends Controller
                     'itemTyCd' => $data['itemTyCd'],
                     'itemNm' => $data['itemNm'],
                     'itemStdNm' => $data['itemStdNm'],
-                    'orgnNatCd' => $data['orgnNatCd'],
-                    'pkgUnitCd' => $data['pkgUnitCd'],
-                    'qtyUnitCd' => $data['qtyUnitCd'],
-                    'taxTyCd' => $data['taxTyCd'],
-                    'btchNo' => $data['btchNo'],
-                    'regBhfId' => $data['regBhfId'],
-                    'bcd' => $data['bcd'],
-                    'dftPrc' => $data['dftPrc'],
-                    'grpPrcL1' => $data['grpPrcL1'],
-                    'grpPrcL2' => $data['grpPrcL2'],
-                    'grpPrcL3' => $data['grpPrcL3'],
-                    'grpPrcL4' => $data['grpPrcL4'],
-                    'grpPrcL5' => $data['grpPrcL5'],
-                    'addInfo' => $data['addInfo'],
-                    'sftyQty' => $data['sftyQty'],
-                    'isrcAplcbYn' => $data['isrcAplcbYn'],
-                    'rraModYn' => $data['isUsed'],
-                    'packageQuantity' => $data['packageQuantity'],
-                    'useYn' => $data['useYn'],
+                    'orgnNatCd' => $data['orgnNatCd'] ?? null,
+                    'pkgUnitCd' => $data['pkgUnitCd'] ?? null,
+                    'qtyUnitCd' => $data['qtyUnitCd'] ?? null,
+                    'taxTyCd' => $data['taxTypCd'] ?? null,
+                    'btchNo' => $data['btchNo'] ?? null,
+                    'regBhfId' => $data['regBhfId'] ?? null,
+                    'bcd' => $data['bcd'] ?? null,
+                    'dftPrc' => $data['dftPrc'] ?? null,
+                    'grpPrcL1' => $data['grpPrcL1'] ?? null,
+                    'grpPrcL2' => $data['grpPrcL2'] ?? null,
+                    'grpPrcL3' => $data['grpPrcL3'] ?? null,
+                    'grpPrcL4' => $data['grpPrcL4'] ?? null,
+                    'grpPrcL5' => $data['grpPrcL5'] ?? null,
+                    'addInfo' => $data['addInfo'] ?? null,
+                    'sftyQty' => $data['sftyQty'] ?? null,
+                    'isrcAplcbYn' => $data['isrcAplcbYn'] ?? null,
+                    'rraModYn' => $data['rraModYn'] ?? null,
+                    'packageQuantity' => $data['packageQuantity'] ?? null,
+                    'useYn' => $data['useYn'] ?? null,
+                    'isUsed' => $data['isUsed'] ?? null,
                 ]);
             }
 
