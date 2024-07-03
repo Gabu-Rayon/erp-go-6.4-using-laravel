@@ -10,6 +10,7 @@ use App\Models\Customer;
 use App\Models\SalesItems;
 use App\Models\ItemInformation;
 use App\Http\Controllers\Controller;
+use App\Models\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\SalesCreditNoteItems;
@@ -79,9 +80,20 @@ class SalesController extends Controller
             foreach ($data['items'] as $item) {
                 \Log::info('SALE ITEM DATA');
                 \Log::info($item);
+
+                $itemFromDb = ProductService::where('itemCd', $item['itemCode'])->first();
+
+                if (!$itemFromDb) {
+                    return redirect()->back()->with('error', 'Item not found');
+                }
+
+                if ($item['quantity'] > $itemFromDb->quantity) {
+                    return redirect()->back()->with('error', 'Quantity exceeds available stock');
+                }
+
+                
                 $itemExprDt = str_replace('-', '', $item['itemExprDate']);
                 $itemExprDate = date('Ymd', strtotime($itemExprDt));
-
                 $itemsDataList[] = [
                     "itemCode" => $item['itemCode'],
                     "itemClassCode" => $item['itemClassCode'],

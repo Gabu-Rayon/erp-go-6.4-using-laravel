@@ -1816,6 +1816,7 @@ Route::get('/details/refundreasons', [DetailsController::class, 'refundreasons']
 Route::get('/details/currencies', [DetailsController::class, 'currencies'])->name('details.currencies');
 Route::get('/details/banks', [DetailsController::class, 'banks'])->name('details.banks');
 Route::get('/details/languages', [DetailsController::class, 'languages'])->name('details.languages');
+Route::get('/details/payment-types', [DetailsController::class, 'paymentTypes'])->name('details.payment-types');
 Route::get('/getnotices', [NoticesListController::class, 'getNoticeList']);
 Route::get('/get-item-information', [ProductServiceController::class, 'getItemInformation']);
 Route::group(
