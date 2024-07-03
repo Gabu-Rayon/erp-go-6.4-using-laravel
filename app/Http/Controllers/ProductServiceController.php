@@ -100,7 +100,6 @@ class ProductServiceController extends Controller
             $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
             $quantityUnitCodes = QuantityUnitCode::all()->pluck('name', 'code');
             $packagingUnitCodes = ProductServicesPackagingUnit::all()->pluck('name', 'code');
-            $productServicesPackagingUnit = ProductServicesPackagingUnit::all()->pluck('name', 'code');
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
             return view(
@@ -116,7 +115,6 @@ class ProductServiceController extends Controller
                     'quantityUnitCodes',
                     'packagingUnitCodes',
                     'countrynames',
-                    'productServicesPackagingUnit',
                     'taxationtype',
                     'category',
                     'customFields'
