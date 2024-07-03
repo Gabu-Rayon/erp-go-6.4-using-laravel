@@ -63,8 +63,6 @@ class ProductServiceController extends Controller
             $itemclassifications = ProductsServicesClassification::pluck('itemClsNm', 'itemClsCd');
             $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
             $countries = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
-            $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
-            $taxes = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
             $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
 
 
@@ -111,7 +109,6 @@ class ProductServiceController extends Controller
                     'itemclassifications',
                     'itemtypes',
                     'countries',
-                    'taxes',
                     'incomeChartAccounts',
                     'incomeSubAccounts',
                     'expenseChartAccounts',
