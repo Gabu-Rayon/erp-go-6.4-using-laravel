@@ -172,6 +172,42 @@
                     });
                 }
             });
+
+            // Function to calculate discount amount
+function calculateDiscountAmount(unitPrice, packageQuantity, quantity, discountRate) {
+    // Calculate the total price before discount
+    var totalPrice = unitPrice * quantity * packageQuantity;
+
+    // Calculate the discounted price
+    var discountAmount = totalPrice * (discountRate / 100);
+
+    return discountAmount;
+}
+
+// Function to update discount amount field
+function updateDiscountAmount(row) {
+    // Get values of required fields
+    var unitPrice = parseFloat(row.find('.unitPrice').val());
+    var packageQuantity = parseFloat(row.find('.pkgQuantity').val());
+    var quantity = parseFloat(row.find('.quantity').val());
+    var discountRate = parseFloat(row.find('.discountRate').val());
+
+    // Calculate discount amount
+    var discountAmt = calculateDiscountAmount(unitPrice, packageQuantity, quantity, discountRate) || 0;
+
+    // Update discount amount field
+    row.find('.discountAmt').val(discountAmt.toFixed(2));
+}
+
+// Event listener for change in unitPrice, pkgQuantity, quantity, and discountRate fields
+$(document).on('keyup change', '.unitPrice, .pkgQuantity, .quantity, .discountRate', function() {
+    // Find the closest row containing the changed field
+    var row = $(this).closest('tr');
+
+    // Update discount amount for the row
+    updateDiscountAmount(row);
+});
+
         });
     </script>
     <script>
@@ -182,40 +218,33 @@
         });
     </script>
     <script>
-        function calculateDiscountAmount(unitPrice, packageQuantity, quantity, discountRate) {
-            // Calculate the total price before discount
-            var totalPrice = unitPrice * quantity * packageQuantity;
-
-            // Calculate the discounted price
-            var discountAmount = totalPrice * (discountRate / 100);
-
+        function calculateDiscountAmount(unitPrice, discountRate) {
+            var discountAmount = unitPrice * (discountRate / 100);
             return discountAmount;
         }
-
-        // Function to update discount amount field
+    
         function updateDiscountAmount(row) {
-            // Get values of required fields
             var unitPrice = parseFloat(row.find('.unitPrice').val());
-            var packageQuantity = parseFloat(row.find('.pkgQuantity').val());
             var quantity = parseFloat(row.find('.quantity').val());
             var discountRate = parseFloat(row.find('.discountRate').val());
-
-            // Calculate discount amount
-            var discountAmt = calculateDiscountAmount(unitPrice, packageQuantity, quantity, discountRate) || 0;
-
-            // Update discount amount field
+    
+            console.log("Unit Price:", unitPrice);
+            console.log("Quantity:", quantity);
+            console.log("Discount Rate:", discountRate);
+    
+            var discountAmt = calculateDiscountAmount(unitPrice, discountRate) * quantity || 0;
+    
+            console.log("Discount Amount:", discountAmt);
+    
             row.find('.discountAmt').val(discountAmt.toFixed(2));
         }
-
-        // Event listener for change in unitPrice, pkgQuantity, quantity, and discountRate fields
-        $(document).on('keyup change', '.unitPrice, .pkgQuantity, .quantity, .discountRate', function() {
-            // Find the closest row containing the changed field
+    
+        $(document).on('keyup change', '.unitPrice, .quantity, .discountRate', function() {
             var row = $(this).closest('tr');
-
-            // Update discount amount for the row
             updateDiscountAmount(row);
         });
     </script>
+    
 <?php $__env->stopPush(); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -373,21 +402,21 @@
                                     <td class="form-group col-md-4">
                                         <?php echo e(Form::label('pkgQuantity', __('Package Quantity'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::number('pkgQuantity', '', ['class' => 'form-control quantity', 'required' => true])); ?>
+                                        <?php echo e(Form::number('pkgQuantity', '', ['class' => 'form-control pkgQuantity', 'required' => true])); ?>
 
                                     </td>
                                     <td class="form-group col-md-4">
                                         <?php echo e(Form::label('discountRate', __('Discount Rate'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::number('discountRate', '', ['class' => 'form-control quantity', 'required' => true])); ?>
+                                        <?php echo e(Form::number('discountRate', '', ['class' => 'form-control discountRate', 'required' => true])); ?>
 
                                     </td>
                                     <td class="form-group col-md-4">
                                         <?php echo e(Form::label('discountAmt', __('Discount Amount'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::number('discountAmt', '', ['class' => 'form-control quantity', 'required' => true])); ?>
+                                        <?php echo e(Form::number('discountAmt', '', ['class' => 'form-control discountAmt', 'required' => true, 'readonly' => true])); ?>
 
-                                    </td>
+                                    </td>                                    
                                     <td class="form-group col-md-4">
                                         <?php echo e(Form::label('itemExprDate', __('Item Expiry Date'), ['class' => 'form-label'])); ?>
 
