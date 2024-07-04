@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Invoice extends Model
 {
@@ -18,7 +19,7 @@ class Invoice extends Model
         'shipping_display',
         'discount_apply',
         'created_by',        
-        'response_trderInvoiceNo',
+        'trderInvoiceNo',
         'response_invoiceNo',
         'orgInvoiceNo',
         'customerTin',
@@ -142,8 +143,8 @@ class Invoice extends Model
         $subTotal = 0;
         foreach($this->items as $product)
         {
-            \Log::info('SUB TOTAL ITEM');
-            \Log::info($product);
+            Log::info('SUB TOTAL ITEM');
+            Log::info($product);
             $subTotal += ($product->unitPrice * $product->quantity * $product->pkgQuantity);
         }
 

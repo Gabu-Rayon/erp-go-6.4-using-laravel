@@ -227,138 +227,104 @@
             <div class="card">
                 <div class="card-body" data-autofill>
                     <div class="row">
-                        <div class="form-group col-md-6">
-                            <!-- <?php echo e(Form::label('customerName', __('Customer Name (*)'), ['class' => 'form-label'])); ?>
+                        <div class="form-group col-md-4">
+                            <?php echo e(Form::label('customer', __('Customer'), ['class' => 'form-label'])); ?>
 
-                                    <?php echo e(Form::select('customerName', $customer, null, ['class' => 'form-control customerName', 'required' => 'required'])); ?> -->
-
-                            <?php echo e(Form::label('customerName', __('Customer Name (*)'), ['class' => 'form-label'])); ?>
-
-                            <?php echo e(Form::select('customerName', $customer, '', ['class' => 'form-control select2 customer', 'data-url' => route('invoice.custom.credit.getcustomerDetails'), 'required' => 'required'])); ?>
+                            <span class="text-danger">*</span>
+                            <?php echo e(Form::select('customer', $customers, null, ['class' => 'form-control select2', 'required' => 'required'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
-                            <?php echo e(Form::label('customerTin', __('Customer Tin (*)'), ['class' => 'form-label'])); ?>
+                        <div class="form-group  col-md-4">
+                            <?php echo e(Form::label('orgInvoiceNo', __('Original Invoice No'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::text('customerTin', '', ['class' => 'form-control customerTin', 'required' => 'required'])); ?>
-
-                        </div>
-                        <!-- <div class="form-group col-md-6">
-                                    <?php echo e(Form::label('invoice', __('Invoice(*)'), ['class' => 'form-label'])); ?>
-
-                                    <?php echo e(Form::select('invoice', $invoices, null, ['class' => 'form-control invoice', 'required' => 'required'])); ?>
-
-                                </div> -->
-                        <div class="form-group col-md-6">
-                            <?php echo e(Form::label('invoice', __('Invoice(*)'), ['class' => 'form-label'])); ?>
-
-                            <?php echo e(Form::number('invoice', '', ['class' => 'form-control invoice', 'placeholder' => '1', 'required' => 'required'])); ?>
-
-                        </div>
-                        <div class="form-group  col-md-6">
-                            <?php echo e(Form::label('orgInvoiceNo', __('Org Invoice No'), ['class' => 'form-label'])); ?>
-
+                            <span class="text-danger">*</span>
                             <?php echo e(Form::number('orgInvoiceNo', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
+                        </div>
+                        <div class="form-group col-md-4">
+                            <?php echo e(Form::label('traderInvoiceNo', __('Trader Invoice No'), ['class' => 'form-label'])); ?>
+
+                            <span class="text-danger">*</span>
+                            <?php echo e(Form::text('traderInvoiceNo', null, ['class' => 'form-control', 'required' => 'required'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
-                            <?php echo e(Form::label('traderInvoiceNo', __('Trader Invoice No(*)'), ['class' => 'form-label'])); ?>
-
-                            <?php echo e(Form::number('traderInvoiceNo', null, ['class' => 'form-control', 'required' => 'required'])); ?>
-
-                        </div>
-                        <div class="form-group col-md-6">
-                            <?php echo e(Form::label('salesType', __('Sales Type(*)'), ['class' => 'form-label'])); ?>
+                        <div class="form-group col-md-4">
+                            <?php echo e(Form::label('salesType', __('Sales Type'), ['class' => 'form-label'])); ?>
 
                             <?php echo e(Form::select('salesType', $salesTypeCodes, null, ['class' => 'form-control select2'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-4">
                             <?php echo e(Form::label('paymentType', __('Payment Type'), ['class' => 'form-label'])); ?>
 
                             <?php echo e(Form::select('paymentType', $paymentTypeCodes, null, ['class' => 'form-control select2'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
-                            <?php echo e(Form::label('creditNoteDate', __('Credit Note Date (*)'), ['class' => 'form-label'])); ?>
+                        <div class="form-group col-md-4">
+                            <?php echo e(Form::label('creditNoteDate', __('Credit Note Date'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::date('creditNoteDate', '', ['class' => 'form-control creditNoteDate', 'required' => true])); ?>
+                            <?php echo e(Form::date('creditNoteDate', '', ['class' => 'form-control creditNoteDate'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
-                            <?php echo e(Form::label('confirmDate', __('Confirm Date (*)'), ['class' => 'form-label'])); ?>
+                        <div class="form-group col-md-4">
+                            <?php echo e(Form::label('confirmDate', __('Confirm Date'), ['class' => 'form-label'])); ?>
 
+                            <span class="text-danger">*</span>
                             <?php echo e(Form::date('confirmDate', '', ['class' => 'form-control', 'required' => 'required'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
-                            <?php echo e(Form::label('salesDate', __('Sales Date (*)'), ['class' => 'form-label'])); ?>
+                        <div class="form-group col-md-4">
+                            <?php echo e(Form::label('salesDate', __('Sales Date'), ['class' => 'form-label'])); ?>
 
+                            <span class="text-danger">*</span>
                             <?php echo e(Form::date('salesDate', '', ['class' => 'form-control', 'required' => 'required'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-4">
                             <?php echo e(Form::label('stockReleseDate', __('Stock Release Date'), ['class' => 'form-label'])); ?>
 
                             <?php echo e(Form::date('stockReleseDate', '', ['class' => 'form-control'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
-                            <?php echo e(Form::label('receiptPublishDate', __('Receipt Publish Date (*)'), ['class' => 'form-label'])); ?>
+                        <div class="form-group col-md-4">
+                            <?php echo e(Form::label('receiptPublishDate', __('Receipt Publish Date'), ['class' => 'form-label'])); ?>
 
+                            <span class="text-danger">*</span>
                             <?php echo e(Form::date('receiptPublishDate', '', ['class' => 'form-control', 'required' => 'required'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
-                            <?php echo e(Form::label('occurredDate', __('Occurred Date (*)'), ['class' => 'form-label'])); ?>
+                        <div class="form-group col-md-4">
+                            <?php echo e(Form::label('occurredDate', __('Occurred Date'), ['class' => 'form-label'])); ?>
 
+                            <span class="text-danger">*</span>
                             <?php echo e(Form::date('occurredDate', '', ['class' => 'form-control', 'required' => 'required'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
-                            <?php echo e(Form::label('creditNoteReason', __('Credit Note Reason(*)'), ['class' => 'form-label'])); ?>
+                        <div class="form-group col-md-4">
+                            <?php echo e(Form::label('creditNoteReason', __('Credit Note Reason'), ['class' => 'form-label'])); ?>
 
+                            <span class="text-danger">*</span>
                             <?php echo e(Form::select('creditNoteReason', $creditNoteReasons, null, ['class' => 'form-control select2'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-4">
                             <?php echo e(Form::label('invoiceStatusCode', __('Invoice Status'), ['class' => 'form-label'])); ?>
 
                             <?php echo e(Form::select('invoiceStatusCode', $invoiceStatusCodes, null, ['class' => 'form-control select2'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-4">
                             <?php echo e(Form::label('isPurchaseAccept', __('Purchase Accepted?'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::select('isPurchaseAccept', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2'])); ?>
+                            <?php echo e(Form::select('isPurchaseAccept', [true => 'Yes', false => 'No'], null, ['class' => 'form-control select2'])); ?>
 
                         </div>
-                        <div class="form-group col-md-6">
-                            <?php echo e(Form::label('isStockIOUpdate', __('Stock IO Update?'), ['class' => 'form-label'])); ?>
-
-                            <?php echo e(Form::select('isStockIOUpdate', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2'])); ?>
-
-                        </div>
-                        <div class="form-group col-md-6">
-                            <?php echo e(Form::label('mapping', __('Mapping'), ['class' => 'form-label'])); ?>
-
-                            <?php echo e(Form::text('mapping', '', ['class' => 'form-control'])); ?>
-
-                        </div>
-                        <!-- <div class="form-group col-md-6">
-                                    <?php echo e(Form::label('amount', __('Amount(*)'), ['class' => 'form-label'])); ?>
-
-                                    <?php echo e(Form::number('amount', '', ['class' => 'form-control'])); ?>
-
-                                </div> -->
                         <div class="form-group col-md-12">
                             <?php echo e(Form::label('remark', __('Remark'), ['class' => 'form-label'])); ?>
 
                             <?php echo e(Form::textarea('remark', '', ['class' => 'form-control', 'rows' => '3'])); ?>
 
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -389,14 +355,13 @@
                                     <td class="form-group col-md-4">
                                         <?php echo e(Form::label('itemCode', __('Item Code'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::select('itemCode', $product_services_Codes, '', ['class' => 'form-control select2 itemCode', 'data-url' => route('invoice.custom.credit.getiteminformation'), 'required' => 'required'])); ?>
+                                        <?php echo e(Form::select('itemCode', $product_services, '', ['class' => 'form-control select2 itemCode', 'data-url' => route('invoice.custom.credit.getiteminformation'), 'required' => 'required'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-4">
                                         <?php echo e(Form::label('unitPrice', __('Unit Price'), ['class' => 'form-label'])); ?>
 
                                         <?php echo e(Form::number('unitPrice', '', ['class' => 'form-control unitPrice', 'required' => true])); ?>
-
 
                                     </td>
                                     <td class="form-group col-md-4">
@@ -405,32 +370,34 @@
                                         <?php echo e(Form::number('quantity', '', ['class' => 'form-control quantity', 'required' => true])); ?>
 
                                     </td>
-                                    <td class="form-group col-md-3">
-                                        <?php echo e(Form::label('pkgQuantity', __('Package Quantity (*)'), ['class' => 'form-label'])); ?>
+                                    <td class="form-group col-md-4">
+                                        <?php echo e(Form::label('pkgQuantity', __('Package Quantity'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::number('pkgQuantity', '', ['class' => 'form-control pkgQuantity', 'required' => 'required'])); ?>
+                                        <?php echo e(Form::number('pkgQuantity', '', ['class' => 'form-control quantity', 'required' => true])); ?>
 
                                     </td>
-                                    <td class="form-group col-md-3">
+                                    <td class="form-group col-md-4">
                                         <?php echo e(Form::label('discountRate', __('Discount Rate'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::number('discountRate', '', ['class' => 'form-control discountRate', 'required' => 'required'])); ?>
+                                        <?php echo e(Form::number('discountRate', '', ['class' => 'form-control quantity', 'required' => true])); ?>
 
                                     </td>
-                                    <td class="form-group col-md-3">
+                                    <td class="form-group col-md-4">
                                         <?php echo e(Form::label('discountAmt', __('Discount Amount'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::number('discountAmt', '', ['class' => 'form-control discountAmt', 'readonly' => true])); ?>
+                                        <?php echo e(Form::number('discountAmt', '', ['class' => 'form-control quantity', 'required' => true])); ?>
 
                                     </td>
-                                    <td class="form-group col-md-3">
+                                    <td class="form-group col-md-4">
                                         <?php echo e(Form::label('itemExprDate', __('Item Expiry Date'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::date('itemExprDate', null, ['class' => 'form-control'])); ?>
+                                        <?php echo e(Form::date('itemExprDate', '', ['class' => 'form-control'])); ?>
 
                                     </td>
-                                    <td class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2"
-                                        data-repeater-delete>
+                                    <td class="form-group col-md-1">
+                                        <a href="#" class="btn btn-outline-danger" data-repeater-delete="">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
                                     </td>
                                 </tr>
                             </tbody>
