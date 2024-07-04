@@ -124,9 +124,9 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <?php echo e(Form::label('saftyQuantity', __('Safty Quantity'), ['class' => 'form-label'])); ?>
+                <?php echo e(Form::label('saftyQuantity', __('Safety Quantity'), ['class' => 'form-label'])); ?>
 
-                <?php echo e(Form::number('sftyQty', $productServiceinformation->sftyQty, ['class' => 'form-control', 'placeholder' => __('Enter Safty Quantity')])); ?>
+                <?php echo e(Form::number('saftyQuantity', $productServiceinformation->sftyQty, ['class' => 'form-control', 'placeholder' => __('Enter Safty Quantity')])); ?>
 
             </div>
         </div>
@@ -158,7 +158,7 @@
             <div class="form-group">
                 <?php echo e(Form::label('isrcAplcbYn', __('Insurance Appicable (Y/N) (*)'), ['class' => 'form-label'])); ?>
 
-                <?php echo e(Form::select('isrcAplcbYn', [true => 'Y', false => 'N'], $productServiceinformation->isrcAplcbYn, ['class' => 'form-control', 'required' => 'required'])); ?>
+                <?php echo e(Form::select('isrcAplcbYn', [true => 'Y', false => 'N'], $productServiceinformation->isrcAplcbYn, ['class' => 'form-control select2', 'required' => 'required'])); ?>
 
             </div>
         </div>
@@ -166,7 +166,7 @@
             <div class="form-group">
                 <?php echo e(Form::label('isUsed', __('Used / UnUsed (Y/N) (*)'), ['class' => 'form-label'])); ?>
 
-                <?php echo e(Form::select('isUsed', [true => 'true', false => 'false'], $productServiceinformation->isUsed, ['class' => 'form-control', 'required' => 'required'])); ?>
+                <?php echo e(Form::select('isUsed', [true => 'true', false => 'false'], $productServiceinformation->isUsed, ['class' => 'form-control select2', 'required' => 'required'])); ?>
 
             </div>
         </div>
