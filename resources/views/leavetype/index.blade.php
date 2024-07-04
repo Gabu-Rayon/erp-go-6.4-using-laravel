@@ -11,11 +11,9 @@
 
 @section('action-btn')
     <div class="float-end">
-        @can('create leave type')
             <a href="#" data-url="{{ route('leavetype.create') }}" data-ajax-popup="true" data-title="{{__('Create New Leave Type')}}" data-bs-toggle="tooltip" title="{{__('Create')}}"  class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-        @endcan
     </div>
 @endsection
 
@@ -44,16 +42,11 @@
 
                                     <td>
 
-
-                                        @can('edit leave type')
                                             <div class="action-btn bg-primary ms-2">
                                                 <a href="#" class="mx-3 btn btn-sm align-items-center" data-url="{{ URL::to('leavetype/'.$leavetype->id.'/edit') }}" data-ajax-popup="true" data-title="{{__('Edit Leave Type')}}" data-bs-toggle="tooltip" title="{{__('Edit')}}" data-original-title="{{__('Edit')}}">
                                                     <i class="ti ti-pencil text-white"></i>
                                                 </a>
                                             </div>
-                                        @endcan
-
-                                        @can('delete leave type')
                                             <div class="action-btn bg-danger ms-2">
 
                                                 {!! Form::open(['method' => 'DELETE', 'route' => ['leavetype.destroy', $leavetype->id],'id'=>'delete-form-'.$leavetype->id]) !!}
@@ -62,7 +55,6 @@
                                                 </a>
                                                 {!! Form::close() !!}
                                             </div>
-                                        @endcan
 
                                     </td>
                                 </tr>

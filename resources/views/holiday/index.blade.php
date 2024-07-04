@@ -9,7 +9,6 @@
 @endsection
 
 @section('action-btn')
-    @can('create holiday')
         <div class="float-end">
             <a href="{{ route('holiday.calender') }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{__('Calender View')}}" data-original-title="{{__('Calender View')}}">
                 <i class="ti ti-calendar"></i>
@@ -18,7 +17,6 @@
                 <i class="ti ti-plus"></i>
             </a>
         </div>
-    @endcan
 @endsection
 
 

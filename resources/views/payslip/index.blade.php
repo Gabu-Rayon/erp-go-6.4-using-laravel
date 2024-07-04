@@ -76,9 +76,7 @@
                                 {{ Form::close() }}
                             </div>
                             <div class="col-auto float-end me-0">
-                                @can('create pay slip')
                                     <input type="button" value="{{ __('Bulk Payment') }}" class="btn btn-primary" id="bulk_payment">
-                                @endcan
                             </div>
                         </div>
                     </div>

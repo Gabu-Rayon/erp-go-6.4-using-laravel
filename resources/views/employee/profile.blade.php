@@ -58,11 +58,10 @@
                     <div class="sal-right-card">
                         <span class="badge badge-pill badge-blue">{{ !empty($employee->designation)?$employee->designation->name:'' }}</span>
                         <div class="Id">
-                            @can('Show Employee Profile')
                                 <a href="{{route('show.employee.profile',\Illuminate\Support\Facades\Crypt::encrypt($employee->id))}}">{{ \Auth::user()->employeeIdFormat($employee->employee_id) }}</a>
                             @else
                                 <a href="#">{{ \Auth::user()->employeeIdFormat($employee->employee_id) }}</a>
-                            @endcan
+                       
                         </div>
                     </div>
                 </div>

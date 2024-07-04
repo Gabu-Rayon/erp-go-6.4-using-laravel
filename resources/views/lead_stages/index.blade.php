@@ -77,20 +77,16 @@
                                                     <span>{{$lead_stages->name}}</span>
                                                 </h6>
                                                 <span class="float-end">
-                                                    @can('edit lead stage')
                                                         <div class="action-btn bg-info ms-2"><a href="#" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-url="{{ URL::to('lead_stages/'.$lead_stages->id.'/edit') }}" data-ajax-popup="true" data-size="md" data-bs-toggle="tooltip" title="{{__('Edit')}}" data-title="{{__('Edit Lead Stages')}}">
                                                             <i class="ti ti-pencil text-white"></i>
                                                         </a>
                                                     </div>
-                                                    @endcan
                                                     @if(count($pipeline['lead_stages']))
-                                                        @can('delete lead stage')
                                                             <div class="action-btn bg-danger ms-2">
                                                                 {!! Form::open(['method' => 'DELETE', 'route' => ['lead_stages.destroy', $lead_stages->id]]) !!}
                                                                 <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}"><i class="ti ti-trash text-white"></i></a>
                                                                 {!! Form::close() !!}
                                                             </div>
-                                                        @endcan
                                                     @endif
                                                 </span>
                                             </li>

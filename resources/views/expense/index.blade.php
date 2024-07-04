@@ -25,11 +25,9 @@
 
 @section('action-btn')
     <div class="float-end">
-        @can('create bill')
             <a href="{{ route('expense.create',0) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{__('Create')}}">
                 <i class="ti ti-plus"></i>
             </a>
-        @endcan
     </div>
 @endsection
 
@@ -112,22 +110,16 @@
                                     @if(Gate::check('edit bill') || Gate::check('delete bill') || Gate::check('show bill'))
                                         <td class="Action">
                                             <span>
-
-                                                @can('show bill')
                                                     <div class="action-btn bg-info ms-2">
                                                         <a href="{{ route('expense.show',\Crypt::encrypt($expense->id)) }}" class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip" title="{{__('Show')}}" data-original-title="{{__('Detail')}}">
                                                             <i class="ti ti-eye text-white"></i>
                                                         </a>
                                                     </div>
-                                                @endcan
-                                                @can('edit bill')
                                                     <div class="action-btn bg-primary ms-2">
                                                         <a href="{{ route('expense.edit',\Crypt::encrypt($expense->id)) }}" class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip" title="Edit" data-original-title="{{__('Edit')}}">
                                                             <i class="ti ti-pencil text-white"></i>
                                                         </a>
                                                     </div>
-                                                @endcan
-                                                @can('delete bill')
                                                     <div class="action-btn bg-danger ms-2">
                                                         {!! Form::open(['method' => 'DELETE', 'route' => ['expense.destroy', $expense->id],'class'=>'delete-form-btn','id'=>'delete-form-'.$expense->id]) !!}
                                                         <a href="#" class="mx-3 btn btn-sm align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?').'|'.__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$expense->id}}').submit();">
@@ -135,7 +127,6 @@
                                                         </a>
                                                         {!! Form::close() !!}
                                                     </div>
-                                                @endcan
                                             </span>
                                         </td>
                                     @endif

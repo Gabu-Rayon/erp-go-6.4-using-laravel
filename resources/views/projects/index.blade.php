@@ -54,15 +54,11 @@
                     @endforeach
                 </div>
             {{------------ End Status Filter ----------------}}
-
-        @can('create project')
             <a href="#" data-size="lg" data-url="{{ route('projects.create') }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Create New Project')}}" data-title="{{__('Create Project')}}" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-        @endcan
     </div>
 @endsection
-
 @section('content')
     <div class="row min-750" id="project_view"></div>
 @endsection

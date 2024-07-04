@@ -39,13 +39,11 @@
 @endpush
 
 @section('action-btn')
-    @can('create bug status')
         <div class="float-end">
             <a href="#" data-url="{{ route('bugstatus.create') }}"  data-bs-toggle="tooltip" title="{{__('Create')}}" class="btn btn-sm btn-primary" data-ajax-popup="true" data-title="{{__('Create Bug Stage')}}">
                 <i class="ti ti-plus"></i>
             </a>
         </div>
-    @endcan
 @endsection
 
 @section('content')
@@ -65,14 +63,11 @@
                                                 <span>{{$bug->title}}</span>
                                             </h6>
                                             <span class="float-end">
-                                                @can('edit bug status')
                                                     <div class="action-btn bg-info ms-2">
                                                         <a href="#" data-url="{{ URL::to('bugstatus/'.$bug->id.'/edit') }}" data-ajax-popup="true"  data-bs-toggle="tooltip" title="{{__('Edit')}}" data-title="{{__('Edit Bug Status')}}" class="mx-3 btn btn-sm d-inline-flex align-items-center">
                                                           <i class="ti ti-pencil text-white"></i>
                                                       </a>
                                                     </div>
-                                                @endcan
-                                                @can('delete bug status')
                                                     <div class="action-btn bg-danger ms-2">
                                                         {!! Form::open(['method' => 'DELETE', 'route' => ['bugstatus.destroy', $bug->id],'id'=>'delete-form-'.$bug->id]) !!}
                                                               <a href="#!" class="mx-3 btn btn-sm align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}" data-original-title="{{__('Delete')}}" data-confirm="Are You Sure?|This action can not be undone. Do you want to continue?" data-confirm-yes="document.getElementById('delete-form-{{$bug->id}}').submit();">
@@ -80,7 +75,6 @@
                                                               </a>
                                                         {!! Form::close() !!}
                                                     </div>
-                                                @endcan
                                             </span>
                                         </li>
                                     @endforeach
