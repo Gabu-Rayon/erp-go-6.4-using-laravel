@@ -130,7 +130,16 @@ class ProductServiceController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * key Note is This We can Post the item First to the Etims Apis 
+     * Then Get Items to post in our Local Database for synchronizing with the correct Etims ItemCd
+     * 
+     *  OR
+     * 
+     * we can do both Post the eTIMS aPIS and also in our Local Db but for this the itemCd Will not match so,
+     * it will be diffcult for edit  the product
+     * 
      */
+
 
     public function store(Request $request)
     {
@@ -190,42 +199,31 @@ class ProductServiceController extends Controller
                 \Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
                 \Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
 
-
-
                 \Log::info('ITEMS');
                 \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
 
                 $apiData = [];
 
-                // Define the mapping array for taxTypeCode to tax_id
-                $taxTypeMapping = [
-                    'A' => 1,
-                    'B' => 2,
-                    'C' => 3,
-                    'D' => 4,
-                    'E' => 5,
-                    'F' => 6,
-                ];
-                $productTypeMapping = [
-                    1 => 'Raw Material',
-                    2 => 'Finished Product',
-                    3 => 'Service',
-                ];
-
                 foreach ($data['items'] as $index => $item) {
-                    \Log::info('ITEM INDEX: ' . $index);
+                    \Log::info('Product $ Service Item Index: ' . $index);
 
-                    // Determine the tax_id based on taxTypeCode
-                    $taxIdCode = isset($item['taxTypeCode']) && array_key_exists($item['taxTypeCode'], $taxTypeMapping)
-                        ? $taxTypeMapping[$item['taxTypeCode']]
-                        : null;
+                    $taxTypeId = null;
+                    if (isset($item['taxTyCd'])) {
+                        $taxType = Tax::where('name', $item['taxTyCd'])->first();
+                        $taxTypeId = $taxType ? $taxType->srtOrd : null;
+                    }
 
-                    // Determine the product type  based on itemTypeCode
-                    $productType = isset($item['itemTypeCode']) && array_key_exists($item['itemTypeCode'], $productTypeMapping)
-                        ? $productTypeMapping[$item['itemTypeCode']]
-                        : null;
+                    $productTypeMapping = null;
+                    if (isset($item['itemTyCd'])) {
+                        $ItemTypeCode = ItemType::where('item_type_code', $item['itemTyCd'])->first();
+                        $productTypeMapping = $ItemTypeCode ? $ItemTypeCode->item_type_name : null;
+                    }
 
-                    \Log::info('Product Type selected for this Product : ' . $productType);
+                    $unitId = null;
+                    if (isset($item['qtyUnitCd'])) {
+                        $unit = ProductServiceUnit::where('code', $item['qtyUnitCd'])->first();
+                        $unitId = $unit ? $unit->id : null;
+                    }
 
                     // Handling image upload with storage limit check
                     if (!empty($item['pro_image']) && $item['pro_image']->isValid()) {
@@ -243,21 +241,15 @@ class ProductServiceController extends Controller
                             // Assign the file name to the pro_image field
                             $item['pro_image'] = $fileName;
 
-                            // Determine the unit_id from qtyUnitCode
-                            $unitId = null;
-                            if (isset($item['qtyUnitCode'])) {
-                                $unit = ProductServiceUnit::where('code', $item['qtyUnitCode'])->first();
-                                $unitId = $unit ? $unit->id : null;
-                            }
                             $productService = ProductService::create([
                                 'name' => $item['itemName'] ?? null,
                                 'sku' => $item['itemCode'] ?? null,
                                 'sale_price' => $item['sale_price'] ?? null,
                                 'purchase_price' => $item['purchase_price'] ?? null,
-                                'tax_id' => $taxIdCode,
+                                'tax_id' => $taxTypeId,
                                 'category_id' => $item['category_id'] ?? null,
                                 'unit_id' => $unitId ?? null,
-                                'type' => $productType ?? null,
+                                'type' => $productTypeMapping ?? null,
                                 'quantity' => $item['quantity'],
                                 'description' => $item['additionalInfo'] ?? null,
                                 'pro_image' => $dir . '/' . $fileName,
@@ -391,6 +383,8 @@ class ProductServiceController extends Controller
             "packageQuantity" => $item["packageQuantity"],
         ];
     }
+
+
 
 
     public function show($id)
@@ -1484,29 +1478,57 @@ class ProductServiceController extends Controller
     public function synchronize()
     {
         try {
-
+            ini_set('max_execution_time', 30000);
             $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20210101120000';
 
-            \Log::info('URL');
-            \Log::info($url);
+            \Log::info('URL: ' . $url);
 
-            $response = Http::withOptions([
-                'verify' => false
-            ])->withHeaders([
-                        'key' => '123456'
-                    ])->timeout(60)->get($url);
+            $response = Http::withOptions(['verify' => false])
+                ->withHeaders(['key' => '123456'])
+                ->timeout(60)
+                ->get($url);
 
             $data = $response->json()['data'];
 
             $remoteItems = $data['data']['itemList'];
 
-            \Log::info('REMOTE ITEMS');
-            \Log::info($remoteItems);
+            \Log::info('REMOTE ITEMS: ', $remoteItems);
 
             $itemsToSync = [];
 
             foreach ($remoteItems as $remoteItem) {
+                $taxTypeId = null;
+                if (isset($remoteItem['taxTyCd'])) {
+                    $taxType = Tax::where('name', $remoteItem['taxTyCd'])->first();
+                    $taxTypeId = $taxType ? $taxType->srtOrd : null;
+                }
+
+                $productTypeMapping = null;
+                if (isset($remoteItem['itemTyCd'])) {
+                    $ItemTypeCode = ItemType::where('item_type_code', $remoteItem['itemTyCd'])->first();
+                    $productTypeMapping = $ItemTypeCode ? $ItemTypeCode->item_type_name : null;
+                }
+
+                $unitId = null;
+                if (isset($remoteItem['qtyUnitCd'])) {
+                    $unit = ProductServiceUnit::where('code', $remoteItem['qtyUnitCd'])->first();
+                    $unitId = $unit ? $unit->id : null;
+                }
+
                 $item = [
+                    'name' => $remoteItem['itemNm'],
+                    'sku' => $remoteItem['itemCd'],
+                    'sale_price' => null,
+                    'purchase_price' => null,
+                    'tax_id' => $taxTypeId,
+                    'category_id' => null,
+                    'unit_id' => $unitId,
+                    'type' => $productTypeMapping,
+                    'description' => $remoteItem['addInfo'],
+                    'pro_image' => null,
+                    'sale_chartaccount_id' => null,
+                    'expense_chartaccount_id' => null,
+                    'created_by' => \Auth::user()->creatorId(),
                     'tin' => $remoteItem['tin'],
                     'itemCd' => $remoteItem['itemCd'],
                     'itemClsCd' => $remoteItem['itemClsCd'],
@@ -1530,18 +1552,19 @@ class ProductServiceController extends Controller
                     'sftyQty' => $remoteItem['sftyQty'],
                     'isrcAplcbYn' => $remoteItem['isrcAplcbYn'],
                     'rraModYn' => $remoteItem['rraModYn'],
-                    'useYn' => $remoteItem['useYn']
+                    'useYn' => $remoteItem['useYn'],
+                    'isUsed' => null,
+                    'packageQuantity' => null
                 ];
                 array_push($itemsToSync, $item);
             }
 
-            \Log::info('ITEMS TO SYNC : ');
-            \Log::info("Product & service being sync" . $itemsToSync);
+            \Log::info('ITEMS TO SYNC: ', $itemsToSync);
 
             $syncedItems = 0;
 
             foreach ($itemsToSync as $itemToSync) {
-                $exists = (boolean) ProductService::where('itemCd', $itemsToSync['itemCd'])->exists();
+                $exists = ProductService::where('itemCd', $itemToSync['itemCd'])->exists();
                 if (!$exists) {
                     ProductService::create($itemToSync);
                     $syncedItems++;
@@ -1549,16 +1572,16 @@ class ProductServiceController extends Controller
             }
 
             if ($syncedItems > 0) {
-                return redirect()->back()->with('success', __('Synced ' . $syncedItems . ' Items' . 'Successfully'));
+                return redirect()->back()->with('success', __('Synced ' . $syncedItems . ' Items Successfully'));
             } else {
                 return redirect()->back()->with('success', __('Items Up To Date'));
             }
         } catch (\Exception $e) {
-            \Log::info('ERROR SYNCING ITEM INFO');
-            \Log::info($e);
+            \Log::error('ERROR SYNCING ITEM INFO: ' . $e->getMessage());
             return redirect()->back()->with('error', __('Error Syncing Item Information'));
         }
     }
+
 
     public function synchronizeItemClassifications()
     {
@@ -1646,189 +1669,58 @@ class ProductServiceController extends Controller
     }
     public function getItemInformation()
     {
-        ini_set('max_execution_time', 300);
+        ini_set('max_execution_time', 30000);
         $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';
 
-        // $response = Http::withHeaders([
-        //     'key' => '123456'
-        // ])->get($url);
+        $response = Http::withOptions(['verify' => false])
+            ->withHeaders(['key' => '123456'])
+            ->timeout(300)
+            ->get($url);
 
+        $responseBody = $response->json();
 
-        $response = Http::withOptions([
-            'verify' => false
-        ])->withHeaders([
-                    'key' => '123456'
-                ])->timeout(300)->get($url);
-
-        $data = $response->json()['data'];
-
-        \Log::info('API Request Data For All Items Information: ' . json_encode($data));
-        \Log::info('API Response: ' . $response->body());
+        \Log::info('API Response: ' . json_encode($responseBody));
         \Log::info('API Response Status Code: ' . $response->status());
 
-        if (isset($data['data'])) {
-            try {
-                // Define the mapping array for taxTyCd to tax_id
-                $taxTypeMapping = [
-                    'A' => 1,
-                    'B' => 2,
-                    'C' => 3,
-                    'D' => 4,
-                    'E' => 5,
-                    'F' => 6,
-                ];
-
-
-                /**
-                 * for Product type Mapping we will check again these parameter when getting item Information form the Api 
-                 * if "itemTyCd": "1", then Raw Material 
-                 * if "itemTyCd": "2", then Finished Product 
-                 * if "itemTyCd": "3", then Service  
-                 * using the model of ItemType   where it has two fillable  (item_type_code,item_type_name)
-                 */
-                  $productTypeMapping = [
-                    1 => 'Raw Material',
-                    2 => 'Finished Product',
-                    3 => 'Service',
-                ];
-                /**
-                 * for UnitId Mapping we will check again these parameter when getting item Information form the Api 
-                 * if "itemTyCd": "1", then Raw Material 
-                 * if "itemTyCd": "2", then Finished Product 
-                 * if "itemTyCd": "3", then Service  
-                 * using the model of ItemType   where it has two fillable  (item_type_code,item_type_name)
-                 */
-
-                 $unitId = null;
-                            if (isset($item['qtyUnitCode'])) {
-                                $unit = ProductServiceUnit::where('code', $item['qtyUnitCode'])->first();
-                                $unitId = $unit ? $unit->id : null;
-                            }
-
-                foreach ($data['data']['itemList'] as $item) {
-                    // Determine the tax_id based on taxTyCd
-                    $taxIdCode = isset($item['taxTyCd']) && array_key_exists($item['taxTyCd'], $taxTypeMapping)
-                        ? $taxTypeMapping[$item['taxTyCd']]
-                        : null;
-                    ProductService::create([
-                        'name' => $item['itemNm'],
-                        'sku' => null,
-                        'sale_price' => null,
-                        'purchase_price' => null,
-                        'quantity' => null,
-                        'tax_id' => $taxIdCode,
-                        'category_id' => null,
-                        'unit_id' => $unitId,
-                        'type' => 'product',  // Set the type to 'product'
-                        'sale_chartaccount_id' => null,
-                        'expense_chartaccount_id' => null,
-                        'description' => $item['addInfo'],
-                        'pro_image' => null,
-                        'created_by' => \Auth::user()->creatorId(),
-                        'tin' => $item['tin'],
-                        'itemCd' => $item['itemCd'],
-                        'itemClsCd' => $item['itemClsCd'],
-                        'itemTyCd' => $item['itemTyCd'],
-                        'itemNm' => $item['itemNm'],
-                        'itemStdNm' => $item['itemStdNm'],
-                        'orgnNatCd' => $item['orgnNatCd'],
-                        'pkgUnitCd' => $item['pkgUnitCd'],
-                        'qtyUnitCd' => $item['qtyUnitCd'],
-                        'taxTyCd' => $item['taxTyCd'],
-                        'btchNo' => $item['btchNo'],
-                        'regBhfId' => $item['regBhfId'],
-                        'bcd' => $item['bcd'],
-                        'dftPrc' => $item['dftPrc'],
-                        'grpPrcL1' => $item['grpPrcL1'],
-                        'grpPrcL2' => $item['grpPrcL2'],
-                        'grpPrcL3' => $item['grpPrcL3'],
-                        'grpPrcL4' => $item['grpPrcL4'],
-                        'grpPrcL5' => $item['grpPrcL5'],
-                        'addInfo' => $item['addInfo'],
-                        'sftyQty' => $item['sftyQty'],
-                        'isrcAplcbYn' => $item['isrcAplcbYn'],
-                        'rraModYn' => $item['rraModYn'],
-                        'useYn' => $item['useYn']
-                    ]);
-                }
-            } catch (Exception $e) {
-                \Log::error('Error adding Product Service informationfrom the API: ');
-                \Log::error($e);
-                return redirect()->route('productservice.index')->with('success', 'Error adding Product Service informationfrom the API.');
-            }
-        } else {
-            return redirect()->back()->with('error', 'No data found in the API response.');
+        if (!$response->successful() || !isset($responseBody['data']) || !isset($responseBody['data']['data']) || !isset($responseBody['data']['data']['itemList'])) {
+            return redirect()->back()->with('error', 'Invalid API response.');
         }
-    }
 
-    public function productServiceSearchByDate(Request $request)
-    {
-        // Log the incoming request
-        \Log::info('Synchronization Product Search by Date request received:', $request->all());
-
-        // Validate the product service search by date date 
-        $request->validate([
-            'searchByDate' => 'required|date_format:Y-m-d',
-        ], [
-            'searchByDate.required' => __('Date is required for synchronization Search for Product & Services SearchByDate.'),
-            'searchByDate.date_format' => __('Invalid date format.'),
-        ]);
-
-        // Get and format the date
-        $date = $request->input('searchByDate');
-        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
-        \Log::info('Date formatted from synchronization product & Services request:', ['formattedDate' => $formattedDate]);
+        $data = $responseBody['data']['data'];
 
         try {
-            // Make the API call
-            $response = Http::withOptions(['verify' => false])
-                ->withHeaders(['key' => '123456'])
-                ->get("https://etims.your-apps.biz/api/GetItemInformation", [
-                    'date' => $formattedDate,
-                ]);
+            foreach ($data['itemList'] as $item) {
+                $taxTypeId = null;
+                if (isset($item['taxTyCd'])) {
+                    $taxType = Tax::where('name', $item['taxTyCd'])->first();
+                    $taxTypeId = $taxType ? $taxType->srtOrd : null;
+                }
 
-            // Check if the response contains the required data
-            $data = $response->json();
-            \Log::info('REMOTE Item Information Data INFO From API ', ['Item Information Data From API info' => $data]);
+                $productTypeMapping = null;
+                if (isset($item['itemTyCd'])) {
+                    $ItemTypeCode = ItemType::where('item_type_code', $item['itemTyCd'])->first();
+                    $productTypeMapping = $ItemTypeCode ? $ItemTypeCode->item_type_name : null;
+                }
 
-            if (!isset($data['data']['itemClsList'])) {
-                return redirect()->back()->with('error', __('There is no search result.'));
-            }
+                $unitId = null;
+                if (isset($item['qtyUnitCd'])) {
+                    $unit = ProductServiceUnit::where('code', $item['qtyUnitCd'])->first();
+                    $unitId = $unit ? $unit->id : null;
+                }
 
-            $remoteItemInformationinfo = $data['data']['itemClsList'];
-            \Log::info('REMOTE Item Information INFO', ['remoteItemInformationinfo' => $remoteItemInformationinfo]);
-
-            $remoteItemInformationinfoToSync = [];
-
-            // Define the mapping array for taxTyCd to tax_id
-            $taxTypeMapping = [
-                'A' => 1,
-                'B' => 2,
-                'C' => 3,
-                'D' => 4,
-                'E' => 5,
-                'F' => 6,
-            ];
-
-            foreach ($remoteItemInformationinfo as $item) {
-                // Determine the tax_id based on taxTyCd
-                $taxIdCode = $item['taxTyCd'] ?? null;
-                $taxIdCode = $taxIdCode && array_key_exists($taxIdCode, $taxTypeMapping) ? $taxTypeMapping[$taxIdCode] : null;
-
-                $productServiceData = [
+                ProductService::create([
                     'name' => $item['itemNm'],
-                    'sku' => null,
+                    'sku' => $item['itemCd'],
                     'sale_price' => null,
                     'purchase_price' => null,
-                    'quantity' => null,
-                    'tax_id' => $taxIdCode,
+                    'tax_id' => $taxTypeId,
                     'category_id' => null,
-                    'unit_id' => null,
-                    'type' => 'product',  // Set the type to 'product'
-                    'sale_chartaccount_id' => null,
-                    'expense_chartaccount_id' => null,
+                    'unit_id' => $unitId,
+                    'type' => $productTypeMapping,
                     'description' => $item['addInfo'],
                     'pro_image' => null,
+                    'sale_chartaccount_id' => null,
+                    'expense_chartaccount_id' => null,
                     'created_by' => \Auth::user()->creatorId(),
                     'tin' => $item['tin'],
                     'itemCd' => $item['itemCd'],
@@ -1853,7 +1745,117 @@ class ProductServiceController extends Controller
                     'sftyQty' => $item['sftyQty'],
                     'isrcAplcbYn' => $item['isrcAplcbYn'],
                     'rraModYn' => $item['rraModYn'],
-                    'useYn' => $item['useYn']
+                    'useYn' => $item['useYn'],
+                    'isUsed' => null,
+                    'packageQuantity' => null
+                ]);
+            }
+
+            return redirect()->route('productservice.index')->with('success', 'Product Service information added successfully from the API.');
+        } catch (Exception $e) {
+            \Log::error('Error adding Product Service information from the API: ' . $e->getMessage());
+            return redirect()->route('productservice.index')->with('error', 'Error adding Product Service information from the API.');
+        }
+    }
+    public function productServiceSearchByDate(Request $request)
+    {
+        // Log the incoming request
+        \Log::info('Synchronization Product Search by Date request received:', $request->all());
+
+        // Validate the product service search by date
+        $request->validate([
+            'searchByDate' => 'required|date_format:Y-m-d',
+        ], [
+            'searchByDate.required' => __('Date is required for synchronization Search for Product & Services SearchByDate.'),
+            'searchByDate.date_format' => __('Invalid date format.'),
+        ]);
+
+        // Get and format the date
+        $date = $request->input('searchByDate');
+        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
+        \Log::info('Date formatted from synchronization product & Services request:', ['formattedDate' => $formattedDate]);
+
+        try {
+            // Make the API call
+            ini_set('max_execution_time', 30000);
+            $response = Http::withOptions(['verify' => false])
+                ->withHeaders(['key' => '123456'])
+                ->get("https://etims.your-apps.biz/api/GetItemInformation", [
+                    'date' => $formattedDate,
+                ]);
+
+            // Check if the response contains the required data
+            $data = $response->json();
+            \Log::info('REMOTE Item Information Data INFO From API ', ['Item Information Data From API info' => $data]);
+
+            if (!isset($data['data']['data']['itemList'])) {
+                return redirect()->back()->with('error', __('There is no search result.'));
+            }
+
+            $remoteItemInformationinfo = $data['data']['data']['itemList'];
+            \Log::info('REMOTE Item Information INFO', ['remoteItemInformationinfo' => $remoteItemInformationinfo]);
+
+            $remoteItemInformationinfoToSync = [];
+
+            foreach ($remoteItemInformationinfo as $item) {
+                $taxTypeId = null;
+                if (isset($item['taxTyCd'])) {
+                    $taxType = Tax::where('name', $item['taxTyCd'])->first();
+                    $taxTypeId = $taxType ? $taxType->srtOrd : null;
+                }
+
+                $productTypeMapping = null;
+                if (isset($item['itemTyCd'])) {
+                    $ItemTypeCode = ItemType::where('item_type_code', $item['itemTyCd'])->first();
+                    $productTypeMapping = $ItemTypeCode ? $ItemTypeCode->item_type_name : null;
+                }
+
+                $unitId = null;
+                if (isset($item['qtyUnitCd'])) {
+                    $unit = ProductServiceUnit::where('code', $item['qtyUnitCd'])->first();
+                    $unitId = $unit ? $unit->id : null;
+                }
+
+                $productServiceData = [
+                    'name' => $item['itemNm'],
+                    'sku' => $item['itemCd'],
+                    'sale_price' => null,
+                    'purchase_price' => null,
+                    'tax_id' => $taxTypeId,
+                    'category_id' => null,
+                    'unit_id' => $unitId,
+                    'type' => $productTypeMapping,
+                    'description' => $item['addInfo'],
+                    'pro_image' => null,
+                    'sale_chartaccount_id' => null,
+                    'expense_chartaccount_id' => null,
+                    'created_by' => \Auth::user()->creatorId(),
+                    'tin' => $item['tin'],
+                    'itemCd' => $item['itemCd'],
+                    'itemClsCd' => $item['itemClsCd'],
+                    'itemTyCd' => $item['itemTyCd'],
+                    'itemNm' => $item['itemNm'],
+                    'itemStdNm' => $item['itemStdNm'],
+                    'orgnNatCd' => $item['orgnNatCd'],
+                    'pkgUnitCd' => $item['pkgUnitCd'],
+                    'qtyUnitCd' => $item['qtyUnitCd'],
+                    'taxTyCd' => $item['taxTyCd'],
+                    'btchNo' => $item['btchNo'],
+                    'regBhfId' => $item['regBhfId'],
+                    'bcd' => $item['bcd'],
+                    'dftPrc' => $item['dftPrc'],
+                    'grpPrcL1' => $item['grpPrcL1'],
+                    'grpPrcL2' => $item['grpPrcL2'],
+                    'grpPrcL3' => $item['grpPrcL3'],
+                    'grpPrcL4' => $item['grpPrcL4'],
+                    'grpPrcL5' => $item['grpPrcL5'],
+                    'addInfo' => $item['addInfo'],
+                    'sftyQty' => $item['sftyQty'],
+                    'isrcAplcbYn' => $item['isrcAplcbYn'],
+                    'rraModYn' => $item['rraModYn'],
+                    'useYn' => $item['useYn'],
+                    'isUsed' => null,
+                    'packageQuantity' => null
                 ];
 
                 array_push($remoteItemInformationinfoToSync, $productServiceData);
@@ -1881,6 +1883,7 @@ class ProductServiceController extends Controller
             return redirect()->back()->with('error', __('Error Syncing Product & Service'));
         }
     }
+
 
 
     public function searchCodeListByDate(Request $request)
