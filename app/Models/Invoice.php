@@ -19,7 +19,7 @@ class Invoice extends Model
         'shipping_display',
         'discount_apply',
         'created_by',        
-        'trderInvoiceNo',
+        'response_trderInvoiceNo',
         'response_invoiceNo',
         'orgInvoiceNo',
         'customerTin',

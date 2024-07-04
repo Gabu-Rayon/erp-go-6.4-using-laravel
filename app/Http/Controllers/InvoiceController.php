@@ -84,11 +84,13 @@ class InvoiceController extends Controller
             $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'income')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
             $items = ProductService::all()->pluck('itemNm', 'itemCd');
+            $product_services = ProductService::all()->pluck('itemNm', 'itemCd');
             $items->prepend('Select Item', '');
             $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'code');
             $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'code');
             $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusCode', 'code');
             $taxes = Details::where('cdCls', '04')->pluck('cd', 'userDfnCd1');
+            $taxationtype  = Details::where('cdCls', '04')->pluck('cd', 'userDfnCd1');
             \Log::info('TAXES');
             \Log::info($taxes);
 
@@ -105,6 +107,8 @@ class InvoiceController extends Controller
                     'paymentTypeCodes',
                     'invoiceStatusCodes',
                     'taxes',
+                    'taxationtype',
+                    'product_services'
                 )
             );
         } else {
@@ -394,13 +398,13 @@ class InvoiceController extends Controller
             'due_date' => $data['due_date'],
             'send_date' => $data['send_date'],
             'category_id' => $data['category_id'],
-            'ref_number' => $data['ref_number'],
+            'ref_number' => $data['ref_number'] ?? null,
             'status' => 0,
             'shipping_display' => null,
             'discount_apply' => null,
             'created_by' => \Auth::user()->creatorId(),
             'response_trderInvoiceNo' => $apiResponseData['data']['tranderInvoiceNo'],
-            'invoiceNo' => $apiResponseData['data']['invoiceNo'],
+            'response_invoiceNo' => $apiResponseData['data']['invoiceNo'],
             'orgInvoiceNo' => $data['orgInvoiceNo'] ?? null,
             'customerTin' => $customer->customerTin,
             'customerName' => $customer->name,

@@ -226,9 +226,13 @@
                 <div class="card-body" data-autofill>
                     <div class="row">
                         <div class="form-group col-md-4">
+
                             {{ Form::label('customer', __('Customer'), ['class' => 'form-label']) }}
+
                             <span class="text-danger">*</span>
+
                             {{ Form::select('customer', $customers, null, ['class' => 'form-control select2', 'required' => 'required']) }}
+                            
                         </div>
                         <div class="form-group  col-md-4">
                             {{ Form::label('orgInvoiceNo', __('Original Invoice No'), ['class' => 'form-label']) }}
