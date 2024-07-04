@@ -96,7 +96,7 @@
                     </div>
                 </div>
                 <div class="card-body table-border-style">
-                    <div class="#">
+                    <div class="table-responsive">
                         <table class="table mb-0" data-repeater-list="items" id="sortable-table">
                             <thead>
                             </thead>
@@ -172,12 +172,6 @@
                                         </div>
                                     </td>
                                     <td class="form-group col-md-3">
-                                        <?php echo e(Form::label('qtyUnitCode', __('Quantity Unit Code'), ['class' => 'form-label'])); ?>
-
-                                        <?php echo e(Form::select('qtyUnitCode', $quantityUnitCodes, null, ['class' => 'form-control select2', 'placeholder' => __('Select Quantity Unit Code'), 'required' => 'required'])); ?>
-
-                                    </td>
-                                    <td class="form-group col-md-3">
                                         <div class="form-group">
                                             <?php echo e(Form::label('barcode', __('Bar Code'), ['class' => 'form-label'])); ?>
 
@@ -249,6 +243,12 @@
                                             <?php echo e(Form::number('packageQuantity', '', ['class' => 'form-control'])); ?>
 
                                         </div>
+                                    </td>
+                                    <td class="form-group col-md-3">
+                                        <?php echo e(Form::label('qtyUnitCode', __('Quantity Unit Code'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::select('qtyUnitCode', $quantityUnitCode, null, ['class' => 'form-control select2', 'placeholder' => __('Select Quantity Unit Code'), 'required' => 'required'])); ?>
+
                                     </td>
                                     <td class="form-group col-md-3">
                                         <?php echo e(Form::label('taxTypeCode', __('Tax Type Code'), ['class' => 'form-label'])); ?>

@@ -469,7 +469,7 @@
                     </div>
                 </div>
                 <div class="card-body table-border-style mt-2">
-                    <div class="#">
+                    <div class="table-responsive">
                         <table class="table  mb-0 table-custom-style" data-repeater-list="items" id="sortable-table">
                             <thead>
                                 <tr>

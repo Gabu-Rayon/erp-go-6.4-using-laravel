@@ -96,7 +96,6 @@
                             <table class="table datatable">
                                 <thead>
                                     <tr>
-                                        <th scope="col"><?php echo e(__('SrNo')); ?></th>
                                         <th scope="col"><?php echo e(__('Code')); ?></th>
                                         <th scope="col"><?php echo e(__('Classification Code')); ?></th>
                                         <th scope="col"><?php echo e(__('Name')); ?></th>
@@ -105,12 +104,8 @@
                                     </tr>
                                 </thead>
                                 <tbody class="list">
-                                    <?php
-                                        $serial = 1;
-                                    ?>
                                     <?php $__currentLoopData = $productServices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $iteminformation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <tr>
-                                            <td><?php echo e($serial++); ?></td>
                                             <td><?php echo e($iteminformation->itemCd); ?></td>
                                             <td><?php echo e($iteminformation->itemClsCd); ?></td>
                                             <td><?php echo e($iteminformation->itemNm); ?></td>
@@ -144,5 +139,4 @@
         </div>
     </div>
 <?php $__env->stopSection(); ?>
-
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/productservice/index.blade.php ENDPATH**/ ?>
