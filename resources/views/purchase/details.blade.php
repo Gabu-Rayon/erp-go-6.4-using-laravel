@@ -169,7 +169,7 @@
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>Supplier Item Code</strong> : {{ $item->spplrItemCd }}
-                                            {{ Form::text('itemPurchases[' . $index . '][supplierItemCode]', $item->itemCd, ['class' => 'form-control']) }}
+                                            {{ Form::text('itemPurchases[' . $index . '][supplierItemCode]', $item->itemCd, ['class' => 'form-control', 'readonly' => true]) }}
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>Supplier Item Name</strong> : {{ $item->spplrItemNm }}

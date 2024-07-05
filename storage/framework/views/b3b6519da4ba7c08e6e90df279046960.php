@@ -213,7 +213,7 @@
                                         <div class="form-group col-md-4">
                                             <strong>Supplier Item Code</strong> : <?php echo e($item->spplrItemCd); ?>
 
-                                            <?php echo e(Form::text('itemPurchases[' . $index . '][supplierItemCode]', $item->itemCd, ['class' => 'form-control'])); ?>
+                                            <?php echo e(Form::text('itemPurchases[' . $index . '][supplierItemCode]', $item->itemCd, ['class' => 'form-control', 'readonly' => true])); ?>
 
                                         </div>
                                         <div class="form-group col-md-4">
