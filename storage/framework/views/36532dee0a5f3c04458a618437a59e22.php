@@ -27,10 +27,10 @@
     <div class="modal-body">
         <div class="row">
             <div class="form-group col-md-3">
-                <?php echo e(Form::label('orgInvoiceNo', __('Invoive No'), ['class' => 'form-label'])); ?>
+                <?php echo e(Form::label('invoiceNo', __('Invoive No'), ['class' => 'form-label'])); ?>
 
                 <span class="text-danger">*</span>
-                <?php echo e(Form::text('orgInvoiceNo', $invoiceDue->response_invoiceNo, array('class' => 'form-control', 'readonly' => true))); ?>
+                <?php echo e(Form::text('invoiceNo', $invoiceDue->response_invoiceNo, array('class' => 'form-control', 'readonly' => true))); ?>
 
             </div>
             <div class="form-group col-md-3">
@@ -163,9 +163,9 @@
                             <?php $__currentLoopData = $invoiceDue->products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
                                     <td>
-                                        <?php echo e($product->product->name); ?>
+                                        <?php echo e($product->itemName); ?>
 
-                                        <?php echo e(Form::hidden("items[$index][product_id]", $product->product->id)); ?>
+                                        <?php echo e(Form::hidden("items[$index][product_id]", $product->id)); ?>
 
                                     </td>
                                     <td>
