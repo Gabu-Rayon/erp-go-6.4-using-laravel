@@ -143,9 +143,6 @@ class InvoiceController extends Controller
      ***************************************************************************/
     public function store(Request $request)
     {
-        // Log the entire request data
-        \Log::info('Invoice Data received From the Form:', $request->all());
-
         try {
             if (
                 \Auth::user()->type == 'company'

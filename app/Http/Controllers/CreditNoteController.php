@@ -13,6 +13,8 @@ use App\Models\ProductService;
 use App\Models\CreditNoteReason;
 use App\Models\PaymentTypeCodes;
 use App\Models\InvoiceStatusCode;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -28,11 +30,11 @@ class CreditNoteController extends Controller
     {
 
         if(
-            \Auth::user()->type == 'accountant'
-            || \Auth::user()->type == 'company'
+            Auth::user()->type == 'accountant'
+            || Auth::user()->type == 'company'
         )
         {
-            $invoices = Invoice::where('created_by', \Auth::user()->creatorId())->get();
+            $invoices = Invoice::where('created_by', Auth::user()->creatorId())->get();
 
             return view('creditNote.index', compact('invoices'));
         } else {
@@ -44,14 +46,14 @@ class CreditNoteController extends Controller
     {
 
         if(
-            \Auth::user()->type == 'accountant'
-            || \Auth::user()->type == 'company'
+            Auth::user()->type == 'accountant'
+            || Auth::user()->type == 'company'
         ) {
 
 
             $invoiceDue = Invoice::where('id', $invoice_id)->first();
-            \Log::info('INVOICE');
-            \Log::info($invoiceDue);
+            Log::info('INVOICE');
+            Log::info($invoiceDue);
             $customer = Customer::find($invoiceDue->customer_id);
             $itemsToAdd = ProductService::all()->pluck('itemNm', 'itemCd');
             $creditNoteReasons = CreditNoteReason::all()->pluck('reason', 'code');
@@ -68,7 +70,7 @@ class CreditNoteController extends Controller
                     'salesTypeCodes',
                     'paymentTypeCodes',
                     'invoiceStatusCodes',
-                    'customers',
+                    'customer',
                     'itemsToAdd'
                 )
             );
@@ -83,7 +85,7 @@ class CreditNoteController extends Controller
         $data = $request->all();
 
         $validator = Validator::make($data, [
-            'orgInvoiceNo' => 'required|numeric',
+            'invoiceNo' => 'required',
             'customerID' => 'required|numeric',
             'salesType' => 'nullable|string|min:1|max:2|exists:sales_type_codes,code',
             'paymentType' => 'nullable|string|min:1|max:1|exists:payment_types_code,id',
@@ -120,9 +122,20 @@ class CreditNoteController extends Controller
         $occurredDate = date('Ymd', strtotime($data['occurredDate']));
 
         $customer = Customer::find($data['customerID']);
+        $invoice = Invoice::where('id', $id)->first();
+
+        $firstUrl = 'https://etims.your-apps.biz/api/GetSalesByTraderInvoiceNo';
+
+        $apiinvoice = Http::withOptions([
+            'verify' => false
+        ])->withHeaders([
+            'key' => '123456'
+            ])->get($firstUrl, [
+                'traderInvoiceNo' => $invoice['response_trderInvoiceNo']
+            ]);
 
         $apiData = [
-            'orgInvoiceNo' => $data['orgInvoiceNo'],
+            'orgInvoiceNo' => $apiinvoice['orgInvoiceNo'],
             'customerTin' => $customer->customerTin,
             'customerName' => $customer->name,
             'salesType' => $data['salesType'] ?? null,
@@ -177,20 +190,20 @@ class CreditNoteController extends Controller
         Log::info('DATA');
         Log::info($apiData);
 
-        // $url = 'https://etims.your-apps.biz/api/AddSaleCreditNote';
+        $url = 'https://etims.your-apps.biz/api/AddSaleCreditNote';
 
-        // $response = Http::withOptions([
-        //     'verify' => false
-        // ])->withHeaders([
-        //     'key' => '123456'
-        //     ])->post($url, $apiData);
+        $response = Http::withOptions([
+            'verify' => false
+        ])->withHeaders([
+            'key' => '123456'
+            ])->post($url, $apiData);
 
-        // Log::info('API RESPONSE');
-        // Log::info($response);
+        Log::info('API RESPONSE');
+        Log::info($response);
 
-        // if ($response['statusCode'] == 400) {
-        //     return redirect()->back()->with('error', $response['message']);
-        // }
+        if ($response['statusCode'] == 400) {
+            return redirect()->back()->with('error', $response['message']);
+        }
 
         $creditNote = CreditNote::create([
             'invoice' => $id,
@@ -246,7 +259,7 @@ class CreditNoteController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Credit Note added successfully.');
+        return redirect()->to('credit-note')->with('success', __('Credit Note successfully created.'));
     } catch (Exception $e) {
         Log::error($e);
         return redirect()->back()->with('error', 'Error occurred while adding Credit Note.');
@@ -258,8 +271,8 @@ class CreditNoteController extends Controller
     public function edit($invoice_id, $creditNote_id)
     {
         if(
-            \Auth::user()->type == 'accountant'
-            || \Auth::user()->type == 'company'
+            Auth::user()->type == 'accountant'
+            || Auth::user()->type == 'company'
         ){
 
             $creditNote = CreditNote::find($creditNote_id);
@@ -275,11 +288,11 @@ class CreditNoteController extends Controller
     {
 
         if(
-            \Auth::user()->type == 'accountant'
-            || \Auth::user()->type == 'company'
+            Auth::user()->type == 'accountant'
+            || Auth::user()->type == 'company'
         ){
 
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(),
                 [
                     'amount' => 'required|numeric',
@@ -296,7 +309,7 @@ class CreditNoteController extends Controller
             $invoiceDue = Invoice::where('id', $invoice_id)->first();
             $credit = CreditNote::find($creditNote_id);
             if ($request->amount > $invoiceDue->getDue() + $credit->amount) {
-                return redirect()->back()->with('error', 'Maximum ' . \Auth::user()->priceFormat($invoiceDue->getDue()) . ' credit limit of this invoice.');
+                return redirect()->back()->with('error', 'Maximum ' . Auth::user()->priceFormat($invoiceDue->getDue()) . ' credit limit of this invoice.');
             }
 
 
@@ -320,8 +333,8 @@ class CreditNoteController extends Controller
     public function destroy($invoice_id, $creditNote_id)
     {
         if(
-            \Auth::user()->type == 'accountant'
-            || \Auth::user()->type == 'company'
+            Auth::user()->type == 'accountant'
+            || Auth::user()->type == 'company'
         ){
 
             $creditNote = CreditNote::find($creditNote_id);
@@ -339,11 +352,11 @@ class CreditNoteController extends Controller
     public function customCreate()
     {
         if(
-            \Auth::user()->type == 'accountant'
-            || \Auth::user()->type == 'company'
+            Auth::user()->type == 'accountant'
+            || Auth::user()->type == 'company'
         ){
 
-            $invoices = Invoice::where('created_by', \Auth::user()->creatorId())->get()->pluck('invoice_id', 'id');
+            $invoices = Invoice::where('created_by', Auth::user()->creatorId())->get()->pluck('invoice_id', 'id');
 
             $customers = Customer::all()->pluck('name', 'customerTin');
             $invoices = Invoice::all()->pluck('invoiceNo', 'id');
@@ -415,13 +428,13 @@ class CreditNoteController extends Controller
     public function customStore(Request $request) {
 
         if(
-            \Auth::user()->type == 'accountant'
-            || \Auth::user()->type == 'company'
+            Auth::user()->type == 'accountant'
+            || Auth::user()->type == 'company'
         ) {
             
         $data = $request->all();
         
-        $validator = \Validator::make(
+        $validator = Validator::make(
             $data, [
                 "orgInvoiceNo" => "required|numeric",
                 "customer" => "required|string|min:1|max:11",
@@ -445,8 +458,8 @@ class CreditNoteController extends Controller
             ]);
             
             if ($validator->fails()) {
-                \Log::info('VALIDATION ERROR');
-                \Log::info($validator->errors());
+                Log::info('VALIDATION ERROR');
+                Log::info($validator->errors());
                 $messages = $validator->getMessageBag();
                 return redirect()->back()->with('error', $messages->first());
             }
@@ -530,8 +543,8 @@ class CreditNoteController extends Controller
                     "directCreditNoteItemsList" => $apiDirectCreditNoteItemsList
                 ];
 
-                \Log::info('FINAL API REQUEST DATA');
-                \Log::info($apiRequestData);
+                Log::info('FINAL API REQUEST DATA');
+                Log::info($apiRequestData);
 
                 $url = 'https://etims.your-apps.biz/api/AddDirectCreditNote';
 
@@ -541,8 +554,8 @@ class CreditNoteController extends Controller
                     'key' => '123456'
                     ])->post($url, $apiRequestData);
 
-                \Log::info('ADD SALE CREDIT NOTE API RESPONSE');
-                \Log::info($response);
+                Log::info('ADD SALE CREDIT NOTE API RESPONSE');
+                Log::info($response);
 
                 if ($response['statusCode'] == 400) {
                     return redirect()->back()->with('error', $response['message']);
@@ -644,7 +657,7 @@ class CreditNoteController extends Controller
         // Fetch Customer information based on the item code
         $customerId = $request->input('customer');
 
-        \Log::info('Customer Id: ' . $customerId);
+        Log::info('Customer Id: ' . $customerId);
         
         $customerInfo['data'] = Customer::where('id', $customerId)->first();
 
