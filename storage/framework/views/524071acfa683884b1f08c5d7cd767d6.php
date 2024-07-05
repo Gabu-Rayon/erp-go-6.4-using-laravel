@@ -197,8 +197,6 @@
                                         <div class="form-group col-md-4">
                                             <strong>Item Code</strong> : <?php echo e($item->itemCd); ?>
 
-                                            <?php echo e(Form::text('itemCode[]', $item->itemCd, ['class' => 'form-control'])); ?>
-
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>Item Class Code</strong> : <?php echo e($item->itemClsCd); ?>
@@ -274,6 +272,13 @@
                                             <?php echo e(Form::number('mapQuantity', null, ['class' => 'form-control productItem'])); ?>
 
                                         </div>
+                                        <div class="form-group col-md-4">
+                            <?php echo e(Form::label('itemCode', __('Item Code'), ['class' => 'form-label'])); ?>
+
+                            <span class="text-danger">*</span>
+                            <?php echo e(Form::select('itemCode', $ProductService, null, ['class' => 'form-control select2 itemCode', 'required' => 'required'])); ?>
+
+                        </div>
                                     </div>
                                 </div>
                             </div>
