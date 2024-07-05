@@ -106,13 +106,14 @@
                                                     </a>
                                                 </div>
                                                 @if ($purchase->isDbImport == 1)
-                                                    <div class="action-btn bg-info ms-2">
-                                                        <a href="#" class="mx-3 btn btn-sm align-items-center"
-                                                            data-bs-toggle="tooltip" title="{{ __('Already Mapped') }}"
-                                                            data-original-title="{{ __('Detail') }}">
-                                                            <i class="ti ti-list text-white"></i>
-                                                        </a>
-                                                    </div>
+                                                <div class="action-btn bg-success ms-2">
+                                                    <a href="#"
+                                                        class="mx-3 btn btn-sm align-items-center pointer-events-none opacity-50 cursor-not-allowed"
+                                                        data-bs-toggle="tooltip" title="{{ __('Already Mapped') }}"
+                                                        data-original-title="{{ __('Detail') }}">
+                                                        <i class="ti ti-check text-white"></i>
+                                                    </a>
+                                                </div>                                                
                                                 @elseif($purchase->isDbImport == 0)
                                                     <div class="action-btn bg-info ms-2">
                                                         <a href="{{ route('purchase.details', ['spplrInvcNo' => $purchase->spplrInvcNo]) }}"

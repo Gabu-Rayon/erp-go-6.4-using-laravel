@@ -142,8 +142,6 @@
 
         <div class="col-12">
             <h5 class="d-inline-block mb-4">{{ __('Product & Services') }}</h5>
-            {{ \Log::info('PURCHASE ITEMS') }}
-            {{ \Log::info($purchaseItems) }}
             @foreach ($purchaseItems->groupBy('itemType') as $itemType => $items)
                 <div class="row">
                     @foreach ($items as $index => $item)
@@ -171,7 +169,7 @@
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>Supplier Item Code</strong> : {{ $item->spplrItemCd }}
-                                            {{ Form::text('itemPurchases[' . $index . '][supplierItemCode]', $item->spplrItemCd, ['class' => 'form-control']) }}
+                                            {{ Form::text('itemPurchases[' . $index . '][supplierItemCode]', $item->itemCd, ['class' => 'form-control']) }}
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>Supplier Item Name</strong> : {{ $item->spplrItemNm }}

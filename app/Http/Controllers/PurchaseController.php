@@ -1367,6 +1367,9 @@ class PurchaseController extends Controller
                     return response()->json(['error' => $validator->errors()->first()], 400);
                 }
 
+                Log::info('DAYTA');
+                Log::info($data);
+
                 $url = 'https://etims.your-apps.biz/api/MapPurchase';
 
                 $response = Http::withHeaders([
@@ -1377,6 +1380,18 @@ class PurchaseController extends Controller
 
                 Log::info('RESPONSE');
                 Log::info($response);
+
+                if ($response['statusCode'] != 200) {
+                    return redirect()->back()->with('error', $response['message']);
+                }
+
+                $purchase = Purchase::where('spplrInvcNo', $data['supplierInvcNo'])->first();
+
+                $purchase->isDbImport = 1;
+                $purchase->save();
+
+                return redirect()->to('purchase')->with('success', 'Purchase successfully mapped.');
+
             } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
