@@ -104,7 +104,7 @@ class CreditNoteController extends Controller
                 'creditNoteReason' => 'required|string|min:2|max:2|exists:credit_note_reasons,code',
                 'remark' => 'nullable|string',
                 'items' => 'required|array',
-                'items.*.product_id' => 'required|string|min:1|exists:product_services,itemCd',
+                'items.*.product_id' => 'required|numeric|exists:product_services,id',
                 'items.*.unitPrice' => 'required|numeric',
                 'items.*.quantity' => 'required|numeric',
                 'items.*.pkgQuantity' => 'required|numeric',
@@ -113,6 +113,8 @@ class CreditNoteController extends Controller
             ]);
 
             if ($validator->fails()) {
+                Log::info('VALIDATION ERROR');
+                Log::info($validator->errors());
                 $messages = $validator->getMessageBag();
                 return redirect()->back()->with('error', $messages->first());
             }
@@ -162,7 +164,7 @@ class CreditNoteController extends Controller
             $totAmt = 0;
 
             foreach ($data['items'] as $item) {
-                $itemFromDB = ProductService::where('itemCd', $item['product_id'])->first();
+                $itemFromDB = ProductService::where('id', $item['product_id'])->first();
                 
                  Log::info("Item Hapa");
                  
@@ -268,6 +270,7 @@ class CreditNoteController extends Controller
 
             return redirect()->to('credit-note')->with('success', __('Credit Note successfully created.'));
         } catch (Exception $e) {
+            Log::error('STORE CREDIT NOTE ERROR');
             Log::error($e);
             return redirect()->back()->with('error', 'Error occurred while adding Credit Note.');
         }
