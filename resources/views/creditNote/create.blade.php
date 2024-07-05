@@ -23,9 +23,9 @@
     <div class="modal-body">
         <div class="row">
             <div class="form-group col-md-3">
-                {{ Form::label('orgInvoiceNo', __('Invoive No'), ['class' => 'form-label']) }}
+                {{ Form::label('invoiceNo', __('Invoive No'), ['class' => 'form-label']) }}
                 <span class="text-danger">*</span>
-                {{ Form::text('orgInvoiceNo', $invoiceDue->response_invoiceNo, array('class' => 'form-control', 'readonly' => true)) }}
+                {{ Form::text('invoiceNo', $invoiceDue->response_invoiceNo, array('class' => 'form-control', 'readonly' => true)) }}
             </div>
             <div class="form-group col-md-3">
                 {{ Form::label('customerName', __('Customer Name'), ['class' => 'form-label']) }}
@@ -125,8 +125,8 @@
                             @foreach ($invoiceDue->products as $index => $product)
                                 <tr>
                                     <td>
-                                        {{ $product->product->name }}
-                                        {{ Form::hidden("items[$index][product_id]", $product->product->id) }}
+                                        {{ $product->itemName }}
+                                        {{ Form::hidden("items[$index][product_id]", $product->id) }}
                                     </td>
                                     <td>
                                         {{ Form::text("items[$index][unitPrice]", $product->price, array('class' => 'form-control', 'required' => true)) }}
