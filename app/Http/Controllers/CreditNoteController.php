@@ -139,8 +139,11 @@ class CreditNoteController extends Controller
                         'traderInvoiceNo' => $invoice['response_trderInvoiceNo']
                     ]);
 
+            Log::info('API INVOICE');
+            Log::info($apiinvoice);
+
             $apiData = [
-                'orgInvoiceNo' => $apiinvoice['orgInvoiceNo'],
+                'orgInvoiceNo' => $apiinvoice['invoiceNo'],
                 'customerTin' => $customer->customerTin,
                 'customerName' => $customer->name,
                 'salesType' => $data['salesType'] ?? null,
@@ -210,7 +213,7 @@ class CreditNoteController extends Controller
             Log::info('API RESPONSE');
             Log::info($response);
 
-            if ($response['statusCode'] == 400) {
+            if ($response['statusCode'] != 200) {
                 return redirect()->back()->with('error', $response['message']);
             }
 
