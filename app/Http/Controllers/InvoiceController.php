@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use App\Models\Plan;
 use App\Models\User;
 use App\Models\Details;
@@ -24,7 +23,6 @@ use App\Models\PaymentTypeCodes;
 use App\Models\TransactionLines;
 use App\Models\WarehouseProduct;
 use App\Models\InvoiceStatusCode;
-use App\Models\ItemClassification;
 use Illuminate\Support\Facades\DB;
 use App\Models\InvoiceBankTransfer;
 use Illuminate\Support\Facades\Log;
@@ -33,6 +31,7 @@ use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\ProductServiceCategory;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class InvoiceController extends Controller
@@ -145,8 +144,8 @@ class InvoiceController extends Controller
     {
         try {
             if (
-                \Auth::user()->type == 'company'
-                || \Auth::user()->type == 'accountant'
+                Auth::user()->type == 'company'
+                || Auth::user()->type == 'accountant'
             ) {
                 $validator = $this->validateInvoice($request);
                 if ($validator->fails()) {
@@ -155,23 +154,22 @@ class InvoiceController extends Controller
                 }
                 $data = $request->all();
                 $customer = Customer::find($data['customer_id']);
-                \Log::info('Invoice Customer', ['customer' => $customer]);
+                Log::info('Invoice Customer', ['customer' => $customer]);
 
                 $apiRequestData = $this->prepareApiRequestData($data, $customer);
-                \Log::info('Invoice Api Data to being Posted :', ['apiRequestData' => $apiRequestData]);
+                Log::info('Invoice Api Data to being Posted :', ['apiRequestData' => $apiRequestData]);
 
                 $saleItemList = $this->prepareSaleItemList($data['items']);
                 $apiRequestData['saleItemList'] = $saleItemList;
-                \Log::info('Invoice  REQ DATA To Be Posted to the Api ', ['apiRequestData' => $apiRequestData]);
+                Log::info('Invoice  REQ DATA To Be Posted to the Api ', ['apiRequestData' => $apiRequestData]);
 
-                //Send data to AddSale API
                 $url = 'https://etims.your-apps.biz/api/AddSale';
                 $response = Http::withOptions(['verify' => false])
                     ->withHeaders(['key' => '123456'])
                     ->post($url, $apiRequestData);
 
-                \Log::info('SALES Invoice API RESPONSE');
-                \Log::info($response);
+                Log::info('SALES Invoice API RESPONSE');
+                Log::info($response);
 
                 if ($response->failed()) {
                     if ($response->json('statusCode') == 400 && $response->json('message') == 'Trader invoice number is alrady exist') {
@@ -471,7 +469,7 @@ class InvoiceController extends Controller
             $itemDetails = ProductService::where('itemCd', $item['itemCode'])->first();
             $itemExprDate = $this->formatDate($item['itemExprDate']);
             InvoiceProduct::create([
-                'product_id' => $item['id'],
+                'product_id' => $itemDetails['id'],
                 'invoice_id' => $inv['invoice_id'],
                 'quantity' => $item['quantity'],
                 'tax' => $item['taxTypeCode'],
