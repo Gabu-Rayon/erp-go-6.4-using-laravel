@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\Invoice;
 use App\Models\Utility;
 use App\Models\Customer;
 use App\Models\CreditNote;
-use App\Models\CreditNoteItem;
 use Illuminate\Http\Request;
 use App\Models\SalesTypeCode;
+use App\Models\CreditNoteItem;
 use App\Models\ProductService;
 use App\Models\CreditNoteReason;
 use App\Models\PaymentTypeCodes;
 use App\Models\InvoiceStatusCode;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 
 class CreditNoteController extends Controller
@@ -68,7 +69,7 @@ class CreditNoteController extends Controller
                     'salesTypeCodes',
                     'paymentTypeCodes',
                     'invoiceStatusCodes',
-                    'customers',
+                    'customer',
                     'itemsToAdd'
                 )
             );
@@ -80,6 +81,7 @@ class CreditNoteController extends Controller
     public function store(Request $request, $id)
 {
     try {
+        
         $data = $request->all();
 
         $validator = Validator::make($data, [
@@ -177,20 +179,20 @@ class CreditNoteController extends Controller
         Log::info('DATA');
         Log::info($apiData);
 
-        // $url = 'https://etims.your-apps.biz/api/AddSaleCreditNote';
+        $url = 'https://etims.your-apps.biz/api/AddSaleCreditNote';
 
-        // $response = Http::withOptions([
-        //     'verify' => false
-        // ])->withHeaders([
-        //     'key' => '123456'
-        //     ])->post($url, $apiData);
+        $response = Http::withOptions([
+            'verify' => false
+        ])->withHeaders([
+            'key' => '123456'
+            ])->post($url, $apiData);
 
-        // Log::info('API RESPONSE');
-        // Log::info($response);
+        Log::info('API RESPONSE');
+        Log::info($response);
 
-        // if ($response['statusCode'] == 400) {
-        //     return redirect()->back()->with('error', $response['message']);
-        // }
+        if ($response['statusCode'] == 400) {
+            return redirect()->back()->with('error', $response['message']);
+        }
 
         $creditNote = CreditNote::create([
             'invoice' => $id,

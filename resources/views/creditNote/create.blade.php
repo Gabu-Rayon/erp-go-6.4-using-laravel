@@ -67,7 +67,7 @@
             <div class="form-group col-md-3">
                 {{ Form::label('confirmDate', __('Confirm Date'),['class'=>'form-label']) }}
                 <span class="text-danger">*</span>
-                {{ Form::datetime('confirmDate', $invoiceDue->confirmDate, array('class' => 'form-control', 'required' => 'required')) }}
+                {{ Form::date('confirmDate', $invoiceDue->confirmDate, array('class' => 'form-control', 'required' => 'required')) }}
             </div>
             <div class="form-group col-md-3">
                 {{ Form::label('salesDate', __('Sales Date'),['class'=>'form-label']) }}
@@ -76,12 +76,12 @@
             </div>
             <div class="form-group col-md-3">
                 {{ Form::label('stockReleseDate', __('Stock Release Date'),['class'=>'form-label']) }}
-                {{ Form::datetime('stockReleseDate', $invoiceDue->stockReleaseDate, array('class' => 'form-control')) }}
+                {{ Form::date('stockReleseDate', $invoiceDue->stockReleaseDate, array('class' => 'form-control')) }}
             </div>
             <div class="form-group col-md-3">
                 {{ Form::label('receiptPublishDate', __('Receipt Publish Date'),['class'=>'form-label']) }}
                 <span class="text-danger">*</span>
-                {{ Form::datetime('receiptPublishDate', $invoiceDue->receipt_RcptPbctDt, array('class' => 'form-control', 'required' => 'required')) }}
+                {{ Form::date('receiptPublishDate', $invoiceDue->receipt_RcptPbctDt, array('class' => 'form-control', 'required' => 'required')) }}
             </div>
             <div class="form-group col-md-3">
                 {{ Form::label('occurredDate', __('Occurred Date'),['class'=>'form-label']) }}
@@ -91,7 +91,7 @@
             <div class="form-group col-md-3">
                 {{ Form::label('creditNoteDate', __('Credit Note Date'),['class'=>'form-label']) }}
                 <span class="text-danger">*</span>
-                {{ Form::datetime('creditNoteDate', '', array('class' => 'form-control')) }}
+                {{ Form::date('creditNoteDate', '', array('class' => 'form-control')) }}
             </div>
             <div class="form-group col-md-3">
                 {{ Form::label('creditNoteReason', __('Credit Note Reason'), ['class' => 'form-label']) }}

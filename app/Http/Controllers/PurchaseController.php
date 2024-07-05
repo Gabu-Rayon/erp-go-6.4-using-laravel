@@ -261,7 +261,8 @@ class PurchaseController extends Controller
         }
     }
 
-    public function synchronize(Request $request){
+    public function synchronize(Request $request)
+    {
         try {
             $request->validate([
                 'getpurchaseByDate' => 'required|date_format:Y-m-d',
@@ -269,17 +270,46 @@ class PurchaseController extends Controller
                 'getpurchaseByDate.required' => __('Date is required for synchronization Search for Purchase SearchByDate.'),
                 'getpurchaseByDate.date_format' => __('Invalid date format.'),
             ]);
-    
+
             $date = $request->input('getpurchaseByDate');
             $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
-            $response = Http::withOptions(['verify' => false])
-                ->withHeaders(['key' => '123456'])
-                ->get("https://etims.your-apps.biz/api/GetPurchaseList?date={$formattedDate}");
 
-            Log::info('API RESPONSE');
+            ini_set('max_execution_time', 30000);
+            // $response = Http::withOptions(['verify' => false])
+            //     ->withHeaders(['key' => '123456'])
+            //     ->get("https://etims.your-apps.biz/api/GetPurchaseList?date={$formattedDate}");
+
+            $url = "https://etims.your-apps.biz/api/GetPurchaseList?date={$formattedDate}";
+
+            $response = Http::withOptions([
+                'verify' => false
+            ])->withHeaders([
+                        'key' => '123456'
+                    ])->timeout(300000)->get($url);
+
+            Log::info('GetPurchaseList API RESPONSE');
             Log::info($response);
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                // Assuming the response contains 'Purchases' and 'itemLists' arrays
+                $Purchases = $data['Purchases'] ?? [];
+                $itemLists = $data['itemLists'] ?? [];
+
+                $syncedCount = $this->synchronizePurchases($Purchases, $itemLists);
+
+                if ($syncedCount > 0) {
+                    return redirect()->route('purchase.index')->with('success', __("Successfully synchronized {$syncedCount} purchases."));
+                } else {
+                    return redirect()->route('purchase.index')->with('info', __('No new purchases to synchronize.'));
+                }
+            } else {
+                Log::error('API responded with an error', ['status' => $response->status(), 'body' => $response->body()]);
+                return redirect()->back()->with('error', __('Error syncing purchases. API responded with an error.'));
+            }
         } catch (\Exception $e) {
-            \Log::error('Error syncing purchases:', ['error' => $e->getMessage()]);
+            Log::error('Error syncing purchases:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', __('Error syncing purchases.'));
         }
     }
@@ -313,7 +343,7 @@ class PurchaseController extends Controller
                     }
                 }
 
-                \Log::info("Synced $syncedPurchaseItemCount item lists for purchase ID {$newPurchase->id}");
+                Log::info("Synced $syncedPurchaseItemCount item lists for purchase ID {$newPurchase->id}");
             }
         }
 
@@ -344,14 +374,15 @@ class PurchaseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create($vendorId){
+    public function create($vendorId)
+    {
         try {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
             $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
 
             $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
-            $venders = Vender::all()->pluck( 'name','spplrTin');
+            $venders = Vender::all()->pluck('name', 'spplrTin');
             $venders->prepend('Select Vender', '');
 
             \Log::info('Venders:');
@@ -391,7 +422,8 @@ class PurchaseController extends Controller
                 'warehouse',
                 'countries',
                 'taxes'
-                ));
+            )
+            );
         } catch (\Exception $e) {
             Log::error('CREATE PURCHASE ERROR');
             Log::error($e);
@@ -403,7 +435,8 @@ class PurchaseController extends Controller
      * Store a newly created resource in storage.
      */
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         try {
 
             $data = $request->all();
@@ -420,7 +453,7 @@ class PurchaseController extends Controller
                 'items.*.pkgQuantity' => 'required|numeric',
                 'items.*.unitPrice' => 'required|numeric',
                 'items.*.discountRate' => 'required|numeric',
-                ]);
+            ]);
 
             if ($validator->fails()) {
                 Log::info('VALIDATION ERRORS');
@@ -430,10 +463,10 @@ class PurchaseController extends Controller
 
             $apiData = [];
             $items = [];
-             \Log::info('Purchase FoRM Data being Posted  : ');
-             \Log::info($data);
+            \Log::info('Purchase FoRM Data being Posted  : ');
+            \Log::info($data);
 
-            
+
 
             if ($data['supplierTin']) {
                 $supplier = Vender::where('spplrTin', $data['supplierTin'])->first();
@@ -460,9 +493,9 @@ class PurchaseController extends Controller
             $apiData['remark'] = $data['remark'] ?? null;
             $apiData['mapping'] = $data['mapping'] ?? null;
 
-            foreach($data['items'] as $givenItem) {
+            foreach ($data['items'] as $givenItem) {
                 $discountRate = $givenItem['discountRate'] ?? 0;
-                $discountAmt = $givenItem['unitPrice'] * $givenItem['quantity'] * $discountRate / 100; 
+                $discountAmt = $givenItem['unitPrice'] * $givenItem['quantity'] * $discountRate / 100;
                 array_push($items, [
                     'itemCode' => $givenItem['itemCode'],
                     'quantity' => $givenItem['quantity'],
@@ -481,8 +514,8 @@ class PurchaseController extends Controller
 
             \Log::info('Api Data Info Being Posted : ');
             \Log::info($apiData);
-            
-            
+
+
             $url = 'https://etims.your-apps.biz/api/AddPurchase';
 
             $response = Http::withHeaders([
@@ -496,7 +529,7 @@ class PurchaseController extends Controller
             } else {
                 return redirect()->back()->with('error', __('Error creating purchase.'));
             }
-            
+
         } catch (\Exception $e) {
             Log::error('STORE PURCHASE ERROR');
             Log::error($e);
@@ -1453,6 +1486,7 @@ class PurchaseController extends Controller
                 if ($mappedpurchase) {
                     // Fetch related purchase Lists items
                     $mappedpurchaseItemsList = MappedPurchaseItemList::where('mapped_purchase_id', $id)->get();
+                 
 
                     \Log::info('mapped Purchases: ' . $mappedpurchase);
 
@@ -1596,7 +1630,7 @@ class PurchaseController extends Controller
         }
     }
 
-     ///search MapPurchase  by Date Code Here 
+    ///search MapPurchase  by Date Code Here 
 
     public function mapPurchaseSearchByDate(Request $request)
     {
