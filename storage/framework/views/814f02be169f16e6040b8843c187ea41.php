@@ -244,97 +244,97 @@
 
 
 <?php $__env->startSection('content'); ?>
-        <?php if($invoice->status != 4): ?>
-            <div class="row">
-                <div class="col-12">
-                    <div class="card ">
-                        <div class="card-body">
-                            <div class="row timeline-wrapper">
-                                <div class="col-md-6 col-lg-4 col-xl-4">
-                                    <div class="timeline-icons"><span class="timeline-dots"></span>
-                                        <i class="ti ti-plus text-primary"></i>
-                                    </div>
-                                    <h6 class="text-primary my-3"><?php echo e(__('Create Invoice')); ?></h6>
-                                    <p class="text-muted text-sm mb-3"><i
-                                            class="ti ti-clock mr-2"></i><?php echo e(__('Created on ')); ?><?php echo e(\Auth::user()->dateFormat($invoice->issue_date)); ?>
-
-                                    </p>
-                                        <a href="<?php echo e(route('invoice.edit', \Crypt::encrypt($invoice->id))); ?>"
-                                            class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
-                                            data-original-title="<?php echo e(__('Edit')); ?>"><i
-                                                class="ti ti-pencil mr-2"></i><?php echo e(__('Edit')); ?></a>
+    <?php if($invoice->status != 4): ?>
+        <div class="row">
+            <div class="col-12">
+                <div class="card ">
+                    <div class="card-body">
+                        <div class="row timeline-wrapper">
+                            <div class="col-md-6 col-lg-4 col-xl-4">
+                                <div class="timeline-icons"><span class="timeline-dots"></span>
+                                    <i class="ti ti-plus text-primary"></i>
                                 </div>
-                                <div class="col-md-6 col-lg-4 col-xl-4">
-                                    <div class="timeline-icons"><span class="timeline-dots"></span>
-                                        <i class="ti ti-mail text-warning"></i>
-                                    </div>
-                                    <h6 class="text-warning my-3"><?php echo e(__('Send Invoice')); ?></h6>
-                                    <p class="text-muted text-sm mb-3">
-                                        <?php if($invoice->status != 0): ?>
-                                            <i class="ti ti-clock mr-2"></i><?php echo e(__('Sent on')); ?>
+                                <h6 class="text-primary my-3"><?php echo e(__('Create Invoice')); ?></h6>
+                                <p class="text-muted text-sm mb-3"><i
+                                        class="ti ti-clock mr-2"></i><?php echo e(__('Created on ')); ?><?php echo e(\Auth::user()->dateFormat($invoice->issue_date)); ?>
 
-                                            <?php echo e(\Auth::user()->dateFormat($invoice->send_date)); ?>
-
-                                        <?php else: ?>
-                                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('send invoice')): ?>
-                                                <small><?php echo e(__('Status')); ?> : <?php echo e(__('Not Sent')); ?></small>
-                                            <?php endif; ?>
-                                        <?php endif; ?>
-                                    </p>
-
-                                    <?php if($invoice->status == 0): ?>
-                                            <a href="<?php echo e(route('invoice.sent', $invoice->id)); ?>" class="btn btn-sm btn-warning"
-                                                data-bs-toggle="tooltip" data-original-title="<?php echo e(__('Mark Sent')); ?>"><i
-                                                    class="ti ti-send mr-2"></i><?php echo e(__('Send')); ?></a>
-                                    <?php endif; ?>
+                                </p>
+                                <a href="<?php echo e(route('invoice.edit', \Crypt::encrypt($invoice->id))); ?>"
+                                    class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
+                                    data-original-title="<?php echo e(__('Edit')); ?>"><i
+                                        class="ti ti-pencil mr-2"></i><?php echo e(__('Edit')); ?></a>
+                            </div>
+                            <div class="col-md-6 col-lg-4 col-xl-4">
+                                <div class="timeline-icons"><span class="timeline-dots"></span>
+                                    <i class="ti ti-mail text-warning"></i>
                                 </div>
-                                <div class="col-md-6 col-lg-4 col-xl-4">
-                                    <div class="timeline-icons"><span class="timeline-dots"></span>
-                                        <i class="ti ti-report-money text-info"></i>
-                                    </div>
-                                    <h6 class="text-info my-3"><?php echo e(__('Get Paid')); ?></h6>
-                                    <p class="text-muted text-sm mb-3"><?php echo e(__('Status')); ?> : <?php echo e(__('Awaiting payment')); ?> </p>
+                                <h6 class="text-warning my-3"><?php echo e(__('Send Invoice')); ?></h6>
+                                <p class="text-muted text-sm mb-3">
                                     <?php if($invoice->status != 0): ?>
-                                            <a href="#" data-url="<?php echo e(route('invoice.payment', $invoice->id)); ?>"
-                                                data-ajax-popup="true" data-title="<?php echo e(__('Add Payment')); ?>"
-                                                class="btn btn-sm btn-info" data-original-title="<?php echo e(__('Add Payment')); ?>"><i
-                                                    class="ti ti-report-money mr-2"></i><?php echo e(__('Receive Payment')); ?></a> <br>
-                                    <?php endif; ?>
+                                        <i class="ti ti-clock mr-2"></i><?php echo e(__('Sent on')); ?>
 
+                                        <?php echo e(\Auth::user()->dateFormat($invoice->send_date)); ?>
+
+                                    <?php else: ?>
+                                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('send invoice')): ?>
+                                            <small><?php echo e(__('Status')); ?> : <?php echo e(__('Not Sent')); ?></small>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                </p>
+
+                                <?php if($invoice->status == 0): ?>
+                                    <a href="<?php echo e(route('invoice.sent', $invoice->id)); ?>" class="btn btn-sm btn-warning"
+                                        data-bs-toggle="tooltip" data-original-title="<?php echo e(__('Mark Sent')); ?>"><i
+                                            class="ti ti-send mr-2"></i><?php echo e(__('Send')); ?></a>
+                                <?php endif; ?>
+                            </div>
+                            <div class="col-md-6 col-lg-4 col-xl-4">
+                                <div class="timeline-icons"><span class="timeline-dots"></span>
+                                    <i class="ti ti-report-money text-info"></i>
                                 </div>
+                                <h6 class="text-info my-3"><?php echo e(__('Get Paid')); ?></h6>
+                                <p class="text-muted text-sm mb-3"><?php echo e(__('Status')); ?> : <?php echo e(__('Awaiting payment')); ?> </p>
+                                <?php if($invoice->status != 0): ?>
+                                    <a href="#" data-url="<?php echo e(route('invoice.payment', $invoice->id)); ?>"
+                                        data-ajax-popup="true" data-title="<?php echo e(__('Add Payment')); ?>"
+                                        class="btn btn-sm btn-info" data-original-title="<?php echo e(__('Add Payment')); ?>"><i
+                                            class="ti ti-report-money mr-2"></i><?php echo e(__('Receive Payment')); ?></a> <br>
+                                <?php endif; ?>
+
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        <?php endif; ?>
-        <?php if($invoice->status != 0): ?>
-            <div class="row justify-content-between align-iteams-center mb-3">
-                <div class="col-md-12 d-flex align-iteams-center justify-content-between justify-content-md-end">
-                    <div class="all-button-box mx-2 mr-2">
-                        <a href="<?php echo e(route('invoice.credit.note', $invoice->id)); ?>" class="btn btn-sm btn-primary"
-                            data-title="<?php echo e(__('Add Credit Note')); ?>">
-                            <?php echo e(__('Add Credit Note')); ?>
+        </div>
+    <?php endif; ?>
+    <?php if($invoice->status != 0): ?>
+        <div class="row justify-content-between align-iteams-center mb-3">
+            <div class="col-md-12 d-flex align-iteams-center justify-content-between justify-content-md-end">
+                <div class="all-button-box mx-2 mr-2">
+                    <a href="<?php echo e(route('invoice.credit.note', $invoice->id)); ?>" class="btn btn-sm btn-primary"
+                        data-title="<?php echo e(__('Add Credit Note')); ?>">
+                        <?php echo e(__('Add Credit Note')); ?>
 
-                        </a>
-                    </div>
-                    <?php if($invoice->status != 4): ?>
-                        <div class="all-button-box mr-2">
-                            <a href="<?php echo e(route('invoice.payment.reminder', $invoice->id)); ?>"
-                                class="btn btn-sm btn-primary me-2"><?php echo e(__('Receipt Reminder')); ?></a>
-                        </div>
-                    <?php endif; ?>
+                    </a>
+                </div>
+                <?php if($invoice->status != 4): ?>
                     <div class="all-button-box mr-2">
-                        <a href="<?php echo e(route('invoice.resent', $invoice->id)); ?>"
-                            class="btn btn-sm btn-primary me-2"><?php echo e(__('Resend Invoice')); ?></a>
+                        <a href="<?php echo e(route('invoice.payment.reminder', $invoice->id)); ?>"
+                            class="btn btn-sm btn-primary me-2"><?php echo e(__('Receipt Reminder')); ?></a>
                     </div>
-                    <div class="all-button-box">
-                        <a href="<?php echo e(route('invoice.pdf', Crypt::encrypt($invoice->id))); ?>" target="_blank"
-                            class="btn btn-sm btn-primary"><?php echo e(__('Download')); ?></a>
-                    </div>
+                <?php endif; ?>
+                <div class="all-button-box mr-2">
+                    <a href="<?php echo e(route('invoice.resent', $invoice->id)); ?>"
+                        class="btn btn-sm btn-primary me-2"><?php echo e(__('Resend Invoice')); ?></a>
+                </div>
+                <div class="all-button-box">
+                    <a href="<?php echo e(route('invoice.pdf', Crypt::encrypt($invoice->id))); ?>" target="_blank"
+                        class="btn btn-sm btn-primary"><?php echo e(__('Download')); ?></a>
                 </div>
             </div>
-        <?php endif; ?>
+        </div>
+    <?php endif; ?>
 
     <div class="row">
         <div class="col-12">
@@ -348,7 +348,7 @@
                                 </div>
                                 <div class="col-xs-12 col-sm-12 col-nd-6 col-lg-6 col-12 text-end">
                                     <h4 class="invoice-number">
-                                        <?php echo e(AUth::user()->invoiceNumberFormat($invoice->invoice_id)); ?></h4>
+                                        <?php echo e($invoice->response_invoiceNo); ?></h4>
                                 </div>
                                 <div class="col-12">
                                     <hr>
@@ -415,6 +415,27 @@
                                         </small>
                                     </div>
                                 <?php endif; ?>
+                                <!-- <?php
+                                    try {
+                                        $formattedDate = \Carbon\Carbon::createFromFormat(
+                                            'YmdHis',
+                                            $invoice->response_SdcDateTime,
+                                        )->format('Y-m-d-H-i-s');
+                                    } catch (\Exception $e) {
+                                        $formattedDate = 'Invalid date format';
+                                    }
+                                ?>
+ -->
+                                <div class="col ">
+                                    <small>
+                                        <strong><?php echo e(__('SCU Information')); ?> :</strong><br>
+                                        <p><i>Date : </i><?php echo e($invoice->response_SdcDateTime); ?></p>
+                                         <p><i>Invoice No : </i><?php echo e($invoice->response_invoiceNo); ?></p>
+                                        <p><i>Trader Invoice No : </i><?php echo e($invoice->response_trderInvoiceNo); ?></p>
+                                        <p><i>Internal Data : </i><?php echo e($invoice->response_IntrlData); ?></p>
+                                         <p><i>Receipt Signature : </i><?php echo e($invoice->response_RcptSign); ?></p>
+                                    </small>
+                                </div>
 
                                 <div class="col">
                                     <div class="float-end mt-3">
