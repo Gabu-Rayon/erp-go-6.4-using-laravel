@@ -12,6 +12,11 @@
     <li class="breadcrumb-item"><?php echo e(__('Details')); ?></li>
 <?php $__env->stopSection(); ?>
 
+<?php echo e(\Log::info('PURCHASE')); ?>
+
+<?php echo e(\Log::info($purchase)); ?>
+
+
 <?php $__env->startSection('content'); ?>
     <div class="row">
         <?php echo e(Form::open(['route' => 'purchase.mapPurchase', 'class' => 'w-100'])); ?>
@@ -45,17 +50,16 @@
 
                         </div>
                         <div class="form-group col-md-4">
-                            <strong>Supplier Invoice No</strong> : <?php echo e($purchase->spplrInvcNo); ?>
-
+                            <strong>Supplier Invoice No</strong>
                             <?php echo e(Form::text('supplierInvcNo', $purchase->spplrInvcNo, ['class' => 'form-control'])); ?>
 
                         </div>
                         <div class="form-group col-md-4">
-                            <strong>Supplier Sdcld</strong> : <?php echo e($purchase->spplrSdcld); ?>
+                            <strong>Supplier Sdcld</strong> : <?php echo e($purchase->spplrSdcld ?? '-'); ?>
 
                         </div>
                         <div class="form-group col-md-4">
-                            <strong>Supplier MrcNo</strong> : <?php echo e($purchase->spplMrcNo); ?>
+                            <strong>Supplier MrcNo</strong> : <?php echo e($purchase->spplMrcNo ?? '-'); ?>
 
                         </div>
                         <div class="form-group col-md-4">
@@ -63,7 +67,7 @@
 
                         </div>
                         <div class="form-group col-md-4">
-                            <strong>Pmt Type Code</strong> : <?php echo e($purchase->pmtTycCd); ?>
+                            <strong>Pmt Type Code</strong> : <?php echo e($purchase->pmtTycCd ?? '-'); ?>
 
                         </div>
                         <div class="form-group col-md-4">
@@ -73,7 +77,7 @@
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Purchase Status Code</strong> :
-                            <?php echo e(Form::text('purchaseStatusCode', null, ['class' => 'form-control'])); ?>
+                            <?php echo e(Form::text('purchaseStatuCode', null, ['class' => 'form-control'])); ?>
 
                         </div>
                         <div class="form-group col-md-4">
@@ -114,14 +118,6 @@
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Tax Rate A</strong> : <?php echo e($purchase->taxRtA); ?>
-
-                        </div>
-                        <div class="form-group col-md-4">
-                            <strong>Tax Rate B</strong> : <?php echo e($purchase->taxRtB); ?>
-
-                        </div>
-                        <div class="form-group col-md-4">
-                            <strong>Tax RateC</strong> : <?php echo e($purchase->taxRtC); ?>
 
                         </div>
                         <div class="form-group col-md-4">
@@ -176,7 +172,6 @@
                             <strong>Remark</strong> : <?php echo e($purchase->remark); ?>
 
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -184,6 +179,10 @@
 
         <div class="col-12">
             <h5 class="d-inline-block mb-4"><?php echo e(__('Product & Services')); ?></h5>
+            <?php echo e(\Log::info('PURCHASE ITEMS')); ?>
+
+            <?php echo e(\Log::info($purchaseItems)); ?>
+
             <?php $__currentLoopData = $purchaseItems->groupBy('itemType'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $itemType => $items): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="row">
                     <?php $__currentLoopData = $items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -198,11 +197,11 @@
                                         <div class="form-group col-md-4">
                                             <strong>Item Code</strong> : <?php echo e($item->itemCd); ?>
 
-                                            <?php echo e(Form::text('itemCode[]', $item->itemCd, ['class' => 'form-control'])); ?>
+                                            <?php echo e(Form::text('itemPurchases[' . $index . '][itemCode]', $item->itemCd, ['class' => 'form-control'])); ?>
 
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>item Class Code</strong> : <?php echo e($item->itemClsCd); ?>
+                                            <strong>Item Class Code</strong> : <?php echo e($item->itemClsCd); ?>
 
                                         </div>
                                         <div class="form-group col-md-4">
@@ -220,7 +219,7 @@
                                         <div class="form-group col-md-4">
                                             <strong>Supplier Item Code</strong> : <?php echo e($item->spplrItemCd); ?>
 
-                                            <?php echo e(Form::text('supplierItemCode[]', $item->spplrItemCd, ['class' => 'form-control'])); ?>
+                                            <?php echo e(Form::text('itemPurchases[' . $index . '][supplierItemCode]', $item->spplrItemCd, ['class' => 'form-control'])); ?>
 
                                         </div>
                                         <div class="form-group col-md-4">
@@ -228,66 +227,47 @@
 
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Package Unit Code</strong> : <?php echo e($item->pkgUnitCd); ?>
+                                            <strong>Item Standard Quantity</strong> : <?php echo e($item->itemStdQty); ?>
 
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Package</strong> : <?php echo e($item->pkg); ?>
+                                            <strong>Item Standard Quantity Unit</strong> : <?php echo e($item->itemStdQtyUom); ?>
 
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Quantity Unit Code</strong> : <?php echo e($item->qtyUnitCd); ?>
+                                            <strong>Item Quantity</strong> : <?php echo e($item->itemQty); ?>
+
+                                            <?php echo e(Form::text('itemPurchases[' . $index . '][mapQuantity]', $item->itemQty, ['class' => 'form-control'])); ?>
 
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Quantity</strong> : <?php echo e($item->qty); ?>
+                                            <strong>Item Unit of Measurement</strong> : <?php echo e($item->itemUom); ?>
 
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Price</strong> : <?php echo e($item->prc); ?>
+                                            <strong>Taxation Type Code</strong> : <?php echo e($item->txblTypeCd); ?>
 
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Supply Amount</strong> : <?php echo e($item->splyAmt); ?>
+                                            <strong>Item Unit Price</strong> : <?php echo e($item->itemPrice); ?>
 
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Discount Rate</strong> : <?php echo e($item->dcRt); ?>
+                                            <strong>Tax Rate</strong> : <?php echo e($item->taxRt); ?>
 
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Discount Amount</strong> : <?php echo e($item->dcAmt); ?>
-
-                                        </div>
-                                        <div class="form-group col-md-4">
-                                            <strong>Tax Type Code</strong> : <?php echo e($item->taxTy); ?>
-
-                                        </div>
-                                        <div class="form-group col-md-4">
-                                            <strong>Taxable Amount</strong> : <?php echo e($item->taxAmt); ?>
-
-                                        </div>
-                                        <div class="form-group col-md-4">
-                                            <strong>Tax Amount</strong> : <?php echo e($purchase->taxRtA); ?>
+                                            <strong>Tax Amount</strong> : <?php echo e($item->taxAmt); ?>
 
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>Total Amount</strong> : <?php echo e($item->totAmt); ?>
 
                                         </div>
-                                        <div class="form-group col-md-4">
-                                            <strong>Item Expire Date</strong> : <?php echo e($item->itemExprDt); ?>
-
-                                        </div>
-                                        <div class="form-group col-md-4">
-                                            <?php echo e(Form::label('mapQuantity', __('Map Quantity'), ['class' => 'form-label'])); ?>
-
-                                            <?php echo e(Form::number('mapQuantity', null, ['class' => 'form-control productItem'])); ?>
-
-                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
