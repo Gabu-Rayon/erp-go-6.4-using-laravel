@@ -19,11 +19,9 @@
         <a href="{{route('projects.gantt',[$project->id,'Week'])}}" class="btn btn-primary @if($duration == 'Week')active @endif" data-value="Week">{{__('Week')}}</a>
         <a href="{{route('projects.gantt',[$project->id,'Month'])}}" class="btn btn-primary @if($duration == 'Month')active @endif" data-value="Month">{{__('Month')}}</a>
     </div>
-    @can('manage project')
         <a href="{{ route('projects.show',$project->id) }}" class="btn btn-primary " data-bs-toggle="tooltip" title="{{__('Back')}}">
             <span class="btn-inner--icon"><i class="ti ti-arrow-left"></i></span>
         </a>
-    @endcan
 </div>
 @endsection
 

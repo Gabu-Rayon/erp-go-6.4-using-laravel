@@ -208,11 +208,9 @@
                 <span class="btn-inner--text"><i class="ti ti-table"></i>{{__('Card View')}}</span>
             </a>
         @endif
-        @can('manage project')
             <a href="{{ route('projects.index') }}" class="btn btn-primary btn-sm" data-bs-toggle="tooltip" title="{{__('Back')}}">
                 <span class="btn-inner--icon"><i class="ti ti-arrow-left"></i></span>
             </a>
-        @endcan
     </div>
 @endsection
 @section('content')

@@ -211,16 +211,12 @@
 @endpush
 @section('action-btn')
     <div class="float-end">
-        @can('manage bug report')
             <a href="{{ route('task.bug',$project->id) }}" data-bs-toggle="tooltip" title="{{__('List')}}" class="btn btn-sm btn-primary">
                 <i class="ti ti-list"></i>
             </a>
-        @endcan
-        @can('create bug report')
             <a href="#" data-size="lg" data-url="{{ route('task.bug.create',$project->id) }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Create New Bug')}}" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-        @endcan
     </div>
 @endsection
 
@@ -272,20 +268,16 @@
                                                     </button>
                                                     @if(Gate::check('edit bug report') || Gate::check('delete bug report'))
                                                         <div class="dropdown-menu dropdown-menu-end">
-                                                            @can('edit project task')
                                                                 <a href="#!" data-size="lg" data-url="{{ route('task.bug.edit',[$project->id,$bug->id]) }}" data-ajax-popup="true" class="dropdown-item" data-bs-original-title="{{__('Edit ').$bug->name}}">
                                                                     <i class="ti ti-pencil"></i>
                                                                     <span>{{__('Edit')}}</span>
                                                                 </a>
-                                                            @endcan
-                                                            @can('delete project task')
                                                                 {!! Form::open(['method' => 'DELETE', 'route' => ['task.bug.destroy', [$project->id,$bug->id]]]) !!}
                                                                 <a href="#!" class="dropdown-item bs-pass-para">
                                                                     <i class="ti ti-archive"></i>
                                                                     <span> {{__('Delete')}} </span>
                                                                 </a>
                                                                 {!! Form::close() !!}
-                                                            @endcan
                                                         </div>
                                                     @endif
                                                 </div>

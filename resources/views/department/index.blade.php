@@ -12,12 +12,9 @@
 
 @section('action-btn')
     <div class="float-end">
-    @can('create department')
             <a href="#" data-url="{{ route('department.create') }}" data-ajax-popup="true" data-title="{{__('Create New Department')}}" data-bs-toggle="tooltip" title="{{__('Create')}}"  class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-
-        @endcan
     </div>
 @endsection
 
@@ -52,14 +49,11 @@
 
         <td class="Action">
             <span>
-                @can('edit department')
                     <div class="action-btn bg-info ms-2">
                         <a href="#" class="mx-3 btn btn-sm  align-items-center" data-url="{{ route('department.edit',$department->id) }}" data-ajax-popup="true"  data-size="lg" data-bs-toggle="tooltip" title="{{__('Edit')}}"  data-title="{{__('Edit Department')}}">
                             <i class="ti ti-pencil text-white"></i>
                         </a>
                     </div> 
-                @endcan
-                @can('delete department')
                     <div class="action-btn bg-danger ms-2">
                         {!! Form::open(['method' => 'DELETE', 'route' => ['department.destroy', $department->id],'id'=>'delete-form-'.$department->id]) !!}
                         <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?').'|'.__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$department->id}}').submit();">
@@ -67,7 +61,6 @@
                         </a>
                         {!! Form::close() !!}
                     </div>
-                @endcan
             </span>
         </td>
     </tr>

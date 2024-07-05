@@ -243,93 +243,93 @@
 
 
 @section('content')
-    @if ($invoice->status != 4)
-        <div class="row">
-            <div class="col-12">
-                <div class="card ">
-                    <div class="card-body">
-                        <div class="row timeline-wrapper">
-                            <div class="col-md-6 col-lg-4 col-xl-4">
-                                <div class="timeline-icons"><span class="timeline-dots"></span>
-                                    <i class="ti ti-plus text-primary"></i>
+        @if ($invoice->status != 4)
+            <div class="row">
+                <div class="col-12">
+                    <div class="card ">
+                        <div class="card-body">
+                            <div class="row timeline-wrapper">
+                                <div class="col-md-6 col-lg-4 col-xl-4">
+                                    <div class="timeline-icons"><span class="timeline-dots"></span>
+                                        <i class="ti ti-plus text-primary"></i>
+                                    </div>
+                                    <h6 class="text-primary my-3">{{ __('Create Invoice') }}</h6>
+                                    <p class="text-muted text-sm mb-3"><i
+                                            class="ti ti-clock mr-2"></i>{{ __('Created on ') }}{{ \Auth::user()->dateFormat($invoice->issue_date) }}
+                                    </p>
+                                        <a href="{{ route('invoice.edit', \Crypt::encrypt($invoice->id)) }}"
+                                            class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
+                                            data-original-title="{{ __('Edit') }}"><i
+                                                class="ti ti-pencil mr-2"></i>{{ __('Edit') }}</a>
                                 </div>
-                                <h6 class="text-primary my-3">{{ __('Create Invoice') }}</h6>
-                                <p class="text-muted text-sm mb-3"><i
-                                        class="ti ti-clock mr-2"></i>{{ __('Created on ') }}{{ \Auth::user()->dateFormat($invoice->issue_date) }}
-                                </p>
-                                <a href="{{ route('invoice.edit', \Crypt::encrypt($invoice->id)) }}"
-                                    class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
-                                    data-original-title="{{ __('Edit') }}"><i
-                                        class="ti ti-pencil mr-2"></i>{{ __('Edit') }}</a>
-                            </div>
-                            <div class="col-md-6 col-lg-4 col-xl-4">
-                                <div class="timeline-icons"><span class="timeline-dots"></span>
-                                    <i class="ti ti-mail text-warning"></i>
-                                </div>
-                                <h6 class="text-warning my-3">{{ __('Send Invoice') }}</h6>
-                                <p class="text-muted text-sm mb-3">
-                                    @if ($invoice->status != 0)
-                                        <i class="ti ti-clock mr-2"></i>{{ __('Sent on') }}
-                                        {{ \Auth::user()->dateFormat($invoice->send_date) }}
-                                    @else
-                                        @can('send invoice')
-                                            <small>{{ __('Status') }} : {{ __('Not Sent') }}</small>
-                                        @endcan
+                                <div class="col-md-6 col-lg-4 col-xl-4">
+                                    <div class="timeline-icons"><span class="timeline-dots"></span>
+                                        <i class="ti ti-mail text-warning"></i>
+                                    </div>
+                                    <h6 class="text-warning my-3">{{ __('Send Invoice') }}</h6>
+                                    <p class="text-muted text-sm mb-3">
+                                        @if ($invoice->status != 0)
+                                            <i class="ti ti-clock mr-2"></i>{{ __('Sent on') }}
+                                            {{ \Auth::user()->dateFormat($invoice->send_date) }}
+                                        @else
+                                            @can('send invoice')
+                                                <small>{{ __('Status') }} : {{ __('Not Sent') }}</small>
+                                            @endcan
+                                        @endif
+                                    </p>
+
+                                    @if ($invoice->status == 0)
+                                            <a href="{{ route('invoice.sent', $invoice->id) }}" class="btn btn-sm btn-warning"
+                                                data-bs-toggle="tooltip" data-original-title="{{ __('Mark Sent') }}"><i
+                                                    class="ti ti-send mr-2"></i>{{ __('Send') }}</a>
                                     @endif
-                                </p>
-
-                                @if ($invoice->status == 0)
-                                    <a href="{{ route('invoice.sent', $invoice->id) }}" class="btn btn-sm btn-warning"
-                                        data-bs-toggle="tooltip" data-original-title="{{ __('Mark Sent') }}"><i
-                                            class="ti ti-send mr-2"></i>{{ __('Send') }}</a>
-                                @endif
-                            </div>
-                            <div class="col-md-6 col-lg-4 col-xl-4">
-                                <div class="timeline-icons"><span class="timeline-dots"></span>
-                                    <i class="ti ti-report-money text-info"></i>
                                 </div>
-                                <h6 class="text-info my-3">{{ __('Get Paid') }}</h6>
-                                <p class="text-muted text-sm mb-3">{{ __('Status') }} : {{ __('Awaiting payment') }} </p>
-                                @if ($invoice->status != 0)
-                                    <a href="#" data-url="{{ route('invoice.payment', $invoice->id) }}"
-                                        data-ajax-popup="true" data-title="{{ __('Add Payment') }}"
-                                        class="btn btn-sm btn-info" data-original-title="{{ __('Add Payment') }}"><i
-                                            class="ti ti-report-money mr-2"></i>{{ __('Receive Payment') }}</a> <br>
-                                @endif
+                                <div class="col-md-6 col-lg-4 col-xl-4">
+                                    <div class="timeline-icons"><span class="timeline-dots"></span>
+                                        <i class="ti ti-report-money text-info"></i>
+                                    </div>
+                                    <h6 class="text-info my-3">{{ __('Get Paid') }}</h6>
+                                    <p class="text-muted text-sm mb-3">{{ __('Status') }} : {{ __('Awaiting payment') }} </p>
+                                    @if ($invoice->status != 0)
+                                            <a href="#" data-url="{{ route('invoice.payment', $invoice->id) }}"
+                                                data-ajax-popup="true" data-title="{{ __('Add Payment') }}"
+                                                class="btn btn-sm btn-info" data-original-title="{{ __('Add Payment') }}"><i
+                                                    class="ti ti-report-money mr-2"></i>{{ __('Receive Payment') }}</a> <br>
+                                    @endif
 
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    @endif
-    @if ($invoice->status != 0)
-        <div class="row justify-content-between align-iteams-center mb-3">
-            <div class="col-md-12 d-flex align-iteams-center justify-content-between justify-content-md-end">
-                <div class="all-button-box mx-2 mr-2">
-                    <a href="{{ route('invoice.credit.note', $invoice->id) }}" class="btn btn-sm btn-primary"
-                        data-title="{{ __('Add Credit Note') }}">
-                        {{ __('Add Credit Note') }}
-                    </a>
-                </div>
-                @if ($invoice->status != 4)
-                    <div class="all-button-box mr-2">
-                        <a href="{{ route('invoice.payment.reminder', $invoice->id) }}"
-                            class="btn btn-sm btn-primary me-2">{{ __('Receipt Reminder') }}</a>
+        @endif
+        @if ($invoice->status != 0)
+            <div class="row justify-content-between align-iteams-center mb-3">
+                <div class="col-md-12 d-flex align-iteams-center justify-content-between justify-content-md-end">
+                    <div class="all-button-box mx-2 mr-2">
+                        <a href="{{ route('invoice.credit.note', $invoice->id) }}" class="btn btn-sm btn-primary"
+                            data-title="{{ __('Add Credit Note') }}">
+                            {{ __('Add Credit Note') }}
+                        </a>
                     </div>
-                @endif
-                <div class="all-button-box mr-2">
-                    <a href="{{ route('invoice.resent', $invoice->id) }}"
-                        class="btn btn-sm btn-primary me-2">{{ __('Resend Invoice') }}</a>
-                </div>
-                <div class="all-button-box">
-                    <a href="{{ route('invoice.pdf', Crypt::encrypt($invoice->id)) }}" target="_blank"
-                        class="btn btn-sm btn-primary">{{ __('Download') }}</a>
+                    @if ($invoice->status != 4)
+                        <div class="all-button-box mr-2">
+                            <a href="{{ route('invoice.payment.reminder', $invoice->id) }}"
+                                class="btn btn-sm btn-primary me-2">{{ __('Receipt Reminder') }}</a>
+                        </div>
+                    @endif
+                    <div class="all-button-box mr-2">
+                        <a href="{{ route('invoice.resent', $invoice->id) }}"
+                            class="btn btn-sm btn-primary me-2">{{ __('Resend Invoice') }}</a>
+                    </div>
+                    <div class="all-button-box">
+                        <a href="{{ route('invoice.pdf', Crypt::encrypt($invoice->id)) }}" target="_blank"
+                            class="btn btn-sm btn-primary">{{ __('Download') }}</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    @endif
+        @endif
 
     <div class="row">
         <div class="col-12">
@@ -343,7 +343,7 @@
                                 </div>
                                 <div class="col-xs-12 col-sm-12 col-nd-6 col-lg-6 col-12 text-end">
                                     <h4 class="invoice-number">
-                                        {{ $invoice->response_invoiceNo }}</h4>
+                                        {{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}</h4>
                                 </div>
                                 <div class="col-12">
                                     <hr>
@@ -409,27 +409,6 @@
                                         </small>
                                     </div>
                                 @endif
-                                <!-- @php
-                                    try {
-                                        $formattedDate = \Carbon\Carbon::createFromFormat(
-                                            'YmdHis',
-                                            $invoice->response_SdcDateTime,
-                                        )->format('Y-m-d-H-i-s');
-                                    } catch (\Exception $e) {
-                                        $formattedDate = 'Invalid date format';
-                                    }
-                                @endphp
- -->
-                                <div class="col ">
-                                    <small>
-                                        <strong>{{ __('SCU Information') }} :</strong><br>
-                                        <p><i>Date : </i>{{ $invoice->response_SdcDateTime }}</p>
-                                         <p><i>Invoice No : </i>{{ $invoice->response_invoiceNo }}</p>
-                                        <p><i>Trader Invoice No : </i>{{ $invoice->response_trderInvoiceNo }}</p>
-                                        <p><i>Internal Data : </i>{{ $invoice->response_IntrlData }}</p>
-                                         <p><i>Receipt Signature : </i>{{ $invoice->response_RcptSign }}</p>
-                                    </small>
-                                </div>
 
                                 <div class="col">
                                     <div class="float-end mt-3">

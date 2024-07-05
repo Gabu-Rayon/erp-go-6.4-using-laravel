@@ -68,7 +68,7 @@ class CreditNoteController extends Controller
                     'salesTypeCodes',
                     'paymentTypeCodes',
                     'invoiceStatusCodes',
-                    'customer',
+                    'customers',
                     'itemsToAdd'
                 )
             );
