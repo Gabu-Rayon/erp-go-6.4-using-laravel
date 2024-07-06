@@ -8,13 +8,11 @@
 @endsection
 
 @section('action-btn')
-    @can('create budget plan')
         <div class="float-end">
             <a href="{{ route('budget.create',0) }}" data-bs-toggle="tooltip" title="{{__('Create')}}" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
         </div>
-    @endcan
 @endsection
 
 @section('content')

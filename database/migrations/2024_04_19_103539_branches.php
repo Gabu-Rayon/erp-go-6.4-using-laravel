@@ -24,7 +24,10 @@ return new class extends Migration
             $table->string('mgrNm');
             $table->string('mgrTelNo');
             $table->string('mgrEmail');
-            $table->char('hqYn', 1)->default('Y'); 
+            $table->char('hqYn', 1)->default('Y');
+            $table->unsignedBigInteger('created_by');
+
+            $table->foreign('created_by')->references('id')->on('users');
             $table->timestamps(); 
         });
     }

@@ -62,7 +62,7 @@
                                         <h5>{{ __('Monthly') }}</h5>
                                     </div>
                                     <div class="col-3 float-right">
-                                        <select name="month" class="form-control selectpicker" id="selectmonth" data-none-selected-text="Nothing selected" >
+                                        <select name="month" class="form-control selectpicker select2 col-6" id="selectmonth" data-none-selected-text="Nothing selected" >
                                             <option value=" ">{{__('Select Month')}}</option>
                                             <option value="1">{{__('January')}}</option>
                                             <option value="2">{{__('February')}}</option>

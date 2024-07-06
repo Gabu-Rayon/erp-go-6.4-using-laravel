@@ -78,7 +78,6 @@ use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SetSalaryController;
-use App\Http\Controllers\StockMoveController;
 use App\Http\Controllers\TaskStageController;
 use App\Http\Controllers\TimesheetController;
 use App\Http\Controllers\ToyyibpayController;
@@ -124,7 +123,6 @@ use App\Http\Controllers\ProjectReportController;
 use App\Http\Controllers\ProjectstagesController;
 use App\Http\Controllers\PurchaseSalesController;
 use App\Http\Controllers\SkrillPaymentController;
-use App\Http\Controllers\StockMoveListController;
 use App\Http\Controllers\StripePaymentController;
 use App\Http\Controllers\XenditPaymentController;
 use App\Http\Controllers\BenefitPaymentController;
@@ -1626,7 +1624,7 @@ Route::group(['middleware' => ['verified']], function () {
     // purchase.mapPurchase
     Route::any('map-purchase', [PurchaseController::class, 'mapPurchase'])->name('purchase.mapPurchase');
     //  purchase.SearchByDate
-    Route::post('/searchByDate', [PurchaseController::class, 'searchByDate'])->name('purchase.searchByDate');
+    Route::post('Map-purchase/SearchByDate', [PurchaseController::class, 'mapPurchaseSearchByDate'])->name('mappedPurchases.sync');
     // mapPurchase blade
     Route::any('/mappedpurchases', [PurchaseController::class, 'mappedPurchases'])->name('purchase.mappedPurchases');
     //  getMapPurchaseSearchByDate
@@ -1818,6 +1816,7 @@ Route::get('/details/refundreasons', [DetailsController::class, 'refundreasons']
 Route::get('/details/currencies', [DetailsController::class, 'currencies'])->name('details.currencies');
 Route::get('/details/banks', [DetailsController::class, 'banks'])->name('details.banks');
 Route::get('/details/languages', [DetailsController::class, 'languages'])->name('details.languages');
+Route::get('/details/payment-types', [DetailsController::class, 'paymentTypes'])->name('details.payment-types');
 Route::get('/getnotices', [NoticesListController::class, 'getNoticeList']);
 Route::get('/get-item-information', [ProductServiceController::class, 'getItemInformation']);
 Route::group(
@@ -1845,6 +1844,7 @@ Route::group(
     ],
     function () {
         Route::resource('brancheslist', BranchesListController::class);
+        Route::get('branches/sync', [BranchController::class, 'sync'])->name('branches.sync');
         Route::get('getbranchbyname/{name}', [BranchesListController::class, 'getBranchByName'])->name('brancheslist.getbranchbyname');
     }
 );
@@ -1962,26 +1962,19 @@ Route::any('/getcustomerbypin', [CustomerController::class, 'getCustomerByTin'])
 Route::middleware(['auth', 'XSS', 'revalidate'])->group(function () {
     // Routes for stock adjustments
     Route::get('stockadjustment', [StockController::class, 'stockAdjustmentIndex'])
-        ->name('stockadjustment.index')
-        ->middleware(['can:manage product & service']);
+        ->name('stockadjustment.index');
     Route::get('stockadjustment/create', [StockController::class, 'stockAdjustmentCreate'])
-        ->name('stockadjustment.create')
-        ->middleware(['can:create product & service']);
+        ->name('stockadjustment.create');
     Route::post('stockadjustment', [StockController::class, 'stockAdjustmentStore'])
-        ->name('stockadjustment.store')
-        ->middleware(['can:create product & service']);
+        ->name('stockadjustment.store');
     Route::get('stockadjustment/{stockAdjustment}', [StockController::class, 'stockAdjustmentShow'])
-        ->name('stockadjustment.show')
-        ->middleware(['can:manage product & service']);
+        ->name('stockadjustment.show');
     Route::get('stockadjustment/{stockAdjustment}/edit', [StockController::class, 'stockAdjustmentEdit'])
-        ->name('stockadjustment.edit')
-        ->middleware(['can:edit product & service']);
+        ->name('stockadjustment.edit');
     Route::put('stockadjustment/{stockAdjustment}', [StockController::class, 'stockAdjustmentUpdate'])
-        ->name('stockadjustment.update')
-        ->middleware(['can:edit product & service']);
+        ->name('stockadjustment.update');
     Route::delete('stockadjustment/{stockAdjustment}', [StockController::class, 'stockAdjustmentDestroy'])
-        ->name('stockadjustment.destroy')
-        ->middleware(['can:delete product & service']);
+        ->name('stockadjustment.destroy');
 
     // Routes for stock moves
     Route::get('stockmove', [StockController::class, 'stockMoveIndex'])->name('stockmove.index');

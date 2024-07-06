@@ -100,7 +100,7 @@
                                             <td>{{ $iteminformation->itemCd }}</td>
                                             <td>{{ $iteminformation->itemClsCd }}</td>
                                             <td>{{ $iteminformation->itemNm }}</td>
-                                            <td>$ {{ $iteminformation->dftPrc }}</td>
+                                            <td>{{ $iteminformation->dftPrc }}</td>
                                             <td>
                                                 <div class="action-btn bg-warning ms-2">
                                                     <a href="{{ route('productservice.show', $iteminformation->id) }}"

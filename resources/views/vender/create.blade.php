@@ -16,20 +16,20 @@
             </div>
             <div class="col-lg-4 col-md-4 col-sm-6">
                 <div class="form-group">
-                    {{Form::label('spplrBhfId',__('Branch'),['class'=>'form-label'])}}
-                    {{Form::text('spplrBhfId',null,array('class'=>'form-control'))}}
-                </div>
+                    {{ Form::label('spplrBhfId', __('Branch'), ['class' => 'form-label']) }}
+                    {{ Form::select('spplrBhfId', $branches, null, ['class' => 'form-control select2', 'placeholder' => __('Select Branch')]) }}
+                </div>                
             </div>
             <div class="col-lg-4 col-md-4 col-sm-6">
                 <div class="form-group">
                     {{Form::label('spplrSdcId',__('SDC ID'),['class'=>'form-label'])}}
-                    {{Form::number('spplrSdcId',null,array('class'=>'form-control','required'=>'required'))}}
+                    {{Form::text('spplrSdcId',null,array('class'=>'form-control','required'=>'required'))}}
                 </div>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-6">
                 <div class="form-group">
                     {{Form::label('spplrMrcNo',__('MRC Number'),['class'=>'form-label'])}}
-                    {{Form::number('spplrMrcNo',null,array('class'=>'form-control','required'=>'required'))}}
+                    {{Form::text('spplrMrcNo',null,array('class'=>'form-control','required'=>'required'))}}
                 </div>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-6">
@@ -42,6 +42,13 @@
                 <div class="form-group">
                     {{Form::label('contact',__('Contact'),['class'=>'form-label'])}}
                     {{Form::number('contact',null,array('class'=>'form-control','required'=>'required'))}}
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6">
+                <div class="form-group">
+                    {{Form::label('avatar', __('Avatar'), ['class' => 'form-label'])}}
+                    <span class="text-danger">*</span>
+                    {{Form::file('avatar', ['class' => 'form-control', 'required' => 'required'])}}
                 </div>
             </div>
             @if(!$customFields->isEmpty())

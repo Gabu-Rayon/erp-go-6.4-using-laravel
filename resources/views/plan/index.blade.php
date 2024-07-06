@@ -11,8 +11,8 @@
 @endsection
 @section('action-btn')
     <div class="float-end">
-        @can('create plan')
             @if (isset($admin_payment_setting) && !empty($admin_payment_setting))
+            @if (\Auth::user()->type == 'super admin')
                 @if (
                     $admin_payment_setting['is_manually_payment_enabled'] == 'on' ||
                         $admin_payment_setting['is_bank_transfer_enabled'] == 'on' ||
@@ -44,7 +44,7 @@
                     </a>
                 @endif
             @endif
-        @endcan
+             @endif
     </div>
 @endsection
 

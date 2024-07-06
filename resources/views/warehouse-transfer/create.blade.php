@@ -7,7 +7,7 @@
         </div>
         <div class="form-group col-md-6">
             {{Form::label('to_warehouse',__('To Warehouse'),array('class'=>'form-label')) }}<span class="text-danger">*</span>
-            {{ Form::select('to_warehouse', [],null, array('class' => 'form-control select','required'=>'required')) }}
+            {{ Form::select('to_warehouse', $to_warehouse,null, array('class' => 'form-control select fromWarehouse','required'=>'required')) }}
         </div>
         <div class="form-group col-md-6" id="product_div">
             {{Form::label('product',__('Product'),array('class'=>'form-label')) }}

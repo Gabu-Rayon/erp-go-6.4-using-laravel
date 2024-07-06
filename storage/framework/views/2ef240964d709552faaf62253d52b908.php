@@ -37,24 +37,25 @@
         <?php if(\Auth::user()->type != 'client'): ?>
             <ul class="dash-navbar">
 
-     <!--------------------- Start Products System ----------------------------------->
+                <!--------------------- Start Products System ----------------------------------->
 
-        
-    <!--------------------- End Products System ----------------------------------->
+
+                <!--------------------- End Products System ----------------------------------->
 
 
 
                 <!--------------------- Start Dashboard ----------------------------------->
-            
 
-                <?php    
-                    $role = Spatie\Permission\Models\Role::findByName(\Auth::user()->type)
+
+                <?php
+                    $role = Spatie\Permission\Models\Role::findByName(\Auth::user()->type);
                 ?>
-                    <?php if($role->hasPermissionTo('show hrm dashboard') ||
-                    $role->hasPermissionTo('show project dashboard') ||
-                    $role->hasPermissionTo('show account dashboard') ||
-                    $role->hasPermissionTo('show crm dashboard') ||
-                    $role->hasPermissionTo('show pos dashboard')): ?>
+                <?php if(
+                    $role->hasPermissionTo('show hrm dashboard') ||
+                        $role->hasPermissionTo('show project dashboard') ||
+                        $role->hasPermissionTo('show account dashboard') ||
+                        $role->hasPermissionTo('show crm dashboard') ||
+                        $role->hasPermissionTo('show pos dashboard')): ?>
                     <li
                         class="dash-item dash-hasmenu
                                 <?php echo e(Request::segment(1) == null ||
@@ -98,14 +99,14 @@
                                             </li>
                                         <?php endif; ?>
 
-                                                 <?php if(
-                                                        $role->hasPermissionTo('income report') ||
-                                                        $role->hasPermissionTo('expense report') ||
-                                                        $role->hasPermissionTo('income vs expense report') ||
-                                                        $role->hasPermissionTo('tax report') ||
-                                                        $role->hasPermissionTo('loss & profit report') ||
-                                                        $role->hasPermissionTo('invoice report') ||
-                                                        $role->hasPermissionTo('bill report')): ?>
+                                        <?php if(
+                                            $role->hasPermissionTo('income report') ||
+                                                $role->hasPermissionTo('expense report') ||
+                                                $role->hasPermissionTo('income vs expense report') ||
+                                                $role->hasPermissionTo('tax report') ||
+                                                $role->hasPermissionTo('loss & profit report') ||
+                                                $role->hasPermissionTo('invoice report') ||
+                                                $role->hasPermissionTo('bill report')): ?>
 
                                             <li
                                                 class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'report' || Request::segment(1) == 'reports-monthly-cashflow' || Request::segment(1) == 'reports-quarterly-cashflow' ? 'active dash-trigger ' : ''); ?>">
@@ -113,8 +114,7 @@
                                                         class="dash-arrow"><i
                                                             data-feather="chevron-right"></i></span></a>
                                                 <ul class="dash-submenu">
-                                                        <?php if($role->hasPermissionTo('statement report')): ?>
-
+                                                    <?php if($role->hasPermissionTo('statement report')): ?>
                                                         <li
                                                             class="dash-item <?php echo e(Request::route()->getName() == 'report.account.statement' ? ' active' : ''); ?>">
                                                             <a class="dash-link"
@@ -122,7 +122,6 @@
                                                         </li>
                                                     <?php endif; ?>
                                                     <?php if($role->hasPermissionTo('invoice report')): ?>
-
                                                         <li
                                                             class="dash-item <?php echo e(Request::route()->getName() == 'report.invoice.summary' ? ' active' : ''); ?>">
                                                             <a class="dash-link"
@@ -151,7 +150,7 @@
                                                                 href="<?php echo e(route('report.bill.summary')); ?>"><?php echo e(__('Bill Summary')); ?></a>
                                                         </li>
                                                     <?php endif; ?>
-                                                     <?php if($role->hasPermissionTo('stock report')): ?>
+                                                    <?php if($role->hasPermissionTo('stock report')): ?>
                                                         <li
                                                             class="dash-item <?php echo e(Request::route()->getName() == 'report.product.stock.report' ? ' active' : ''); ?>">
                                                             <a href="<?php echo e(route('report.product.stock.report')); ?>"
@@ -165,28 +164,28 @@
                                                                 href="<?php echo e(route('report.monthly.cashflow')); ?>"><?php echo e(__('Cash Flow')); ?></a>
                                                         </li>
                                                     <?php endif; ?>
-                                                    <?php if($role->hasPermissionTo('manage transaction')      ): ?>                                               
+                                                    <?php if($role->hasPermissionTo('manage transaction')): ?>
                                                         <li
                                                             class="dash-item <?php echo e(Request::route()->getName() == 'transaction.index' || Request::route()->getName() == 'transfer.create' || Request::route()->getName() == 'transaction.edit' ? ' active' : ''); ?>">
                                                             <a class="dash-link"
                                                                 href="<?php echo e(route('transaction.index')); ?>"><?php echo e(__('Transaction')); ?></a>
                                                         </li>
                                                     <?php endif; ?>
-                                                     <?php if($role->hasPermissionTo('income report')       ): ?>                                                
+                                                    <?php if($role->hasPermissionTo('income report')): ?>
                                                         <li
                                                             class="dash-item <?php echo e(Request::route()->getName() == 'report.income.summary' ? ' active' : ''); ?>">
                                                             <a class="dash-link"
                                                                 href="<?php echo e(route('report.income.summary')); ?>"><?php echo e(__('Income Summary')); ?></a>
                                                         </li>
                                                     <?php endif; ?>
-                                                     <?php if($role->hasPermissionTo('expense report')): ?>        
+                                                    <?php if($role->hasPermissionTo('expense report')): ?>
                                                         <li
                                                             class="dash-item <?php echo e(Request::route()->getName() == 'report.expense.summary' ? ' active' : ''); ?>">
                                                             <a class="dash-link"
                                                                 href="<?php echo e(route('report.expense.summary')); ?>"><?php echo e(__('Expense Summary')); ?></a>
                                                         </li>
                                                     <?php endif; ?>
-                                                     <?php if($role->hasPermissionTo('income vs expense report')): ?>
+                                                    <?php if($role->hasPermissionTo('income vs expense report')): ?>
                                                         <li
                                                             class="dash-item <?php echo e(Request::route()->getName() == 'report.income.vs.expense.summary' ? ' active' : ''); ?>">
                                                             <a class="dash-link"
@@ -208,11 +207,11 @@
                             <?php endif; ?>
 
                             <?php if($userPlan->hrm == 1): ?>
-                                   <?php if($role->hasPermissionTo('show hrm dashboard')): ?>
+                                <?php if($role->hasPermissionTo('show hrm dashboard')): ?>
                                     <li
                                         class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'hrm-dashboard' || Request::segment(1) == 'reports-payroll' ? ' active dash-trigger' : ''); ?>">
-                                        <a class="dash-link" href="#"><?php echo e(__('HRM ')); ?><span class="dash-arrow"><i
-                                                    data-feather="chevron-right"></i></span></a>
+                                        <a class="dash-link" href="#"><?php echo e(__('HRM ')); ?><span
+                                                class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
                                         <ul class="dash-submenu">
                                             <li
                                                 class="dash-item <?php echo e(\Request::route()->getName() == 'hrm.dashboard' ? ' active' : ''); ?>">
@@ -220,7 +219,7 @@
                                                     href="<?php echo e(route('hrm.dashboard')); ?>"><?php echo e(__(' Overview')); ?></a>
                                             </li>
 
-                                             <?php if($role->hasPermissionTo('manage report')): ?>
+                                            <?php if($role->hasPermissionTo('manage report')): ?>
                                                 <li class="dash-item dash-hasmenu
                                                                     <?php echo e(Request::segment(1) == 'reports-monthly-attendance' ||
                                                                     Request::segment(1) == 'reports-leave' ||
@@ -230,7 +229,8 @@
                                                     href="#hr-report" data-toggle="collapse" role="button"
                                                     aria-expanded="<?php echo e(Request::segment(1) == 'reports-monthly-attendance' || Request::segment(1) == 'reports-leave' || Request::segment(1) == 'reports-payroll' ? 'true' : 'false'); ?>">
                                                     <a class="dash-link" href="#"><?php echo e(__('Reports')); ?><span
-                                                            class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
+                                                            class="dash-arrow"><i
+                                                                data-feather="chevron-right"></i></span></a>
                                                     <ul class="dash-submenu">
                                                         <li
                                                             class="dash-item <?php echo e(request()->is('reports-payroll') ? 'active' : ''); ?>">
@@ -271,7 +271,8 @@
                                                 href="#crm-report" data-toggle="collapse" role="button"
                                                 aria-expanded="<?php echo e(Request::segment(1) == 'reports-lead' || Request::segment(1) == 'reports-deal' ? 'true' : 'false'); ?>">
                                                 <a class="dash-link" href="#"><?php echo e(__('Reports')); ?><span
-                                                        class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
+                                                        class="dash-arrow"><i
+                                                            data-feather="chevron-right"></i></span></a>
                                                 <ul class="dash-submenu">
                                                     <li
                                                         class="dash-item <?php echo e(request()->is('reports-lead') ? 'active' : ''); ?>">
@@ -291,7 +292,7 @@
                             <?php endif; ?>
 
                             <?php if($userPlan->project == 1): ?>
-                                 <?php if($role->hasPermissionTo('show project dashboard')): ?>
+                                <?php if($role->hasPermissionTo('show project dashboard')): ?>
                                     <li
                                         class="dash-item <?php echo e(Request::route()->getName() == 'project.dashboard' ? ' active' : ''); ?>">
                                         <a class="dash-link"
@@ -301,7 +302,7 @@
                             <?php endif; ?>
 
                             <?php if($userPlan->pos == 1): ?>
-                                  <?php if($role->hasPermissionTo('show pos dashboard')): ?>
+                                <?php if($role->hasPermissionTo('show pos dashboard')): ?>
                                     <li
                                         class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'pos-dashboard' || Request::segment(1) == 'reports-warehouse' || Request::segment(1) == 'reports-daily-purchase' || Request::segment(1) == 'reports-monthly-purchase' || Request::segment(1) == 'reports-daily-pos' || Request::segment(1) == 'reports-monthly-pos' || Request::segment(1) == 'reports-pos-vs-purchase' ? ' active dash-trigger' : ''); ?>">
                                         <a class="dash-link" href="#"><?php echo e(__('POS')); ?><span
@@ -316,7 +317,8 @@
                                                 href="#crm-report" data-toggle="collapse" role="button"
                                                 aria-expanded="<?php echo e(Request::segment(1) == 'reports-warehouse' || Request::segment(1) == 'reports-daily-purchase' || Request::segment(1) == 'reports-monthly-purchase' || Request::segment(1) == 'reports-daily-pos' || Request::segment(1) == 'reports-monthly-pos' || Request::segment(1) == 'reports-pos-vs-purchase' ? 'true' : 'false'); ?>">
                                                 <a class="dash-link" href="#"><?php echo e(__('Reports')); ?><span
-                                                        class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
+                                                        class="dash-arrow"><i
+                                                            data-feather="chevron-right"></i></span></a>
                                                 <ul class="dash-submenu">
                                                     <li
                                                         class="dash-item <?php echo e(request()->is('reports-warehouse') ? 'active' : ''); ?>">
@@ -350,49 +352,47 @@
                 <?php endif; ?>
                 <!--------------------- End Dashboard ----------------------------------->
 
+                <?php if($role->hasPermissionTo('show crm dashboard')): ?>
+                    <li class="dash-item dash-hasmenu">
+                        <a href="#!" class="dash-link ">
+                            <span class="dash-micon">
+                                <i class="ti ti-template"></i>
+                            </span>
+                            <span class="dash-mtext">
+                                <?php echo e(__('Basic Data')); ?>
 
-                  <?php if($role->hasPermissionTo('manage product & service')): ?>
-            <li class="dash-item dash-hasmenu">
-                <a href="#!" class="dash-link ">
-                    <span class="dash-micon">
-                        <i class="ti ti-template"></i>
-                    </span>
-                    <span class="dash-mtext">
-                        <?php echo e(__('Basic Data')); ?>
+                            </span>
+                            <span class="dash-arrow">
+                                <i data-feather="chevron-right"></i>
+                            </span>
+                        </a>
+                        <ul class="dash-submenu">
+                            <?php if($role->hasPermissionTo('manage product & service')): ?>
+                                <li class="dash-item <?php echo e(Request::segment(1) == 'basicdata' ? 'active' : ''); ?>">
+                                    <a href="<?php echo e(route('noticelist.index')); ?>"
+                                        class="dash-link"><?php echo e(__('Notices List')); ?>
 
-                    </span>
-                    <span class="dash-arrow">
-                        <i data-feather="chevron-right"></i>
-                    </span>
-                </a>
-                <ul class="dash-submenu">
-                    <?php if($role->hasPermissionTo('manage product & service')): ?>
-                        <li class="dash-item <?php echo e(Request::segment(1) == 'basicdata' ? 'active' : ''); ?>">
-                            <a href="<?php echo e(route('noticelist.index')); ?>"
-                                class="dash-link"><?php echo e(__('Notices List')); ?>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                            <?php if($role->hasPermissionTo('manage product & service')): ?>
+                                <li class="dash-item <?php echo e(Request::segment(1) == 'basicdata' ? 'active' : ''); ?>">
+                                    <a href="<?php echo e(route('insurance.index')); ?>"
+                                        class="dash-link"><?php echo e(__('Send Insurance')); ?>
 
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                    <?php if($role->hasPermissionTo('manage product & service')): ?>
-                        <li class="dash-item <?php echo e(Request::segment(1) == 'basicdata' ? 'active' : ''); ?>">
-                            <a href="<?php echo e(route('insurance.index')); ?>"
-                                class="dash-link"><?php echo e(__('Send Insurance')); ?>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                            <?php if($role->hasPermissionTo('manage product & service')): ?>
+                                <li class="dash-item <?php echo e(Request::segment(1) == 'customerbypin' ? 'active' : ''); ?>">
+                                    <a href="#" class="dash-link"><?php echo e(__('Get Customer By Pin')); ?>
 
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                    <?php if($role->hasPermissionTo('manage product & service')): ?>
-                        <li class="dash-item <?php echo e(Request::segment(1) == 'customerbypin' ? 'active' : ''); ?>">
-                            <a href="#"
-                                class="dash-link"><?php echo e(__('Get Customer By Pin')); ?>
-
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                </ul>
-            </li>
-        <?php endif; ?>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </li>
+                <?php endif; ?>
 
 
                 <!--------------------- Start HRM ----------------------------------->
@@ -467,7 +467,10 @@
                                     class="dash-item  <?php echo e(Request::segment(1) == 'employee' ? 'active dash-trigger' : ''); ?>   ">
                                     <?php if(\Auth::user()->type == 'Employee'): ?>
                                         <?php
-                                            $employee = App\Models\Employee::where('user_id', \Auth::user()->id)->first();
+                                            $employee = App\Models\Employee::where(
+                                                'user_id',
+                                                \Auth::user()->id,
+                                            )->first();
                                         ?>
                                         <a class="dash-link"
                                             href="<?php echo e(route('employee.show', \Illuminate\Support\Facades\Crypt::encrypt($employee->id))); ?>"><?php echo e(__('Employee')); ?></a>
@@ -478,8 +481,8 @@
                                         </a>
                                     <?php endif; ?>
                                 </li>
-                                  
-                                    <?php if($role->hasPermissionTo('manage set salary') || $role->hasPermissionTo('manage pay slip')): ?>
+
+                                <?php if($role->hasPermissionTo('manage set salary') || $role->hasPermissionTo('manage pay slip')): ?>
 
                                     <li
                                         class="dash-item dash-hasmenu  <?php echo e(Request::segment(1) == 'setsalary' || Request::segment(1) == 'payslip' ? 'active dash-trigger' : ''); ?>">
@@ -487,15 +490,16 @@
                                                 class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
                                         <ul class="dash-submenu">
 
-                                              <?php if($role->hasPermissionTo('manage set salary')): ?>
+                                            <?php if($role->hasPermissionTo('manage set salary')): ?>
                                                 <li
                                                     class="dash-item <?php echo e(request()->is('setsalary*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
                                                         href="<?php echo e(route('setsalary.index')); ?>"><?php echo e(__('Set salary')); ?></a>
                                                 </li>
                                             <?php endif; ?>
-                                               <?php if($role->hasPermissionTo('manage pay slip')): ?>
-                                                <li class="dash-item <?php echo e(request()->is('payslip*') ? 'active' : ''); ?>">
+                                            <?php if($role->hasPermissionTo('manage pay slip')): ?>
+                                                <li
+                                                    class="dash-item <?php echo e(request()->is('payslip*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
                                                         href="<?php echo e(route('payslip.index')); ?>"><?php echo e(__('Payslip')); ?></a>
                                                 </li>
@@ -504,7 +508,7 @@
                                     </li>
                                 <?php endif; ?>
 
-                                    <?php if($role->hasPermissionTo('manage leave') ||  $role->hasPermissionTo('manage attendance')): ?>
+                                <?php if($role->hasPermissionTo('manage leave') || $role->hasPermissionTo('manage attendance')): ?>
                                     <li
                                         class="dash-item dash-hasmenu  <?php echo e(Request::segment(1) == 'leave' || Request::segment(1) == 'attendanceemployee' ? 'active dash-trigger' : ''); ?>">
                                         <a class="dash-link" href="#"><?php echo e(__('Leave Management Setup')); ?><span
@@ -531,13 +535,13 @@
                                                             <a class="dash-link"
                                                                 href="<?php echo e(route('attendanceemployee.index')); ?>"><?php echo e(__('Mark Attendance')); ?></a>
                                                         </li>
-                                                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create attendance')): ?>
-                                                            <li
-                                                                class="dash-item <?php echo e(Request::route()->getName() == 'attendanceemployee.bulkattendance' ? 'active' : ''); ?>">
-                                                                <a class="dash-link"
-                                                                    href="<?php echo e(route('attendanceemployee.bulkattendance')); ?>"><?php echo e(__('Bulk Attendance')); ?></a>
-                                                            </li>
-                                                        <?php endif; ?>
+                                                        <li
+                                                            class="dash-item <?php echo e(Request::route()->getName() == 'attendanceemployee.bulkattendance' ? 'active' : ''); ?>">
+                                                            <a class="dash-link"
+                                                                href="<?php echo e(route('attendanceemployee.bulkattendance')); ?>"><?php echo e(__('Bulk Attendance')); ?>
+
+                                                            </a>
+                                                        </li>
                                                     </ul>
                                                 </li>
                                             <?php endif; ?>
@@ -545,7 +549,10 @@
                                     </li>
                                 <?php endif; ?>
 
-                                <?php if($role->hasPermissionTo('manage indicator') ||  $role->hasPermissionTo('manage appraisal') || $role->hasPermissionTo('manage goal tracking')): ?>
+                                <?php if(
+                                    $role->hasPermissionTo('manage indicator') ||
+                                        $role->hasPermissionTo('manage appraisal') ||
+                                        $role->hasPermissionTo('manage goal tracking')): ?>
                                     <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'indicator' || Request::segment(1) == 'appraisal' || Request::segment(1) == 'goaltracking' ? 'active dash-trigger' : ''); ?>"
                                         href="#navbar-performance" data-toggle="collapse" role="button"
                                         aria-expanded="<?php echo e(Request::segment(1) == 'indicator' || Request::segment(1) == 'appraisal' || Request::segment(1) == 'goaltracking' ? 'true' : 'false'); ?>">
@@ -562,7 +569,7 @@
                                                 </li>
                                             <?php endif; ?>
 
-                                             <?php if($role->hasPermissionTo('manage appraisal')): ?>
+                                            <?php if($role->hasPermissionTo('manage appraisal')): ?>
                                                 <li
                                                     class="dash-item <?php echo e(request()->is('appraisal*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
@@ -581,7 +588,10 @@
                                     </li>
                                 <?php endif; ?>
 
-                                <?php if($role->hasPermissionTo('manage training') ||  $role->hasPermissionTo('manage trainer') ||  $role->hasPermissionTo('show training') ): ?>
+                                <?php if(
+                                    $role->hasPermissionTo('manage training') ||
+                                        $role->hasPermissionTo('manage trainer') ||
+                                        $role->hasPermissionTo('show training')): ?>
                                     <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'trainer' || Request::segment(1) == 'training' ? 'active dash-trigger' : ''); ?>"
                                         href="#navbar-training" data-toggle="collapse" role="button"
                                         aria-expanded="<?php echo e(Request::segment(1) == 'trainer' || Request::segment(1) == 'training' ? 'true' : 'false'); ?>">
@@ -590,14 +600,16 @@
                                         <ul class="dash-submenu">
 
                                             <?php if($role->hasPermissionTo('manage training')): ?>
-                                                <li class="dash-item <?php echo e(request()->is('training*') ? 'active' : ''); ?>">
+                                                <li
+                                                    class="dash-item <?php echo e(request()->is('training*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
                                                         href="<?php echo e(route('training.index')); ?>"><?php echo e(__('Training List')); ?></a>
                                                 </li>
-                                            <?php endif; ?> 
+                                            <?php endif; ?>
 
-                                              <?php if($role->hasPermissionTo('manage trainer')): ?>
-                                                <li class="dash-item <?php echo e(request()->is('trainer*') ? 'active' : ''); ?>">
+                                            <?php if($role->hasPermissionTo('manage trainer')): ?>
+                                                <li
+                                                    class="dash-item <?php echo e(request()->is('trainer*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
                                                         href="<?php echo e(route('trainer.index')); ?>"><?php echo e(__('Trainer')); ?></a>
                                                 </li>
@@ -607,18 +619,19 @@
                                     </li>
                                 <?php endif; ?>
 
-                                        <?php if($role->hasPermissionTo('manage job') || 
-                                         $role->hasPermissionTo('create job')||
-                                         $role->hasPermissionTo('manage job application') || 
-                                         $role->hasPermissionTo('manage custom question')|| 
-                                         $role->hasPermissionTo('show interview schedule') ||
-                                          $role->hasPermissionTo('show career')): ?>
+                                <?php if(
+                                    $role->hasPermissionTo('manage job') ||
+                                        $role->hasPermissionTo('create job') ||
+                                        $role->hasPermissionTo('manage job application') ||
+                                        $role->hasPermissionTo('manage custom question') ||
+                                        $role->hasPermissionTo('show interview schedule') ||
+                                        $role->hasPermissionTo('show career')): ?>
                                     <li
                                         class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'job' || Request::segment(1) == 'job-application' || Request::segment(1) == 'candidates-job-applications' || Request::segment(1) == 'job-onboard' || Request::segment(1) == 'custom-question' || Request::segment(1) == 'interview-schedule' || Request::segment(1) == 'career' ? 'active dash-trigger' : ''); ?>    ">
                                         <a class="dash-link" href="#"><?php echo e(__('Recruitment Setup')); ?><span
                                                 class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
                                         <ul class="dash-submenu">
-                                              <?php if($role->hasPermissionTo('manage job')): ?>
+                                            <?php if($role->hasPermissionTo('manage job')): ?>
                                                 <li
                                                     class="dash-item <?php echo e(Request::route()->getName() == 'job.index' || Request::route()->getName() == 'job.create' || Request::route()->getName() == 'job.edit' || Request::route()->getName() == 'job.show' ? 'active' : ''); ?>">
                                                     <a class="dash-link"
@@ -626,7 +639,7 @@
                                                 </li>
                                             <?php endif; ?>
 
-                                               <?php if($role->hasPermissionTo('create job')): ?>
+                                            <?php if($role->hasPermissionTo('create job')): ?>
                                                 <li
                                                     class="dash-item <?php echo e(Request::route()->getName() == 'job.create' ? 'active' : ''); ?> ">
                                                     <a class="dash-link"
@@ -641,7 +654,7 @@
                                                         href="<?php echo e(route('job-application.index')); ?>"><?php echo e(__('Job Application')); ?></a>
                                                 </li>
                                             <?php endif; ?>
-                                             <?php if($role->hasPermissionTo('manage job application')): ?>
+                                            <?php if($role->hasPermissionTo('manage job application')): ?>
                                                 <li
                                                     class="dash-item <?php echo e(request()->is('candidates-job-applications') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
@@ -655,7 +668,7 @@
                                                         href="<?php echo e(route('job.on.board')); ?>"><?php echo e(__('Job On-boarding')); ?></a>
                                                 </li>
                                             <?php endif; ?>
-                                              <?php if($role->hasPermissionTo('manage custom question')): ?>
+                                            <?php if($role->hasPermissionTo('manage custom question')): ?>
                                                 <li
                                                     class="dash-item  <?php echo e(request()->is('custom-question*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
@@ -663,7 +676,7 @@
                                                 </li>
                                             <?php endif; ?>
 
-                                            <?php if($role->hasPermissionTo('show interview schedule')): ?>                                               
+                                            <?php if($role->hasPermissionTo('show interview schedule')): ?>
                                                 <li
                                                     class="dash-item <?php echo e(request()->is('interview-schedule*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
@@ -671,7 +684,7 @@
                                                 </li>
                                             <?php endif; ?>
 
-                                              <?php if($role->hasPermissionTo('show career')): ?>         
+                                            <?php if($role->hasPermissionTo('show career')): ?>
                                                 <li class="dash-item <?php echo e(request()->is('career*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
                                                         href="<?php echo e(route('career', [\Auth::user()->creatorId(), $lang])); ?>"><?php echo e(__('Career')); ?></a>
@@ -683,29 +696,30 @@
 
 
 
-                                        <?php if($role->hasPermissionTo('manage award') || 
-                                            $role->hasPermissionTo('manage transfer') || 
-                                            $role->hasPermissionTo('manage resignation') || 
-                                            $role->hasPermissionTo('manage travel') || 
-                                            $role->hasPermissionTo('manage promotion') || 
-                                            $role->hasPermissionTo('manage complaint') || 
-                                            $role->hasPermissionTo('manage warning') || 
-                                            $role->hasPermissionTo('manage termination') ||
-                                             $role->hasPermissionTo('manage announcement') ||
-                                              $role->hasPermissionTo('manage holiday')): ?>
+                                <?php if(
+                                    $role->hasPermissionTo('manage award') ||
+                                        $role->hasPermissionTo('manage transfer') ||
+                                        $role->hasPermissionTo('manage resignation') ||
+                                        $role->hasPermissionTo('manage travel') ||
+                                        $role->hasPermissionTo('manage promotion') ||
+                                        $role->hasPermissionTo('manage complaint') ||
+                                        $role->hasPermissionTo('manage warning') ||
+                                        $role->hasPermissionTo('manage termination') ||
+                                        $role->hasPermissionTo('manage announcement') ||
+                                        $role->hasPermissionTo('manage holiday')): ?>
                                     <li
                                         class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'holiday-calender' || Request::segment(1) == 'holiday' || Request::segment(1) == 'policies' || Request::segment(1) == 'award' || Request::segment(1) == 'transfer' || Request::segment(1) == 'resignation' || Request::segment(1) == 'travel' || Request::segment(1) == 'promotion' || Request::segment(1) == 'complaint' || Request::segment(1) == 'warning' || Request::segment(1) == 'termination' || Request::segment(1) == 'announcement' || Request::segment(1) == 'competencies' ? 'active dash-trigger' : ''); ?>">
                                         <a class="dash-link" href="#"><?php echo e(__('HR Admin Setup')); ?><span
                                                 class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
                                         <ul class="dash-submenu">
-                                             <?php if($role->hasPermissionTo('manage award')): ?>         
+                                            <?php if($role->hasPermissionTo('manage award')): ?>
                                                 <li class="dash-item <?php echo e(request()->is('award*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
                                                         href="<?php echo e(route('award.index')); ?>"><?php echo e(__('Award')); ?></a>
                                                 </li>
                                             <?php endif; ?>
 
-                                                <?php if($role->hasPermissionTo('manage transfer')): ?>  
+                                            <?php if($role->hasPermissionTo('manage transfer')): ?>
                                                 <li
                                                     class="dash-item  <?php echo e(request()->is('transfer*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
@@ -713,7 +727,7 @@
                                                 </li>
                                             <?php endif; ?>
 
-                                             <?php if($role->hasPermissionTo('manage resignation')): ?>  
+                                            <?php if($role->hasPermissionTo('manage resignation')): ?>
                                                 <li
                                                     class="dash-item <?php echo e(request()->is('resignation*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
@@ -721,14 +735,14 @@
                                                 </li>
                                             <?php endif; ?>
 
-                                            <?php if($role->hasPermissionTo('manage travel')): ?> 
+                                            <?php if($role->hasPermissionTo('manage travel')): ?>
                                                 <li class="dash-item <?php echo e(request()->is('travel*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
                                                         href="<?php echo e(route('travel.index')); ?>"><?php echo e(__('Trip')); ?></a>
                                                 </li>
                                             <?php endif; ?>
 
-                                             <?php if($role->hasPermissionTo('manage promotion')): ?>
+                                            <?php if($role->hasPermissionTo('manage promotion')): ?>
                                                 <li
                                                     class="dash-item <?php echo e(request()->is('promotion*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
@@ -736,7 +750,7 @@
                                                 </li>
                                             <?php endif; ?>
 
-                                             <?php if($role->hasPermissionTo('manage complaint')): ?>
+                                            <?php if($role->hasPermissionTo('manage complaint')): ?>
                                                 <li
                                                     class="dash-item <?php echo e(request()->is('complaint*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
@@ -744,14 +758,15 @@
                                                 </li>
                                             <?php endif; ?>
                                             <?php if($role->hasPermissionTo('manage warning')): ?>
-                                                <li class="dash-item <?php echo e(request()->is('warning*') ? 'active' : ''); ?>">
+                                                <li
+                                                    class="dash-item <?php echo e(request()->is('warning*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
                                                         href="<?php echo e(route('warning.index')); ?>"><?php echo e(__('Warning')); ?></a>
                                                 </li>
                                             <?php endif; ?>
 
 
-                                             <?php if($role->hasPermissionTo('manage termination')): ?>
+                                            <?php if($role->hasPermissionTo('manage termination')): ?>
                                                 <li
                                                     class="dash-item <?php echo e(request()->is('termination*') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
@@ -767,7 +782,7 @@
                                                 </li>
                                             <?php endif; ?>
 
-                                             <?php if($role->hasPermissionTo('manage holiday')): ?>
+                                            <?php if($role->hasPermissionTo('manage holiday')): ?>
                                                 <li
                                                     class="dash-item <?php echo e(request()->is('holiday*') || request()->is('holiday-calender') ? 'active' : ''); ?>">
                                                     <a class="dash-link"
@@ -777,14 +792,13 @@
                                         </ul>
                                     </li>
                                 <?php endif; ?>
-                                  <?php if($role->hasPermissionTo('manage event')): ?>
+                                <?php if($role->hasPermissionTo('manage event')): ?>
                                     <li class="dash-item <?php echo e(request()->is('event*') ? 'active' : ''); ?>">
                                         <a class="dash-link"
                                             href="<?php echo e(route('event.index')); ?>"><?php echo e(__('Event Setup')); ?></a>
                                     </li>
                                 <?php endif; ?>
                                 <?php if($role->hasPermissionTo('manage meeting')): ?>
-
                                     <li class="dash-item <?php echo e(request()->is('meeting*') ? 'active' : ''); ?>">
                                         <a class="dash-link"
                                             href="<?php echo e(route('meeting.index')); ?>"><?php echo e(__('Meeting')); ?></a>
@@ -837,36 +851,37 @@
                                 <?php endif; ?>
 
 
-                        </ul>
-                    </li>
+                            </ul>
+                        </li>
+                    <?php endif; ?>
                 <?php endif; ?>
-            <?php endif; ?>
 
-            <!--------------------- End HRM ----------------------------------->
+                <!--------------------- End HRM ----------------------------------->
 
-            <!--------------------- Start Account ----------------------------------->
+                <!--------------------- Start Account ----------------------------------->
 
-            <?php if(!empty($userPlan) &&  $userPlan->account == 1): ?>
-                         <?php if($role->hasPermissionTo('manage award') || 
-                                            $role->hasPermissionTo('manage customer') || 
-                                            $role->hasPermissionTo('manage vender') || 
-                                            $role->hasPermissionTo('manage customer') || 
-                                            $role->hasPermissionTo('manage  proposal') || 
-                                            $role->hasPermissionTo('manage bank account') || 
-                                            $role->hasPermissionTo('manage bank transfer') || 
-                                            $role->hasPermissionTo('manage invoice') ||
-                                             $role->hasPermissionTo('manage revenue') ||
-                                              $role->hasPermissionTo('manage credit note') || 
-                                               $role->hasPermissionTo('manage bill') ||
-                                                $role->hasPermissionTo('manage payment') ||
-                                                 $role->hasPermissionTo('manage debit note') ||
-                                                  $role->hasPermissionTo('manage chart of account') ||
-                                                   $role->hasPermissionTo('manage journal entry') ||
-                                                    $role->hasPermissionTo('balance sheet report') ||
-                                                     $role->hasPermissionTo('ledger report') ||
-                                                       $role->hasPermissionTo('trial balance report')): ?>
-                    <li
-                        class="dash-item dash-hasmenu
+                <?php if(!empty($userPlan) && $userPlan->account == 1): ?>
+                    <?php if(
+                        $role->hasPermissionTo('manage award') ||
+                            $role->hasPermissionTo('manage customer') ||
+                            $role->hasPermissionTo('manage vender') ||
+                            $role->hasPermissionTo('manage customer') ||
+                            $role->hasPermissionTo('manage  proposal') ||
+                            $role->hasPermissionTo('manage bank account') ||
+                            $role->hasPermissionTo('manage bank transfer') ||
+                            $role->hasPermissionTo('manage invoice') ||
+                            $role->hasPermissionTo('manage revenue') ||
+                            $role->hasPermissionTo('manage credit note') ||
+                            $role->hasPermissionTo('manage bill') ||
+                            $role->hasPermissionTo('manage payment') ||
+                            $role->hasPermissionTo('manage debit note') ||
+                            $role->hasPermissionTo('manage chart of account') ||
+                            $role->hasPermissionTo('manage journal entry') ||
+                            $role->hasPermissionTo('balance sheet report') ||
+                            $role->hasPermissionTo('ledger report') ||
+                            $role->hasPermissionTo('trial balance report')): ?>
+                        <li
+                            class="dash-item dash-hasmenu
                                      <?php echo e(Request::route()->getName() == 'print-setting' ||
                                      Request::segment(1) == 'customer' ||
                                      Request::segment(1) == 'vender' ||
@@ -900,280 +915,288 @@
                                      Request::segment(1) == 'debit-note'
                                          ? ' active dash-trigger'
                                          : ''); ?>">
-                        <a href="#!" class="dash-link"><span class="dash-micon"><i
-                                    class="ti ti-box"></i></span><span
-                                class="dash-mtext"><?php echo e(__('Accounting System ')); ?>
+                            <a href="#!" class="dash-link"><span class="dash-micon"><i
+                                        class="ti ti-box"></i></span><span
+                                    class="dash-mtext"><?php echo e(__('Accounting System ')); ?>
 
-                            </span><span class="dash-arrow"><i data-feather="chevron-right"></i></span>
-                        </a>
-                        <ul class="dash-submenu">
-                            <?php if($role->hasPermissionTo('manage bank account') || $role->hasPermissionTo('manage bank transfer')): ?>
-                                <li
-                                    class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'bank-account' || Request::segment(1) == 'bank-transfer' ? 'active dash-trigger' : ''); ?>">
-                                    <a class="dash-link" href="#"><?php echo e(__('Banking')); ?><span
-                                            class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
-                                    <ul class="dash-submenu">
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'bank-account.index' || Request::route()->getName() == 'bank-account.create' || Request::route()->getName() == 'bank-account.edit' ? ' active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('bank-account.index')); ?>"><?php echo e(__('Account')); ?></a>
-                                        </li>
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'bank-transfer.index' || Request::route()->getName() == 'bank-transfer.create' || Request::route()->getName() == 'bank-transfer.edit' ? ' active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('bank-transfer.index')); ?>"><?php echo e(__('Transfer')); ?></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            <?php endif; ?>
-                                     <?php if($role->hasPermissionTo('manage customer') || 
-                                            $role->hasPermissionTo('manage proposal') || 
-                                            $role->hasPermissionTo('manage invoice') || 
-                                            $role->hasPermissionTo('manage revenue') || 
-                                            $role->hasPermissionTo('manage credit note')): ?>
-                                <li
-                                    class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'customer' || Request::segment(1) == 'proposal' || Request::segment(1) == 'invoice' || Request::segment(1) == 'revenue' || Request::segment(1) == 'credit-note' ? 'active dash-trigger' : ''); ?>">
-                                    <a class="dash-link" href="#"><?php echo e(__('Sales')); ?><span
-                                            class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
-                                    <ul class="dash-submenu">
-
-                                        <?php if($role->hasPermissionTo('manage customer')): ?>
+                                </span><span class="dash-arrow"><i data-feather="chevron-right"></i></span>
+                            </a>
+                            <ul class="dash-submenu">
+                                <?php if($role->hasPermissionTo('manage bank account') || $role->hasPermissionTo('manage bank transfer')): ?>
+                                    <li
+                                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'bank-account' || Request::segment(1) == 'bank-transfer' ? 'active dash-trigger' : ''); ?>">
+                                        <a class="dash-link" href="#"><?php echo e(__('Banking')); ?><span
+                                                class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
+                                        <ul class="dash-submenu">
                                             <li
-                                                class="dash-item <?php echo e(Request::segment(1) == 'customer' ? 'active' : ''); ?>">
+                                                class="dash-item <?php echo e(Request::route()->getName() == 'bank-account.index' || Request::route()->getName() == 'bank-account.create' || Request::route()->getName() == 'bank-account.edit' ? ' active' : ''); ?>">
                                                 <a class="dash-link"
-                                                    href="<?php echo e(route('customer.index')); ?>"><?php echo e(__('Customer')); ?></a>
+                                                    href="<?php echo e(route('bank-account.index')); ?>"><?php echo e(__('Account')); ?></a>
                                             </li>
-                                        <?php endif; ?>
-
-                                        <?php if($role->hasPermissionTo('manage proposal')): ?>
                                             <li
-                                                class="dash-item <?php echo e(Request::segment(1) == 'proposal' ? 'active' : ''); ?>">
+                                                class="dash-item <?php echo e(Request::route()->getName() == 'bank-transfer.index' || Request::route()->getName() == 'bank-transfer.create' || Request::route()->getName() == 'bank-transfer.edit' ? ' active' : ''); ?>">
                                                 <a class="dash-link"
-                                                    href="<?php echo e(route('proposal.index')); ?>"><?php echo e(__('Estimate')); ?></a>
+                                                    href="<?php echo e(route('bank-transfer.index')); ?>"><?php echo e(__('Transfer')); ?></a>
                                             </li>
-                                        <?php endif; ?>
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'invoice.index' || Request::route()->getName() == 'invoice.create' || Request::route()->getName() == 'invoice.edit' || Request::route()->getName() == 'invoice.show' ? ' active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('invoice.index')); ?>"><?php echo e(__('Invoice')); ?></a>
-                                        </li>
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'revenue.index' || Request::route()->getName() == 'revenue.create' || Request::route()->getName() == 'revenue.edit' ? ' active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('revenue.index')); ?>"><?php echo e(__('Revenue')); ?></a>
-                                        </li>
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'credit.note' ? ' active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('credit.note')); ?>"><?php echo e(__('Credit Note')); ?></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            <?php endif; ?>
-                                     <?php if($role->hasPermissionTo('manage vender') || 
-                                            $role->hasPermissionTo('manage bill') || 
-                                            $role->hasPermissionTo('manage payment') ||
-                                             $role->hasPermissionTo('manage debit note')): ?>
-                                <li
-                                    class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'bill' || Request::segment(1) == 'vender' || Request::segment(1) == 'expense' || Request::segment(1) == 'payment' || Request::segment(1) == 'debit-note' ? 'active dash-trigger' : ''); ?>">
-                                    <a class="dash-link" href="#"><?php echo e(__('Purchases')); ?><span
-                                            class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
-                                    <ul class="dash-submenu">
-                                        <?php if($role->hasPermissionTo('manage vender')): ?>
+                                        </ul>
+                                    </li>
+                                <?php endif; ?>
+                                <?php if(
+                                    $role->hasPermissionTo('manage customer') ||
+                                        $role->hasPermissionTo('manage proposal') ||
+                                        $role->hasPermissionTo('manage invoice') ||
+                                        $role->hasPermissionTo('manage revenue') ||
+                                        $role->hasPermissionTo('manage credit note')): ?>
+                                    <li
+                                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'customer' || Request::segment(1) == 'proposal' || Request::segment(1) == 'invoice' || Request::segment(1) == 'revenue' || Request::segment(1) == 'credit-note' ? 'active dash-trigger' : ''); ?>">
+                                        <a class="dash-link" href="#"><?php echo e(__('Sales')); ?><span
+                                                class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
+                                        <ul class="dash-submenu">
+
+                                            <?php if($role->hasPermissionTo('manage customer')): ?>
+                                                <li
+                                                    class="dash-item <?php echo e(Request::segment(1) == 'customer' ? 'active' : ''); ?>">
+                                                    <a class="dash-link"
+                                                        href="<?php echo e(route('customer.index')); ?>"><?php echo e(__('Customer')); ?></a>
+                                                </li>
+                                            <?php endif; ?>
+
+                                            <?php if($role->hasPermissionTo('manage proposal')): ?>
+                                                <li
+                                                    class="dash-item <?php echo e(Request::segment(1) == 'proposal' ? 'active' : ''); ?>">
+                                                    <a class="dash-link"
+                                                        href="<?php echo e(route('proposal.index')); ?>"><?php echo e(__('Estimate')); ?></a>
+                                                </li>
+                                            <?php endif; ?>
                                             <li
-                                                class="dash-item <?php echo e(Request::segment(1) == 'vender' ? 'active' : ''); ?>">
+                                                class="dash-item <?php echo e(Request::route()->getName() == 'invoice.index' || Request::route()->getName() == 'invoice.create' || Request::route()->getName() == 'invoice.edit' || Request::route()->getName() == 'invoice.show' ? ' active' : ''); ?>">
                                                 <a class="dash-link"
-                                                    href="<?php echo e(route('vender.index')); ?>"><?php echo e(__('Suppiler')); ?></a>
+                                                    href="<?php echo e(route('invoice.index')); ?>"><?php echo e(__('Invoice')); ?></a>
                                             </li>
-                                        <?php endif; ?>
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'bill.index' || Request::route()->getName() == 'bill.create' || Request::route()->getName() == 'bill.edit' || Request::route()->getName() == 'bill.show' ? ' active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('bill.index')); ?>"><?php echo e(__('Bill')); ?></a>
-                                        </li>
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'expense.index' || Request::route()->getName() == 'expense.create' || Request::route()->getName() == 'expense.edit' || Request::route()->getName() == 'expense.show' ? ' active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('expense.index')); ?>"><?php echo e(__('Expense')); ?></a>
-                                        </li>
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'payment.index' || Request::route()->getName() == 'payment.create' || Request::route()->getName() == 'payment.edit' ? ' active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('payment.index')); ?>"><?php echo e(__('Payment')); ?></a>
-                                        </li>
-                                        <li
-                                            class="dash-item  <?php echo e(Request::route()->getName() == 'debit.note' ? ' active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('debit.note')); ?>"><?php echo e(__('Debit Note')); ?></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            <?php endif; ?>
-                                     <?php if($role->hasPermissionTo('manage chart of account') || 
-                                            $role->hasPermissionTo('manage journal entry') || 
-                                            $role->hasPermissionTo('balance sheet report') ||
-                                             $role->hasPermissionTo('ledger report') ||
-                                             $role->hasPermissionTo('trial balance report')): ?>
-                                <li
-                                    class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'chart-of-account' ||
-                                    Request::segment(1) == 'journal-entry' ||
-                                    Request::segment(2) == 'profit-loss' ||
-                                    Request::segment(2) == 'ledger' ||
-                                    Request::segment(2) == 'balance-sheet' ||
-                                    Request::segment(2) == 'trial-balance'
-                                        ? 'active dash-trigger'
-                                        : ''); ?>">
-                                    <a class="dash-link" href="#"><?php echo e(__('Double Entry')); ?><span
-                                            class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
-                                    <ul class="dash-submenu">
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'chart-of-account.index' || Request::route()->getName() == 'chart-of-account.show' ? ' active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('chart-of-account.index')); ?>"><?php echo e(__('Chart of Accounts')); ?></a>
-                                        </li>
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'journal-entry.edit' ||
-                                            Request::route()->getName() == 'journal-entry.create' ||
-                                            Request::route()->getName() == 'journal-entry.index' ||
-                                            Request::route()->getName() == 'journal-entry.show'
-                                                ? ' active'
-                                                : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('journal-entry.index')); ?>"><?php echo e(__('Journal Account')); ?></a>
-                                        </li>
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'report.ledger' ? ' active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('report.ledger', 0)); ?>"><?php echo e(__('Ledger Summary')); ?></a>
-                                        </li>
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'report.balance.sheet' ? ' active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('report.balance.sheet')); ?>"><?php echo e(__('Balance Sheet')); ?></a>
-                                        </li>
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'report.profit.loss' ? ' active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('report.profit.loss')); ?>"><?php echo e(__('Profit & Loss')); ?></a>
-                                        </li>
+                                            <li
+                                                class="dash-item <?php echo e(Request::route()->getName() == 'revenue.index' || Request::route()->getName() == 'revenue.create' || Request::route()->getName() == 'revenue.edit' ? ' active' : ''); ?>">
+                                                <a class="dash-link"
+                                                    href="<?php echo e(route('revenue.index')); ?>"><?php echo e(__('Revenue')); ?></a>
+                                            </li>
+                                            <li
+                                                class="dash-item <?php echo e(Request::route()->getName() == 'credit.note' ? ' active' : ''); ?>">
+                                                <a class="dash-link"
+                                                    href="<?php echo e(route('credit.note')); ?>"><?php echo e(__('Credit Note')); ?></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                <?php endif; ?>
+                                <?php if(
+                                    $role->hasPermissionTo('manage vender') ||
+                                        $role->hasPermissionTo('manage bill') ||
+                                        $role->hasPermissionTo('manage payment') ||
+                                        $role->hasPermissionTo('manage debit note')): ?>
+                                    <li
+                                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'bill' || Request::segment(1) == 'vender' || Request::segment(1) == 'expense' || Request::segment(1) == 'payment' || Request::segment(1) == 'debit-note' ? 'active dash-trigger' : ''); ?>">
+                                        <a class="dash-link" href="#"><?php echo e(__('Purchases')); ?><span
+                                                class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
+                                        <ul class="dash-submenu">
+                                            <?php if($role->hasPermissionTo('manage vender')): ?>
+                                                <li
+                                                    class="dash-item <?php echo e(Request::segment(1) == 'vender' ? 'active' : ''); ?>">
+                                                    <a class="dash-link"
+                                                        href="<?php echo e(route('vender.index')); ?>"><?php echo e(__('Suppiler')); ?></a>
+                                                </li>
+                                            <?php endif; ?>
+                                            <li
+                                                class="dash-item <?php echo e(Request::route()->getName() == 'bill.index' || Request::route()->getName() == 'bill.create' || Request::route()->getName() == 'bill.edit' || Request::route()->getName() == 'bill.show' ? ' active' : ''); ?>">
+                                                <a class="dash-link"
+                                                    href="<?php echo e(route('bill.index')); ?>"><?php echo e(__('Bill')); ?></a>
+                                            </li>
+                                            <li
+                                                class="dash-item <?php echo e(Request::route()->getName() == 'expense.index' || Request::route()->getName() == 'expense.create' || Request::route()->getName() == 'expense.edit' || Request::route()->getName() == 'expense.show' ? ' active' : ''); ?>">
+                                                <a class="dash-link"
+                                                    href="<?php echo e(route('expense.index')); ?>"><?php echo e(__('Expense')); ?></a>
+                                            </li>
+                                            <li
+                                                class="dash-item <?php echo e(Request::route()->getName() == 'payment.index' || Request::route()->getName() == 'payment.create' || Request::route()->getName() == 'payment.edit' ? ' active' : ''); ?>">
+                                                <a class="dash-link"
+                                                    href="<?php echo e(route('payment.index')); ?>"><?php echo e(__('Payment')); ?></a>
+                                            </li>
+                                            <li
+                                                class="dash-item  <?php echo e(Request::route()->getName() == 'debit.note' ? ' active' : ''); ?>">
+                                                <a class="dash-link"
+                                                    href="<?php echo e(route('debit.note')); ?>"><?php echo e(__('Debit Note')); ?></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                <?php endif; ?>
+                                <?php if(
+                                    $role->hasPermissionTo('manage chart of account') ||
+                                        $role->hasPermissionTo('manage journal entry') ||
+                                        $role->hasPermissionTo('balance sheet report') ||
+                                        $role->hasPermissionTo('ledger report') ||
+                                        $role->hasPermissionTo('trial balance report')): ?>
+                                    <li
+                                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'chart-of-account' ||
+                                        Request::segment(1) == 'journal-entry' ||
+                                        Request::segment(2) == 'profit-loss' ||
+                                        Request::segment(2) == 'ledger' ||
+                                        Request::segment(2) == 'balance-sheet' ||
+                                        Request::segment(2) == 'trial-balance'
+                                            ? 'active dash-trigger'
+                                            : ''); ?>">
+                                        <a class="dash-link" href="#"><?php echo e(__('Double Entry')); ?><span
+                                                class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
+                                        <ul class="dash-submenu">
+                                            <li
+                                                class="dash-item <?php echo e(Request::route()->getName() == 'chart-of-account.index' || Request::route()->getName() == 'chart-of-account.show' ? ' active' : ''); ?>">
+                                                <a class="dash-link"
+                                                    href="<?php echo e(route('chart-of-account.index')); ?>"><?php echo e(__('Chart of Accounts')); ?></a>
+                                            </li>
+                                            <li
+                                                class="dash-item <?php echo e(Request::route()->getName() == 'journal-entry.edit' ||
+                                                Request::route()->getName() == 'journal-entry.create' ||
+                                                Request::route()->getName() == 'journal-entry.index' ||
+                                                Request::route()->getName() == 'journal-entry.show'
+                                                    ? ' active'
+                                                    : ''); ?>">
+                                                <a class="dash-link"
+                                                    href="<?php echo e(route('journal-entry.index')); ?>"><?php echo e(__('Journal Account')); ?></a>
+                                            </li>
+                                            <li
+                                                class="dash-item <?php echo e(Request::route()->getName() == 'report.ledger' ? ' active' : ''); ?>">
+                                                <a class="dash-link"
+                                                    href="<?php echo e(route('report.ledger', 0)); ?>"><?php echo e(__('Ledger Summary')); ?></a>
+                                            </li>
+                                            <li
+                                                class="dash-item <?php echo e(Request::route()->getName() == 'report.balance.sheet' ? ' active' : ''); ?>">
+                                                <a class="dash-link"
+                                                    href="<?php echo e(route('report.balance.sheet')); ?>"><?php echo e(__('Balance Sheet')); ?></a>
+                                            </li>
+                                            <li
+                                                class="dash-item <?php echo e(Request::route()->getName() == 'report.profit.loss' ? ' active' : ''); ?>">
+                                                <a class="dash-link"
+                                                    href="<?php echo e(route('report.profit.loss')); ?>"><?php echo e(__('Profit & Loss')); ?></a>
+                                            </li>
 
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'trial.balance' ? ' active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('trial.balance')); ?>"><?php echo e(__('Trial Balance')); ?></a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            <?php endif; ?>
-                            <?php if(\Auth::user()->type == 'company'): ?>
-                                <li class="dash-item <?php echo e(Request::segment(1) == 'budget' ? 'active' : ''); ?>">
-                                    <a class="dash-link"
-                                        href="<?php echo e(route('budget.index')); ?>"><?php echo e(__('Budget Planner')); ?></a>
-                                </li>
-                            <?php endif; ?>
+                                            <li
+                                                class="dash-item <?php echo e(Request::route()->getName() == 'trial.balance' ? ' active' : ''); ?>">
+                                                <a class="dash-link"
+                                                    href="<?php echo e(route('trial.balance')); ?>"><?php echo e(__('Trial Balance')); ?></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                <?php endif; ?>
+                                <?php if(\Auth::user()->type == 'company'): ?>
+                                    <li class="dash-item <?php echo e(Request::segment(1) == 'budget' ? 'active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('budget.index')); ?>"><?php echo e(__('Budget Planner')); ?></a>
+                                    </li>
+                                <?php endif; ?>
 
-                             <?php if($role->hasPermissionTo('manage goal')): ?>
-                                <li class="dash-item <?php echo e(Request::segment(1) == 'goal' ? 'active' : ''); ?>">
-                                    <a class="dash-link"
-                                        href="<?php echo e(route('goal.index')); ?>"><?php echo e(__('Financial Goal')); ?></a>
-                                </li>
-                            <?php endif; ?>
+                                <?php if($role->hasPermissionTo('manage goal')): ?>
+                                    <li class="dash-item <?php echo e(Request::segment(1) == 'goal' ? 'active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('goal.index')); ?>"><?php echo e(__('Financial Goal')); ?></a>
+                                    </li>
+                                <?php endif; ?>
 
-                                     <?php if($role->hasPermissionTo('manage constant tax') || 
-                                            $role->hasPermissionTo('manage constant category') || 
-                                            $role->hasPermissionTo('manage constant unit') ||
-                                             $role->hasPermissionTo('manage constant payment method') || 
-                                             $role->hasPermissionTo('manage constant custom field')): ?>
-                                <li
-                                    class="dash-item <?php echo e(Request::segment(1) == 'taxes' || Request::segment(1) == 'product-category' || Request::segment(1) == 'product-unit' || Request::segment(1) == 'payment-method' || Request::segment(1) == 'custom-field' || Request::segment(1) == 'chart-of-account-type' ? 'active dash-trigger' : ''); ?>">
-                                    <a class="dash-link"
-                                        href="<?php echo e(route('taxes.index')); ?>"><?php echo e(__('Accounting Setup')); ?></a>
-                                </li>
-                            <?php endif; ?>
-                            <?php if($role->hasPermissionTo('manage print settings')): ?>
-                                <li
-                                    class="dash-item <?php echo e(Request::route()->getName() == 'print-setting' ? ' active' : ''); ?>">
-                                    <a class="dash-link"
-                                        href="<?php echo e(route('print.setting')); ?>"><?php echo e(__('Print Settings')); ?></a>
-                                </li>
-                            <?php endif; ?>
+                                <?php if(
+                                    $role->hasPermissionTo('manage constant tax') ||
+                                        $role->hasPermissionTo('manage constant category') ||
+                                        $role->hasPermissionTo('manage constant unit') ||
+                                        $role->hasPermissionTo('manage constant payment method') ||
+                                        $role->hasPermissionTo('manage constant custom field')): ?>
+                                    <li
+                                        class="dash-item <?php echo e(Request::segment(1) == 'taxes' || Request::segment(1) == 'product-category' || Request::segment(1) == 'product-unit' || Request::segment(1) == 'payment-method' || Request::segment(1) == 'custom-field' || Request::segment(1) == 'chart-of-account-type' ? 'active dash-trigger' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('taxes.index')); ?>"><?php echo e(__('Accounting Setup')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+                                <?php if($role->hasPermissionTo('manage print settings')): ?>
+                                    <li
+                                        class="dash-item <?php echo e(Request::route()->getName() == 'print-setting' ? ' active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('print.setting')); ?>"><?php echo e(__('Print Settings')); ?></a>
+                                    </li>
+                                <?php endif; ?>
 
-                        </ul>
-                    </li>
-                <?php endif; ?>
-            <?php endif; ?>
-
-            <!--------------------- End Account ----------------------------------->
-
-            <!--------------------- Start CRM ----------------------------------->
-
-            <?php if(!empty($userPlan) &&  $userPlan->crm == 1): ?>
-                         <?php if($role->hasPermissionTo('manage lead') || 
-                                            $role->hasPermissionTo('manage deal') || 
-                                            $role->hasPermissionTo('manage form builder') ||
-                                             $role->hasPermissionTo('manage contract')): ?>
-                    <li
-                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'stages' || Request::segment(1) == 'labels' || Request::segment(1) == 'sources' || Request::segment(1) == 'lead_stages' || Request::segment(1) == 'pipelines' || Request::segment(1) == 'deals' || Request::segment(1) == 'leads' || Request::segment(1) == 'form_builder' || Request::segment(1) == 'form_response' || Request::segment(1) == 'contract' ? ' active dash-trigger' : ''); ?>">
-                        <a href="#!" class="dash-link"><span class="dash-micon"><i
-                                    class="ti ti-layers-difference"></i></span><span
-                                class="dash-mtext"><?php echo e(__('CRM System')); ?></span><span class="dash-arrow"><i
-                                    data-feather="chevron-right"></i></span></a>
-                        <ul
-                            class="dash-submenu <?php echo e(Request::segment(1) == 'stages' || Request::segment(1) == 'labels' || Request::segment(1) == 'sources' || Request::segment(1) == 'lead_stages' || Request::segment(1) == 'leads' || Request::segment(1) == 'form_builder' || Request::segment(1) == 'form_response' || Request::segment(1) == 'deals' || Request::segment(1) == 'pipelines' ? 'show' : ''); ?>">
-                            <?php if($role->hasPermissionTo('manage lead')): ?>
-                                <li
-                                    class="dash-item <?php echo e(Request::route()->getName() == 'leads.list' || Request::route()->getName() == 'leads.index' || Request::route()->getName() == 'leads.show' ? ' active' : ''); ?>">
-                                    <a class="dash-link" href="<?php echo e(route('leads.index')); ?>"><?php echo e(__('Leads')); ?></a>
-                                </li>
-                            <?php endif; ?>
-                              <?php if($role->hasPermissionTo('manage deal')): ?>
-                                <li
-                                    class="dash-item <?php echo e(Request::route()->getName() == 'deals.list' || Request::route()->getName() == 'deals.index' || Request::route()->getName() == 'deals.show' ? ' active' : ''); ?>">
-                                    <a class="dash-link" href="<?php echo e(route('deals.index')); ?>"><?php echo e(__('Deals')); ?></a>
-                                </li>
-                            <?php endif; ?>
-
-                               <?php if($role->hasPermissionTo('manage form builder')): ?>
-                                <li
-                                    class="dash-item <?php echo e(Request::segment(1) == 'form_builder' || Request::segment(1) == 'form_response' ? 'active open' : ''); ?>">
-                                    <a class="dash-link"
-                                        href="<?php echo e(route('form_builder.index')); ?>"><?php echo e(__('Form Builder')); ?></a>
-                                </li>
-                            <?php endif; ?>
-
-                             <?php if($role->hasPermissionTo('manage contract')): ?>
-                                <li
-                                    class="dash-item  <?php echo e(Request::route()->getName() == 'contract.index' || Request::route()->getName() == 'contract.show' ? 'active' : ''); ?>">
-                                    <a class="dash-link"
-                                        href="<?php echo e(route('contract.index')); ?>"><?php echo e(__('Contract')); ?></a>
-                                </li>
-                    <?php endif; ?>
-
-                             <?php if($role->hasPermissionTo('manage lead stage') || 
-                                            $role->hasPermissionTo('manage pipeline') || 
-                                            $role->hasPermissionTo('manage source') ||
-                                             $role->hasPermissionTo('manage label') || 
-                                             $role->hasPermissionTo('manage stage')): ?>
-                        <li
-                            class="dash-item  <?php echo e(Request::segment(1) == 'stages' || Request::segment(1) == 'labels' || Request::segment(1) == 'sources' || Request::segment(1) == 'lead_stages' || Request::segment(1) == 'pipelines' || Request::segment(1) == 'product-category' || Request::segment(1) == 'product-unit' || Request::segment(1) == 'payment-method' || Request::segment(1) == 'custom-field' || Request::segment(1) == 'chart-of-account-type' ? 'active dash-trigger' : ''); ?>">
-                            <a class="dash-link"
-                                href="<?php echo e(route('pipelines.index')); ?>   "><?php echo e(__('CRM System Setup')); ?></a>
-
+                            </ul>
                         </li>
                     <?php endif; ?>
-            </ul>
-            </li>
-        <?php endif; ?>
-        <?php endif; ?>
+                <?php endif; ?>
 
-        <!--------------------- End CRM ----------------------------------->
+                <!--------------------- End Account ----------------------------------->
 
-        <!--------------------- Start Project ----------------------------------->
+                <!--------------------- Start CRM ----------------------------------->
 
-        <?php if(!empty($userPlan) &&  $userPlan->project == 1): ?>
-              <?php if($role->hasPermissionTo('manage project')): ?>
-                <li
-                    class="dash-item dash-hasmenu
+                <?php if(!empty($userPlan) && $userPlan->crm == 1): ?>
+                    <?php if(
+                        $role->hasPermissionTo('manage lead') ||
+                            $role->hasPermissionTo('manage deal') ||
+                            $role->hasPermissionTo('manage form builder') ||
+                            $role->hasPermissionTo('manage contract')): ?>
+                        <li
+                            class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'stages' || Request::segment(1) == 'labels' || Request::segment(1) == 'sources' || Request::segment(1) == 'lead_stages' || Request::segment(1) == 'pipelines' || Request::segment(1) == 'deals' || Request::segment(1) == 'leads' || Request::segment(1) == 'form_builder' || Request::segment(1) == 'form_response' || Request::segment(1) == 'contract' ? ' active dash-trigger' : ''); ?>">
+                            <a href="#!" class="dash-link"><span class="dash-micon"><i
+                                        class="ti ti-layers-difference"></i></span><span
+                                    class="dash-mtext"><?php echo e(__('CRM System')); ?></span><span class="dash-arrow"><i
+                                        data-feather="chevron-right"></i></span></a>
+                            <ul
+                                class="dash-submenu <?php echo e(Request::segment(1) == 'stages' || Request::segment(1) == 'labels' || Request::segment(1) == 'sources' || Request::segment(1) == 'lead_stages' || Request::segment(1) == 'leads' || Request::segment(1) == 'form_builder' || Request::segment(1) == 'form_response' || Request::segment(1) == 'deals' || Request::segment(1) == 'pipelines' ? 'show' : ''); ?>">
+                                <?php if($role->hasPermissionTo('manage lead')): ?>
+                                    <li
+                                        class="dash-item <?php echo e(Request::route()->getName() == 'leads.list' || Request::route()->getName() == 'leads.index' || Request::route()->getName() == 'leads.show' ? ' active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('leads.index')); ?>"><?php echo e(__('Leads')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+                                <?php if($role->hasPermissionTo('manage deal')): ?>
+                                    <li
+                                        class="dash-item <?php echo e(Request::route()->getName() == 'deals.list' || Request::route()->getName() == 'deals.index' || Request::route()->getName() == 'deals.show' ? ' active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('deals.index')); ?>"><?php echo e(__('Deals')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+
+                                <?php if($role->hasPermissionTo('manage form builder')): ?>
+                                    <li
+                                        class="dash-item <?php echo e(Request::segment(1) == 'form_builder' || Request::segment(1) == 'form_response' ? 'active open' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('form_builder.index')); ?>"><?php echo e(__('Form Builder')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+
+                                <?php if($role->hasPermissionTo('manage contract')): ?>
+                                    <li
+                                        class="dash-item  <?php echo e(Request::route()->getName() == 'contract.index' || Request::route()->getName() == 'contract.show' ? 'active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('contract.index')); ?>"><?php echo e(__('Contract')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+
+                                <?php if(
+                                    $role->hasPermissionTo('manage lead stage') ||
+                                        $role->hasPermissionTo('manage pipeline') ||
+                                        $role->hasPermissionTo('manage source') ||
+                                        $role->hasPermissionTo('manage label') ||
+                                        $role->hasPermissionTo('manage stage')): ?>
+                                    <li
+                                        class="dash-item  <?php echo e(Request::segment(1) == 'stages' || Request::segment(1) == 'labels' || Request::segment(1) == 'sources' || Request::segment(1) == 'lead_stages' || Request::segment(1) == 'pipelines' || Request::segment(1) == 'product-category' || Request::segment(1) == 'product-unit' || Request::segment(1) == 'payment-method' || Request::segment(1) == 'custom-field' || Request::segment(1) == 'chart-of-account-type' ? 'active dash-trigger' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('pipelines.index')); ?>   "><?php echo e(__('CRM System Setup')); ?></a>
+
+                                    </li>
+                                <?php endif; ?>
+                            </ul>
+                        </li>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                <!--------------------- End CRM ----------------------------------->
+
+                <!--------------------- Start Project ----------------------------------->
+
+                <?php if(!empty($userPlan) && $userPlan->project == 1): ?>
+                    <?php if($role->hasPermissionTo('manage project')): ?>
+                        <li
+                            class="dash-item dash-hasmenu
                                             <?php echo e(Request::segment(1) == 'project' ||
                                             Request::segment(1) == 'bugs-report' ||
                                             Request::segment(1) == 'bugstatus' ||
@@ -1188,423 +1211,463 @@
                                             Request::segment(1) == 'project_report'
                                                 ? 'active dash-trigger'
                                                 : ''); ?>">
-                    <a href="#!" class="dash-link"><span class="dash-micon"><i
-                                class="ti ti-share"></i></span><span
-                            class="dash-mtext"><?php echo e(__('Project System')); ?></span><span class="dash-arrow"><i
-                                data-feather="chevron-right"></i></span></a>
-                    <ul class="dash-submenu">
+                            <a href="#!" class="dash-link"><span class="dash-micon"><i
+                                        class="ti ti-share"></i></span><span
+                                    class="dash-mtext"><?php echo e(__('Project System')); ?></span><span class="dash-arrow"><i
+                                        data-feather="chevron-right"></i></span></a>
+                            <ul class="dash-submenu">
 
-                        <?php if($role->hasPermissionTo('manage project')): ?>
-                            <li
-                                class="dash-item  <?php echo e(Request::segment(1) == 'project' || Request::route()->getName() == 'projects.list' || Request::route()->getName() == 'projects.list' || Request::route()->getName() == 'projects.index' || Request::route()->getName() == 'projects.show' || request()->is('projects/*') ? 'active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('projects.index')); ?>"><?php echo e(__('Projects')); ?></a>
-                            </li>
-                        <?php endif; ?>
+                                <?php if($role->hasPermissionTo('manage project')): ?>
+                                    <li
+                                        class="dash-item  <?php echo e(Request::segment(1) == 'project' || Request::route()->getName() == 'projects.list' || Request::route()->getName() == 'projects.list' || Request::route()->getName() == 'projects.index' || Request::route()->getName() == 'projects.show' || request()->is('projects/*') ? 'active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('projects.index')); ?>"><?php echo e(__('Projects')); ?></a>
+                                    </li>
+                                <?php endif; ?>
 
-                         <?php if($role->hasPermissionTo('manage project task')): ?>
-                            <li class="dash-item <?php echo e(request()->is('taskboard*') ? 'active' : ''); ?>">
-                                <a class="dash-link"
-                                    href="<?php echo e(route('taskBoard.view', 'list')); ?>"><?php echo e(__('Tasks')); ?></a>
-                            </li>
-                        <?php endif; ?>
-                         <?php if($role->hasPermissionTo('manage timesheet')): ?>
-                            <li class="dash-item <?php echo e(request()->is('timesheet-list*') ? 'active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('timesheet.list')); ?>"><?php echo e(__('Timesheet')); ?></a>
-                            </li>
-                        <?php endif; ?>
+                                <?php if($role->hasPermissionTo('manage project task')): ?>
+                                    <li class="dash-item <?php echo e(request()->is('taskboard*') ? 'active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('taskBoard.view', 'list')); ?>"><?php echo e(__('Tasks')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+                                <?php if($role->hasPermissionTo('manage timesheet')): ?>
+                                    <li class="dash-item <?php echo e(request()->is('timesheet-list*') ? 'active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('timesheet.list')); ?>"><?php echo e(__('Timesheet')); ?></a>
+                                    </li>
+                                <?php endif; ?>
 
-                           <?php if($role->hasPermissionTo('manage bug report')): ?>
-                            <li class="dash-item <?php echo e(request()->is('bugs-report*') ? 'active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('bugs.view', 'list')); ?>"><?php echo e(__('Bug')); ?></a>
-                            </li>
-                        <?php endif; ?>
+                                <?php if($role->hasPermissionTo('manage bug report')): ?>
+                                    <li class="dash-item <?php echo e(request()->is('bugs-report*') ? 'active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('bugs.view', 'list')); ?>"><?php echo e(__('Bug')); ?></a>
+                                    </li>
+                                <?php endif; ?>
 
-                        <?php if($role->hasPermissionTo('manage project task')): ?>
-                            <li class="dash-item <?php echo e(request()->is('calendar*') ? 'active' : ''); ?>">
-                                <a class="dash-link"
-                                    href="<?php echo e(route('task.calendar', ['all'])); ?>"><?php echo e(__('Task Calendar')); ?></a>
-                            </li>
-                        <?php endif; ?>
+                                <?php if($role->hasPermissionTo('manage project task')): ?>
+                                    <li class="dash-item <?php echo e(request()->is('calendar*') ? 'active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('task.calendar', ['all'])); ?>"><?php echo e(__('Task Calendar')); ?></a>
+                                    </li>
+                                <?php endif; ?>
 
-                        <?php if(\Auth::user()->type != 'super admin'): ?>
-                            <li class="dash-item  <?php echo e(Request::segment(1) == 'time-tracker' ? 'active open' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('time.tracker')); ?>"><?php echo e(__('Tracker')); ?></a>
-                            </li>
-                        <?php endif; ?>
-                        <?php if(\Auth::user()->type == 'company' || \Auth::user()->type == 'Employee'): ?>
-                            <li
-                                class="dash-item  <?php echo e(Request::route()->getName() == 'project_report.index' || Request::route()->getName() == 'project_report.show' ? 'active' : ''); ?>">
-                                <a class="dash-link"
-                                    href="<?php echo e(route('project_report.index')); ?>"><?php echo e(__('Project Report')); ?></a>
-                            </li>
-                        <?php endif; ?>
+                                <?php if(\Auth::user()->type != 'super admin'): ?>
+                                    <li
+                                        class="dash-item  <?php echo e(Request::segment(1) == 'time-tracker' ? 'active open' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('time.tracker')); ?>"><?php echo e(__('Tracker')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+                                <?php if(\Auth::user()->type == 'company' || \Auth::user()->type == 'Employee'): ?>
+                                    <li
+                                        class="dash-item  <?php echo e(Request::route()->getName() == 'project_report.index' || Request::route()->getName() == 'project_report.show' ? 'active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('project_report.index')); ?>"><?php echo e(__('Project Report')); ?></a>
+                                    </li>
+                                <?php endif; ?>
 
-                          <?php if($role->hasPermissionTo('manage project task stage') || $role->hasPermissionTo('manage bug status')): ?>
-                            <li
-                                class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'bugstatus' || Request::segment(1) == 'project-task-stages' ? 'active dash-trigger' : ''); ?>">
-                                <a class="dash-link" href="#"><?php echo e(__('Project System Setup')); ?><span
-                                        class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
-                                <ul class="dash-submenu">
-                                      <?php if($role->hasPermissionTo('manage project task stage')): ?>
-                                        <li
-                                            class="dash-item  <?php echo e(Request::route()->getName() == 'project-task-stages.index' ? 'active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('project-task-stages.index')); ?>"><?php echo e(__('Project Task Stages')); ?></a>
-                                        </li>
-                                    <?php endif; ?>
-                                     <?php if($role->hasPermissionTo('manage bug status')): ?>
-                                        <li
-                                            class="dash-item <?php echo e(Request::route()->getName() == 'bugstatus.index' ? 'active' : ''); ?>">
-                                            <a class="dash-link"
-                                                href="<?php echo e(route('bugstatus.index')); ?>"><?php echo e(__('Bug Status')); ?></a>
-                                        </li>
-                                    <?php endif; ?>
-                                </ul>
-                            </li>
-                        <?php endif; ?>
-                    </ul>
-                </li>
-            <?php endif; ?>
-        <?php endif; ?>
-
-        <!--------------------- End Project ----------------------------------->
-
-
-
-        <!--------------------- Start User Managaement System ----------------------------------->
-
-        <?php if(
-            \Auth::user()->type != 'super admin' &&
-                $role->hasPermissionTo('manage user') || $role->hasPermissionTo('manage role')|| $role->hasPermissionTo('manage client')): ?>
-
-            <li
-                class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'users' ||
-                Request::segment(1) == 'roles' ||
-                Request::segment(1) == 'clients' ||
-                Request::segment(1) == 'userlogs'
-                    ? ' active dash-trigger'
-                    : ''); ?>">
-
-                <a href="#!" class="dash-link "><span class="dash-micon"><i
-                            class="ti ti-users"></i></span><span
-                        class="dash-mtext"><?php echo e(__('User Management')); ?></span><span class="dash-arrow"><i
-                            data-feather="chevron-right"></i></span></a>
-                <ul class="dash-submenu">
-
-
-                      <?php if($role->hasPermissionTo('manage user')): ?>
-                        <li
-                            class="dash-item <?php echo e(Request::route()->getName() == 'users.index' || Request::route()->getName() == 'users.create' || Request::route()->getName() == 'users.edit' || Request::route()->getName() == 'user.userlog' ? ' active' : ''); ?>">
-                            <a class="dash-link" href="<?php echo e(route('users.index')); ?>"><?php echo e(__('User')); ?></a>
+                                <?php if($role->hasPermissionTo('manage project task stage') || $role->hasPermissionTo('manage bug status')): ?>
+                                    <li
+                                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'bugstatus' || Request::segment(1) == 'project-task-stages' ? 'active dash-trigger' : ''); ?>">
+                                        <a class="dash-link" href="#"><?php echo e(__('Project System Setup')); ?><span
+                                                class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
+                                        <ul class="dash-submenu">
+                                            <?php if($role->hasPermissionTo('manage project task stage')): ?>
+                                                <li
+                                                    class="dash-item  <?php echo e(Request::route()->getName() == 'project-task-stages.index' ? 'active' : ''); ?>">
+                                                    <a class="dash-link"
+                                                        href="<?php echo e(route('project-task-stages.index')); ?>"><?php echo e(__('Project Task Stages')); ?></a>
+                                                </li>
+                                            <?php endif; ?>
+                                            <?php if($role->hasPermissionTo('manage bug status')): ?>
+                                                <li
+                                                    class="dash-item <?php echo e(Request::route()->getName() == 'bugstatus.index' ? 'active' : ''); ?>">
+                                                    <a class="dash-link"
+                                                        href="<?php echo e(route('bugstatus.index')); ?>"><?php echo e(__('Bug Status')); ?></a>
+                                                </li>
+                                            <?php endif; ?>
+                                        </ul>
+                                    </li>
+                                <?php endif; ?>
+                            </ul>
                         </li>
                     <?php endif; ?>
-                      <?php if($role->hasPermissionTo('manage role')): ?>
-                    
-                        <li
-                            class="dash-item <?php echo e(Request::route()->getName() == 'roles.index' || Request::route()->getName() == 'roles.create' || Request::route()->getName() == 'roles.edit' ? ' active' : ''); ?> ">
-                            <a class="dash-link" href="<?php echo e(route('roles.index')); ?>"><?php echo e(__('Role')); ?></a>
-                        </li>
-                    <?php endif; ?>
-                     <?php if($role->hasPermissionTo('manage client')): ?>
-                        <li
-                            class="dash-item <?php echo e(Request::route()->getName() == 'clients.index' || Request::segment(1) == 'clients' || Request::route()->getName() == 'clients.edit' ? ' active' : ''); ?>">
-                            <a class="dash-link" href="<?php echo e(route('clients.index')); ?>"><?php echo e(__('Client')); ?></a>
-                        </li>
-                    <?php endif; ?>
-                    
-                    
-                    
-                    
-                    
-                </ul>
-            </li>
-        <?php endif; ?>
+                <?php endif; ?>
 
-        <!--------------------- End User Managaement System----------------------------------->
+                <!--------------------- End Project ----------------------------------->
 
 
-        <!--------------------- Start Products System ----------------------------------->
 
-        <?php if($role->hasPermissionTo('manage product & service') || $role->hasPermissionTo('manage product & service')): ?>
-            <li class="dash-item dash-hasmenu">
-                <a href="#!" class="dash-link ">
-                    <span class="dash-micon"><i class="ti ti-shopping-cart"></i></span><span
-                        class="dash-mtext"><?php echo e(__('Products System')); ?></span><span class="dash-arrow">
-                        <i data-feather="chevron-right"></i></span>
-                </a>
-                <ul class="dash-submenu">
-                    <?php if($role->hasPermissionTo('manage product & service')): ?>
-                        <li class="dash-item <?php echo e(Request::segment(1) == 'index' ? 'active' : ''); ?>">
-                            <a href="<?php echo e(route('productservice.index')); ?>"
-                                class="dash-link"><?php echo e(__('Products & Services')); ?>
+                <!--------------------- Start User Managaement System ----------------------------------->
 
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                    <?php if($role->hasPermissionTo('manage product & service')): ?>
-                        <li class="dash-item <?php echo e(Request::segment(1) == 'getcodelist' ? 'active' : ''); ?>">
-                            <a href="<?php echo e(route('productservice.getcodelist')); ?>"
-                                class="dash-link"><?php echo e(__('Code List')); ?>
+                <?php if(
+                    (\Auth::user()->type != 'super admin' && $role->hasPermissionTo('manage user')) ||
+                        $role->hasPermissionTo('manage role') ||
+                        $role->hasPermissionTo('manage client')): ?>
 
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                      <?php if($role->hasPermissionTo('manage product & service')): ?>
-                        <li class="dash-item <?php echo e(Request::segment(1) == 'itemclassifications' ? 'active' : ''); ?>">
-                            <a href="<?php echo e(route('productservice.classifications')); ?>"
-                                class="dash-link"><?php echo e(__('Item Classifications')); ?>
-
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                    <?php if($role->hasPermissionTo('manage product & service')): ?>
                     <li
-                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'productstock' ? 'active dash-trigger' : ''); ?>"
-                        href="#"
-                        data-toggle="collapse"
-                        role="button"
-                        aria-expanded="<?php echo e(Request::segment(1) == 'productstock'
-                                            || Request::segment(1) == 'stockadjustment'
-                                            || Request::segment(1) == 'stockinfo'
-                                            ? 'true'
-                                            : 'false'); ?>"
-                    >
-                        <a class="dash-link" href="#">
-                            <?php echo e(__('Product Stock')); ?>
+                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'users' ||
+                        Request::segment(1) == 'roles' ||
+                        Request::segment(1) == 'clients' ||
+                        Request::segment(1) == 'userlogs'
+                            ? ' active dash-trigger'
+                            : ''); ?>">
 
+                        <a href="#!" class="dash-link "><span class="dash-micon"><i
+                                    class="ti ti-users"></i></span><span
+                                class="dash-mtext"><?php echo e(__('User Management')); ?></span><span class="dash-arrow"><i
+                                    data-feather="chevron-right"></i></span></a>
+                        <ul class="dash-submenu">
+
+
+                            <?php if($role->hasPermissionTo('manage user')): ?>
+                                <li
+                                    class="dash-item <?php echo e(Request::route()->getName() == 'users.index' || Request::route()->getName() == 'users.create' || Request::route()->getName() == 'users.edit' || Request::route()->getName() == 'user.userlog' ? ' active' : ''); ?>">
+                                    <a class="dash-link" href="<?php echo e(route('users.index')); ?>"><?php echo e(__('User')); ?></a>
+                                </li>
+                            <?php endif; ?>
+                            <?php if($role->hasPermissionTo('manage role')): ?>
+                                <li
+                                    class="dash-item <?php echo e(Request::route()->getName() == 'roles.index' || Request::route()->getName() == 'roles.create' || Request::route()->getName() == 'roles.edit' ? ' active' : ''); ?> ">
+                                    <a class="dash-link" href="<?php echo e(route('roles.index')); ?>"><?php echo e(__('Role')); ?></a>
+                                </li>
+                            <?php endif; ?>
+                            <?php if($role->hasPermissionTo('manage client')): ?>
+                                <li
+                                    class="dash-item <?php echo e(Request::route()->getName() == 'clients.index' || Request::segment(1) == 'clients' || Request::route()->getName() == 'clients.edit' ? ' active' : ''); ?>">
+                                    <a class="dash-link"
+                                        href="<?php echo e(route('clients.index')); ?>"><?php echo e(__('Client')); ?></a>
+                                </li>
+                            <?php endif; ?>
+                            
+                            
+                            
+                            
+                            
+                        </ul>
+                    </li>
+                <?php endif; ?>
+
+                <!--------------------- End User Managaement System----------------------------------->
+
+
+                <!--------------------- Start Products System ----------------------------------->
+
+                <?php if($role->hasPermissionTo('show crm dashboard') || $role->hasPermissionTo('show crm dashboard')): ?>
+                    <li class="dash-item dash-hasmenu">
+                        <a href="#!" class="dash-link ">
+                            <span class="dash-micon"><i class="ti ti-shopping-cart"></i></span><span
+                                class="dash-mtext"><?php echo e(__('Products System')); ?></span><span class="dash-arrow">
+                                <i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="dash-submenu">
+                            <?php if($role->hasPermissionTo('manage product & service')): ?>
+                                <li class="dash-item <?php echo e(Request::segment(1) == 'index' ? 'active' : ''); ?>">
+                                    <a href="<?php echo e(route('productservice.index')); ?>"
+                                        class="dash-link"><?php echo e(__('Products & Services')); ?>
+
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                            <?php if($role->hasPermissionTo('manage product & service')): ?>
+                                <li class="dash-item <?php echo e(Request::segment(1) == 'getcodelist' ? 'active' : ''); ?>">
+                                    <a href="<?php echo e(route('productservice.getcodelist')); ?>"
+                                        class="dash-link"><?php echo e(__('Code List')); ?>
+
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                            <?php if($role->hasPermissionTo('manage product & service')): ?>
+                                <li
+                                    class="dash-item <?php echo e(Request::segment(1) == 'itemclassifications' ? 'active' : ''); ?>">
+                                    <a href="<?php echo e(route('productservice.classifications')); ?>"
+                                        class="dash-link"><?php echo e(__('Item Classifications')); ?>
+
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                            <?php if($role->hasPermissionTo('manage product & service')): ?>
+                                <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'productstock' ? 'active dash-trigger' : ''); ?>"
+                                    href="#" data-toggle="collapse" role="button"
+                                    aria-expanded="<?php echo e(Request::segment(1) == 'productstock' ||
+                                    Request::segment(1) == 'stockadjustment' ||
+                                    Request::segment(1) == 'stockinfo'
+                                        ? 'true'
+                                        : 'false'); ?>">
+                                    <a class="dash-link" href="#">
+                                        <?php echo e(__('Product Stock')); ?>
+
+                                        <span class="dash-arrow">
+                                            <i data-feather="chevron-right"></i>
+                                        </span>
+                                    </a>
+                                    <ul class="dash-submenu">
+                                        <li
+                                            class="dash-item <?php echo e(request()->is('productstock.index') ? 'active' : ''); ?>">
+                                            <a class="dash-link"
+                                                href="<?php echo e(route('productstock.index')); ?>"><?php echo e(__('Stock')); ?></a>
+                                        </li>
+                                        <li class="dash-item <?php echo e(request()->is('stockmove.index') ? 'active' : ''); ?>">
+                                            <a class="dash-link"
+                                                href="<?php echo e(route('stockmove.index')); ?>"><?php echo e(__('Get Move List')); ?></a>
+                                        </li>
+                                        <li class="dash-item <?php echo e(request()->is('stockadjustment') ? 'active' : ''); ?>">
+                                            <a class="dash-link"
+                                                href="<?php echo e(route('stockadjustment.index')); ?>"><?php echo e(__('Stock Adjustment')); ?></a>
+                                        </li>
+                                        <li
+                                            class="dash-item <?php echo e(request()->is('stockmove.create') ? 'active' : ''); ?>">
+                                            <a class="dash-link"
+                                                href="<?php echo e(route('stockmove.create')); ?>"><?php echo e(__('Move Stock')); ?></a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+
+                <!--------------------- End Products System ----------------------------------->
+
+
+                <!--------------------- Start POs System ----------------------------------->
+                <?php if(!empty($userPlan) && $userPlan->pos == 1): ?>
+                    <?php if(
+                        $role->hasPermissionTo('manage warehouse') ||
+                            $role->hasPermissionTo('manage purchase') ||
+                            $role->hasPermissionTo('manage pos') ||
+                            $role->hasPermissionTo('manage print settings')): ?>
+                        <li
+                            class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'warehouse' || Request::segment(1) == 'purchase' || Request::segment(1) == 'quotation' || in_array(Request::route()->getName(), ['pos.barcode', 'pos.print', 'pos.show']) ? ' active dash-trigger' : ''); ?>">
+                            <a href="#!" class="dash-link">
+                                <span class="dash-micon"><i class="ti ti-layers-difference"></i></span>
+                                <span class="dash-mtext"><?php echo e(__('POS System')); ?></span>
+                                <span class="dash-arrow"><i data-feather="chevron-right"></i></span>
+                            </a>
+                            <ul
+                                class="dash-submenu <?php echo e(Request::segment(1) == 'warehouse' || Request::segment(1) == 'purchase' || in_array(Request::route()->getName(), ['pos.barcode', 'pos.print', 'pos.show']) ? 'show' : ''); ?>">
+
+                                <?php if($role->hasPermissionTo('manage warehouse')): ?>
+                                    <li
+                                        class="dash-item <?php echo e(in_array(Request::route()->getName(), ['warehouse.index', 'warehouse.show']) ? ' active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('warehouse.index')); ?>"><?php echo e(__('Warehouse')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+
+                                <?php if($role->hasPermissionTo('manage purchase')): ?>
+                                    <li
+                                        class="dash-item <?php echo e(Request::route()->getName() == 'purchase.index' ? ' active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('purchase.index')); ?>"><?php echo e(__('Purchase')); ?></a>
+                                    </li>
+                                    <li
+                                        class="dash-item <?php echo e(Request::route()->getName() == 'purchase.mappedPurchases' ? ' active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('purchase.mappedPurchases')); ?>"><?php echo e(__('Mapped Purchase')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+
+                                <?php if($role->hasPermissionTo('manage quotation')): ?>
+                                    <li
+                                        class="dash-item <?php echo e(in_array(Request::route()->getName(), ['quotation.index', 'quotation.create', 'quotation.edit', 'quotation.show']) ? ' active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('quotation.index')); ?>"><?php echo e(__('Quotation')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+
+                                <?php if($role->hasPermissionTo('manage pos')): ?>
+                                    <li
+                                        class="dash-item <?php echo e(Request::route()->getName() == 'pos.index' ? ' active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('pos.index')); ?>"><?php echo e(__(' Add POS')); ?></a>
+                                    </li>
+                                    <li
+                                        class="dash-item <?php echo e(in_array(Request::route()->getName(), ['pos.report', 'pos.show']) ? ' active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('pos.report')); ?>"><?php echo e(__('POS')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+
+                                <?php if($role->hasPermissionTo('manage warehouse')): ?>
+                                    <li
+                                        class="dash-item <?php echo e(in_array(Request::route()->getName(), ['warehouse-transfer.index', 'warehouse-transfer.show']) ? ' active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('warehouse-transfer.index')); ?>"><?php echo e(__('Transfer')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+
+                                <?php if($role->hasPermissionTo('create barcode')): ?>
+                                    <li
+                                        class="dash-item <?php echo e(in_array(Request::route()->getName(), ['pos.barcode', 'pos.print']) ? ' active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('pos.barcode')); ?>"><?php echo e(__('Print Barcode')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+
+                                <?php if($role->hasPermissionTo('manage pos')): ?>
+                                    <li
+                                        class="dash-item <?php echo e(Request::route()->getName() == 'pos.print.setting' ? ' active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('pos.print.setting')); ?>"><?php echo e(__('Print Settings')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+
+                            </ul>
+                        </li>
+
+                    <?php endif; ?>
+                <?php endif; ?>
+                <!--------------------- End POs System ----------------------------------->
+
+                <?php if(\Auth::user()->type == 'company'): ?>
+                    <li
+                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : ''); ?>">
+                        <a href="#!" class="dash-link">
+                            <span class="dash-micon">
+                                <i class="ti ti-layers-difference"></i>
+                            </span>
+                            <span class="dash-mtext"><?php echo e(__('Import Items')); ?></span>
                             <span class="dash-arrow">
                                 <i data-feather="chevron-right"></i>
                             </span>
                         </a>
-                        <ul class="dash-submenu">
-                            <li class="dash-item <?php echo e(request()->is('productstock.index') ? 'active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('productstock.index')); ?>"><?php echo e(__('Stock')); ?></a>
+                        <ul
+                            class="dash-submenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create'); ?>">
+                            <li class="dash-item <?php echo e(Request::route()->getName() == 'index'); ?>">
+                                <a class="dash-link"
+                                    href="<?php echo e(route('importeditems.index')); ?>"><?php echo e(__('Get Import Items')); ?></a>
                             </li>
-                            <li class="dash-item <?php echo e(request()->is('stockmove.index') ? 'active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('stockmove.index')); ?>"><?php echo e(__('Get Move List')); ?></a>
-                            </li>
-                            <li class="dash-item <?php echo e(request()->is('stockadjustment') ? 'active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('stockadjustment.index')); ?>"><?php echo e(__('Stock Adjustment')); ?></a>
-                            </li>
-                            <li class="dash-item <?php echo e(request()->is('stockmove.create') ? 'active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('stockmove.create')); ?>"><?php echo e(__('Move Stock')); ?></a>
+                            <li class="dash-item <?php echo e(Request::route()->getName() == 'create'); ?>">
+                                <a class="dash-link"
+                                    href="<?php echo e(route('importeditems.mapImportedItem')); ?>"><?php echo e(__('Send Import Item')); ?></a>
                             </li>
                         </ul>
                     </li>
+                <?php endif; ?>
+
+                <?php if(\Auth::user()->type != 'super admin'): ?>
+                    <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'support' ? 'active' : ''); ?>">
+                        <a href="<?php echo e(route('support.index')); ?>" class="dash-link">
+                            <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
+                                class="dash-mtext"><?php echo e(__('Support System')); ?></span>
+                        </a>
+                    </li>
+                    <li
+                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'zoom-meeting' || Request::segment(1) == 'zoom-meeting-calender' ? 'active' : ''); ?>">
+                        <a href="<?php echo e(route('zoom-meeting.index')); ?>" class="dash-link">
+                            <span class="dash-micon"><i class="ti ti-user-check"></i></span><span
+                                class="dash-mtext"><?php echo e(__('Zoom Meeting')); ?></span>
+                        </a>
+                    </li>
+                    <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'chats' ? 'active' : ''); ?>">
+                        <a href="<?php echo e(url('chats')); ?>" class="dash-link">
+                            <span class="dash-micon"><i class="ti ti-message-circle"></i></span><span
+                                class="dash-mtext"><?php echo e(__('Messenger')); ?></span>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+                <?php if(\Auth::user()->type == 'company'): ?>
+                    <li
+                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'notification_templates' ? 'active' : ''); ?>">
+                        <a href="<?php echo e(route('notification-templates.index')); ?>" class="dash-link">
+                            <span class="dash-micon"><i class="ti ti-notification"></i></span><span
+                                class="dash-mtext"><?php echo e(__('Notification Template')); ?></span>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+
+                <?php if(\Auth::user()->type == 'super admin'): ?>
+                    <li
+                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'api-initialization' ? 'active' : ''); ?>">
+                        <a href="<?php echo e(route('apiinitialization.index')); ?>" class="dash-link">
+                            <span class="dash-micon">
+                                <i class="ti ti-headphones"></i>
+                            </span>
+                            <span class="dash-mtext">
+                                <?php echo e(__('API Initialization')); ?>
+
+                            </span>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+
+                <?php if(\Auth::user()->type == 'company'): ?>
+                    <li
+                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'compositionlist' ? 'active' : ''); ?>">
+                        <a href="<?php echo e(route('compositionlist.index')); ?>" class="dash-link">
+                            <span class="dash-micon"><i class="ti ti-notification"></i></span><span
+                                class="dash-mtext"><?php echo e(__('Composition List')); ?></span>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+                <!-- <?php if(\Auth::user()->type == 'company'): ?>
+<li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'iteminfomation' ? 'active' : ''); ?>">
+                            <a href="<?php echo e(route('productservice.index')); ?>" class="dash-link">
+                                <span class="dash-micon"><i class="ti ti-notification"></i></span><span
+                                    class="dash-mtext"><?php echo e(__('Product Service')); ?></span>
+                            </a>
+                        </li>
+<?php endif; ?>
+                     -->
+                <!--------------------- Start System Setup ----------------------------------->
+
+                <?php if(\Auth::user()->type != 'super admin'): ?>
+                    <?php if(
+                        $role->hasPermissionTo('manage company plan') ||
+                            $role->hasPermissionTo('manage order') ||
+                            $role->hasPermissionTo('manage company settings')): ?>
+                        <li
+                            class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'settings' ||
+                            Request::segment(1) == 'plans' ||
+                            Request::segment(1) == 'stripe' ||
+                            Request::segment(1) == 'order'
+                                ? ' active dash-trigger'
+                                : ''); ?>">
+                            <a href="#!" class="dash-link">
+                                <span class="dash-micon"><i class="ti ti-settings"></i></span><span
+                                    class="dash-mtext"><?php echo e(__('Settings')); ?></span>
+                                <span class="dash-arrow">
+                                    <i data-feather="chevron-right"></i></span>
+                            </a>
+                            <ul class="dash-submenu">
+                                <?php if($role->hasPermissionTo('manage company settings')): ?>
+                                    <li
+                                        class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'settings' ? ' active' : ''); ?>">
+                                        <a href="<?php echo e(route('settings')); ?>"
+                                            class="dash-link"><?php echo e(__('System Settings')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+                                <?php if($role->hasPermissionTo('manage company plan')): ?>
+                                    <li
+                                        class="dash-item<?php echo e(Request::route()->getName() == 'plans.index' || Request::route()->getName() == 'stripe' ? ' active' : ''); ?>">
+                                        <a href="<?php echo e(route('plans.index')); ?>"
+                                            class="dash-link"><?php echo e(__('Setup Subscription Plan')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+
+                                <?php if($role->hasPermissionTo('manage order') && Auth::user()->type == 'company'): ?>
+                                    )
+                                    <li class="dash-item <?php echo e(Request::segment(1) == 'order' ? 'active' : ''); ?>">
+                                        <a href="<?php echo e(route('order.index')); ?>"
+                                            class="dash-link"><?php echo e(__('Order')); ?></a>
+                                    </li>
+                                <?php endif; ?>
+                            </ul>
+                        </li>
                     <?php endif; ?>
-                </ul>
-            </li>
-        <?php endif; ?>
-
-        <!--------------------- End Products System ----------------------------------->
+                <?php endif; ?>
 
 
-        <!--------------------- Start POs System ----------------------------------->
-        <?php if(!empty($userPlan) &&  $userPlan->pos == 1): ?>
-                    <?php if($role->hasPermissionTo('manage warehouse') ||
-                     $role->hasPermissionTo('manage purchase') ||
-                     $role->hasPermissionTo('manage pos') ||
-                     $role->hasPermissionTo('manage print settings')): ?>
-                <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'warehouse' || Request::segment(1) == 'purchase' || Request::segment(1) == 'quotation' || in_array(Request::route()->getName(), ['pos.barcode', 'pos.print', 'pos.show']) ? ' active dash-trigger' : ''); ?>">
-                    <a href="#!" class="dash-link">
-                        <span class="dash-micon"><i class="ti ti-layers-difference"></i></span>
-                        <span class="dash-mtext"><?php echo e(__('POS System')); ?></span>
-                        <span class="dash-arrow"><i data-feather="chevron-right"></i></span>
-                    </a>
-                    <ul class="dash-submenu <?php echo e(Request::segment(1) == 'warehouse' || Request::segment(1) == 'purchase' || in_array(Request::route()->getName(), ['pos.barcode', 'pos.print', 'pos.show']) ? 'show' : ''); ?>">
-                
-                        <?php if($role->hasPermissionTo('manage warehouse')): ?>
-                            <li class="dash-item <?php echo e(in_array(Request::route()->getName(), ['warehouse.index', 'warehouse.show']) ? ' active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('warehouse.index')); ?>"><?php echo e(__('Warehouse')); ?></a>
-                            </li>
-                        <?php endif; ?>
-                        
-                        <?php if($role->hasPermissionTo('manage purchase')): ?>
-                            <li class="dash-item <?php echo e(Request::route()->getName() == 'purchase.index' ? ' active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('purchase.index')); ?>"><?php echo e(__('Purchase')); ?></a>
-                            </li>
-                            <li class="dash-item <?php echo e(Request::route()->getName() == 'purchase.mappedPurchases' ? ' active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('purchase.mappedPurchases')); ?>"><?php echo e(__('Mapped Purchase')); ?></a>
-                            </li>
-                        <?php endif; ?>
-                
-                        <?php if($role->hasPermissionTo('manage quotation')): ?>
-                            <li class="dash-item <?php echo e(in_array(Request::route()->getName(), ['quotation.index', 'quotation.create', 'quotation.edit', 'quotation.show']) ? ' active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('quotation.index')); ?>"><?php echo e(__('Quotation')); ?></a>
-                            </li>
-                        <?php endif; ?>
-                
-                        <?php if($role->hasPermissionTo('manage pos')): ?>
-                            <li class="dash-item <?php echo e(Request::route()->getName() == 'pos.index' ? ' active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('pos.index')); ?>"><?php echo e(__(' Add POS')); ?></a>
-                            </li>
-                            <li class="dash-item <?php echo e(in_array(Request::route()->getName(), ['pos.report', 'pos.show']) ? ' active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('pos.report')); ?>"><?php echo e(__('POS')); ?></a>
-                            </li>
-                        <?php endif; ?>
-                
-                        <?php if($role->hasPermissionTo('manage warehouse')): ?>
-                            <li class="dash-item <?php echo e(in_array(Request::route()->getName(), ['warehouse-transfer.index', 'warehouse-transfer.show']) ? ' active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('warehouse-transfer.index')); ?>"><?php echo e(__('Transfer')); ?></a>
-                            </li>
-                        <?php endif; ?>
-                
-                        <?php if($role->hasPermissionTo('create barcode')): ?>
-                            <li class="dash-item <?php echo e(in_array(Request::route()->getName(), ['pos.barcode', 'pos.print']) ? ' active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('pos.barcode')); ?>"><?php echo e(__('Print Barcode')); ?></a>
-                            </li>
-                        <?php endif; ?>
-                
-                        <?php if($role->hasPermissionTo('manage pos')): ?>
-                            <li class="dash-item <?php echo e(Request::route()->getName() == 'pos.print.setting' ? ' active' : ''); ?>">
-                                <a class="dash-link" href="<?php echo e(route('pos.print.setting')); ?>"><?php echo e(__('Print Settings')); ?></a>
-                            </li>
-                        <?php endif; ?>
-                
-                    </ul>
-                </li>
-                
-            <?php endif; ?>
-        <?php endif; ?>
-        <!--------------------- End POs System ----------------------------------->
 
-        <?php if(\Auth::user()->type == 'company'): ?>
-        <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create' ? 'active' : ''); ?>">
-            <a href="#!" class="dash-link">
-                <span class="dash-micon">
-                    <i class="ti ti-layers-difference"></i>
-                </span>
-                <span class="dash-mtext"><?php echo e(__('Import Items')); ?></span>
-                <span class="dash-arrow">
-                    <i data-feather="chevron-right"></i>
-                </span>
-            </a>
-            <ul class="dash-submenu <?php echo e(Request::segment(1) == 'index' || Request::segment(1) == 'create'); ?>">
-                <li class="dash-item <?php echo e(Request::route()->getName() == 'index'); ?>">
-                    <a class="dash-link" href="<?php echo e(route('importeditems.index')); ?>"><?php echo e(__('Get Import Items')); ?></a>
-                </li>
-                <li class="dash-item <?php echo e(Request::route()->getName() == 'create'); ?>">
-                <a class="dash-link" href="<?php echo e(route('importeditems.mapImportedItem')); ?>"><?php echo e(__('Send Import Item')); ?></a>
-                </li>
+
+                <!--------------------- End System Setup ----------------------------------->
             </ul>
-        </li>
-        <?php endif; ?>
-
-        <?php if(\Auth::user()->type != 'super admin'): ?>
-            <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'support' ? 'active' : ''); ?>">
-                <a href="<?php echo e(route('support.index')); ?>" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-headphones"></i></span><span
-                        class="dash-mtext"><?php echo e(__('Support System')); ?></span>
-                </a>
-            </li>
-            <li
-                class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'zoom-meeting' || Request::segment(1) == 'zoom-meeting-calender' ? 'active' : ''); ?>">
-                <a href="<?php echo e(route('zoom-meeting.index')); ?>" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-user-check"></i></span><span
-                        class="dash-mtext"><?php echo e(__('Zoom Meeting')); ?></span>
-                </a>
-            </li>
-            <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'chats' ? 'active' : ''); ?>">
-                <a href="<?php echo e(url('chats')); ?>" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-message-circle"></i></span><span
-                        class="dash-mtext"><?php echo e(__('Messenger')); ?></span>
-                </a>
-            </li>
-        <?php endif; ?>
-
-        <?php if(\Auth::user()->type == 'company'): ?>
-            <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'notification_templates' ? 'active' : ''); ?>">
-                <a href="<?php echo e(route('notification-templates.index')); ?>" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-notification"></i></span><span
-                        class="dash-mtext"><?php echo e(__('Notification Template')); ?></span>
-                </a>
-            </li>
-        <?php endif; ?>
-
-
-        <?php if(\Auth::user()->type == 'company'): ?>
-        <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'api-initialization' ? 'active' : ''); ?>">
-            <a href="<?php echo e(route('apiinitialization.index')); ?>" class="dash-link">
-                <span class="dash-micon">
-                    <i class="ti ti-headphones"></i>
-                </span>
-                <span class="dash-mtext">
-                    <?php echo e(__('API Initialization')); ?>
-
-                </span>
-            </a>
-        </li>
-        <?php endif; ?>
-
-
-        <?php if(\Auth::user()->type == 'company'): ?>
-            <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'compositionlist' ? 'active' : ''); ?>">
-                <a href="<?php echo e(route('compositionlist.index')); ?>" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-notification"></i></span><span
-                        class="dash-mtext"><?php echo e(__('Composition List')); ?></span>
-                </a>
-            </li>
-        <?php endif; ?>
-
-         <!-- <?php if(\Auth::user()->type == 'company'): ?>
-            <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'iteminfomation' ? 'active' : ''); ?>">
-                <a href="<?php echo e(route('productservice.index')); ?>" class="dash-link">
-                    <span class="dash-micon"><i class="ti ti-notification"></i></span><span
-                        class="dash-mtext"><?php echo e(__('Product Service')); ?></span>
-                </a>
-            </li>
-        <?php endif; ?>
-         -->
-        <!--------------------- Start System Setup ----------------------------------->
-
-        <?php if(\Auth::user()->type != 'super admin'): ?>
-              <?php if($role->hasPermissionTo('manage company plan') ||
-                     $role->hasPermissionTo('manage order') ||
-                     $role->hasPermissionTo('manage company settings')): ?>
-                <li
-                    class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'settings' ||
-                    Request::segment(1) == 'plans' ||
-                    Request::segment(1) == 'stripe' ||
-                    Request::segment(1) == 'order'
-                        ? ' active dash-trigger'
-                        : ''); ?>">
-                    <a href="#!" class="dash-link">
-                        <span class="dash-micon"><i class="ti ti-settings"></i></span><span
-                            class="dash-mtext"><?php echo e(__('Settings')); ?></span>
-                        <span class="dash-arrow">
-                            <i data-feather="chevron-right"></i></span>
-                    </a>
-                    <ul class="dash-submenu">
-                        <?php if($role->hasPermissionTo('manage company settings')): ?>
-                            <li
-                                class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'settings' ? ' active' : ''); ?>">
-                                <a href="<?php echo e(route('settings')); ?>"
-                                    class="dash-link"><?php echo e(__('System Settings')); ?></a>
-                            </li>
-                        <?php endif; ?>
-                        <?php if($role->hasPermissionTo('manage company plan')): ?>
-                            <li
-                                class="dash-item<?php echo e(Request::route()->getName() == 'plans.index' || Request::route()->getName() == 'stripe' ? ' active' : ''); ?>">
-                                <a href="<?php echo e(route('plans.index')); ?>"
-                                    class="dash-link"><?php echo e(__('Setup Subscription Plan')); ?></a>
-                            </li>
-                        <?php endif; ?>
-
-                        <?php if($role->hasPermissionTo('manage order') && Auth::user()->type == 'company'): ?>)
-                            <li class="dash-item <?php echo e(Request::segment(1) == 'order' ? 'active' : ''); ?>">
-                                <a href="<?php echo e(route('order.index')); ?>" class="dash-link"><?php echo e(__('Order')); ?></a>
-                            </li>
-                        <?php endif; ?>
-                    </ul>
-                </li>
-            <?php endif; ?>
-        <?php endif; ?>
-
-
-
-
-        <!--------------------- End System Setup ----------------------------------->
-        </ul>
         <?php endif; ?>
         <?php if(\Auth::user()->type == 'client'): ?>
             <ul class="dash-navbar">
@@ -1699,7 +1762,7 @@
         <?php endif; ?>
         <?php if(\Auth::user()->type == 'super admin'): ?>
             <ul class="dash-navbar">
-               <?php if(\Auth::user()->type == 'super admin'): ?>
+                <?php if(\Auth::user()->type == 'super admin'): ?>
                     <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'dashboard' ? ' active' : ''); ?>">
                         <a href="<?php echo e(route('client.dashboard.view')); ?>" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-home"></i></span><span
@@ -1709,7 +1772,7 @@
                 <?php endif; ?>
 
 
-                 <?php if(\Auth::user()->type == 'super admin'): ?>
+                <?php if(\Auth::user()->type == 'super admin'): ?>
                     <li
                         class="dash-item dash-hasmenu <?php echo e(Request::route()->getName() == 'users.index' || Request::route()->getName() == 'users.create' || Request::route()->getName() == 'users.edit' ? ' active' : ''); ?>">
                         <a href="<?php echo e(route('users.index')); ?>" class="dash-link">
@@ -1717,7 +1780,7 @@
                                 class="dash-mtext"><?php echo e(__('Companies')); ?></span>
                         </a>
                     </li>
-                 <?php endif; ?>
+                <?php endif; ?>
 
                 <?php if(\Auth::user()->type == 'super admin'): ?>
                     <li class="dash-item dash-hasmenu  <?php echo e(Request::segment(1) == 'plans' ? 'active' : ''); ?>">
@@ -1743,7 +1806,7 @@
                         </a>
                     </li>
                 <?php endif; ?>
-                 <?php if(\Auth::user()->type == 'super admin'): ?>
+                <?php if(\Auth::user()->type == 'super admin'): ?>
                     <li class="dash-item dash-hasmenu  <?php echo e(Request::segment(1) == 'orders' ? 'active' : ''); ?>">
                         <a href="<?php echo e(route('order.index')); ?>" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-shopping-cart-plus"></i></span><span
@@ -1764,7 +1827,7 @@
                     <?php echo $__env->make('landingpage::menu.landingpage', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
                 <?php endif; ?>
 
-                <?php if(('manage system settings')): ?>
+                <?php if('manage system settings'): ?>
                     <li
                         class="dash-item dash-hasmenu <?php echo e(Request::route()->getName() == 'systems.index' ? ' active' : ''); ?>">
                         <a href="<?php echo e(route('systems.index')); ?>" class="dash-link">
@@ -1810,4 +1873,5 @@
         </div>
     </div>
 </div>
-</nav><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/partials/admin/menu.blade.php ENDPATH**/ ?>
+</nav>
+<?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/partials/admin/menu.blade.php ENDPATH**/ ?>

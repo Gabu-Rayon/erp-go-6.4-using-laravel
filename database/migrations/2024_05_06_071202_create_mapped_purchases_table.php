@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->integer('mappedPurchaseId')->nullable();
             $table->integer('invcNo')->nullable();
+            $table->unsignedBigInteger('created_by');
             $table->integer('orgInvcNo')->default(0)->nullable();
             $table->string('supplrTin')->nullable();
             $table->string('supplrBhfId')->nullable();
@@ -51,6 +52,8 @@ return new class extends Migration {
             $table->boolean('isUpload')->nullable();
             $table->boolean('isStockIOUpdate')->nullable();
             $table->boolean('isClientStockUpdate')->nullable();
+
+            $table->foreign('created_by')->references('id')->on('users');
             $table->timestamps();
         });
     }

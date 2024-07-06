@@ -160,14 +160,12 @@
 
 
             <div class="modal-footer">
-                @can('share project')
                     @php $projectID= Crypt::encrypt($project->id); @endphp
                     <a href="#" id="{{ route('projects.link', \Illuminate\Support\Facades\Crypt::encrypt($project->id)) }}"
                        class="btn btn-primary"
                        onclick="copyToClipboard(this)" >
                        {{__('Copy Project')}}
                     </a>
-                @endcan
                 <input type="submit" value="{{__('Save')}}" class="btn  btn-primary">
             </div>
 

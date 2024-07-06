@@ -44,7 +44,7 @@
                                             </td>
                                             <td class="Action">
                                                 <span>
-                                                    @can('edit role')
+                                                    @if (Auth::user()->type == 'super admin' || 'company')
                                                         <div class="action-btn bg-info ms-2">
                                                             <a href="#"
                                                                 class="mx-3 btn btn-sm d-inline-flex align-items-center"
@@ -55,10 +55,10 @@
                                                                 <i class="ti ti-pencil text-white"></i>
                                                             </a>
                                                         </div>
-                                                    @endcan
+                                                    @endif
 
                                                     @if ($role->name != 'Employee')
-                                                        @can('delete role')
+                                                         @if (Auth::user()->type == 'super admin' || 'company')
                                                             <div class="action-btn bg-danger ms-2">
                                                                 {!! Form::open([
                                                                     'method' => 'DELETE',
@@ -71,7 +71,7 @@
                                                                         class="ti ti-trash text-white"></i></a>
                                                                 {!! Form::close() !!}
                                                             </div>
-                                                        @endcan
+                                                        @endif
                                                     @endif
                                                 </span>
                                             </td>

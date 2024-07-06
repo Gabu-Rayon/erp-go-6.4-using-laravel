@@ -57,12 +57,6 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                {{ Form::label('batchNo', __('Item Batch No'), ['class' => 'form-label']) }}
-                {{ Form::text('btchNo', null, ['class' => 'form-control', 'placeholder' => __('Enter Item Batch No')]) }}
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
                 {{ Form::label('unitPrice', __('Default Unit Price (*)'), ['class' => 'form-label']) }}
                 {{ Form::text('dftPrc', null, ['class' => 'form-control', 'placeholder' => __('Enter Default Unit Price'), 'required' => 'required']) }}
             </div>
@@ -105,20 +99,32 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
+                {{ Form::label('Bar Code', __('Bar Code'), ['class' => 'form-label']) }}
+               {{ Form::text('bcd', null, ['class' => 'form-control', 'placeholder' => __('Enter bar Code')]) }}
+            </div>
+        </div>
+          <div class="col-md-6">
+            <div class="form-group">
+                {{ Form::label('Batch No', __('Batch No'), ['class' => 'form-label']) }}
+               {{ Form::text('btchNo', null, ['class' => 'form-control', 'placeholder' => __('Enter Batch No')]) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
                 {{ Form::label('packageQuantity', __('Package Quantity'), ['class' => 'form-label']) }}
-                {{ Form::number('pkgQuantity', null, ['class' => 'form-control', 'placeholder' => __('Enter Item Package Quantity')]) }}
+                {{ Form::number('packageQuantity', null, ['class' => 'form-control']) }}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('isrcAplcbYn', __('Insurance Appicable (Y/N) (*)'), ['class' => 'form-label']) }}
-                {{ Form::select('isrcAplcbYn', [true => 'Yes', false => 'No'], $productServiceinformation->isrcAplcbYn, ['class' => 'form-control', 'required' => 'required']) }}
+                {{ Form::select('isrcAplcbYn', [true => 'Y', false => 'N'], $productServiceinformation->isrcAplcbYn, ['class' => 'form-control select2', 'required' => 'required']) }}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 {{ Form::label('isUsed', __('Used / UnUsed (Y/N) (*)'), ['class' => 'form-label']) }}
-                {{ Form::select('isUsed', [true => 'Yes', false => 'Yes'], $productServiceinformation->isUsed, ['class' => 'form-control', 'required' => 'required']) }}
+                {{ Form::select('isUsed', [true => 'true', false => 'false'], $productServiceinformation->isUsed, ['class' => 'form-control select2', 'required' => 'required']) }}
             </div>
         </div>
         <div class="col-md-6">

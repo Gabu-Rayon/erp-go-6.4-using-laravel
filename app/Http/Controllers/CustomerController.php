@@ -154,24 +154,26 @@ class CustomerController extends Controller
 ****/
     public function store(Request $request)
     {
+
+
+        \Log::info('creacting customer Request : ');
+        \Log::info($request);
         if(
             \Auth::user()->type == 'accountant'
             || \Auth::user()->type == 'company'
         ){
 
             $rules = [
-                'customertin' => 'required|between:9,15',
-                'name' => 'required',
+                'customerTin' => 'required|between:9,15',
+                'customerName' => 'required',
                 'address' => 'required',
-                'telno' => 'required',
-                'tax_number' => 'required',
-                'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
+                'telNo' => 'required',
                 'email' => [
                     'required',
                     Rule::unique('customers')->where(function ($query) {
                         return $query->where('created_by', \Auth::user()->id);
                     }),
-                    'faxno' => 'required',
+                    'faxNo' => 'required',
                     'remark' => 'required',
                 ],
             ];
@@ -188,14 +190,14 @@ class CustomerController extends Controller
             $customer = new Customer();
             $customer->customer_id = $this->customerNumber();
             $customer->customerNo = $this->customerNumber();
-            $customer->customertin = $request->customertin;
-            $customer->name = $request->name;
+            $customer->customerTin = $request->customerTin;
+            $customer->name = $request->customerName;
             $customer->email = $request->email;
             $customer->address = $request->address;
-            $customer->tax_number = $request->tax_number;
+            $customer->tax_number = $request->customerTin;
             $customer->contact = $request->contact;
-            $customer->faxno = $request->faxno;
-            $customer->isUsed = true;
+            $customer->faxNo = $request->faxNo;
+            $customer->isUsed = $request->isUsed;
             $customer->remark = $request->remark;
             $customer->avatar = $request->avatar;
             $customer->created_by = \Auth::user()->creatorId();
@@ -223,12 +225,12 @@ class CustomerController extends Controller
             //array containing the data to be sent to the API
             $requestData = [
                 'customerNo' => $this->customerNumber(),
-                'customerTin' => $request->customertin,
-                'customerName' => $request->name,
+                'customerTin' => $request->customerTin,
+                'customerName' => $request->customerName,
                 'address' => $request->address,
-                'telNo' => $request->telno,
+                'telNo' => $request->telNo,
                 'email' => $request->email,
-                'faxNo' => $request->faxno,
+                'faxNo' => $request->faxNo,
                 'isUsed' => true,
                 'remark' => $request->remark,
             ];

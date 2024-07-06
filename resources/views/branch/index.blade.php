@@ -10,13 +10,14 @@
 
 @section('action-btn')
     <div class="float-end">
-        @can('create branch')
-            <a href="#" data-url="{{ route('branch.create') }}" data-ajax-popup="true"
-                data-title="{{ __('Create New Branch') }}" data-bs-toggle="tooltip" title="{{ __('Create') }}"
-                class="btn btn-sm btn-primary">
-                <i class="ti ti-plus"></i>
-            </a>
-        @endcan
+        <a href="#" data-url="{{ route('branch.create') }}" data-ajax-popup="true"
+            data-title="{{ __('Create New Branch') }}" data-bs-toggle="tooltip" title="{{ __('Create') }}"
+            class="btn btn-sm btn-primary">
+            <i class="ti ti-plus"></i>
+        </a>
+        <a href="{{ route('branches.sync') }}" class="btn btn-sm btn-primary">
+            Synchronize
+        </a>
     </div>
 @endsection
 
@@ -68,7 +69,7 @@
                                                                 data-original-title="{{ __('Delete') }}"
                                                                 data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
                                                                 data-confirm-yes="document.getElementById('delete-form-{{ $branch['bhfId'] }}').submit();"><i
-                                                                    class="ti ti-trash text-white text-white"></i></a>
+                                                                    class="ti ti-trash text-white"></i></a>
                                                             {!! Form::close() !!}
                                                         </div>
                                                     @endcan

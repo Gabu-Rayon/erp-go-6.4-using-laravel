@@ -12,6 +12,7 @@ class mappedPurchases extends Model
     protected $fillable = [
         'mappedPurchaseId',
         'invcNo',
+        'created_by',
         'orgInvcNo',
         'supplrTin',
         'supplrBhfId',

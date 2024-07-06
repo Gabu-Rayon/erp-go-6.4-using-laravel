@@ -11,11 +11,9 @@
 
 @section('action-btn')
     <div class="float-end">
-    @can('create travel')
             <a href="#" data-url="{{ route('travel.create') }}" data-size="lg" data-ajax-popup="true" data-title="{{__('Create New Trip')}}" data-bs-toggle="tooltip" title="{{__('Create')}}"  class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-        @endcan
     </div>
 @endsection
 

@@ -11,11 +11,9 @@
 
 @section('action-btn')
     <div class="float-end">
-        @can('create allowance option')
             <a href="#" data-url="{{ route('allowanceoption.create') }}" data-ajax-popup="true" data-title="{{__('Create New Allowance Option')}}" data-bs-toggle="tooltip" title="{{__('Create')}}"  class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-        @endcan
     </div>
 @endsection
 

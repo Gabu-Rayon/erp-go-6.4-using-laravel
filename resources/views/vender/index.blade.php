@@ -68,7 +68,7 @@ $profile = asset(Storage::url('uploads/avatar/'));
                                                 </a>
                                             @endcan
                                         </td>
-                                        <td>{{ $Vender['name'] }}</td>
+                                        <td>{{ $Vender['spplrNm'] }}</td>
                                         <td>{{ $Vender['contact'] }}</td>
                                         <td>{{ $Vender['email'] }}</td>
                                         <td>{{ \Auth::user()->priceFormat($Vender['balance']) }}</td>
@@ -82,7 +82,7 @@ $profile = asset(Storage::url('uploads/avatar/'));
                                                                 <a href="{{ route('vender.show', \Crypt::encrypt($Vender['id'])) }}"
                                                                     class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip"
                                                                     title="{{ __('View') }}">
-                                                                    <i class="ti ti-eye text-white text-white"></i>
+                                                                    <i class="ti ti-eye text-white"></i>
                                                                 </a>
                                                             </div>
                                                         @endcan
@@ -104,7 +104,7 @@ $profile = asset(Storage::url('uploads/avatar/'));
                                                                            data-original-title="{{ __('Delete') }}" title="{{ __('Delete') }}"
                                                                            data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
                                                                            data-confirm-yes="document.getElementById('delete-form-{{ $Vender['id'] }}').submit();">
-                                                                        <i class="ti ti-trash text-white text-white"></i>
+                                                                        <i class="ti ti-trash text-white"></i>
                                                                     </a>
                                                                 {!! Form::close() !!}
                                                             </div>
