@@ -1481,22 +1481,6 @@ Route::group(['middleware' => ['verified']], function () {
         },
     );
 
-    Route::group(
-        [
-            'middleware' => [
-                'auth',
-                'XSS',
-                'revalidate',
-            ],
-        ],
-        function () {
-            Route::resource('stockinfo', StockMoveController::class);
-        },
-    );
-
-    Route::get('stockinfo/stockadjustment', [StockMoveController::class, 'stockAdjustment'])->name('stockinfo.stockadjustment');
-    Route::get('stockinfo/getstockmovelistfromapi', [StockMoveController::class, 'getStockMoveListFromApi']);
-
     Route::resource('competencies', CompetenciesController::class)->middleware(['auth', 'XSS']);
 
     Route::group(
