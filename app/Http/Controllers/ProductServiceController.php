@@ -100,7 +100,7 @@ class ProductServiceController extends Controller
             $expenseSubAccounts->where('chart_of_accounts.parent', '!=', 0);
             $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
             $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
-            $quantityUnitCodes = QuantityUnitCode::all()->pluck('name', 'code');
+            $quantityUnitCode = QuantityUnitCode::all()->pluck('name', 'code');
             $packagingUnitCodes = ProductServicesPackagingUnit::all()->pluck('name', 'code');
             $productServicesPackagingUnit = ProductServicesPackagingUnit::all()->pluck('name', 'code');
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
@@ -116,7 +116,7 @@ class ProductServiceController extends Controller
                     'incomeSubAccounts',
                     'expenseChartAccounts',
                     'expenseSubAccounts',
-                    'quantityUnitCodes',
+                    'quantityUnitCode',
                     'packagingUnitCodes',
                     'countrynames',
                     'productServicesPackagingUnit',
