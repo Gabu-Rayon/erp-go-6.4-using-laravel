@@ -432,9 +432,7 @@ class PurchaseController extends Controller
             $items = [];
              \Log::info('Purchase FoRM Data being Posted  : ');
              \Log::info($data);
-
-            
-
+             
             if ($data['supplierTin']) {
                 $supplier = Vender::where('spplrTin', $data['supplierTin'])->first();
                 \Log::info('Supplier Info  : ');
