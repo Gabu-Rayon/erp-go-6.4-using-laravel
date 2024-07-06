@@ -102,4 +102,4 @@
 
     </div>
 </div>
-<?php /**PATH C:\Users\hp\Desktop\projects\erp-go-6.4-using-laravel\resources\views/layouts/account_setup.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/layouts/account_setup.blade.php ENDPATH**/ ?>

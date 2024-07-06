@@ -49,9 +49,11 @@
                             @foreach ($employees as $employee)
                                 <tr>
                                     <td class="Id">
+                                        @can('show employee profile')
                                             <a href="{{route('employee.show',\Illuminate\Support\Facades\Crypt::encrypt($employee->id))}}" class="btn btn-outline-primary">{{ \Auth::user()->employeeIdFormat($employee->employee_id) }}</a>
                                         @else
                                             <a href="#"  class="btn btn-outline-primary">{{ \Auth::user()->employeeIdFormat($employee->employee_id) }}</a>
+                                        @endcan
                                     </td>
                                     {{ Log::info('department') }}
                                     {{ Log::info($departments) }}
@@ -85,16 +87,21 @@
                                     @if(Gate::check('edit employee') || Gate::check('delete employee'))
                                         <td>
                                             @if($employee->is_active==1)
+                                                @can('edit employee')
                                                 <div class="action-btn bg-primary ms-2">
                                                     <a href="{{route('employee.edit',\Illuminate\Support\Facades\Crypt::encrypt($employee->id))}}" class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip" title="{{__('Edit')}}"
                                                      data-original-title="{{__('Edit')}}"><i class="ti ti-pencil text-white"></i></a>
                                                 </div>
+
+                                                    @endcan
+                                                @can('delete employee')
                                                 <div class="action-btn bg-danger ms-2">
                                                 {!! Form::open(['method' => 'DELETE', 'route' => ['employee.destroy', $employee->id],'id'=>'delete-form-'.$employee->id]) !!}
 
                                                     <a href="#" class="mx-3 btn btn-sm align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?').'|'.__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$employee->id}}').submit();"><i class="ti ti-trash text-white"></i></a>
                                                     {!! Form::close() !!}
                                                 </div>
+                                                @endcan
                                             @else
 
                                                 <i class="ti ti-lock"></i>

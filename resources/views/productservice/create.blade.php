@@ -93,7 +93,7 @@
                     </div>
                 </div>
                 <div class="card-body table-border-style">
-                    <div class="table-responsive">
+                    <div class="#">
                         <table class="table mb-0" data-repeater-list="items" id="sortable-table">
                             <thead>
                             </thead>
@@ -154,7 +154,7 @@
                                     </td>
                                     <td class="form-group col-md-3">
                                         {{ Form::label('qtyUnitCode', __('Quantity Unit Code'), ['class' => 'form-label']) }}
-                                        {{ Form::select('qtyUnitCode', $quantityUnitCode, null, ['class' => 'form-control select2', 'placeholder' => __('Select Quantity Unit Code'), 'required' => 'required']) }}
+                                        {{ Form::select('qtyUnitCode', $quantityUnitCodes, null, ['class' => 'form-control select2', 'placeholder' => __('Select Quantity Unit Code'), 'required' => 'required']) }}
                                     </td>
                                     <td class="form-group col-md-3">
                                         <div class="form-group">

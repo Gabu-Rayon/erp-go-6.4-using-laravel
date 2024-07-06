@@ -157,11 +157,15 @@
                                     <td>{{ $attendance->late }}</td>
                                     <td>{{ $attendance->early_leaving }}</td>
                                     <td>{{ $attendance->overtime }}</td>
+                                    @if(Gate::check('edit attendance') || Gate::check('delete attendance'))
                                         <td>
+                                            @can('edit attendance')
                                                 <div class="action-btn bg-primary ms-2">
                                                     <a href="#" data-url="{{ URL::to('attendanceemployee/'.$attendance->id.'/edit') }}" data-size="lg" data-ajax-popup="true" data-title="{{__('Edit Attendance')}}" class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip" title="{{__('Edit')}}" data-original-title="{{__('Edit')}}">
                                                         <i class="ti ti-pencil text-white"></i></a>
                                                 </div>
+                                            @endcan
+                                            @can('delete attendance')
                                                 <div class="action-btn bg-danger ms-2">
                                                     {!! Form::open(['method' => 'DELETE', 'route' => ['attendanceemployee.destroy', $attendance->id],'id'=>'delete-form-'.$attendance->id]) !!}
 
@@ -170,7 +174,9 @@
                                                         <i class="ti ti-trash text-white"></i></a>
                                                     {!! Form::close() !!}
                                                 </div>
+                                            @endif
                                         </td>
+                                    @endif
                                 </tr>
                             @endforeach
                             </tbody>

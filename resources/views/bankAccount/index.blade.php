@@ -9,9 +9,12 @@
 
 @section('action-btn')
     <div class="float-end">
+        @can('create bank account')
             <a href="#" data-url="{{ route('bank-account.create') }}" data-ajax-popup="true" data-size="lg" data-bs-toggle="tooltip" title="{{__('Create')}}" data-title="{{__('Create New Bank Account')}}" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
+
+        @endcan
     </div>
 @endsection
 

@@ -87,6 +87,7 @@
                             <table class="table datatable">
                                 <thead>
                                     <tr>
+                                        <th scope="col">{{ __('SrNo') }}</th>
                                         <th scope="col">{{ __('Code') }}</th>
                                         <th scope="col">{{ __('Classification Code') }}</th>
                                         <th scope="col">{{ __('Name') }}</th>
@@ -95,8 +96,12 @@
                                     </tr>
                                 </thead>
                                 <tbody class="list">
+                                    @php
+                                        $serial = 1;
+                                    @endphp
                                     @foreach ($productServices as $iteminformation)
                                         <tr>
+                                            <td>{{ $serial++ }}</td>
                                             <td>{{ $iteminformation->itemCd }}</td>
                                             <td>{{ $iteminformation->itemClsCd }}</td>
                                             <td>{{ $iteminformation->itemNm }}</td>

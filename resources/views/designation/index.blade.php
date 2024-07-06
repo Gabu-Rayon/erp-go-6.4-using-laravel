@@ -10,9 +10,11 @@
 
 @section('action-btn')
     <div class="float-end">
+        @can('create designation')
             <a href="#" data-url="{{ route('designation.create') }}" data-ajax-popup="true" data-title="{{__('Create New Designation')}}" data-bs-toggle="tooltip" title="{{__('Create')}}"  class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
+        @endcan
     </div>
 @endsection
 
@@ -44,11 +46,16 @@
 
                                     <td class="Action">
                                         <span>
+
+                                            @can('edit designation')
                                                 <div class="action-btn bg-primary ms-2">
                                                     <a href="#" class="mx-3 btn btn-sm align-items-center" data-url="{{route('designation.edit',$designation->id) }}" data-ajax-popup="true" data-title="{{__('Edit Designation')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                         <i class="ti ti-pencil text-white"></i>
                                                     </a>
                                                 </div>
+                                            @endcan
+
+                                            @can('delete designation')
                                                 <div class="action-btn bg-danger ms-2">
 
                                                     {!! Form::open(['method' => 'DELETE', 'route' => ['designation.destroy', $designation->id],'id'=>'delete-form-'.$designation->id]) !!}
@@ -57,6 +64,7 @@
                                                         </a>
                                                     {!! Form::close() !!}
                                                 </div>
+                                            @endcan
 
                                         </span>
                                     </td>

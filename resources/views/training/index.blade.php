@@ -11,9 +11,11 @@
 
 @section('action-btn')
     <div class="float-end">
+        @can('create training')
             <a href="#" data-size="lg" data-url="{{ route('training.create') }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Create')}}" data-title="{{__('Create New Training')}}" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
+        @endcan
     </div>
 @endsection
 

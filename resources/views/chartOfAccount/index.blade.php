@@ -55,10 +55,12 @@
 
 @section('action-btn')
     <div class="float-end">
+        @can('create chart of account')
             <a href="#" data-url="{{ route('chart-of-account.create') }}" data-bs-toggle="tooltip" title="{{ __('Create') }}"
                 data-size="lg" data-ajax-popup="true" data-title="{{ __('Create New Account') }}" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
+        @endcan
     </div>
 @endsection
 @section('content')

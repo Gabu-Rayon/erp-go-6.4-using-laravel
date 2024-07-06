@@ -28,7 +28,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->decimal('discountRate', 10, 2);
             $table->decimal('discountAmt', 10, 2);
-            $table->string('itemExprDate')->nullable();
+            $table->string('itemExprDate');
             $table->timestamps();
            
         });
