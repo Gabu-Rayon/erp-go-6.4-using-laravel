@@ -109,7 +109,7 @@
                                         <div class="btn-box">
                                             <?php echo e(Form::label('account', __('Account'),['class'=>'form-label'])); ?>
 
-                                            <?php echo e(Form::select('account', $account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control select'))); ?>
+                                            <?php echo e(Form::select('account', $account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control select2'))); ?>
 
                                         </div>
                                     </div>
@@ -117,11 +117,10 @@
                                         <div class="btn-box">
                                             <?php echo e(Form::label('type', __('Category'),['class'=>'form-label'])); ?>
 
-                                            <?php echo e(Form::select('type',$types,isset($_GET['type'])?$_GET['type']:'', array('class' => 'form-control select','placeholder'=>__('Select Category')))); ?>
+                                            <?php echo e(Form::select('type',$types,isset($_GET['type'])?$_GET['type']:'', array('class' => 'form-control select2','placeholder'=>__('Select Category')))); ?>
 
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                             <div class="col-auto">
