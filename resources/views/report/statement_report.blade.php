@@ -102,16 +102,15 @@
                                     <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12">
                                         <div class="btn-box">
                                             {{ Form::label('account', __('Account'),['class'=>'form-label'])}}
-                                            {{Form::select('account', $account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control select')) }}
+                                            {{Form::select('account', $account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control select2')) }}
                                         </div>
                                     </div>
                                     <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12">
                                         <div class="btn-box">
                                             {{ Form::label('type', __('Category'),['class'=>'form-label'])}}
-                                            {{ Form::select('type',$types,isset($_GET['type'])?$_GET['type']:'', array('class' => 'form-control select','placeholder'=>__('Select Category'))) }}
+                                            {{ Form::select('type',$types,isset($_GET['type'])?$_GET['type']:'', array('class' => 'form-control select2','placeholder'=>__('Select Category'))) }}
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                             <div class="col-auto">

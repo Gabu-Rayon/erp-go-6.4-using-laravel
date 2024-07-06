@@ -1,14 +1,15 @@
-@extends('layouts.admin')
-@section('page-title')
-    {{ __('Sales Report') }}
-@endsection
-@section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-    <li class="breadcrumb-item">{{ __('Sales Report') }}</li>
-@endsection
-@push('script-page')
 
-    <script type="text/javascript" src="{{ asset('js/html2pdf.bundle.min.js') }}"></script>
+<?php $__env->startSection('page-title'); ?>
+    <?php echo e(__('Sales Report')); ?>
+
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('breadcrumb'); ?>
+    <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
+    <li class="breadcrumb-item"><?php echo e(__('Sales Report')); ?></li>
+<?php $__env->stopSection(); ?>
+<?php $__env->startPush('script-page'); ?>
+
+    <script type="text/javascript" src="<?php echo e(asset('js/html2pdf.bundle.min.js')); ?>"></script>
     <script>
         var filename = $('#filename').val();
 
@@ -55,39 +56,42 @@
 
     </script>
 
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('action-btn')
+<?php $__env->startSection('action-btn'); ?>
 
     <div class="float-end">
         <a href="#" onclick="saveAsPDF()" class="btn btn-sm btn-primary me-1" data-bs-toggle="tooltip"
-            title="{{ __('Print') }}" data-original-title="{{ __('Print') }}"><i class="ti ti-printer"></i></a>
+            title="<?php echo e(__('Print')); ?>" data-original-title="<?php echo e(__('Print')); ?>"><i class="ti ti-printer"></i></a>
     </div>
 
     <div class="float-end me-2">
-        {{ Form::open(['route' => ['sales.export']]) }}
+        <?php echo e(Form::open(['route' => ['sales.export']])); ?>
+
         <input type="hidden" name="start_date" class="start_date">
         <input type="hidden" name="end_date" class="end_date">
         <input type="hidden" name="report" class="report">
-        <button type="submit" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{ __('Export') }}"
-            data-original-title="{{ __('Export') }}"><i class="ti ti-file-export"></i></button>
-        {{ Form::close() }}
+        <button type="submit" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="<?php echo e(__('Export')); ?>"
+            data-original-title="<?php echo e(__('Export')); ?>"><i class="ti ti-file-export"></i></button>
+        <?php echo e(Form::close()); ?>
+
     </div>
 
     <div class="float-end me-2" id="filter">
         <button id="filter" class="btn btn-sm btn-primary"><i class="ti ti-filter"></i></button>
     </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="mt-4">
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="mt-2" id="multiCollapseExample1">
                     <div class="card" id="show_filter" style="display:none;">
                         <div class="card-body">
-                            {{ Form::open(['route' => ['report.sales'], 'method' => 'GET', 'id' => 'report_sales']) }}
+                            <?php echo e(Form::open(['route' => ['report.sales'], 'method' => 'GET', 'id' => 'report_sales'])); ?>
+
                             <div class="row align-items-center justify-content-end">
                                 <div class="col-xl-10">
                                     <div class="row">
@@ -101,15 +105,19 @@
                                         </div>
                                         <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12">
                                             <div class="btn-box">
-                                                {{ Form::label('start_date', __('Start Date'), ['class' => 'form-label']) }}
-                                                {{ Form::date('start_date', $filter['startDateRange'], ['class' => 'startDate form-control']) }}
+                                                <?php echo e(Form::label('start_date', __('Start Date'), ['class' => 'form-label'])); ?>
+
+                                                <?php echo e(Form::date('start_date', $filter['startDateRange'], ['class' => 'startDate form-control'])); ?>
+
                                             </div>
                                         </div>
 
                                         <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12">
                                             <div class="btn-box">
-                                                {{ Form::label('end_date', __('End Date'), ['class' => 'form-label']) }}
-                                                {{ Form::date('end_date', $filter['endDateRange'], ['class' => 'endDate form-control']) }}
+                                                <?php echo e(Form::label('end_date', __('End Date'), ['class' => 'form-label'])); ?>
+
+                                                <?php echo e(Form::date('end_date', $filter['endDateRange'], ['class' => 'endDate form-control'])); ?>
+
                                             </div>
                                         </div>
                                         <input type="hidden" name="view" value="horizontal">
@@ -120,14 +128,14 @@
                                         <div class="col-auto">
                                             <a href="#" class="btn btn-sm btn-primary"
                                                 onclick="document.getElementById('report_sales').submit(); return false;"
-                                                data-bs-toggle="tooltip" title="{{ __('Apply') }}"
-                                                data-original-title="{{ __('apply') }}">
+                                                data-bs-toggle="tooltip" title="<?php echo e(__('Apply')); ?>"
+                                                data-original-title="<?php echo e(__('apply')); ?>">
                                                 <span class="btn-inner--icon"><i class="ti ti-search"></i></span>
                                             </a>
 
-                                            <a href="{{ route('report.sales') }}" class="btn btn-sm btn-danger "
-                                                data-bs-toggle="tooltip" title="{{ __('Reset') }}"
-                                                data-original-title="{{ __('Reset') }}">
+                                            <a href="<?php echo e(route('report.sales')); ?>" class="btn btn-sm btn-danger "
+                                                data-bs-toggle="tooltip" title="<?php echo e(__('Reset')); ?>"
+                                                data-original-title="<?php echo e(__('Reset')); ?>">
                                                 <span class="btn-inner--icon"><i
                                                         class="ti ti-trash-off text-white-off "></i></span>
                                             </a>
@@ -137,16 +145,17 @@
                                 </div>
                             </div>
                         </div>
-                        {{ Form::close() }}
+                        <?php echo e(Form::close()); ?>
+
                     </div>
                 </div>
             </div>
         </div>
 
-        @php
+        <?php
             $authUser = \Auth::user()->creatorId();
             $user = App\Models\User::find($authUser);
-        @endphp
+        ?>
 
     </div>
 
@@ -157,10 +166,10 @@
                     <div class="d-flex justify-content-between w-100">
                         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" id="profile-tab3" data-bs-toggle="pill" href="#item" role="tab" aria-controls="pills-item" aria-selected="true">{{__('Sales by Item')}}</a>
+                                <a class="nav-link active" id="profile-tab3" data-bs-toggle="pill" href="#item" role="tab" aria-controls="pills-item" aria-selected="true"><?php echo e(__('Sales by Item')); ?></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="contact-tab4" data-bs-toggle="pill" href="#customer" role="tab" aria-controls="pills-customer" aria-selected="false">{{__('Sales by Customer')}}</a>
+                                <a class="nav-link" id="contact-tab4" data-bs-toggle="pill" href="#customer" role="tab" aria-controls="pills-customer" aria-selected="false"><?php echo e(__('Sales by Customer')); ?></a>
                             </li>
                         </ul>
                     </div>
@@ -174,23 +183,25 @@
                                     <table class="table table-flush" id="report-dataTable">
                                         <thead>
                                         <tr>
-                                            <th width="33%"> {{__('Invoice Item')}}</th>
-                                            <th width="33%"> {{__('Quantity Sold')}}</th>
-                                            <th width="33%"> {{__('Amount')}}</th>
-                                            <th class="text-end"> {{__('Average Price')}}</th>
+                                            <th width="33%"> <?php echo e(__('Invoice Item')); ?></th>
+                                            <th width="33%"> <?php echo e(__('Quantity Sold')); ?></th>
+                                            <th width="33%"> <?php echo e(__('Amount')); ?></th>
+                                            <th class="text-end"> <?php echo e(__('Average Price')); ?></th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($invoiceItems as $invoiceItem)
-                                            {{ \Log::info('INVOICE ITEM') }}
-                                            {{ \Log::info($invoiceItem) }}
+                                            <?php $__currentLoopData = $invoiceItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $invoiceItem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php echo e(\Log::info('INVOICE ITEM')); ?>
+
+                                            <?php echo e(\Log::info($invoiceItem)); ?>
+
                                                 <tr>
-                                                    <td>{{ $invoiceItem['itemNm']}}</td>
-                                                    <td>{{ $invoiceItem['quantity']}}</td>
-                                                    <td>{{ \Auth::user()->priceFormat($invoiceItem['price']) }}</td>
-                                                    <td>{{ \Auth::user()->priceFormat($invoiceItem['average_price']) }}</td>
+                                                    <td><?php echo e($invoiceItem['itemNm']); ?></td>
+                                                    <td><?php echo e($invoiceItem['quantity']); ?></td>
+                                                    <td><?php echo e(\Auth::user()->priceFormat($invoiceItem['price'])); ?></td>
+                                                    <td><?php echo e(\Auth::user()->priceFormat($invoiceItem['average_price'])); ?></td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -199,21 +210,21 @@
                                     <table class="table table-flush" id="report-dataTable">
                                         <thead>
                                         <tr>
-                                            <th width="33%"> {{__('Customer Name')}}</th>
-                                            <th width="33%"> {{__('Invoice Count')}}</th>
-                                            <th width="33%"> {{__('Sales')}}</th>
-                                            <th class="text-end"> {{__('Sales With Tax')}}</th>
+                                            <th width="33%"> <?php echo e(__('Customer Name')); ?></th>
+                                            <th width="33%"> <?php echo e(__('Invoice Count')); ?></th>
+                                            <th width="33%"> <?php echo e(__('Sales')); ?></th>
+                                            <th class="text-end"> <?php echo e(__('Sales With Tax')); ?></th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($invoiceCustomers as $invoiceCustomer)
+                                            <?php $__currentLoopData = $invoiceCustomers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $invoiceCustomer): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <tr>
-                                                    <td>{{ $invoiceCustomer['name'] }}</td>
-                                                    <td>{{ $invoiceCustomer['invoice_count']}}</td>
-                                                    <td>{{ \Auth::user()->priceFormat($invoiceCustomer['price']) }}</td>
-                                                    <td>{{ \Auth::user()->priceFormat($invoiceCustomer['price'] + $invoiceCustomer['total_tax']) }}</td>
+                                                    <td><?php echo e($invoiceCustomer['name']); ?></td>
+                                                    <td><?php echo e($invoiceCustomer['invoice_count']); ?></td>
+                                                    <td><?php echo e(\Auth::user()->priceFormat($invoiceCustomer['price'])); ?></td>
+                                                    <td><?php echo e(\Auth::user()->priceFormat($invoiceCustomer['price'] + $invoiceCustomer['total_tax'])); ?></td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -226,4 +237,5 @@
         </div>
     </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\hp\Desktop\projects\erp-go-6.4-using-laravel\resources\views/report/sales_report.blade.php ENDPATH**/ ?>
