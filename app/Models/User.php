@@ -15,7 +15,7 @@ use Lab404\Impersonate\Models\Impersonate;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles ,Impersonate;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, Impersonate;
 
     protected $appends = ['profile'];
 
@@ -104,7 +104,6 @@ class User extends Authenticatable implements MustVerifyEmail
         $decimal_number = Utility::getValByName('decimal_number') ? Utility::getValByName('decimal_number') : 0;
 
         return (($settings['site_currency_symbol_position'] == "pre") ? $settings['site_currency_symbol'] : '') . number_format($price, $decimal_number) . (($settings['site_currency_symbol_position'] == "post") ? $settings['site_currency_symbol'] : '');
-
     }
 
     public static function priceFormats($price)
@@ -205,8 +204,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $plan = Plan::find($planID);
         if ($plan) {
             $this->plan = $plan->id;
-            if($this->trial_expire_date != null);
-            {
+            if ($this->trial_expire_date != null); {
                 $this->trial_expire_date = null;
             }
             if ($plan->duration == 'month') {
@@ -351,7 +349,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function countPaidCompany()
     {
         return User::where('type', '=', 'company')->whereNotIn(
-            'plan', [
+            'plan',
+            [
                 0,
                 1,
             ]
@@ -429,7 +428,6 @@ class User extends Authenticatable implements MustVerifyEmail
         $totalIncome = (!empty($revenue) ? $revenue : 0) + (!empty($invoiceTotal) ? ($invoiceTotal) : 0);
 
         return $totalIncome;
-
     }
     public function incomecat()
     {
@@ -526,10 +524,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         if ($month != '' && $date != '') {
             $InvoiceProducts = \DB::table('invoice_products')
-                ->select('invoice_products.invoice_id as invoice',
+                ->select(
+                    'invoice_products.invoice_id as invoice',
                     \DB::raw('SUM(quantity) as total_quantity'),
                     \DB::raw('SUM(discount) as total_discount'),
-                    \DB::raw('SUM(price * quantity)  as sub_total'))
+                    \DB::raw('SUM(price * quantity)  as sub_total')
+                )
                 ->selectRaw('(SELECT SUM((price * quantity - discount) * (taxes.rate / 100)) FROM invoice_products
                     LEFT JOIN taxes ON FIND_IN_SET(taxes.id, invoice_products.tax) > 0
                     WHERE invoice_products.invoice_id = invoices.id) as tax_values')
@@ -542,10 +542,12 @@ class User extends Authenticatable implements MustVerifyEmail
                 ->keyBy('invoice');
         } elseif ($date != '') {
             $InvoiceProducts = \DB::table('invoice_products')
-                ->select('invoice_products.invoice_id as invoice',
+                ->select(
+                    'invoice_products.invoice_id as invoice',
                     \DB::raw('SUM(quantity) as total_quantity'),
                     \DB::raw('SUM(discount) as total_discount'),
-                    \DB::raw('SUM(price * quantity)  as sub_total'))
+                    \DB::raw('SUM(price * quantity)  as sub_total')
+                )
                 ->selectRaw('(SELECT SUM((price * quantity - discount) * (taxes.rate / 100)) FROM invoice_products
                     LEFT JOIN taxes ON FIND_IN_SET(taxes.id, invoice_products.tax) > 0
                     WHERE invoice_products.invoice_id = invoices.id) as tax_values')
@@ -557,10 +559,12 @@ class User extends Authenticatable implements MustVerifyEmail
                 ->keyBy('invoice');
         } elseif ($month != '') {
             $InvoiceProducts = \DB::table('invoice_products')
-                ->select('invoice_products.invoice_id as invoice',
+                ->select(
+                    'invoice_products.invoice_id as invoice',
                     \DB::raw('SUM(quantity) as total_quantity'),
                     \DB::raw('SUM(discount) as total_discount'),
-                    \DB::raw('SUM(price * quantity)  as sub_total'))
+                    \DB::raw('SUM(price * quantity)  as sub_total')
+                )
                 ->selectRaw('(SELECT SUM((price * quantity - discount) * (taxes.rate / 100)) FROM invoice_products
                     LEFT JOIN taxes ON FIND_IN_SET(taxes.id, invoice_products.tax) > 0
                     WHERE invoice_products.invoice_id = invoices.id) as tax_values')
@@ -589,10 +593,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         if ($month != '' && $date != '') {
             $BillProducts = \DB::table('bill_products')
-                ->select('bill_products.bill_id as bill',
+                ->select(
+                    'bill_products.bill_id as bill',
                     \DB::raw('SUM(bill_products.quantity) as total_quantity'),
                     \DB::raw('SUM(bill_products.discount) as total_discount'),
-                    \DB::raw('SUM(bill_products.price * bill_products.quantity)  as sub_total'))
+                    \DB::raw('SUM(bill_products.price * bill_products.quantity)  as sub_total')
+                )
                 ->selectRaw('(SELECT SUM(bill_accounts.price) FROM bill_accounts
                     WHERE bill_accounts.ref_id = bills.id) as acc_price')
                 ->selectRaw('(SELECT SUM((price * quantity - discount) * (taxes.rate / 100)) FROM bill_products
@@ -607,10 +613,12 @@ class User extends Authenticatable implements MustVerifyEmail
                 ->keyBy('bill');
         } elseif ($date != '') {
             $BillProducts = \DB::table('bill_products')
-                ->select('bill_products.bill_id as bill',
+                ->select(
+                    'bill_products.bill_id as bill',
                     \DB::raw('SUM(quantity) as total_quantity'),
                     \DB::raw('SUM(discount) as total_discount'),
-                    \DB::raw('SUM(bill_products.price * bill_products.quantity)  as sub_total'))
+                    \DB::raw('SUM(bill_products.price * bill_products.quantity)  as sub_total')
+                )
                 ->selectRaw('(SELECT SUM(bill_accounts.price) FROM bill_accounts
                     WHERE bill_accounts.ref_id = bills.id) as acc_price')
                 ->selectRaw('(SELECT SUM((price * quantity - discount) * (taxes.rate / 100)) FROM bill_products
@@ -624,10 +632,12 @@ class User extends Authenticatable implements MustVerifyEmail
                 ->keyBy('bill');
         } elseif ($month != '') {
             $BillProducts = \DB::table('bill_products')
-                ->select('bill_products.bill_id as bill',
+                ->select(
+                    'bill_products.bill_id as bill',
                     \DB::raw('SUM(quantity) as total_quantity'),
                     \DB::raw('SUM(discount) as total_discount'),
-                    \DB::raw('SUM(bill_products.price * bill_products.quantity)  as sub_total'))
+                    \DB::raw('SUM(bill_products.price * bill_products.quantity)  as sub_total')
+                )
                 ->selectRaw('(SELECT SUM(bill_accounts.price) FROM bill_accounts
                     WHERE bill_accounts.ref_id = bills.id) as acc_price')
                 ->selectRaw('(SELECT SUM((price * quantity - discount) * (taxes.rate / 100)) FROM bill_products
@@ -690,7 +700,6 @@ class User extends Authenticatable implements MustVerifyEmail
         $dataArr['expense'] = $expenseArr;
 
         return $dataArr;
-
     }
 
     // public function getIncExpLineChartDate()
@@ -808,7 +817,6 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return DB::table('settings')->where('created_by', '=', $userId)->get()->pluck('value', 'name');
-
     }
 
     public function currentPlan()
@@ -1227,7 +1235,6 @@ class User extends Authenticatable implements MustVerifyEmail
         } else {
             return ProjectTask::select('project_tasks.*', 'project_users.id as up_id')->join('project_users', 'project_users.project_id', '=', 'project_tasks.project_id')->where('project_users.user_id', '=', $this->authId())->count();
         }
-
     }
 
     public function project_complete_task($project_last_stage)
@@ -1253,7 +1260,8 @@ class User extends Authenticatable implements MustVerifyEmail
             return ProjectTask::whereIn('project_id', $user_projects)->join('projects', 'projects.id', '=', 'project_tasks.project_id')->where('project_tasks.end_date', '>', date('Y-m-d'))->limit(5)->get();
         } else {
             return ProjectTask::select('project_tasks.*', 'project_tasks.end_date as task_due_date', 'project_users.id as up_id', 'projects.project_name as project_name', 'projectstages.name as stage_name')->join('project_users', 'project_users.project_id', '=', 'project_tasks.project_id')->join('projects', 'project_users.project_id', '=', 'projects.id')->join('projectstages', 'project_tasks.stage_id', '=', 'projectstages.id')->where('project_users.user_id', '=', $this->authId())->where('project_tasks.end_date', '>', date('Y-m-d'))->limit(5)->orderBy(
-                'project_tasks.end_date', 'ASC'
+                'project_tasks.end_date',
+                'ASC'
             )->get();
         }
     }
@@ -1278,7 +1286,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
         if ($user_type == 'company' || $user_type == 'super admin') {
             $user = User::where('id', \Auth::user()->id)->first();
-
         } else {
             $user = User::where('id', \Auth::user()->created_by)->first();
         }
@@ -1296,7 +1303,6 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return !empty($user->plan) ? Plan::find($user->plan)->hrm : '';
-
     }
 
     public static function show_account()
@@ -1320,7 +1326,6 @@ class User extends Authenticatable implements MustVerifyEmail
             $user = User::where('id', \Auth::user()->created_by)->first();
         }
         return !empty($user->plan) ? Plan::find($user->plan)->project : '';
-
     }
 
     public static function show_pos()
@@ -1332,7 +1337,6 @@ class User extends Authenticatable implements MustVerifyEmail
             $user = User::where('id', \Auth::user()->created_by)->first();
         }
         return !empty($user->plan) ? Plan::find($user->plan)->pos : '';
-
     }
 
     public function clientProjects()
@@ -1371,7 +1375,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'Complaint Resent',
             'Leave Action Sent',
             'Payslip Sent',
-            'Promotion Sent', 'Resignation Sent',
+            'Promotion Sent',
+            'Resignation Sent',
             'Termination Sent',
             'Transfer Sent',
             'Trip Sent',
@@ -1393,7 +1398,6 @@ class User extends Authenticatable implements MustVerifyEmail
                     ]
                 );
             }
-
         }
 
         $defaultTemplate = [
@@ -3572,7 +3576,6 @@ class User extends Authenticatable implements MustVerifyEmail
                         ]
                     );
                 }
-
             }
         }
     }
@@ -3619,10 +3622,11 @@ class User extends Authenticatable implements MustVerifyEmail
                 'city' => 'Portland',
                 'city_zip' => 97227,
                 'created_by' => 2,
+                'branch_id' => 1,
             ]
         );
-
     }
+
 
     public function userWarehouseRegister($user_id)
     {
@@ -3635,7 +3639,6 @@ class User extends Authenticatable implements MustVerifyEmail
                 'created_by' => $user_id,
             ]
         );
-
     }
 
     //default bank account for new company
@@ -3652,7 +3655,6 @@ class User extends Authenticatable implements MustVerifyEmail
                 'created_by' => $user_id,
             ]
         );
-
     }
 
     public function extraKeyword()
@@ -3732,7 +3734,6 @@ class User extends Authenticatable implements MustVerifyEmail
             } else {
                 return 0;
             }
-
         } elseif (Auth::user()->user_type != 'company' && Auth::user()->user_type != 'super admin') {
 
             if (Auth::user()->current_location == 0) {

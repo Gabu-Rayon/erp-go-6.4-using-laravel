@@ -17,12 +17,11 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call(NotificationSeeder::class);
-        Artisan::call('module:migrate LandingPage');
-        Artisan::call('module:seed LandingPage');
-
+        // Artisan::call('module:migrate LandingPage');
+        // Artisan::call('module:seed LandingPage');
         $this->call(PlansTableSeeder::class);
         $this->call(UsersTableSeeder::class);
-        // $this->call(AiTemplateSeeder::class);
+        $this->call(AiTemplateSeeder::class);
         $this->call(ProductServicesPackagingUnitsSeeder::class);
         $this->call(ProductServiceUnitsSeeder::class);
         $this->call(ImportItemStatusCodesSeeder::class);
