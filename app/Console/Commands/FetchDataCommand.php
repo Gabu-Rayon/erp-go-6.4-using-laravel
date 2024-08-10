@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use AppHttp\Controllers\ProductServiceController;
 use Illuminate\Console\Command;
-use App\Http\Controllers\ProductServiceController;
 
 class FetchDataCommand extends Command
 {

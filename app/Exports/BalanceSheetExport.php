@@ -26,7 +26,7 @@ class BalanceSheetExport implements FromArray, WithEvents, WithHeadings, WithSty
         $liabilitiesOrEquityEncountered = false;
         $liabilitiesOrEquityEncountered1 = false;
         $liabilities = false;
-        
+
         $assets = false;
 
         foreach ($data as $category => $subCategories) {
@@ -37,43 +37,42 @@ class BalanceSheetExport implements FromArray, WithEvents, WithHeadings, WithSty
                 foreach ($subCategory['account'] as $account) {
                     foreach ($account as $key => $record) {
 
-                    if ($record['netAmount'] != null) {
-                        if ($category == 'Liabilities' || $category == 'Equity') {
-                            if (!$liabilitiesOrEquityEncountered) {
-                                $formattedData[] = [
-                                    'Account Name' => 'Liabilities & Equity',
-                                    'Account No' => '',
-                                    'Total' => '',
-                                ];
-                                $liabilitiesOrEquityEncountered = true;
-                            }
+                        if ($record['netAmount'] != null) {
+                            if ($category == 'Liabilities' || $category == 'Equity') {
+                                if (!$liabilitiesOrEquityEncountered) {
+                                    $formattedData[] = [
+                                        'Account Name' => 'Liabilities & Equity',
+                                        'Account No' => '',
+                                        'Total' => '',
+                                    ];
+                                    $liabilitiesOrEquityEncountered = true;
+                                }
 
-                            if (!$liabilities) {
+                                if (!$liabilities) {
 
-                                $formattedData[] = [
-                                    'Account Name' => '  ' . $category,
-                                    'Account No' => '',
-                                    'Total' => '',
+                                    $formattedData[] = [
+                                        'Account Name' => '  ' . $category,
+                                        'Account No' => '',
+                                        'Total' => '',
 
-                                ];
-                                $liabilities = true;
+                                    ];
+                                    $liabilities = true;
+                                }
+                            } else {
+                                if (!$assets) {
 
-                            }
-                        } else {
-                            if (!$assets) {
+                                    $formattedData[] = [
+                                        'Account Name' => $category,
+                                        'Account No' => '',
+                                        'Total' => '',
 
-                                $formattedData[] = [
-                                    'Account Name' => $category,
-                                    'Account No' => '',
-                                    'Total' => '',
-
-                                ];
-                                $assets = true;
+                                    ];
+                                    $assets = true;
+                                }
                             }
                         }
                     }
                 }
-            }
                 break;
             }
 
@@ -88,38 +87,34 @@ class BalanceSheetExport implements FromArray, WithEvents, WithHeadings, WithSty
                         ];
                         break;
                     }
-            }
+                }
 
                 foreach ($subCategory['account'] as $key => $account) {
                     foreach ($account as $key => $record) {
 
-                    if ($record['netAmount'] != null && $record['account_name'] == 'Total ' . $subCategory['subType']) {
-                        $formattedData[] = [
-                            'Account Name' => '    ' . $record['account_name'],
-                            'Account No' => $record['account_code'],
-                            'Total' => $record['netAmount'],
-                        ];
+                        if ($record['netAmount'] != null && $record['account_name'] == 'Total ' . $subCategory['subType']) {
+                            $formattedData[] = [
+                                'Account Name' => '    ' . $record['account_name'],
+                                'Account No' => $record['account_code'],
+                                'Total' => $record['netAmount'],
+                            ];
 
-                        $amountTotal += $record['netAmount'];
-                    } 
-                    elseif ($record['account'] == 'parent' || $record['account'] == 'parentTotal') {
-                        $formattedData[] = [
-                            'Account Name' => '       ' . $record['account_name'],
-                            'Account No' => $record['account_code'],
-                            'Total' => $record['netAmount'],
-                        ];
-                    }
-                    elseif ($record['netAmount'] != null && !preg_match('/\bTotal\b/i', $record['account_name'])) {
-                        $formattedData[] = [
-                            'Account Name' => '         ' . $record['account_name'],
-                            'Account No' => $record['account_code'],
-                            'Total' => $record['netAmount'],
-                        ];
-
+                            $amountTotal += $record['netAmount'];
+                        } elseif ($record['account'] == 'parent' || $record['account'] == 'parentTotal') {
+                            $formattedData[] = [
+                                'Account Name' => '       ' . $record['account_name'],
+                                'Account No' => $record['account_code'],
+                                'Total' => $record['netAmount'],
+                            ];
+                        } elseif ($record['netAmount'] != null && !preg_match('/\bTotal\b/i', $record['account_name'])) {
+                            $formattedData[] = [
+                                'Account Name' => '         ' . $record['account_name'],
+                                'Account No' => $record['account_code'],
+                                'Total' => $record['netAmount'],
+                            ];
+                        }
                     }
                 }
-                }
-
             }
 
             if (($category == 'Liabilities' && $amountTotal != 0) || ($category == 'Equity' && $amountTotal != 0)) {
@@ -151,7 +146,6 @@ class BalanceSheetExport implements FromArray, WithEvents, WithHeadings, WithSty
                 'Total' => $total,
             ];
             $liabilitiesOrEquityEncountered1 = true;
-
         }
         $this->data = $formattedData;
         $this->companyName = $companyName;
@@ -193,9 +187,7 @@ class BalanceSheetExport implements FromArray, WithEvents, WithHeadings, WithSty
     public function registerEvents(): array
     {
         return [
-            BeforeWriting::class => function (BeforeWriting $event) {
-
-            },
+            BeforeWriting::class => function (BeforeWriting $event) {},
 
             AfterSheet::class => function (AfterSheet $event) {
                 $event->sheet->getDelegate()->mergeCells('A1:F1');

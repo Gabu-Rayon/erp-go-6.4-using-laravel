@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace AppHttp\Controllers;
 
 use Exception;
 use Carbon\Carbon;
@@ -11,24 +11,25 @@ use App\Models\Details;
 use App\Models\Utility;
 use App\Models\ItemType;
 use App\Models\CustomField;
-use Illuminate\Http\Request;
 use App\Models\ChartOfAccount;
 use App\Models\ProductService;
 use App\Models\WarehouseProduct;
 use App\Models\ProductServiceUnit;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProductServiceExport;
+use App\Http\Controllers\Controller;
 use App\Imports\ProductServiceImport;
 use App\Models\ProductServiceCategory;
 use Illuminate\Support\Facades\Storage;
 use App\Models\ProductsServicesClassification;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 use App\Models\QuantityUnitCode;
 use App\Models\ProductServicesPackagingUnit;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request as Request;
+use Illuminate\Support\Facades\Validator;
 
 class ProductServiceController extends Controller
 {
@@ -39,13 +40,13 @@ class ProductServiceController extends Controller
             $category->prepend('Select Category', '');
 
             if (!empty($request->category)) {
-                // $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', $request->category)->with(['category', 'unit'])->get();
+                // $productServices = ProductService::where('created_by', '=', Auth::user()->creatorId())->where('category_id', $request->category)->with(['category', 'unit'])->get();
                 $productServices = ProductService::all();
             } else {
-                // $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->with(['category', 'unit'])->get();
+                // $productServices = ProductService::where('created_by', '=', Auth::user()->creatorId())->with(['category', 'unit'])->get();
                 $productServices = ProductService::all();
             }
-            \Log::info("All Product Service" . $productServices);
+            Log::info("All Product Service" . $productServices);
 
             return view('productservice.index', compact('productServices', 'category'));
         } catch (Exception $e) {
@@ -71,50 +72,43 @@ class ProductServiceController extends Controller
             $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
 
 
-            $incomeChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
+            $incomeChartAccounts = ChartOfAccount::select(DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
                 ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
                 ->where('chart_of_account_types.name', 'income')
                 ->where('parent', '=', 0)
-                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+                ->where('chart_of_accounts.created_by', Auth::user()->creatorId())->get()
                 ->pluck('code_name', 'id');
             $incomeChartAccounts->prepend('Select Account', 0);
 
-            $incomeSubAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name,chart_of_accounts.id, chart_of_accounts.code, chart_of_account_parents.account'));
+            $incomeSubAccounts = ChartOfAccount::select(DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name,chart_of_accounts.id, chart_of_accounts.code, chart_of_account_parents.account'));
             $incomeSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
             $incomeSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
             $incomeSubAccounts->where('chart_of_account_types.name', 'income');
             $incomeSubAccounts->where('chart_of_accounts.parent', '!=', 0);
-            $incomeSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
+            $incomeSubAccounts->where('chart_of_accounts.created_by', Auth::user()->creatorId());
             $incomeSubAccounts = $incomeSubAccounts->get()->toArray();
-            $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
+            $customFields = CustomField::where('created_by', '=', Auth::user()->creatorId())->where('module', '=', 'product')->get();
 
 
-            $expenseChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
+            $expenseChartAccounts = ChartOfAccount::select(DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
                 ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
                 ->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold'])
-                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
+                ->where('chart_of_accounts.created_by', Auth::user()->creatorId())->get()
                 ->pluck('code_name', 'id');
             $expenseChartAccounts->prepend('Select Account', '');
 
-            $expenseSubAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name,chart_of_accounts.id, chart_of_accounts.code, chart_of_account_parents.account'));
+            $expenseSubAccounts = ChartOfAccount::select(DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name,chart_of_accounts.id, chart_of_accounts.code, chart_of_account_parents.account'));
             $expenseSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
             $expenseSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
             $expenseSubAccounts->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold']);
             $expenseSubAccounts->where('chart_of_accounts.parent', '!=', 0);
-            $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
+            $expenseSubAccounts->where('chart_of_accounts.created_by', Auth::user()->creatorId());
             $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
             $quantityUnitCodes = QuantityUnitCode::all()->pluck('name', 'code');
             $packagingUnitCodes = ProductServicesPackagingUnit::all()->pluck('name', 'code');
-<<<<<<< HEAD
-            $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
-            $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
-            $category->prepend('Select Category', '');
-
-=======
             $productServicesPackagingUnit = ProductServicesPackagingUnit::all()->pluck('name', 'code');
-            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
+            $category = ProductServiceCategory::where('created_by', '=', Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
->>>>>>> Purchase
             return view(
                 'productservice.create',
                 compact(
@@ -152,14 +146,10 @@ class ProductServiceController extends Controller
 
     public function store(Request $request)
     {
-<<<<<<< HEAD
-        \Log::info('CREATE PRODUCT SERVICE REQUEST Clicked :' . $request);
-=======
->>>>>>> Purchase
         try {
             $data = $request->all();
 
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $data,
                 [
                     'items' => 'required|array',
@@ -201,16 +191,16 @@ class ProductServiceController extends Controller
             }
 
             if (
-                \Auth::user()->type == 'company'
-                || \Auth::user()->type == 'accountant'
+                Auth::user()->type == 'company'
+                || Auth::user()->type == 'accountant'
             ) {
-                \Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
-                \Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
+                Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
+                Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
 
 
 
-                \Log::info('ITEMS');
-                \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
+                Log::info('ITEMS');
+                Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
 
                 $apiData = [];
 
@@ -230,7 +220,7 @@ class ProductServiceController extends Controller
                 ];
 
                 foreach ($data['items'] as $index => $item) {
-                    \Log::info('ITEM INDEX: ' . $index);
+                    Log::info('ITEM INDEX: ' . $index);
 
                     // Determine the tax_id based on taxTypeCode
                     $taxIdCode = isset($item['taxTypeCode']) && array_key_exists($item['taxTypeCode'], $taxTypeMapping)
@@ -242,20 +232,20 @@ class ProductServiceController extends Controller
                         ? $productTypeMapping[$item['itemTypeCode']]
                         : null;
 
-                    \Log::info('Product Type selected for this Product : ' . $productType);
+                    Log::info('Product Type selected for this Product : ' . $productType);
 
                     // Handling image upload with storage limit check
                     if (!empty($item['pro_image']) && $item['pro_image']->isValid()) {
-                        \Log::info('Image File Object for Item ' . ($index + 1));
+                        Log::info('Image File Object for Item ' . ($index + 1));
                         $image_size = $item['pro_image']->getSize();
-                        $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
+                        $result = Utility::updateStorageLimit(Auth::user()->creatorId(), $image_size);
 
                         if ($result == 1) {
                             $fileName = $item['pro_image']->getClientOriginalName();
                             $dir = 'uploads/pro_image';
                             $path = Utility::upload_file($item, 'pro_image', $fileName, $dir, []);
 
-                            \Log::info('product image path:', $path);
+                            Log::info('product image path:', $path);
 
                             // Assign the file name to the pro_image field
                             $item['pro_image'] = $fileName;
@@ -280,7 +270,7 @@ class ProductServiceController extends Controller
                                 'pro_image' => $dir . '/' . $fileName,
                                 'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
                                 'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
-                                'created_by' => \Auth::user()->creatorId(),
+                                'created_by' => Auth::user()->creatorId(),
                                 'tin' => $item['tin'] ?? null,
                                 'itemCd' => $item['itemCode'],
                                 'itemClsCd' => $item['itemClassifiCode'],
@@ -320,37 +310,37 @@ class ProductServiceController extends Controller
                             //     "packageQuantity" => $item['packageQuantity'] ?? 0
                             // ];
                         } else {
-                            \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
+                            Log::info('Storage limit exceeded for user ' . Auth::user()->creatorId());
                             return redirect()->back()->with('error', 'Storage limit exceeded.');
                         }
                     } else {
-                        \Log::info('No valid image uploaded for item ' . ($index + 1));
+                        Log::info('No valid image uploaded for item ' . ($index + 1));
                     }
                 }
 
                 // Post data to the external API
-                $response = \Http::withOptions([
+                $response = Http::withOptions([
                     'verify' => false
                 ])->withHeaders([
-                            'Accept' => 'application/json',
-                            'Content-Type' => 'application/json',
-                            'key' => '123456'
-                        ])->post('https://etims.your-apps.biz/api/AddItemsList', $apiData);
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                    'key' => '123456'
+                ])->post('https://etims.your-apps.biz/api/AddItemsList', $apiData);
 
                 // Log response data
-                \Log::info('API Response Status Code For Posting Product Data: ' . $response->status());
-                \Log::info('API Request Product Data Posted: ' . json_encode($apiData));
-                \Log::info('API Response Body For Posting Product Data: ' . $response->body());
+                Log::info('API Response Status Code For Posting Product Data: ' . $response->status());
+                Log::info('API Request Product Data Posted: ' . json_encode($apiData));
+                Log::info('API Response Body For Posting Product Data: ' . $response->body());
 
                 if ($response->successful()) {
-                    \Log::info('Data successfully posted to the API');
+                    Log::info('Data successfully posted to the API');
                 } else {
-                    \Log::error('Error posting data to the API: ' . $response->body());
+                    Log::error('Error posting data to the API: ' . $response->body());
                 }
 
 
                 // Post data to the ItemOpeningStock API
-                // $openingStockResponse = \Http::withOptions([
+                // $openingStockResponse = Http::withOptions([
                 //     'verify' => false
                 // ])->withHeaders([
                 //             'Accept' => 'application/json',
@@ -358,14 +348,14 @@ class ProductServiceController extends Controller
                 //             'key' => '123456'
                 //         ])->post('https://etims.your-apps.biz/api/ItemOpeningStock', $openingStockData);
 
-                // \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $openingStockResponse->status());
-                // \Log::info('API Request Opening Stock Data Posted: ' . json_encode($openingStockData));
-                // \Log::info('API Response Body For Posting Opening Stock Data: ' . $openingStockResponse->body());
+                // Log::info('API Response Status Code For Posting Opening Stock Data: ' . $openingStockResponse->status());
+                // Log::info('API Request Opening Stock Data Posted: ' . json_encode($openingStockData));
+                // Log::info('API Response Body For Posting Opening Stock Data: ' . $openingStockResponse->body());
 
                 // if ($openingStockResponse->successful()) {
-                //     \Log::info('Opening stock data successfully posted to the API');
+                //     Log::info('Opening stock data successfully posted to the API');
                 // } else {
-                //     \Log::error('Error posting opening stock data to the API: ' . $openingStockResponse->body());
+                //     Log::error('Error posting opening stock data to the API: ' . $openingStockResponse->body());
                 // }
 
 
@@ -374,8 +364,8 @@ class ProductServiceController extends Controller
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
         } catch (\Exception $e) {
-            \Log::error('CREATE PRODUCT SERVICE ERROR');
-            \Log::error($e);
+            Log::error('CREATE PRODUCT SERVICE ERROR');
+            Log::error($e);
             return redirect()->back()->with('error', 'Something Went Wrong');
         }
     }
@@ -452,22 +442,17 @@ class ProductServiceController extends Controller
                 'message' => 'error',
                 'data' => $e->getMessage()
             ]);
-
         }
     }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> Purchase
     public function update(Request $request, $id)
     {
-        $itemInformation = ProductService::find($id);
-        \Log::info('Product Service INFO being edited :', ['item' => $itemInformation]);
+        $itemInformation = ProductService::findOrFail($id);
+        Log::info('Product Service INFO being edited :', ['item' => $itemInformation]);
 
         try {
 
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(),
                 [
                     'itemCd' => 'required',
@@ -500,7 +485,7 @@ class ProductServiceController extends Controller
             }
 
             $data = $request->all();
-            \Log::info('Product Service INFO being edited and posted to the API:', $data);
+            Log::info('Product Service INFO being edited and posted to the API:', $data);
 
             $reqData = [
                 "itemCode" => $data['itemCd'],
@@ -520,32 +505,24 @@ class ProductServiceController extends Controller
                 "group3UnitPrice" => $data['grpPrcL3'],
                 "group4UnitPrice" => $data['grpPrcL4'],
                 "group5UnitPrice" => $data['grpPrcL5'],
-<<<<<<< HEAD
-                "additionalInfo" => $data['addInfo'] ?? null,
+                "additionalInfo" => $data['addInfo'],
                 "saftyQuantity" => $data['sftyQty'],
                 "isInrcApplicable" => (bool) $data['isrcAplcbYn'],
                 "isUsed" => (bool) $data['isUsed'],
-                "packageQuantity" => $data['pkgQuantity'],
-=======
-                "additionalInfo" => $data['addInfo'],
-                "saftyQuantity" => $data['sftyQty'],
-                "isInrcApplicable" => (boolean) $data['isrcAplcbYn'],
-                "isUsed" => (boolean) $data['isUsed'],
                 "packageQuantity" => $data['packageQuantity'],
->>>>>>> Purchase
             ];
 
             $response = Http::withOptions([
                 'verify' => false
             ])->withHeaders([
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/json',
-                        'key' => '123456'
-                    ])->post('https://etims.your-apps.biz/api/UpdateItem', $reqData);
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'key' => '123456'
+            ])->post('https://etims.your-apps.biz/api/UpdateItem', $reqData);
 
             $res = $response->json();
-            \Log::info('API Request Data: ' . json_encode($reqData));
-            \Log::info('API RESPONSE when posting the Product Details When being Edited: ', ['response' => $res]);
+            Log::info('API Request Data: ' . json_encode($reqData));
+            Log::info('API RESPONSE when posting the Product Details When being Edited: ', ['response' => $res]);
 
             if ($res['statusCode'] != 200) {
                 return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
@@ -577,21 +554,21 @@ class ProductServiceController extends Controller
                 ? $productTypeMapping[$data['itemTypeCode']]
                 : null;
 
-            \Log::info('Product Type selected for this Product : ' . $productType);
+            Log::info('Product Type selected for this Product : ' . $productType);
 
             // Handling image upload with storage limit check
             $fileName = $itemInformation->pro_image; // Default to existing image
             if ($request->hasFile('pro_image') && $data['pro_image']->isValid()) {
-                \Log::info('Image File Object for Item being edited');
+                Log::info('Image File Object for Item being edited');
                 $image_size = $data['pro_image']->getSize();
-                $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
+                $result = Utility::updateStorageLimit(Auth::user()->creatorId(), $image_size);
 
                 if ($result == 1) {
                     $fileName = $data['pro_image']->getClientOriginalName();
                     $dir = 'uploads/pro_image';
                     $path = Utility::upload_file($data, 'pro_image', $fileName, $dir, []);
-                    \Log::info('PATH');
-                    \Log::info($path);
+                    Log::info('PATH');
+                    Log::info($path);
 
                     // Update the product Service information including the new image name
                     $iteminformation->update([
@@ -608,7 +585,7 @@ class ProductServiceController extends Controller
                         'pro_image' => $dir . '/' . $fileName ?? null,
                         'sale_chartaccount_id' => $data['sale_chartaccount_id'] ?? null,
                         'expense_chartaccount_id' => $data['expense_chartaccount_id'] ?? null,
-                        'created_by' => \Auth::user()->creatorId(),
+                        'created_by' => Auth::user()->creatorId(),
                         'tin' => $data['tin'] ?? null,
                         'itemCd' => $data['itemCd'] ?? null,
                         'itemClsCd' => $data['itemClsCd'],
@@ -637,13 +614,10 @@ class ProductServiceController extends Controller
                         'isUsed' => $data['isUsed'] ?? null,
                     ]);
                 } else {
-                    \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
+                    Log::info('Storage limit exceeded for user ' . Auth::user()->creatorId());
                     return redirect()->back()->with('error', 'Storage limit exceeded.');
                 }
-<<<<<<< HEAD
-=======
             } else {
-                // Update the Product Service information without changing the image
                 $iteminformation->update([
                     'name' => $data['itemNm'] ?? null,
                     'sku' => $data['itemCode'] ?? null,
@@ -657,7 +631,7 @@ class ProductServiceController extends Controller
                     'description' => $data['additionalInfo'] ?? null,
                     'sale_chartaccount_id' => $data['sale_chartaccount_id'] ?? null,
                     'expense_chartaccount_id' => $data['expense_chartaccount_id'] ?? null,
-                    'created_by' => \Auth::user()->creatorId(),
+                    'created_by' => Auth::user()->creatorId(),
                     'tin' => $data['tin'] ?? null,
                     'itemCd' => $data['itemCd'],
                     'itemClsCd' => $data['itemClsCd'],
@@ -685,7 +659,6 @@ class ProductServiceController extends Controller
                     'useYn' => $data['useYn'] ?? null,
                     'isUsed' => $data['isUsed'] ?? null,
                 ]);
->>>>>>> Purchase
             }
 
             // Determine the unit_id from qtyUnitCode
@@ -710,7 +683,7 @@ class ProductServiceController extends Controller
                 'pro_image' => $dir . '/' . $fileName,
                 'sale_chartaccount_id' => $data['sale_chartaccount_id'],
                 'expense_chartaccount_id' => $data['expense_chartaccount_id'],
-                'created_by' => \Auth::user()->creatorId(),
+                'created_by' => Auth::user()->creatorId(),
                 'tin' => $data['tin'] ?? null,
                 'itemCd' => $data['itemCd'],
                 'itemClsCd' => $data['itemClsCd'],
@@ -740,7 +713,7 @@ class ProductServiceController extends Controller
 
             return redirect()->route('productservice.index')->with('success', 'Product / Service Updated Successfully');
         } catch (\Exception $e) {
-            \Log::error('UPDATE PRODUCT SERVICE ERROR', ['exception' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            Log::error('UPDATE PRODUCT SERVICE ERROR', ['exception' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return redirect()->back()->with('error', 'Something Went Wrong');
         }
     }
@@ -752,49 +725,49 @@ class ProductServiceController extends Controller
     public function edit($id)
     {
         // if (
-        //     \Auth::user()->type == 'company'
-        //     || \Auth::user()->type == 'accountant'
+        //     Auth::user()->type == 'company'
+        //     || Auth::user()->type == 'accountant'
         // ) {
         $productServiceinformation = ProductService::find($id);
 
         $productServiceclassifications = ProductsServicesClassification::pluck('itemClsNm', 'itemClsCd');
         $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
-        \Log::info($itemtypes);
+        Log::info($itemtypes);
         $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
         $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
 
 
-            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
-            $unit = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $tax = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $incomeChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
-                ->where('chart_of_account_types.name', 'income')
-                ->where('parent', '=', 0)
-                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-                ->pluck('code_name', 'id');
-            $incomeChartAccounts->prepend('Select Account', 0);
-            $incomeSubAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name', 'chart_of_account_parents.account');
-            $incomeSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
-            $incomeSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
-            $incomeSubAccounts->where('chart_of_account_types.name', 'income');
-            $incomeSubAccounts->where('chart_of_accounts.parent', '!=', 0);
-            $incomeSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
-            $incomeSubAccounts = $incomeSubAccounts->get()->toArray();
-            $expenseChartAccounts = ChartOfAccount::select(\DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
-                ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
-                ->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold'])
-                ->where('chart_of_accounts.created_by', \Auth::user()->creatorId())->get()
-                ->pluck('code_name', 'id');
-            $expenseChartAccounts->prepend('Select Account', '');
-            $expenseSubAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name', 'chart_of_account_parents.account');
-            $expenseSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
-            $expenseSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
-            $expenseSubAccounts->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold']);
-            $expenseSubAccounts->where('chart_of_accounts.parent', '!=', 0);
-            $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
-            $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
-            $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
+        $category = ProductServiceCategory::where('created_by', '=', Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
+        $unit = ProductServiceUnit::where('created_by', '=', Auth::user()->creatorId())->get()->pluck('name', 'id');
+        $tax = Tax::where('created_by', '=', Auth::user()->creatorId())->get()->pluck('name', 'id');
+        $incomeChartAccounts = ChartOfAccount::select(DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
+            ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
+            ->where('chart_of_account_types.name', 'income')
+            ->where('parent', '=', 0)
+            ->where('chart_of_accounts.created_by', Auth::user()->creatorId())->get()
+            ->pluck('code_name', 'id');
+        $incomeChartAccounts->prepend('Select Account', 0);
+        $incomeSubAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name', 'chart_of_account_parents.account');
+        $incomeSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
+        $incomeSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
+        $incomeSubAccounts->where('chart_of_account_types.name', 'income');
+        $incomeSubAccounts->where('chart_of_accounts.parent', '!=', 0);
+        $incomeSubAccounts->where('chart_of_accounts.created_by', Auth::user()->creatorId());
+        $incomeSubAccounts = $incomeSubAccounts->get()->toArray();
+        $expenseChartAccounts = ChartOfAccount::select(DB::raw('CONCAT(chart_of_accounts.code, " - ", chart_of_accounts.name) AS code_name, chart_of_accounts.id as id'))
+            ->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type')
+            ->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold'])
+            ->where('chart_of_accounts.created_by', Auth::user()->creatorId())->get()
+            ->pluck('code_name', 'id');
+        $expenseChartAccounts->prepend('Select Account', '');
+        $expenseSubAccounts = ChartOfAccount::select('chart_of_accounts.id', 'chart_of_accounts.code', 'chart_of_accounts.name', 'chart_of_account_parents.account');
+        $expenseSubAccounts->leftjoin('chart_of_account_parents', 'chart_of_accounts.parent', 'chart_of_account_parents.id');
+        $expenseSubAccounts->leftjoin('chart_of_account_types', 'chart_of_account_types.id', 'chart_of_accounts.type');
+        $expenseSubAccounts->whereIn('chart_of_account_types.name', ['Expenses', 'Costs of Goods Sold']);
+        $expenseSubAccounts->where('chart_of_accounts.parent', '!=', 0);
+        $expenseSubAccounts->where('chart_of_accounts.created_by', Auth::user()->creatorId());
+        $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
+        $customFields = CustomField::where('created_by', '=', Auth::user()->creatorId())->where('module', '=', 'product')->get();
 
         return view(
             'productservice.edit',
@@ -825,16 +798,15 @@ class ProductServiceController extends Controller
     public function destroy($id)
     {
         if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
+            Auth::user()->type == 'company'
+            || Auth::user()->type == 'accountant'
         ) {
             $productService = ProductService::find($id);
-            if ($productService->created_by == \Auth::user()->creatorId()) {
+            if ($productService->created_by == Auth::user()->creatorId()) {
                 if (!empty($productService->pro_image)) {
                     //storage limit
                     $file_path = '/uploads/pro_image/' . $productService->pro_image;
-                    $result = Utility::changeStorageLimit(\Auth::user()->creatorId(), $file_path);
-
+                    $result = Utility::changeStorageLimit(Auth::user()->creatorId(), $file_path);
                 }
 
                 $productService->delete();
@@ -867,7 +839,7 @@ class ProductServiceController extends Controller
           'file' => 'required',
       ];
 
-      $validator = \Validator::make($request->all(), $rules);
+      $validator = Validator::make($request->all(), $rules);
 
       if ($validator->fails()) {
           $messages = $validator->getMessageBag();
@@ -910,7 +882,7 @@ class ProductServiceController extends Controller
           $productService->unit_id = $items[7];
           $productService->type = $items[8];
           $productService->description = $items[9];
-          $productService->created_by = \Auth::user()->creatorId();
+          $productService->created_by = Auth::user()->creatorId();
 
           if (empty($productService)) {
               $errorArray[] = $productService;
@@ -939,7 +911,7 @@ class ProductServiceController extends Controller
 
       return redirect()->back()->with($data['status'], $data['msg']);
   }
-   ***/
+     ***/
 
     public function import(Request $request)
     {
@@ -947,7 +919,7 @@ class ProductServiceController extends Controller
             'file' => 'required',
         ];
 
-        $validator = \Validator::make($request->all(), $rules);
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             $messages = $validator->getMessageBag();
@@ -975,7 +947,7 @@ class ProductServiceController extends Controller
                 // 'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
                 // 'description' => $item['description'] ?? null,
                 // 'pro_image' => $storedFilePath,
-                'created_by' => \Auth::user()->creatorId(),
+                'created_by' => Auth::user()->creatorId(),
                 "itemCode" => $product[0],
                 "itemClassifiCode" => $product[1],
                 "itemTypeCode" => $product[2],
@@ -1010,9 +982,9 @@ class ProductServiceController extends Controller
         ])->post('https://etims.your-apps.biz/api/SaveItems', $jsonData);
 
         // Log the API response
-        \Log::info('API Request Data: ' . json_encode($products));
-        \Log::info('API Response: ' . $response->body());
-        \Log::info('API Response Status Code: ' . $response->status());
+        Log::info('API Request Data: ' . json_encode($products));
+        Log::info('API Response: ' . $response->body());
+        Log::info('API Response Status Code: ' . $response->status());
 
         // Check if API call was successful
         // if ($response->successful()) {
@@ -1020,7 +992,7 @@ class ProductServiceController extends Controller
         //     return redirect()->route('productservice.index')->with('success', __('Data imported and posted to API successfully.'));
         // } else {
         //     // If API call failed, log error and handle error message
-        //     \Log::error('API Error: ' . $response->body());
+        //     Log::error('API Error: ' . $response->body());
 
         //     // Get the error message from the API response
         //     $errorMessage = $response->json()['message'] ?? __('Failed to import data or post to API.');
@@ -1041,13 +1013,12 @@ class ProductServiceController extends Controller
             // If API call failed, return with error message
             return redirect()->back()->with('error', __('Failed to import data or post to API.'));
         }
-
     }
 
 
     public function warehouseDetail($id)
     {
-        $products = WarehouseProduct::with(['warehouse'])->where('product_id', '=', $id)->where('created_by', '=', \Auth::user()->creatorId())->get();
+        $products = WarehouseProduct::with(['warehouse'])->where('product_id', '=', $id)->where('created_by', '=', Auth::user()->creatorId())->get();
         return view('productservice.detail', compact('products'));
     }
 
@@ -1065,7 +1036,6 @@ class ProductServiceController extends Controller
                 if ($request->cat_id !== '' && $request->search == '') {
                     if ($request->cat_id == '0') {
                         $products = ProductService::getallproducts()->whereIn('product_services.id', $ids)->get();
-
                     } else {
                         $products = ProductService::getallproducts()->where('category_id', $request->cat_id)->whereIn('product_services.id', $ids)->get();
                     }
@@ -1081,10 +1051,8 @@ class ProductServiceController extends Controller
 
                 if ($request->cat_id == '0') {
                     $products = ProductService::getallproducts()->whereIn('product_services.id', $ids)->with(['unit'])->get();
-
                 } else {
                     $products = ProductService::getallproducts()->whereIn('product_services.id', $ids)->where('category_id', $request->cat_id)->with(['unit'])->get();
-
                 }
             }
 
@@ -1103,7 +1071,6 @@ class ProductServiceController extends Controller
                         $productprice = $product->purchase_price != 0 ? $product->purchase_price : 0;
                     } else if ($request->session_key == 'pos') {
                         $productprice = $product->dftPrc != 0 ? $product->dftPrc : 0;
-
                     } else {
                         $productprice = $product->dftPrc != 0 ? $product->dftPrc : $product->purchase_price;
                     }
@@ -1127,11 +1094,9 @@ class ProductServiceController extends Controller
                             </div>
 
                     ';
-
                 }
 
                 return Response($output);
-
             } else {
                 $output = '<div class="card card-body col-12 text-center">
                     <h5>' . __("No Product Available") . '</h5>
@@ -1146,8 +1111,8 @@ class ProductServiceController extends Controller
 
         try {
             if (
-                \Auth::user()->type == 'company'
-                || \Auth::user()->type == 'accountant'
+                Auth::user()->type == 'company'
+                || Auth::user()->type == 'accountant'
                 && $request->ajax()
             ) {
                 $product = WarehouseProduct::where('product_id', $id)->first();
@@ -1369,8 +1334,8 @@ class ProductServiceController extends Controller
                 );
             }
         } catch (\Exception $e) {
-            \Log::info('ADD TO CART ERROR');
-            \Log::info($e);
+            Log::info('ADD TO CART ERROR');
+            Log::info($e);
 
             return response()->json(
                 [
@@ -1410,7 +1375,6 @@ class ProductServiceController extends Controller
                 $tax = ($subtotal * $producttax) / 100;
 
                 $cart[$id]["subtotal"] = $subtotal + $tax;
-
             }
 
             if (isset($cart[$id]) && ($cart[$id]["originalquantity"]) < $cart[$id]['quantity'] && $session_key == 'pos') {
@@ -1466,7 +1430,6 @@ class ProductServiceController extends Controller
             return redirect()->back()->with('error', __('Cart is empty!'));
         } else {
             return redirect()->back()->with('error', __('Cart cannot be empty!.'));
-
         }
     }
 
@@ -1480,7 +1443,6 @@ class ProductServiceController extends Controller
         }
 
         return response()->json();
-
     }
 
     public function removeFromCart(Request $request)
@@ -1506,21 +1468,21 @@ class ProductServiceController extends Controller
 
             $url = 'https://etims.your-apps.biz/api/GetCodeList?date=20210101120000';
 
-            \Log::info('URL');
-            \Log::info($url);
+            Log::info('URL');
+            Log::info($url);
 
             $response = Http::withOptions([
                 'verify' => false
             ])->withHeaders([
-                        'key' => '123456'
-                    ])->timeout(60)->get($url);
+                'key' => '123456'
+            ])->timeout(60)->get($url);
 
             $data = $response->json()['data'];
 
             $remoteCodes = $data['data']['clsList'];
 
-            \Log::info('REMOTE CODES');
-            \Log::info(json_encode($remoteCodes));
+            Log::info('REMOTE CODES');
+            Log::info(json_encode($remoteCodes));
 
             $codesToSync = [];
 
@@ -1537,13 +1499,13 @@ class ProductServiceController extends Controller
                 array_push($codesToSync, $code);
             }
 
-            \Log::info('CODES TO SYNC');
-            \Log::info($codesToSync);
+            Log::info('CODES TO SYNC');
+            Log::info($codesToSync);
 
             $syncedCodes = 0;
 
             foreach ($codesToSync as $codeToSync) {
-                $exists = (boolean) Code::where('cdCls', $codeToSync['cdCls'])->exists();
+                $exists = (bool) Code::where('cdCls', $codeToSync['cdCls'])->exists();
                 if (!$exists) {
                     Code::create($codeToSync);
                     $syncedCodes++;
@@ -1555,11 +1517,9 @@ class ProductServiceController extends Controller
             } else {
                 return redirect()->back()->with('success', __('Codes Up To Date'));
             }
-
-
         } catch (\Exception $e) {
-            \Log::info('ERROR SYNCING CODE LIST');
-            \Log::info($e);
+            Log::info('ERROR SYNCING CODE LIST');
+            Log::info($e);
             return redirect()->back()->with('error', __('Error Syncing Code List'));
         }
     }
@@ -1570,21 +1530,21 @@ class ProductServiceController extends Controller
 
             $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20210101120000';
 
-            \Log::info('URL');
-            \Log::info($url);
+            Log::info('URL');
+            Log::info($url);
 
             $response = Http::withOptions([
                 'verify' => false
             ])->withHeaders([
-                        'key' => '123456'
-                    ])->timeout(60)->get($url);
+                'key' => '123456'
+            ])->timeout(60)->get($url);
 
             $data = $response->json()['data'];
 
             $remoteItems = $data['data']['itemList'];
 
-            \Log::info('REMOTE ITEMS');
-            \Log::info($remoteItems);
+            Log::info('REMOTE ITEMS');
+            Log::info($remoteItems);
 
             $itemsToSync = [];
 
@@ -1618,13 +1578,13 @@ class ProductServiceController extends Controller
                 array_push($itemsToSync, $item);
             }
 
-            \Log::info('ITEMS TO SYNC : ');
-            \Log::info("Product & service being sync" . $itemsToSync);
+            Log::info('ITEMS TO SYNC : ');
+            Log::info("Product & service being sync" . $itemsToSync);
 
             $syncedItems = 0;
 
             foreach ($itemsToSync as $itemToSync) {
-                $exists = (boolean) ProductService::where('itemCd', $itemsToSync['itemCd'])->exists();
+                $exists = (bool) ProductService::where('itemCd', $itemsToSync['itemCd'])->exists();
                 if (!$exists) {
                     ProductService::create($itemToSync);
                     $syncedItems++;
@@ -1637,8 +1597,8 @@ class ProductServiceController extends Controller
                 return redirect()->back()->with('success', __('Items Up To Date'));
             }
         } catch (\Exception $e) {
-            \Log::info('ERROR SYNCING ITEM INFO');
-            \Log::info($e);
+            Log::info('ERROR SYNCING ITEM INFO');
+            Log::info($e);
             return redirect()->back()->with('error', __('Error Syncing Item Information'));
         }
     }
@@ -1652,15 +1612,15 @@ class ProductServiceController extends Controller
             $response = Http::withOptions([
                 'verify' => false
             ])->withHeaders([
-                        'key' => '123456'
-                    ])->timeout(60)->get($url);
+                'key' => '123456'
+            ])->timeout(60)->get($url);
 
             $data = $response->json()['data'];
 
             $remoteIteminfo = $data['data']['itemClsList'];
 
-            \Log::info('REMOTE ITEM INFO');
-            \Log::info($remoteIteminfo);
+            Log::info('REMOTE ITEM INFO');
+            Log::info($remoteIteminfo);
 
             $remoteItemInfoToSync = [];
 
@@ -1676,13 +1636,13 @@ class ProductServiceController extends Controller
                 array_push($remoteItemInfoToSync, $item);
             }
 
-            \Log::info('REMOTE ITEM INFO TO SYNC');
-            \Log::info($remoteItemInfoToSync);
+            Log::info('REMOTE ITEM INFO TO SYNC');
+            Log::info($remoteItemInfoToSync);
 
             $syncedItemInfo = 0;
 
             foreach ($remoteItemInfoToSync as $remoteItemInfo) {
-                $exists = (boolean) ProductsServicesClassification::where('itemClsCd', $remoteItemInfo['itemClsCd'])->exists();
+                $exists = (bool) ProductsServicesClassification::where('itemClsCd', $remoteItemInfo['itemClsCd'])->exists();
                 if (!$exists) {
                     ProductsServicesClassification::create($remoteItemInfo);
                     $syncedItemInfo++;
@@ -1695,11 +1655,10 @@ class ProductServiceController extends Controller
                 return redirect()->back()->with('success', __('Product Service  Classifications Up To Date'));
             }
         } catch (\Exception $e) {
-            \Log::info('ERROR SYNCING ITEM CLASSIFICATIONS');
-            \Log::info($e);
+            Log::info('ERROR SYNCING ITEM CLASSIFICATIONS');
+            Log::info($e);
             return redirect()->back()->with('error', __('Error Syncing Product Service  Classifications'));
         }
-
     }
 
 
@@ -1717,7 +1676,7 @@ class ProductServiceController extends Controller
         $iteminformations = ProductService::all();
         $itemtypes = ItemType::all();
 
-        \Log::info($itemtypes);
+        Log::info($itemtypes);
         return view('productservice.getiteminformation', compact('iteminformations', 'itemtypes'));
     }
 
@@ -1740,14 +1699,14 @@ class ProductServiceController extends Controller
         $response = Http::withOptions([
             'verify' => false
         ])->withHeaders([
-                    'key' => '123456'
-                ])->timeout(300)->get($url);
+            'key' => '123456'
+        ])->timeout(300)->get($url);
 
         $data = $response->json()['data'];
 
-        \Log::info('API Request Data For All Items Information: ' . json_encode($data));
-        \Log::info('API Response: ' . $response->body());
-        \Log::info('API Response Status Code: ' . $response->status());
+        Log::info('API Request Data For All Items Information: ' . json_encode($data));
+        Log::info('API Response: ' . $response->body());
+        Log::info('API Response Status Code: ' . $response->status());
 
         if (isset($data['data'])) {
             try {
@@ -1780,7 +1739,7 @@ class ProductServiceController extends Controller
                         'expense_chartaccount_id' => null,
                         'description' => $item['addInfo'],
                         'pro_image' => null,
-                        'created_by' => \Auth::user()->creatorId(),
+                        'created_by' => Auth::user()->creatorId(),
                         'tin' => $item['tin'],
                         'itemCd' => $item['itemCd'],
                         'itemClsCd' => $item['itemClsCd'],
@@ -1808,8 +1767,8 @@ class ProductServiceController extends Controller
                     ]);
                 }
             } catch (Exception $e) {
-                \Log::error('Error adding Product Service informationfrom the API: ');
-                \Log::error($e);
+                Log::error('Error adding Product Service informationfrom the API: ');
+                Log::error($e);
                 return redirect()->route('productservice.index')->with('success', 'Error adding Product Service informationfrom the API.');
             }
         } else {
@@ -1820,7 +1779,7 @@ class ProductServiceController extends Controller
     public function productServiceSearchByDate(Request $request)
     {
         // Log the incoming request
-        \Log::info('Synchronization Product Search by Date request received:', $request->all());
+        Log::info('Synchronization Product Search by Date request received:', $request->all());
 
         // Validate the product service search by date date 
         $request->validate([
@@ -1833,7 +1792,7 @@ class ProductServiceController extends Controller
         // Get and format the date
         $date = $request->input('searchByDate');
         $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
-        \Log::info('Date formatted from synchronization product & Services request:', ['formattedDate' => $formattedDate]);
+        Log::info('Date formatted from synchronization product & Services request:', ['formattedDate' => $formattedDate]);
 
         try {
             // Make the API call
@@ -1845,14 +1804,14 @@ class ProductServiceController extends Controller
 
             // Check if the response contains the required data
             $data = $response->json();
-            \Log::info('REMOTE Item Information Data INFO From API ', ['Item Information Data From API info' => $data]);
+            Log::info('REMOTE Item Information Data INFO From API ', ['Item Information Data From API info' => $data]);
 
             if (!isset($data['data']['itemClsList'])) {
                 return redirect()->back()->with('error', __('There is no search result.'));
             }
 
             $remoteItemInformationinfo = $data['data']['itemClsList'];
-            \Log::info('REMOTE Item Information INFO', ['remoteItemInformationinfo' => $remoteItemInformationinfo]);
+            Log::info('REMOTE Item Information INFO', ['remoteItemInformationinfo' => $remoteItemInformationinfo]);
 
             $remoteItemInformationinfoToSync = [];
 
@@ -1885,7 +1844,7 @@ class ProductServiceController extends Controller
                     'expense_chartaccount_id' => null,
                     'description' => $item['addInfo'],
                     'pro_image' => null,
-                    'created_by' => \Auth::user()->creatorId(),
+                    'created_by' => Auth::user()->creatorId(),
                     'tin' => $item['tin'],
                     'itemCd' => $item['itemCd'],
                     'itemClsCd' => $item['itemClsCd'],
@@ -1915,7 +1874,7 @@ class ProductServiceController extends Controller
                 array_push($remoteItemInformationinfoToSync, $productServiceData);
             }
 
-            \Log::info('Product & Service Data to Sync:', ['remoteItemInformationinfoToSync' => $remoteItemInformationinfoToSync]);
+            Log::info('Product & Service Data to Sync:', ['remoteItemInformationinfoToSync' => $remoteItemInformationinfoToSync]);
 
             $syncedLocalItemInformationinfo = 0;
             // Check if the product service already exists and sync if not
@@ -1933,7 +1892,7 @@ class ProductServiceController extends Controller
                 return redirect()->back()->with('success', __('Product & Service(s) Up To Date'));
             }
         } catch (\Exception $e) {
-            \Log::error('Error syncing Product & Service:', ['error' => $e->getMessage()]);
+            Log::error('Error syncing Product & Service:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', __('Error Syncing Product & Service'));
         }
     }
@@ -1942,7 +1901,7 @@ class ProductServiceController extends Controller
     public function searchCodeListByDate(Request $request)
     {
         // Log the request from the form
-        \Log::info('Synchronization request received From Searching the Code List Search Form:', $request->all());
+        Log::info('Synchronization request received From Searching the Code List Search Form:', $request->all());
 
         // Get the date passed from the search form
         $date = $request->input('searchCodeListByDate');
@@ -1953,7 +1912,7 @@ class ProductServiceController extends Controller
         // Format the date using Carbon
         $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
 
-        \Log::info('Date Formatted for Synchronization request:', ['formattedDate' => $formattedDate]);
+        Log::info('Date Formatted for Synchronization request:', ['formattedDate' => $formattedDate]);
 
         try {
             $url = 'https://etims.your-apps.biz/api/GetCodeList?date=' . $formattedDate;
@@ -1964,14 +1923,14 @@ class ProductServiceController extends Controller
 
             $data = $response->json()['data'];
 
-            \Log::info('REMOTE Code List INFO From Data Response', ['remote Item Classifications' => $data]);
+            Log::info('REMOTE Code List INFO From Data Response', ['remote Item Classifications' => $data]);
 
             if (!isset($data['data']['clsList'])) {
                 return redirect()->back()->with('error', __('There is no search result.'));
             }
 
             $remoteCodeListinfo = $data['data']['clsList'];
-            \Log::info('REMOTE CODE LIST INFO', ['remoteCodeListinfo' => $remoteCodeListinfo]);
+            Log::info('REMOTE CODE LIST INFO', ['remoteCodeListinfo' => $remoteCodeListinfo]);
 
             $remoteCodeListinfoToSync = [];
             foreach ($remoteCodeListinfo as $remoteCodeList) {
@@ -1987,7 +1946,7 @@ class ProductServiceController extends Controller
                 array_push($remoteCodeListinfoToSync, $codeList);
             }
 
-            \Log::info('REMOTE CODE LIST INFO TO SYNC:', ['remoteCodeListinfoToSync' => $remoteCodeListinfoToSync]);
+            Log::info('REMOTE CODE LIST INFO TO SYNC:', ['remoteCodeListinfoToSync' => $remoteCodeListinfoToSync]);
 
             $syncedLocalCodeListinfo = 0;
             foreach ($remoteCodeListinfoToSync as $remoteCodeListInfo) {
@@ -2004,10 +1963,8 @@ class ProductServiceController extends Controller
                 return redirect()->back()->with('success', __('Code List Up To Date'));
             }
         } catch (\Exception $e) {
-            \Log::error('Error syncing Code List:', ['error' => $e->getMessage()]);
+            Log::error('Error syncing Code List:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', __('Error Syncing Code List'));
         }
     }
-
-
 }
