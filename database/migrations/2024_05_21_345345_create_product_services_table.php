@@ -45,7 +45,7 @@ return new class extends Migration
 
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('taxTypeCode')->references('cd')->on('details');
-            $table->foreign('itemClassifiCode')->references('itemClsCd')->on('productServices_classifications');
+            $table->foreign('itemClassifiCode')->references('itemClsCd')->on('productservices_classifications');
             $table->timestamps();
         });
     }
