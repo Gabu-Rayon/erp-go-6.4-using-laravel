@@ -158,7 +158,6 @@
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>Item Code</strong> : {{ $item->itemCd }}
-                                            {{ Form::text('itemCode[]', $item->itemCd, ['class' => 'form-control']) }}
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>item Class Code</strong> : {{ $item->itemClsCd }}
@@ -222,6 +221,11 @@
                                             {{ Form::label('mapQuantity', __('Map Quantity'), ['class' => 'form-label']) }}
                                             {{ Form::number('mapQuantity', null, ['class' => 'form-control productItem']) }}
                                         </div>
+                                        <div class="form-group col-md-4">
+                            {{ Form::label('itemCode', __('Item Code'), ['class' => 'form-label']) }}
+                            <span class="text-danger">*</span>
+                            {{ Form::select('itemCode', $ProductService, null, ['class' => 'form-control select2 itemCode', 'required' => 'required']) }}
+                        </div>
                                     </div>
                                 </div>
                             </div>

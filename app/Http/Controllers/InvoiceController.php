@@ -458,7 +458,7 @@ class InvoiceController extends Controller
             $itemDetails = ProductService::where('itemCd', $item['itemCode'])->first();
             $itemExprDate = $this->formatDate($item['itemExprDate']);
             InvoiceProduct::create([
-                'product_id' => $item['itemCode'],
+                'product_id' => $itemDetails['id'],
                 'invoice_id' => $inv['invoice_id'],
                 'quantity' => $item['quantity'],
                 'tax' => $itemDetails->taxTyCd,
