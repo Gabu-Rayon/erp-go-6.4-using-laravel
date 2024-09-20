@@ -653,7 +653,6 @@ Route::group(['middleware' => ['verified']], function () {
             Route::get('report/expense-summary', [ReportController::class, 'expenseSummary'])->name('report.expense.summary');
             Route::get('report/income-vs-expense-summary', [ReportController::class, 'incomeVsExpenseSummary'])->name('report.income.vs.expense.summary');
             Route::get('report/tax-summary', [ReportController::class, 'taxSummary'])->name('report.tax.summary');
-            //        Route::get('report/profit-loss-summary', [ReportController::class, 'profitLossSummary'])->name('report.profit.loss.summary');
             Route::get('report/invoice-summary', [ReportController::class, 'invoiceSummary'])->name('report.invoice.summary');
             Route::get('report/bill-summary', [ReportController::class, 'billSummary'])->name('report.bill.summary');
             Route::get('report/product-stock-report', [ReportController::class, 'productStock'])->name('report.product.stock.report');
@@ -1482,22 +1481,6 @@ Route::group(['middleware' => ['verified']], function () {
         },
     );
 
-    Route::group(
-        [
-            'middleware' => [
-                'auth',
-                'XSS',
-                'revalidate',
-            ],
-        ],
-        function () {
-            Route::resource('stockinfo', StockMoveController::class);
-        },
-    );
-
-    Route::get('stockinfo/stockadjustment', [StockMoveController::class, 'stockAdjustment'])->name('stockinfo.stockadjustment');
-    Route::get('stockinfo/getstockmovelistfromapi', [StockMoveController::class, 'getStockMoveListFromApi']);
-
     Route::resource('competencies', CompetenciesController::class)->middleware(['auth', 'XSS']);
 
     Route::group(
@@ -1624,7 +1607,7 @@ Route::group(['middleware' => ['verified']], function () {
     // purchase.mapPurchase
     Route::any('map-purchase', [PurchaseController::class, 'mapPurchase'])->name('purchase.mapPurchase');
     //  purchase.SearchByDate
-    Route::post('/searchByDate', [PurchaseController::class, 'searchByDate'])->name('purchase.searchByDate');
+    Route::post('Map-purchase/SearchByDate', [PurchaseController::class, 'mapPurchaseSearchByDate'])->name('mappedPurchases.sync');
     // mapPurchase blade
     Route::any('/mappedpurchases', [PurchaseController::class, 'mappedPurchases'])->name('purchase.mappedPurchases');
     //  getMapPurchaseSearchByDate
@@ -1816,6 +1799,7 @@ Route::get('/details/refundreasons', [DetailsController::class, 'refundreasons']
 Route::get('/details/currencies', [DetailsController::class, 'currencies'])->name('details.currencies');
 Route::get('/details/banks', [DetailsController::class, 'banks'])->name('details.banks');
 Route::get('/details/languages', [DetailsController::class, 'languages'])->name('details.languages');
+Route::get('/details/payment-types', [DetailsController::class, 'paymentTypes'])->name('details.payment-types');
 Route::get('/getnotices', [NoticesListController::class, 'getNoticeList']);
 Route::get('/get-item-information', [ProductServiceController::class, 'getItemInformation']);
 Route::group(
@@ -1843,6 +1827,7 @@ Route::group(
     ],
     function () {
         Route::resource('brancheslist', BranchesListController::class);
+        Route::get('branches/sync', [BranchController::class, 'sync'])->name('branches.sync');
         Route::get('getbranchbyname/{name}', [BranchesListController::class, 'getBranchByName'])->name('brancheslist.getbranchbyname');
     }
 );

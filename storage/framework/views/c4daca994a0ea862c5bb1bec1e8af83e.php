@@ -1,7 +1,15 @@
 <div class="card sticky-top" style="top:30px">
     <div class="list-group list-group-flush" id="useradd-sidenav">
-        <a href="<?php echo e(route('taxes.index')); ?>" class="list-group-item list-group-item-action border-0 <?php echo e((Request::route()->getName() == 'taxes.index' ) ? ' active' : ''); ?>"><?php echo e(__('Taxes')); ?> <div class="float-end"><i class="ti ti-chevron-right"></i></div></a>
+        <a
+            href="<?php echo e(route('taxes.index')); ?>"
+            class="list-group-item list-group-item-action border-0 <?php echo e((Request::route()->getName() == 'taxes.index' ) ? ' active' : ''); ?>"
+            >
+                <?php echo e(__('Taxes')); ?>
 
+                <div class="float-end">
+                    <i class="ti ti-chevron-right"></i>
+                </div>
+            </a>
         <a
             href="<?php echo e(route('details.countries')); ?>"
             class="list-group-item list-group-item-action border-0
@@ -66,6 +74,20 @@
                     : ''); ?>"
             >
                 <?php echo e(__('Languages')); ?>
+
+                <div class="float-end">
+                    <i class="ti ti-chevron-right"></i>
+                </div>
+        </a>
+
+        <a
+            href="<?php echo e(route('details.payment-types')); ?>"
+            class="list-group-item list-group-item-action border-0
+                <?php echo e((Request::route()->getName() == 'details.payment-types' )
+                    ? ' active'
+                    : ''); ?>"
+            >
+                <?php echo e(__('Payment Types')); ?>
 
                 <div class="float-end">
                     <i class="ti ti-chevron-right"></i>

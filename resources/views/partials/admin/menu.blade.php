@@ -1537,7 +1537,7 @@
             @endif
 
 
-            @if (\Auth::user()->type == 'company')
+            @if (\Auth::user()->type == 'super admin')
                 <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'api-initialization' ? 'active' : '' }}">
                     <a href="{{ route('apiinitialization.index') }}" class="dash-link">
                         <span class="dash-micon">

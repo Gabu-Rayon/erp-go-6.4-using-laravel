@@ -25,11 +25,14 @@ class WarehouseTransferController extends Controller
     {
         $from_warehouse = Warehouse::all()->pluck('name', 'id');
         $from_warehouse->prepend('Select Warehouse', '');
-        $ware_pro= WarehouseProduct::join('item_list', 'warehouse_products.product_id', '=', 'item_list.id')
-                                ->pluck('itemNm','product_id');
+        $to_warehouse = Warehouse::all()->pluck('name', 'id');
+        $to_warehouse->prepend('Select Warehouse', '');
+        $ware_pro = WarehouseProduct::join('product_services', 'warehouse_products.itemCd', '=', 'product_services.itemCd')
+                             ->pluck('product_services.itemNm', 'warehouse_products.itemCd');
         $ware_pro->prepend('Select products', '');
+        \Log::info('WARE PRO');
         \Log::info($ware_pro);
-        return view('warehouse-transfer.create',compact('from_warehouse', 'ware_pro'));
+        return view('warehouse-transfer.create',compact('from_warehouse','to_warehouse', 'ware_pro'));
 
     }
 

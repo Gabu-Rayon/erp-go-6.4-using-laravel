@@ -43,7 +43,6 @@ class PurchaseController extends Controller
      */
     public function index(Request $request)
     {
-
         try {
             if (\Auth::user()->type == 'company') {
                 $vender = Vender::all()->pluck('name', 'id');
@@ -56,7 +55,7 @@ class PurchaseController extends Controller
                 return redirect()->back()->with('error', 'Permission Denied');
             }
         } catch (\Exception $e) {
-            \Log::info('RENDER PURCHASE INDEX ERROR');
+            \Log::info('RENDER PURCHASE INDEX ERROR : ');
             \Log::info($e);
 
             return redirect()->back()->with('error', $e->getMessage());
@@ -433,9 +432,7 @@ class PurchaseController extends Controller
             $items = [];
              \Log::info('Purchase FoRM Data being Posted  : ');
              \Log::info($data);
-
-            
-
+             
             if ($data['supplierTin']) {
                 $supplier = Vender::where('spplrTin', $data['supplierTin'])->first();
                 \Log::info('Supplier Info  : ');
@@ -1337,11 +1334,12 @@ class PurchaseController extends Controller
 
             if (\Auth::user()->type == 'company') {
                 $rules = [
-                    'supplierInvcNo' => 'required',
-                    'purchaseTypeCode' => 'required',
-                    'purchaseStatusCode' => 'required',
-                    'itemCode.*' => 'required',
-                    'supplierItemCode.*' => 'required',
+                    'supplierInvcNo' => 'nullable|string',
+                    'purchaseTypeCode' => 'nullable|string',
+                    'purchaseStatusCode' => 'nullable|string',
+                    'itemCode.*' => 'nullable|string|exists:product_services,itemCd',
+                    'supplierItemCode.*' => 'nullable|string',
+                    'mapQuantity.*' => 'nullable|numeric',
                 ];
 
                 // Validate request data
@@ -1358,6 +1356,7 @@ class PurchaseController extends Controller
                     $itemPurchases[] = [
                         'supplierItemCode' => $request->input('supplierItemCode')[$key],
                         'itemCode' => $itemCode,
+                        'mapQuantity' => $request->input('mapQuantity')[$key],
                     ];
                 }
 
@@ -1582,6 +1581,7 @@ class PurchaseController extends Controller
                                 'totAmt' => $item['totAmt'],
                                 'itemExprDt' => $item['itemExprDt'],
                             ]);
+
                         }
                     }
                 }
@@ -1596,7 +1596,7 @@ class PurchaseController extends Controller
 
      ///search MapPurchase  by Date Code Here 
 
-    public function searchByDate(Request $request)
+    public function mapPurchaseSearchByDate(Request $request)
     {
         // Log the request from the form
         \Log::info('Synchronization request received from Searching the MapPurchase SearchByDate Form:', $request->all());
@@ -1620,10 +1620,10 @@ class PurchaseController extends Controller
                 ->withHeaders(['key' => '123456'])
                 ->get("https://etims.your-apps.biz/api/MapPurchase/SearchByDate?date={$formattedDate}");
 
-            $data = $response->json()['data'];
-            if (!isset($data['data'])) {
-                return redirect()->back()->with('error', __('There is no search result.'));
-            }
+            $data = $response->json();
+            // if (!isset($data['data'])) {
+            //     return redirect()->back()->with('error', __('There is no search result.'));
+            // }
 
             $remoteMapPurchaseSearchByDateinfo = $data['data'];
             \Log::info('Remote item info:', $remoteMapPurchaseSearchByDateinfo);
@@ -1637,6 +1637,8 @@ class PurchaseController extends Controller
 
                 if (isset($remoteItem['mapPurchaseItemList']) && is_array($remoteItem['mapPurchaseItemList'])) {
                     foreach ($remoteItem['mapPurchaseItemList'] as $itemList) {
+                        \Log::info('Remote item list::');
+                        \Log::info($itemList);
                         $remoteMapPurchaseItemListsToSync[] = $this->prepareMapPurchaseItemListData($itemList);
                     }
                 }
@@ -1664,6 +1666,7 @@ class PurchaseController extends Controller
         return [
             'mappedPurchaseId' => $remoteItem['id'],
             'invcNo' => $remoteItem['invcNo'],
+            'created_by' => \Auth::user()->creatorId(),
             'orgInvcNo' => $remoteItem['orgInvcNo'],
             'supplrTin' => $remoteItem['supplrTin'],
             'supplrBhfId' => $remoteItem['supplrBhfId'],
@@ -1756,6 +1759,19 @@ class PurchaseController extends Controller
 
                         // Create the mapped purchase item list
                         MappedPurchaseItemList::create($itemList);
+
+                        \Log::info('ITEMS LIST');
+                        \Log::info($itemList);
+
+                        //Also creating  new product for the warehouse 
+                        WarehouseProduct::create([
+                            'warehouse_id' => 1,
+                            'product_id' => null,
+                            'itemCd' => $itemList['mapping'],
+                            'quantity' => $itemList['qty'],
+                            'packageQuantity' => $itemList['pkg'],
+                            'created_by' => \Auth::user()->creatorId()
+                        ]);
                         $syncedPurchaseItemCount++;
                     }
                 }
@@ -1766,7 +1782,5 @@ class PurchaseController extends Controller
 
         return $syncedCount;
     }
-
-
 
 }

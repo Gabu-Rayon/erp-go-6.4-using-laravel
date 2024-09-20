@@ -31,8 +31,6 @@
         {{--        <a href="{{ route('bill.export') }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{__('Export')}}"> --}}
         {{--            <i class="ti ti-file-export"></i> --}}
         {{--        </a> --}}
-
-        @can('create quotation')
             {{-- <a href="{{ route('quotations.create', 0) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip"
                 title="{{ __('Create') }}">
                 <i class="ti ti-plus"></i>
@@ -41,7 +39,6 @@
                 data-bs-toggle="tooltip" data-title="{{ __('Quotataion Create') }}" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
-        @endcan
     </div>
 @endsection
 

@@ -246,20 +246,20 @@
                                 </tr>
                                 <tr>
                                     <td class="col-md-4">
-                                        <?php echo e(Form::label('supplrItemCode', __('Supplier Item Code'), ['class' => 'form-label'])); ?>
-
+                                        <?php echo e(Form::label('supplrItemCode', __('Supplier Item Code'), ['class' => 'form-label'])); ?><span
+                                                class="text-success">(Optional)</span>
                                         <?php echo e(Form::text('supplrItemCode', null, ['class' => 'form-control'])); ?>
 
                                     </td>
                                     <td class="col-md-4">
-                                        <?php echo e(Form::label('supplrItemClsCode', __('Supplier Item Class Code'), ['class' => 'form-label'])); ?>
-
+                                        <?php echo e(Form::label('supplrItemClsCode', __('Supplier Item Class Code'), ['class' => 'form-label'])); ?><span
+                                                class="text-success">(Optional)</span>
                                         <?php echo e(Form::text('supplrItemClsCode', null, ['class' => 'form-control'])); ?>
 
                                     </td>
                                     <td class="col-md-4">
-                                        <?php echo e(Form::label('supplrItemName', __('Supplier Item Name'), ['class' => 'form-label'])); ?>
-
+                                        <?php echo e(Form::label('supplrItemName', __('Supplier Item Name'), ['class' => 'form-label'])); ?><span
+                                                class="text-success">(Optional)</span>
                                         <?php echo e(Form::text('supplrItemName', null, ['class' => 'form-control'])); ?>
 
                                     </td>

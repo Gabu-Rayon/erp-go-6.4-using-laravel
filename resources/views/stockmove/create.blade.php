@@ -337,11 +337,11 @@
                     <div class="row">
                         <div class="form-group col-md-4">
                             {{ Form::label('branch', __('Branch (*)'), ['class' => 'form-label']) }}
-                            {{ Form::select('branch', $branches, null, ['class' => 'form-control']) }}
+                            {{ Form::select('branch', $branches, null, ['class' => 'form-control select2']) }}
                         </div>
                         <div class="form-group col-md-4">
                             {{ Form::label('releaseType', __('Stored / Release Type (*)'),['class'=>'form-label']) }}
-                            {{ Form::select('releaseType', $releaseTypes, null, ['class' => 'form-control']) }}
+                            {{ Form::select('releaseType', $releaseTypes, null, ['class' => 'form-control select2']) }}
                         </div>
                     </div>
                 </div>
@@ -372,7 +372,7 @@
                                 <tr>
                                     <td class="form-group col-md-4">
                                         {{ Form::label('item', __('Item'), ['class' => 'form-label']) }}
-                                        {{ Form::select('item', $items, null, ['class' => 'form-control']) }}
+                                        {{ Form::select('item', $items, null, ['class' => 'form-control select2']) }}
                                     </td>
                                     <td class="form-group col-md-4">
                                         {{ Form::label('quantity', __('Quantity'),['class'=>'form-label']) }}
@@ -382,61 +382,9 @@
                                         {{ Form::label('quantityUnit', __('Quantity Unit'),['class'=>'form-label']) }}
                                         {{ Form::text('quantityUnit', '', array('class' => 'form-control', 'required' => 'required')) }}
                                     </td>
-                                    <td class="ti ti-trash text-white text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
+                                    <td class="ti ti-trash text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
                                 </tr>
                             </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td></td>
-                                    <td><strong>{{ __('Amount') }} <br><small
-                                                class="text-danger font-weight-bold">{{ __('after  Tax & discount') }}</small>
-                                            ({{ \Auth::user()->currencySymbol() }})</strong></td>
-                                    <td class="text-end amount">0.00</td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td></td>
-                                    <td><strong>{{ __('Sub Total') }} ({{ \Auth::user()->currencySymbol() }})</strong>
-                                    </td>
-                                    <td class="text-end subTotal">0.00</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td></td>
-                                    <td><strong>{{ __('Discount') }} ({{ \Auth::user()->currencySymbol() }})</strong></td>
-                                    <td class="text-end totalDiscount">0.00</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td></td>
-                                    <td><strong>{{ __('Tax') }} ({{ \Auth::user()->currencySymbol() }})</strong></td>
-                                    <td class="text-end totalTax">0.00</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td>&nbsp;</td>
-                                    <td class="blue-text"><strong>{{ __('Total Amount') }}
-                                            ({{ \Auth::user()->currencySymbol() }})</strong></td>
-                                    <td class="blue-text text-end totalAmount">0.00</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>
