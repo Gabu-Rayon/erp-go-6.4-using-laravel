@@ -49,10 +49,7 @@ class DashboardController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
-
-    }
+    public function __construct() {}
 
 
     public function landingPage()
@@ -66,7 +63,6 @@ class DashboardController extends Controller
         if ($adminSettings['display_landing_page'] == 'on' && \Schema::hasTable('landing_page_settings')) {
 
             return view('landingpage::layouts.landingpage', compact('adminSettings'));
-
         } else {
             return redirect('login');
         }
@@ -143,17 +139,17 @@ class DashboardController extends Controller
                         ->where('invoices.created_by', '=', \Auth::user()->creatorId())
                         ->orderBy('invoices.id', 'desc')
                         ->limit(5)
-                        ->select('invoices.*', 'customers.name as customerName')
+                        ->select('invoices.*', 'customers.customerName as customerName')
                         ->get();
 
                     $data['weeklyInvoice'] = \Auth::user()->weeklyInvoice();
                     $data['monthlyInvoice'] = \Auth::user()->monthlyInvoice();
                     $data['recentBill'] = Bill::join('venders', 'bills.vender_id', '=', 'venders.id')
-                    ->where('bills.created_by', '=', \Auth::user()->creatorId())
-                    ->orderBy('bills.id', 'desc')
-                    ->limit(5)
-                    ->select('bills.*', 'venders.name as vender_name')
-                    ->get();
+                        ->where('bills.created_by', '=', \Auth::user()->creatorId())
+                        ->orderBy('bills.id', 'desc')
+                        ->limit(5)
+                        ->select('bills.*', 'venders.spplrNm as vender_name')
+                        ->get();
 
                     $data['weeklyBill'] = \Auth::user()->weeklyBill();
                     $data['monthlyBill'] = \Auth::user()->monthlyBill();
@@ -172,11 +168,9 @@ class DashboardController extends Controller
 
                     return $this->hrm_dashboard_index();
                 }
-
             }
         } else {
             return redirect('login');
-
         }
     }
 
@@ -390,7 +384,6 @@ class DashboardController extends Controller
                 } else {
                     return redirect('login');
                 }
-
             }
         }
     }
@@ -413,7 +406,7 @@ class DashboardController extends Controller
                 $crm_data['total_contracts'] = Contract::where('created_by', \Auth::user()->creatorId())->count();
 
                 //lead status
-//                $user_leads   = $leads->pluck('lead_id')->toArray();
+                //                $user_leads   = $leads->pluck('lead_id')->toArray();
                 $total_leads = count($leads);
                 $lead_status = [];
                 $status = LeadStage::select('lead_stages.*', 'pipelines.name as pipeline')
@@ -426,13 +419,12 @@ class DashboardController extends Controller
                     $lead_status[$k]['lead_stage'] = $v->name;
                     $lead_status[$k]['lead_total'] = count($v->lead());
                     $lead_status[$k]['lead_percentage'] = Utility::getCrmPercentage($lead_status[$k]['lead_total'], $total_leads);
-
                 }
 
                 $crm_data['lead_status'] = $lead_status;
 
                 //deal status
-//                $user_deal   = $deals->pluck('deal_id')->toArray();
+                //                $user_deal   = $deals->pluck('deal_id')->toArray();
                 $total_deals = count($deals);
                 $deal_status = [];
                 $dealstatuss = Stage::select('stages.*', 'pipelines.name as pipeline')
@@ -516,7 +508,6 @@ class DashboardController extends Controller
                 $chartData = $this->getOrderChart(['duration' => 'week']);
 
                 return view('dashboard.super_admin', compact('user', 'chartData'));
-
             } elseif (Auth::user()->type == 'client') {
                 $transdate = date('Y-m-d', time());
                 $currentYear = date('Y');
@@ -573,7 +564,6 @@ class DashboardController extends Controller
                 if (!empty($client_deal->first())) {
 
                     $arrCount['task'] = DealTask::whereIn('deal_id', [$client_deal->first()])->count();
-
                 } else {
                     $arrCount['task'] = 0;
                 }
@@ -618,7 +608,6 @@ class DashboardController extends Controller
                     } else {
                         $project['client_project_budget_due_per'] = 0;
                     }
-
                 }
 
                 $top_tasks = Auth::user()->created_top_due_task();
@@ -689,5 +678,4 @@ class DashboardController extends Controller
 
         return Utility::error_res('Tracker not found.');
     }
-
 }
