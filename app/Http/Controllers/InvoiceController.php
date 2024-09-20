@@ -162,9 +162,9 @@ class InvoiceController extends Controller
                 \Log::info('Invoice  REQ DATA To Be Posted to the Api ', ['apiRequestData' => $apiRequestData]);
 
                 //Send data to AddSale API
-                $url = 'https://etims.your-apps.biz/api/AddSale';
+                $url = env('ETIMS_API_ENDPOINT') . 'AddSaleV2';
                 $response = Http::withOptions(['verify' => false])
-                    ->withHeaders(['key' => '123456'])
+                    ->withHeaders(['key' => env('ETIMS_API_KEY')])
                     ->post($url, $apiRequestData);
 
 

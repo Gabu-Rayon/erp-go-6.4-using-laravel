@@ -100,6 +100,7 @@ class ProductServiceController extends Controller
             $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
             $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
             $quantityUnitCode = QuantityUnitCode::all()->pluck('name', 'code');
+            $quantityUnitCodes = QuantityUnitCode::all()->pluck('name', 'code');
             $packagingUnitCodes = ProductServicesPackagingUnit::all()->pluck('name', 'code');
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
@@ -114,6 +115,7 @@ class ProductServiceController extends Controller
                     'expenseChartAccounts',
                     'expenseSubAccounts',
                     'quantityUnitCode',
+                    'quantityUnitCodes',
                     'packagingUnitCodes',
                     'taxationtype',
                     'category',
@@ -307,8 +309,8 @@ class ProductServiceController extends Controller
                 ])->withHeaders([
                             'Accept' => 'application/json',
                             'Content-Type' => 'application/json',
-                            'key' => '123456'
-                        ])->post('https://etims.your-apps.biz/api/AddItemsList', $apiData);
+                            'key' => 'Ktt+NyEdh//9bD7e4XcwJSyH9U0/lcFbzlxyCIBFr/lTGha5eEWV9cWpf2iQCqoR'
+                        ])->post('http://localhost:8088/api/AddItemsListV2', $apiData);
 
                 // Log response data
                 \Log::info('API Response Status Code For Posting Product Data: ' . $response->status());
@@ -1599,8 +1601,8 @@ class ProductServiceController extends Controller
     {
         try {
             ini_set('max_execution_time', 30000);
-            $baseUrl = 'https://etims.your-apps.biz/api/GetItemInformation';
-            $apiKey = '123456';
+            $baseUrl = env('ETIMS_API_ENDPOINT') . 'GetItemInformationV2';
+            $apiKey = env('ETIMS_API_KEY');
             $batchSize = 1000;
             $syncedItems = 0;
 
@@ -1618,13 +1620,17 @@ class ProductServiceController extends Controller
                     ->timeout(60)
                     ->get($url);
 
-                $data = $response->json()['data'];
+                    Log::info('DATAAAAA::::');
+                    Log::info($response->json());
+                $data = $response->json()['responseData'];
 
-                if (empty($data['data']['itemList'])) {
+
+
+                if (empty($data['itemList'])) {
                     break;
                 }
 
-                $remoteItems = $data['data']['itemList'];
+                $remoteItems = $data['itemList'];
 
                 \Log::info('REMOTE ITEMS Information : ', $remoteItems);
 
@@ -1664,7 +1670,7 @@ class ProductServiceController extends Controller
                         'expense_chartaccount_id' => null,
                         'created_by' => \Auth::user()->creatorId(),
                         'tin' => $remoteItem['tin'],
-                        'itemCd' => $remoteItem['itemCd'],
+                        'itemCstd' => $remoteItem['itemCd'],
                         'itemClsCd' => $remoteItem['itemClsCd'],
                         'itemTyCd' => $remoteItem['itemTyCd'],
                         'itemNm' => $remoteItem['itemNm'],
@@ -1714,7 +1720,8 @@ class ProductServiceController extends Controller
                 return redirect()->back()->with('success', __('Items Up To Date'));
             }
         } catch (\Exception $e) {
-            \Log::error('ERROR SYNCING ITEM INFO: ' . $e->getMessage());
+            \Log::error('ERROR SYNCING ITEM INFO: ');
+            Log::error($e);
             return redirect()->back()->with('error', __('Error Syncing Item Information'));
         }
     }
