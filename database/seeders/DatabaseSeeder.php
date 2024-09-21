@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use App\Models\Utility;
@@ -17,29 +18,19 @@ class DatabaseSeeder extends Seeder
         $this->call(NotificationSeeder::class);
         Artisan::call('module:migrate LandingPage');
         Artisan::call('module:seed LandingPage');
-
-        if(\Request::route()->getName()!='LaravelUpdater::database')
-        {
-            $this->call(PlansTableSeeder::class);
-            $this->call(UsersTableSeeder::class);
-            $this->call(AiTemplateSeeder::class);
-            $this->call(ProductServicesPackagingUnitsSeeder::class);
-            $this->call(ProductServiceUnitsSeeder::class);
-            $this->call(ImportItemStatusCodesSeeder::class);
-            $this->call(InvoiceStatusCodesSeeder::class);
-            $this->call(PaymentTypesCodeSeeder::class);
-            $this->call(PurchaseStatusCodesSeeder::class);
-
-            $this->call(PurchaseTypesCodeSeeder::class);
-            $this->call(SalesTypeCodesSeeder::class);
-            $this->call(CreditNoteReasonsSeeder::class);
-            $this->call(ItemTypeSeeder::class);
-            $this->call(StockReleaseTypesSeeder::class);
-
-        }else{
-            Utility::languagecreate();
-
-        }
-
+        $this->call(PlansTableSeeder::class);
+        $this->call(UsersTableSeeder::class);
+        $this->call(AiTemplateSeeder::class);
+        $this->call(ProductServicesPackagingUnitsSeeder::class);
+        $this->call(ProductServiceUnitsSeeder::class);
+        $this->call(ImportItemStatusCodesSeeder::class);
+        $this->call(InvoiceStatusCodesSeeder::class);
+        $this->call(PaymentTypesCodeSeeder::class);
+        $this->call(PurchaseStatusCodesSeeder::class);
+        $this->call(PurchaseTypesCodeSeeder::class);
+        $this->call(SalesTypeCodesSeeder::class);
+        $this->call(CreditNoteReasonsSeeder::class);
+        $this->call(ItemTypeSeeder::class);
+        $this->call(StockReleaseTypesSeeder::class);
     }
 }
