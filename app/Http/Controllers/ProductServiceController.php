@@ -102,7 +102,7 @@ class ProductServiceController extends Controller
             $quantityUnitCode = QuantityUnitCode::all()->pluck('name', 'code');
             $quantityUnitCodes = QuantityUnitCode::all()->pluck('name', 'code');
             $packagingUnitCodes = ProductServicesPackagingUnit::all()->pluck('name', 'code');
-            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
+            $category = ProductServiceCategory::all()->pluck('name', 'id');
             $category->prepend('Select Category', '');
             return view(
                 'productservice.create',

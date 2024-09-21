@@ -79,7 +79,7 @@ class InvoiceController extends Controller
         ) {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
             $invoice_number = \Auth::user()->invoiceNumberFormat($this->invoiceNumber());
-            $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('customerName', 'id');
             $customers->prepend('Select Customer', '');
             $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'income')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
@@ -238,7 +238,6 @@ class InvoiceController extends Controller
                 }
 
                 return redirect()->to('invoice')->with('success', 'Sale Created Successfully');
-
             } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
@@ -290,7 +289,7 @@ class InvoiceController extends Controller
             //is Stock IO Update should always be true 
             "isStockIOUpdate" => true,
             // "isStockIOUpdate" => $data['isStockIOUpdate'],
-            
+
             //Mapping will be the id of the Invoice_id autogenrated by the system 
             // "mapping" => $data['mapping'],
             "mapping" => $this->invoiceNumber(),
@@ -559,7 +558,6 @@ class InvoiceController extends Controller
                         Utility::updateUserBalance('customer', $request->customer_id, $updatePrice, 'credit');
                     } else {
                         Utility::total_quantity('plus', $invoiceProduct->quantity, $invoiceProduct->product_id);
-
                     }
 
                     if (isset($products[$i]['item'])) {
@@ -585,7 +583,6 @@ class InvoiceController extends Controller
                     if (empty($products[$i]['id'])) {
                         Utility::addProductStock($products[$i]['item'], $products[$i]['quantity'], $type, $description, $type_id);
                     }
-
                 }
 
                 TransactionLines::where('reference_id', $invoice->id)->where('reference', 'Invoice')->delete();
@@ -690,7 +687,6 @@ class InvoiceController extends Controller
                     $invoicepayment = InvoicePayment::find($invoices->id);
                     $invoices->delete();
                     $invoicepayment->delete();
-
                 }
 
                 if ($invoice->customer_id != 0 && $invoice->status != 0) {
@@ -856,9 +852,7 @@ class InvoiceController extends Controller
                 $resp = Utility::sendEmailTemplate('customer_invoice_sent', [$customer->id => $customer->email], $customerArr);
 
                 return redirect()->back()->with('success', __('Invoice successfully sent.') . (($resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
-
             }
-
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -890,7 +884,6 @@ class InvoiceController extends Controller
             $resp = Utility::sendEmailTemplate('customer_invoice_sent', [$customer->id => $customer->email], $customerArr);
 
             return redirect()->back()->with('success', __('Invoice successfully sent.') . (($resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
-
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -956,7 +949,6 @@ class InvoiceController extends Controller
                     $request->add_receipt->storeAs('', $fileName);
                     $invoicePayment->add_receipt = $fileName;
                 }
-
             }
 
             $invoicePayment->save();
@@ -1037,15 +1029,12 @@ class InvoiceController extends Controller
                 $status = Utility::WebhookCall($webhook['url'], $parameter, $webhook['method']);
                 if ($status == true) {
                     return redirect()->back()->with('success', __('Payment successfully added.') . ((isset($result) && $result != 1) ? '<br> <span class="text-danger">' . $result . '</span>' : '') . (($resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
-
                 } else {
                     return redirect()->back()->with('error', __('Webhook call failed.'));
                 }
             }
             return redirect()->back()->with('success', __('Payment successfully added.') . ((isset($result) && $result != 1) ? '<br> <span class="text-danger">' . $result . '</span>' : '') . (($resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
-
         }
-
     }
 
     public function paymentDestroy(Request $request, $invoice_id, $payment_id)
@@ -1070,7 +1059,6 @@ class InvoiceController extends Controller
 
             if ($due > 0 && $total != $due) {
                 $invoice->status = 3;
-
             } else {
                 $invoice->status = 2;
             }
@@ -1079,7 +1067,6 @@ class InvoiceController extends Controller
                 //storage limit
                 $file_path = '/uploads/payment/' . $payment->add_receipt;
                 $result = Utility::changeStorageLimit(\Auth::user()->creatorId(), $file_path);
-
             }
 
             $invoice->save();
@@ -1142,7 +1129,6 @@ class InvoiceController extends Controller
             ];
 
             $resp = Utility::sendEmailTemplate('new_payment_reminder', [$customer->id => $customer->email], $reminderArr);
-
         }
 
         return redirect()->back()->with('success', __('Payment reminder successfully send.') . (($resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
@@ -1184,7 +1170,6 @@ class InvoiceController extends Controller
         }
 
         return redirect()->back()->with('success', __('Invoice successfully sent.') . ((isset($smtp_error)) ? '<br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
-
     }
 
     public function shippingDisplay(Request $request, $id)
@@ -1387,9 +1372,9 @@ class InvoiceController extends Controller
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
         }
         //
-//        $logo         = asset(Storage::url('uploads/logo/'));
-//        $company_logo = Utility::getValByName('company_logo_dark');
-//        $img          = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png'));
+        //        $logo         = asset(Storage::url('uploads/logo/'));
+        //        $company_logo = Utility::getValByName('company_logo_dark');
+        //        $img          = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png'));
 
         $logo = asset(Storage::url('uploads/logo/'));
         $company_logo = Utility::getValByName('company_logo_dark');
@@ -1412,7 +1397,6 @@ class InvoiceController extends Controller
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
-
     }
 
     public function saveTemplateSettings(Request $request)
@@ -1498,7 +1482,6 @@ class InvoiceController extends Controller
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
         }
-
     }
 
     public function export()
@@ -1654,6 +1637,4 @@ class InvoiceController extends Controller
             return redirect()->back()->with('error', __('Sales Trader Invoice No, Not Found !'));
         }
     }
-
-
 }

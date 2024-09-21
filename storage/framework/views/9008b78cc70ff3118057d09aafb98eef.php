@@ -173,7 +173,7 @@
                                     <td class="form-group col-md-3">
                                         <?php echo e(Form::label('qtyUnitCode', __('Quantity Unit Code'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::select('qtyUnitCode', $quantityUnitCode, null, ['class' => 'form-control select2', 'placeholder' => __('Select Quantity Unit Code'), 'required' => 'required'])); ?>
+                                        <?php echo e(Form::select('qtyUnitCode', $quantityUnitCodes, null, ['class' => 'form-control select2', 'placeholder' => __('Select Quantity Unit Code'), 'required' => 'required'])); ?>
 
                                     </td>
                                     <td class="form-group col-md-3">

@@ -261,7 +261,8 @@ class PurchaseController extends Controller
         }
     }
 
-    public function synchronize(Request $request){
+    public function synchronize(Request $request)
+    {
         try {
             $request->validate([
                 'getpurchaseByDate' => 'required|date_format:Y-m-d',
@@ -269,7 +270,7 @@ class PurchaseController extends Controller
                 'getpurchaseByDate.required' => __('Date is required for synchronization Search for Purchase SearchByDate.'),
                 'getpurchaseByDate.date_format' => __('Invalid date format.'),
             ]);
-    
+
             $date = $request->input('getpurchaseByDate');
             $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
             $response = Http::withOptions(['verify' => false])
@@ -344,14 +345,15 @@ class PurchaseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create($vendorId){
+    public function create($vendorId)
+    {
         try {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
             $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
 
             $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
-            $venders = Vender::all()->pluck( 'name','spplrTin');
+            $venders = Vender::all()->pluck('name', 'spplrTin');
             $venders->prepend('Select Vender', '');
 
             \Log::info('Venders:');
@@ -391,7 +393,7 @@ class PurchaseController extends Controller
                 'warehouse',
                 'countries',
                 'taxes'
-                ));
+            ));
         } catch (\Exception $e) {
             Log::error('CREATE PURCHASE ERROR');
             Log::error($e);
@@ -403,7 +405,8 @@ class PurchaseController extends Controller
      * Store a newly created resource in storage.
      */
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         try {
 
             $data = $request->all();
@@ -420,7 +423,7 @@ class PurchaseController extends Controller
                 'items.*.pkgQuantity' => 'required|numeric',
                 'items.*.unitPrice' => 'required|numeric',
                 'items.*.discountRate' => 'required|numeric',
-                ]);
+            ]);
 
             if ($validator->fails()) {
                 Log::info('VALIDATION ERRORS');
@@ -430,9 +433,9 @@ class PurchaseController extends Controller
 
             $apiData = [];
             $items = [];
-             \Log::info('Purchase FoRM Data being Posted  : ');
-             \Log::info($data);
-             
+            \Log::info('Purchase FoRM Data being Posted  : ');
+            \Log::info($data);
+
             if ($data['supplierTin']) {
                 $supplier = Vender::where('spplrTin', $data['supplierTin'])->first();
                 \Log::info('Supplier Info  : ');
@@ -458,9 +461,9 @@ class PurchaseController extends Controller
             $apiData['remark'] = $data['remark'] ?? null;
             $apiData['mapping'] = $data['mapping'] ?? null;
 
-            foreach($data['items'] as $givenItem) {
+            foreach ($data['items'] as $givenItem) {
                 $discountRate = $givenItem['discountRate'] ?? 0;
-                $discountAmt = $givenItem['unitPrice'] * $givenItem['quantity'] * $discountRate / 100; 
+                $discountAmt = $givenItem['unitPrice'] * $givenItem['quantity'] * $discountRate / 100;
                 array_push($items, [
                     'itemCode' => $givenItem['itemCode'],
                     'quantity' => $givenItem['quantity'],
@@ -479,8 +482,8 @@ class PurchaseController extends Controller
 
             \Log::info('Api Data Info Being Posted : ');
             \Log::info($apiData);
-            
-            
+
+
             $url = 'https://etims.your-apps.biz/api/AddPurchase';
 
             $response = Http::withHeaders([
@@ -494,7 +497,6 @@ class PurchaseController extends Controller
             } else {
                 return redirect()->back()->with('error', __('Error creating purchase.'));
             }
-            
         } catch (\Exception $e) {
             Log::error('STORE PURCHASE ERROR');
             Log::error($e);
@@ -527,7 +529,6 @@ class PurchaseController extends Controller
                 \Log::info($ids);
 
                 $id = Crypt::decrypt($ids);
-
             } catch (\Throwable $e) {
                 \Log::info('Exception Error if the Purchase is not Found :');
 
@@ -666,7 +667,6 @@ class PurchaseController extends Controller
                             } else {
                                 $temp->delete();
                             }
-
                         }
                     }
                     if (!empty($warehouse_qty)) {
@@ -683,7 +683,6 @@ class PurchaseController extends Controller
                         $product_qty->save();
                     }
                     $purchase_product->delete();
-
                 }
 
                 $purchase->delete();
@@ -697,7 +696,6 @@ class PurchaseController extends Controller
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
-
     }
 
     function purchaseNumber()
@@ -739,7 +737,6 @@ class PurchaseController extends Controller
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
-
     }
     public function resent($id)
     {
@@ -839,13 +836,12 @@ class PurchaseController extends Controller
             } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
-         *****/
+             *****/
 
             return redirect()->back()->with('success', __('Bill successfully sent.'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
-
     }
 
     public function purchase($purchase_id)
@@ -922,7 +918,6 @@ class PurchaseController extends Controller
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
-
     }
 
     public function previewPurchase($template, $color)
@@ -1084,7 +1079,6 @@ class PurchaseController extends Controller
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
         }
-
     }
 
 
@@ -1101,7 +1095,6 @@ class PurchaseController extends Controller
             return view('purchase.payment', compact('venders', 'categories', 'accounts', 'purchase'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
-
         }
     }
 
@@ -1199,12 +1192,10 @@ class PurchaseController extends Controller
                 $resp = Utility::sendEmailTemplate('new_bill_payment', [$vender->id => $vender->email], $billPaymentArr);
 
                 return redirect()->back()->with('success', __('Payment successfully added.') . (($resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
-
             }
 
             return redirect()->back()->with('success', __('Payment successfully added.'));
         }
-
     }
 
     public function paymentDestroy(Request $request, $purchase_id, $payment_id)
@@ -1221,7 +1212,6 @@ class PurchaseController extends Controller
 
             if ($due > 0 && $total != $due) {
                 $purchase->status = 3;
-
             } else {
                 $purchase->status = 2;
             }
@@ -1280,13 +1270,11 @@ class PurchaseController extends Controller
             } elseif ($res->quantity < $qty) {
                 $ware_pro->quantity = $qty - $res->quantity;
                 $ware_pro->save();
-
             }
             PurchaseProduct::where('id', '=', $request->id)->delete();
 
 
             return redirect()->back()->with('success', __('Purchase product successfully deleted.'));
-
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -1402,9 +1390,9 @@ class PurchaseController extends Controller
                         'key' => '123456',
                         'Content-Type' => 'application/json',
                     ])->post($endpoint, [
-                                'invoiceNo' => $request->input('supplierInvcNo'),
-                                'isUpdate' => true
-                            ]);
+                        'invoiceNo' => $request->input('supplierInvcNo'),
+                        'isUpdate' => true
+                    ]);
 
                     \Log::info('Api Response For Updating the Map Purchase Status: ' . $secondResponse);
 
@@ -1581,7 +1569,6 @@ class PurchaseController extends Controller
                                 'totAmt' => $item['totAmt'],
                                 'itemExprDt' => $item['itemExprDt'],
                             ]);
-
                         }
                     }
                 }
@@ -1594,7 +1581,7 @@ class PurchaseController extends Controller
         }
     }
 
-     ///search MapPurchase  by Date Code Here 
+    ///search MapPurchase  by Date Code Here 
 
     public function mapPurchaseSearchByDate(Request $request)
     {
@@ -1782,5 +1769,4 @@ class PurchaseController extends Controller
 
         return $syncedCount;
     }
-
 }
