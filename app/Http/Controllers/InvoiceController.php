@@ -83,32 +83,26 @@ class InvoiceController extends Controller
             $customers->prepend('Select Customer', '');
             $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'income')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
-            $items = ProductService::all()->pluck('itemNm', 'itemCd');
             $product_services = ProductService::all()->pluck('itemNm', 'itemCd');
-            $items->prepend('Select Item', '');
+            $product_services->prepend('--', '');
             $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'code');
             $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'code');
             $invoiceStatusCodes = InvoiceStatusCode::all()->pluck('invoiceStatusCode', 'code');
-            $taxes = Details::where('cdCls', '04')->pluck('cd', 'userDfnCd1');
-            $taxationtype  = Details::where('cdCls', '04')->pluck('cd', 'userDfnCd1');
-            \Log::info('TAXES');
-            \Log::info($taxes);
+            $taxationtype = Details::where('cdCls', '04')->pluck('userDfnCd1', 'cd');
 
             return view(
                 'invoice.create',
                 compact(
                     'customers',
                     'invoice_number',
-                    'items',
+                    'product_services',
                     'category',
                     'customFields',
                     'customerId',
                     'salesTypeCodes',
                     'paymentTypeCodes',
                     'invoiceStatusCodes',
-                    'taxes',
-                    'taxationtype',
-                    'product_services'
+                    'taxationtype'
                 )
             );
         } else {
@@ -143,6 +137,9 @@ class InvoiceController extends Controller
      ***************************************************************************/
     public function store(Request $request)
     {
+        // Log the entire request data
+        \Log::info('Invoice Data received From the Form:', $request->all());
+
         try {
             if (
                 \Auth::user()->type == 'company'
@@ -165,13 +162,11 @@ class InvoiceController extends Controller
                 \Log::info('Invoice  REQ DATA To Be Posted to the Api ', ['apiRequestData' => $apiRequestData]);
 
                 //Send data to AddSale API
-                $url = 'https://etims.your-apps.biz/api/AddSale';
+                $url = env('ETIMS_API_ENDPOINT') . 'AddSaleV2';
                 $response = Http::withOptions(['verify' => false])
-                    ->withHeaders(['key' => '123456'])
+                    ->withHeaders(['key' => env('ETIMS_API_KEY')])
                     ->post($url, $apiRequestData);
 
-                \Log::info('SALES Invoice API RESPONSE');
-                \Log::info($response);
 
                 if ($response->failed()) {
                     if ($response->json('statusCode') == 400 && $response->json('message') == 'Trader invoice number is alrady exist') {
@@ -256,39 +251,26 @@ class InvoiceController extends Controller
     private function validateInvoice($request)
     {
         return \Validator::make($request->all(), [
-            'traderInvoiceNo' => 'required|string|max:50|min:1',
-            'customer_id' => 'required|numeric',
-            'salesType' => 'nullable|string|min:1|max:1',
-            'paymentType' => 'nullable|string|min:2|max:2',
-            'invoiceStatusCode' => 'nullable|string|min:2|max:2',
-            'stockReleseDate' => 'nullable|date',
-            'category_id' => 'required|numeric',
-            'confirmDate' => 'required|date',
-            'salesDate' => 'required|date',
-            'receiptPublishDate' => 'required|date',
-            'occurredDate' => 'required|date',
-            'issue_date' => 'required|date',
-            'send_date' => 'required|date',
-            'due_date' => 'required|date',
-            'ref_number' => 'nullable|string|max:50',
-            'remark' => 'nullable|string|max:255',
+            'customer_id' => 'required',
+            'issue_date' => 'required',
+            'due_date' => 'required',
+            'category_id' => 'required',
+            'traderInvoiceNo' => 'required|max:50|min:1',
             'items' => 'required|array',
-            'items.*.itemCode' => 'required|string|max:50|min:1',
-            'items.*.quantity' => 'required|numeric',
-            'items.*.pkgQuantity' => 'required|numeric',
-            'items.*.price' => 'required|numeric',
-            'items.*.discount' => 'nullable|numeric',
-            'items.*.tax' => 'nullable|numeric',
-            'items.*.taxAmount' => 'nullable|numeric',
-            'items.*.description' => 'nullable|string|max:255',
-            'items.*.itemExpDate' => 'nullable|date',
+            'items.*.itemCode' => 'required',
+            'items.*.quantity' => 'required',
+            'items.*.pkgQauntity' => 'required',
+            'items.*.price' => 'required',
+            'items.*.discount' => 'required',
+            'items.*.tax' => 'required',
+            'items.*.taxAmount' => 'required',
+            'items.*.description' => 'required',
+            'items.*.itemExpDate' => 'nullable',
         ]);
     }
 
     private function prepareApiRequestData($data, $customer)
     {
-        \Log::info('DATAAA');
-        \Log::info($data);
         return [
             "customerNo" => $customer->customerNo,
             "customerTin" => $customer->customerTin,
@@ -304,8 +286,13 @@ class InvoiceController extends Controller
             "occurredDate" => $this->formatDate($data['occurredDate']),
             "invoiceStatusCode" => $data['invoiceStatusCode'],
             "remark" => $data['remark'],
-            "isPurchaseAccept" => isset($data['isPurchaseAccept']) && $data['isPurchaseAccept'] == 1 ? true : false,
+            "isPurchaseAccept" => $data['isPurchaseAccept'],
+            //is Stock IO Update should always be true 
             "isStockIOUpdate" => true,
+            // "isStockIOUpdate" => $data['isStockIOUpdate'],
+            
+            //Mapping will be the id of the Invoice_id autogenrated by the system 
+            // "mapping" => $data['mapping'],
             "mapping" => $this->invoiceNumber(),
             "saleItemList" => []
         ];
@@ -326,7 +313,7 @@ class InvoiceController extends Controller
                 "itemTypeCode" => $itemDetails->itemTyCd,
                 "itemName" => $itemDetails->itemNm,
                 "orgnNatCd" => $itemDetails->orgnNatCd,
-                "taxTypeCode" => $item['taxTypeCode'],
+                "taxTypeCode" => $itemDetails->taxTyCd,
                 "unitPrice" => $item['price'],
                 "isrcAplcbYn" => $itemDetails->isrcAplcbYn,
                 "pkgUnitCode" => $itemDetails->pkgUnitCd,
@@ -395,7 +382,7 @@ class InvoiceController extends Controller
             'due_date' => $data['due_date'],
             'send_date' => $data['send_date'],
             'category_id' => $data['category_id'],
-            'ref_number' => $data['ref_number'] ?? null,
+            'ref_number' => $data['ref_number'],
             'status' => 0,
             'shipping_display' => null,
             'discount_apply' => null,
@@ -474,7 +461,7 @@ class InvoiceController extends Controller
                 'product_id' => $itemDetails['id'],
                 'invoice_id' => $inv['invoice_id'],
                 'quantity' => $item['quantity'],
-                'tax' => $item['taxTypeCode'],
+                'tax' => $itemDetails->taxTyCd,
                 'discount' => $item['discountAmt'],
                 'price' => $this->calculateTotalAmount([
                     ['pkgQuantity' => $item['pkgQuantity'], 'quantity' => $item['quantity'], 'unitPrice' => $item['unitPrice']]
@@ -485,7 +472,7 @@ class InvoiceController extends Controller
                 "itemTypeCode" => $itemDetails->itemTyCd,
                 "itemName" => $itemDetails->itemNm,
                 "orgnNatCd" => $itemDetails->orgnNatCd,
-                "taxTypeCode" => $item['taxTypeCode'],
+                "taxTypeCode" => $itemDetails->taxTyCd,
                 "unitPrice" => $item['unitPrice'],
                 "isrcAplcbYn" => $itemDetails->isrcAplcbYn,
                 "pkgUnitCode" => $itemDetails->pkgUnitCd,

@@ -91,9 +91,11 @@
         <a href="{{route('deals.export')}}" data-bs-toggle="tooltip" title="{{__('Export')}}" class="btn btn-sm btn-primary">
             <i class="ti ti-file-export"></i>
         </a>
+        @can ('create deal')
         <a href="#" data-size="lg" data-url="{{ route('deals.create') }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Create New Deal')}}" data-title="{{__('Create Deal')}}" class="btn btn-sm btn-primary">
             <i class="ti ti-plus"></i>
         </a>
+        @endcan
     </div>
 @endsection
 
@@ -212,6 +214,7 @@
                                                         <i class="ti ti-dots-vertical"></i>
                                                     </button>
                                                     <div class="dropdown-menu dropdown-menu-end">
+                                                        @can('edit deal')
                                                             <a href="#!" data-size="md" data-url="{{ URL::to('deals/'.$deal->id.'/labels') }}" data-ajax-popup="true" class="dropdown-item" data-bs-original-title="{{__('Labels')}}">
                                                                 <i class="ti ti-bookmark"></i>
                                                                 <span>{{__('Labels')}}</span>
@@ -220,12 +223,15 @@
                                                                 <i class="ti ti-pencil"></i>
                                                                 <span>{{__('Edit')}}</span>
                                                             </a>
+                                                        @endcan
+                                                        @can('delete deal')
                                                             {!! Form::open(['method' => 'DELETE', 'route' => ['deals.destroy', $deal->id],'id'=>'delete-form-'.$deal->id]) !!}
                                                                 <a href="#!" class="dropdown-item bs-pass-para">
                                                                     <i class="ti ti-archive"></i>
                                                                     <span> {{__('Delete')}} </span>
                                                                 </a>
                                                             {!! Form::close() !!}
+                                                        @endcan
                                                     </div>
                                                 </div>
                                             @endif

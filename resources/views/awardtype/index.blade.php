@@ -12,9 +12,12 @@
 
 @section('action-btn')
     <div class="float-end">
+        @can('create award type')
             <a href="#" data-url="{{ route('awardtype.create') }}" data-ajax-popup="true" data-title="{{__('Create New Award Type')}}" data-bs-toggle="tooltip" title="{{__('Create')}}"  class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
+
+        @endcan
     </div>
 @endsection
 

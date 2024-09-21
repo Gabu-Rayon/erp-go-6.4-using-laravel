@@ -130,13 +130,7 @@
                                             @endif
                                         </div>
                                         <div class="card-header border-0 pb-0 position-relative">
-                                            <h5><a href="
-                                                ('view lead')
-                                                @if($lead->is_active)
-                                                {{route('leads.show',$lead->id)}}
-                                                @else#@endif 
-                                                @else
-                                                ">{{$lead->name}}</a></h5>
+                                            <h5><a href="@can('view lead')@if($lead->is_active){{route('leads.show',$lead->id)}}@else#@endif @else#@endcan">{{$lead->name}}</a></h5>
                                             <div class="card-header-right">
                                                 @if(Auth::user()->type != 'client')
                                                     <div class="btn-group card-option">
@@ -146,6 +140,7 @@
                                                             <i class="ti ti-dots-vertical"></i>
                                                         </button>
                                                         <div class="dropdown-menu dropdown-menu-end">
+                                                            @can('edit lead')
                                                                 <a href="#!" data-size="md" data-url="{{ URL::to('leads/'.$lead->id.'/labels') }}" data-ajax-popup="true" class="dropdown-item" data-bs-original-title="{{__('Labels')}}">
                                                                     <i class="ti ti-bookmark"></i>
                                                                     <span>{{__('Labels')}}</span>
@@ -157,12 +152,16 @@
                                                                     <i class="ti ti-pencil"></i>
                                                                     <span>{{__('Edit')}}</span>
                                                                 </a>
+                                                            @endcan
+                                                            @can('delete lead')
                                                                 {!! Form::open(['method' => 'DELETE', 'route' => ['leads.destroy', $lead->id],'id'=>'delete-form-'.$lead->id]) !!}
                                                                 <a href="#!" class="dropdown-item bs-pass-para">
                                                                     <i class="ti ti-archive"></i>
                                                                     <span> {{__('Delete')}} </span>
                                                                 </a>
                                                                 {!! Form::close() !!}
+                                                            @endcan
+
 
                                                         </div>
                                                     </div>

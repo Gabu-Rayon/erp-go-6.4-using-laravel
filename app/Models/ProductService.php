@@ -8,7 +8,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ProductService extends Model
-{ protected $fillable = [
+{
+
+
+    protected $table = "product_services";
+    
+     protected $fillable = [
         'name',
         'sku',
         'sale_price',
@@ -45,6 +50,13 @@ class ProductService extends Model
         'sftyQty',
         'packageQuantity',
         'addInfo',
+        'isrcAplcbYn',
+        'rraModYn',
+        'useYn',
+        'isUsed',
+        'kraItemCode',
+        'isKRASync',
+        'isStockIO'
 ];
 
     public function taxes()

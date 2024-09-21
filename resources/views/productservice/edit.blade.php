@@ -93,8 +93,8 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                {{ Form::label('saftyQuantity', __('Safty Quantity'), ['class' => 'form-label']) }}
-                {{ Form::number('sftyQty', $productServiceinformation->sftyQty, ['class' => 'form-control', 'placeholder' => __('Enter Safty Quantity')]) }}
+                {{ Form::label('saftyQuantity', __('Safety Quantity'), ['class' => 'form-label']) }}
+                {{ Form::number('saftyQuantity', $productServiceinformation->sftyQty, ['class' => 'form-control', 'placeholder' => __('Enter Safty Quantity')]) }}
             </div>
         </div>
         <div class="col-md-6">

@@ -18,7 +18,7 @@ class Customer extends Authenticatable
     protected $fillable = [
         'customer_id',
         'customerTin',
-        'name',
+        'customerName',
         'address',
         'telNo',
         'email',

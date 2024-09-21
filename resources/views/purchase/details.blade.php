@@ -11,9 +11,6 @@
     <li class="breadcrumb-item">{{ __('Details') }}</li>
 @endsection
 
-{{ \Log::info('PURCHASE') }}
-{{ \Log::info($purchase) }}
-
 @section('content')
     <div class="row">
         {{ Form::open(['route' => 'purchase.mapPurchase', 'class' => 'w-100']) }}
@@ -43,20 +40,20 @@
                             <strong>Supplier BhfId</strong> : {{ $purchase->spplrBhfId }}
                         </div>
                         <div class="form-group col-md-4">
-                            <strong>Supplier Invoice No</strong>
+                            <strong>Supplier Invoice No</strong> : {{ $purchase->spplrInvcNo }}
                             {{ Form::text('supplierInvcNo', $purchase->spplrInvcNo, ['class' => 'form-control']) }}
                         </div>
                         <div class="form-group col-md-4">
-                            <strong>Supplier Sdcld</strong> : {{ $purchase->spplrSdcld ?? '-' }}
+                            <strong>Supplier Sdcld</strong> : {{ $purchase->spplrSdcld }}
                         </div>
                         <div class="form-group col-md-4">
-                            <strong>Supplier MrcNo</strong> : {{ $purchase->spplMrcNo ?? '-' }}
+                            <strong>Supplier MrcNo</strong> : {{ $purchase->spplMrcNo }}
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Receipt Type Code</strong> : {{ $purchase->rcptTyCd }}
                         </div>
                         <div class="form-group col-md-4">
-                            <strong>Pmt Type Code</strong> : {{ $purchase->pmtTycCd ?? '-' }}
+                            <strong>Pmt Type Code</strong> : {{ $purchase->pmtTycCd }}
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Purchase Type Code</strong> :
@@ -64,7 +61,7 @@
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Purchase Status Code</strong> :
-                            {{ Form::text('purchaseStatuCode', null, ['class' => 'form-control']) }}
+                            {{ Form::text('purchaseStatusCode', null, ['class' => 'form-control']) }}
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Confirmed Date</strong> : {{ $purchase->cfmDt }}
@@ -95,6 +92,12 @@
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Tax Rate A</strong> : {{ $purchase->taxRtA }}
+                        </div>
+                        <div class="form-group col-md-4">
+                            <strong>Tax Rate B</strong> : {{ $purchase->taxRtB }}
+                        </div>
+                        <div class="form-group col-md-4">
+                            <strong>Tax RateC</strong> : {{ $purchase->taxRtC }}
                         </div>
                         <div class="form-group col-md-4">
                             <strong>Tax Rate B</strong> : {{ $purchase->taxRtB }}
@@ -135,6 +138,7 @@
                         <div class="form-group col-md-4">
                             <strong>Remark</strong> : {{ $purchase->remark }}
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -142,8 +146,6 @@
 
         <div class="col-12">
             <h5 class="d-inline-block mb-4">{{ __('Product & Services') }}</h5>
-            {{ \Log::info('PURCHASE ITEMS') }}
-            {{ \Log::info($purchaseItems) }}
             @foreach ($purchaseItems->groupBy('itemType') as $itemType => $items)
                 <div class="row">
                     @foreach ($items as $index => $item)
@@ -158,7 +160,7 @@
                                             <strong>Item Code</strong> : {{ $item->itemCd }}
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Item Class Code</strong> : {{ $item->itemClsCd }}
+                                            <strong>item Class Code</strong> : {{ $item->itemClsCd }}
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>Item Name</strong> : {{ $item->itemNm }}
@@ -171,35 +173,43 @@
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>Supplier Item Code</strong> : {{ $item->spplrItemCd }}
-                                            {{ Form::text('itemPurchases[' . $index . '][supplierItemCode]', $item->spplrItemCd, ['class' => 'form-control']) }}
+                                            {{ Form::text('supplierItemCode[]', $item->spplrItemCd, ['class' => 'form-control']) }}
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>Supplier Item Name</strong> : {{ $item->spplrItemNm }}
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Item Standard Quantity</strong> : {{ $item->itemStdQty }}
+                                            <strong>Package Unit Code</strong> : {{ $item->pkgUnitCd }}
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Item Standard Quantity Unit</strong> : {{ $item->itemStdQtyUom }}
+                                            <strong>Package</strong> : {{ $item->pkg }}
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Item Quantity</strong> : {{ $item->itemQty }}
-                                            {{ Form::text('itemPurchases[' . $index . '][mapQuantity]', $item->itemQty, ['class' => 'form-control']) }}
+                                            <strong>Quantity Unit Code</strong> : {{ $item->qtyUnitCd }}
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Item Unit of Measurement</strong> : {{ $item->itemUom }}
+                                            <strong>Quantity</strong> : {{ $item->qty }}
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Taxation Type Code</strong> : {{ $item->txblTypeCd }}
+                                            <strong>Price</strong> : {{ $item->prc }}
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Item Unit Price</strong> : {{ $item->itemPrice }}
+                                            <strong>Supply Amount</strong> : {{ $item->splyAmt }}
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Tax Rate</strong> : {{ $item->taxRt }}
+                                            <strong>Discount Rate</strong> : {{ $item->dcRt }}
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <strong>Tax Amount</strong> : {{ $item->taxAmt }}
+                                            <strong>Discount Amount</strong> : {{ $item->dcAmt }}
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <strong>Tax Type Code</strong> : {{ $item->taxTy }}
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <strong>Taxable Amount</strong> : {{ $item->taxAmt }}
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <strong>Tax Amount</strong> : {{ $purchase->taxRtA }}
                                         </div>
                                         <div class="form-group col-md-4">
                                             <strong>Total Amount</strong> : {{ $item->totAmt }}

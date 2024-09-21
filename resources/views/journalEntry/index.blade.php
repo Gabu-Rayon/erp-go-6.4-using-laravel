@@ -10,9 +10,11 @@
 
 @section('action-btn')
     <div class="float-end">
+        @can('create journal entry')
             <a href="{{ route('journal-entry.create') }}" data-title="{{__('Create New Journal')}}" data-bs-toggle="tooltip"  title="{{__('Create')}}" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
+        @endcan
     </div>
 @endsection
 
@@ -45,11 +47,14 @@
                                     </td>
                                     <td>{{!empty($journalEntry->description)?$journalEntry->description:'-'}}</td>
                                     <td>
+                                        @can('edit journal entry')
                                             <div class="action-btn bg-primary ms-2">
                                                 <a data-title="{{__('Edit Journal')}}" href="{{ route('journal-entry.edit',[$journalEntry->id]) }}" class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip" title="{{__('Edit')}}" data-original-title="{{__('Edit')}}">
                                                     <i class="ti ti-pencil text-white"></i>
                                                 </a>
                                             </div>
+                                        @endcan
+                                        @can('delete journal entry')
                                                 <div class="action-btn bg-danger ms-2">
                                                     {!! Form::open(['method' => 'DELETE', 'route' => array('journal-entry.destroy', $journalEntry->id),'id'=>'delete-form-'.$journalEntry->id]) !!}
 
@@ -58,6 +63,7 @@
                                                         </a>
                                                     {!! Form::close() !!}
                                                 </div>
+                                        @endcan
                                     </td>
                                 </tr>
                             @endforeach

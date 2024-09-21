@@ -17,25 +17,34 @@
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-end">
 
+                                        @can('create project')
                                             <a class="dropdown-item" data-ajax-popup="true"
                                                data-size="md" data-title="{{ __('Duplicate Project') }}"
                                                data-url="{{ route('project.copy', [$project->id]) }}">
                                                 <i class="ti ti-copy"></i> <span>{{ __('Duplicate') }}</span>
                                             </a>
+                                        @endcan
+                                        @can('edit project')
                                             <a href="#!" data-size="lg" data-url="{{ route('projects.edit', $project->id) }}" data-ajax-popup="true" class="dropdown-item" data-bs-original-title="{{__('Edit Project')}}">
                                                 <i class="ti ti-pencil"></i>
                                                 <span>{{__('Edit')}}</span>
-                                            </a>                                            {!! Form::open(['method' => 'DELETE', 'route' => ['projects.destroy',$project->id]]) !!}
+                                            </a>
+                                        @endcan
+                                        @can('delete project')
+                                            {!! Form::open(['method' => 'DELETE', 'route' => ['projects.destroy',$project->id]]) !!}
                                             <a href="#!" class="dropdown-item bs-pass-para">
                                                 <i class="ti ti-archive"></i>
                                                 <span> {{__('Delete')}}</span>
                                             </a>
 
                                             {!! Form::close() !!}
+                                        @endcan
+                                        @can('edit project')
                                             <a href="#!" data-size="lg" data-url="{{ route('invite.project.member.view', $project->id) }}" data-ajax-popup="true" class="dropdown-item" data-bs-original-title="{{__('Invite User')}}">
                                                 <i class="ti ti-send"></i>
                                                 <span>{{__('Invite User')}}</span>
                                             </a>
+                                        @endcan
                                     </div>
                                 </div>
                             </div>

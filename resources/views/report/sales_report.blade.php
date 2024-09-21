@@ -182,6 +182,8 @@
                                         </thead>
                                         <tbody>
                                             @foreach($invoiceItems as $invoiceItem)
+                                            {{ \Log::info('INVOICE ITEM') }}
+                                            {{ \Log::info($invoiceItem) }}
                                                 <tr>
                                                     <td>{{ $invoiceItem['itemNm']}}</td>
                                                     <td>{{ $invoiceItem['quantity']}}</td>

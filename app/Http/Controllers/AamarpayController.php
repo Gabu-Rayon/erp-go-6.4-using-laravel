@@ -14,7 +14,6 @@ use App\Models\User;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Log;
 use PhpParser\Node\Stmt\TryCatch;
 
 class AamarpayController extends Controller
@@ -50,7 +49,7 @@ class AamarpayController extends Controller
                             return redirect()->back()->with('error', __('This coupon code has expired.'));
                         }
                         if ($get_amount <= 0) {
-                            $authuser = Auth::user();
+                            $authuser = \Auth::user();
                             $authuser->plan = $plan->id;
                             $authuser->save();
                             $assignPlan = $authuser->assignPlan($plan->id);
@@ -59,7 +58,7 @@ class AamarpayController extends Controller
                                     try {
                                         $authuser->cancel_subscription($authuser->id);
                                     } catch (\Exception $exception) {
-                                        Log::debug($exception->getMessage());
+                                        \Log::debug($exception->getMessage());
                                     }
                                 }
                                 $orderID = strtoupper(str_replace('.', '', uniqid('', true)));
@@ -158,8 +157,8 @@ class AamarpayController extends Controller
             return redirect()->route('plans.index')->with('error', __('Plan is deleted.'));
         }
         } catch (\Exception $e) {
-            Log::info('Aamarpay Error');
-            Log::error($e);
+            \Log::info('Aamarpay Error');
+            \Log::error($e);
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
@@ -190,8 +189,8 @@ class AamarpayController extends Controller
         <?php
         exit;
         } catch (\Exception $e) {
-            Log::info('Redirect to Merchant Error');
-            Log::error($e);
+            \Log::info('Redirect to Merchant Error');
+            \Log::error($e);
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
@@ -200,7 +199,7 @@ class AamarpayController extends Controller
     {
         try {
             $data = Crypt::decrypt($data);
-            $user = Auth::user();
+            $user = \Auth::user();
     
             if ($data['response'] == "success")
             {
@@ -262,8 +261,8 @@ class AamarpayController extends Controller
                 return redirect()->route('plans.index')->with('error', __('Your Transaction is fail please try again'));
             }
         } catch (\Exception $e) {
-            Log::info('Aamarpay Success Error');
-            Log::error($e);
+            \Log::info('Aamarpay Success Error');
+            \Log::error($e);
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
@@ -444,7 +443,7 @@ class AamarpayController extends Controller
                     $status = Utility::WebhookCall($webhook['url'],$parameter,$webhook['method']);
                     if($status == true)
                     {
-                        return redirect()->route('invoice.link.copy', Crypt::encrypt($invoice->id))->with('error', __('Transaction has been failed.'));
+                        return redirect()->route('invoice.link.copy', \Crypt::encrypt($invoice->id))->with('error', __('Transaction has been failed.'));
                     }
                     else
                     {
@@ -453,7 +452,7 @@ class AamarpayController extends Controller
                 }
 
 
-                return redirect()->route('invoice.link.copy', Crypt::encrypt($invoice->id))->with('success', __('Invoice paid Successfully!'));
+                return redirect()->route('invoice.link.copy', \Crypt::encrypt($invoice->id))->with('success', __('Invoice paid Successfully!'));
 
             }
             elseif ($data['response'] == "cancel")
@@ -465,13 +464,13 @@ class AamarpayController extends Controller
             {
 
 
-                return redirect()->route('invoice.link.copy', Crypt::encrypt($invoice->id))->with('error', __('Transaction fail'));
+                return redirect()->route('invoice.link.copy', \Crypt::encrypt($invoice->id))->with('error', __('Transaction fail'));
             }
         }
         catch (\Throwable $th)
         {
 
-            return redirect()->route('invoice.link.copy', Crypt::encrypt($invoice->id))->with('error', $th->getMessage());
+            return redirect()->route('invoice.link.copy', \Crypt::encrypt($invoice->id))->with('error', $th->getMessage());
 
         }
     }

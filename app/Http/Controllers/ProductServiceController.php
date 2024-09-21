@@ -35,14 +35,16 @@ class ProductServiceController extends Controller
     public function index(Request $request)
     {
         try {
-            $category = ItemType::whereIn('item_type_name', ['Finished Product', 'Service'])->pluck('item_type_name', 'item_type_code');
+            $category = ItemType::whereIn('item_type_name', ['Raw Material', 'Finished Product', 'Service'])->pluck('item_type_name', 'item_type_code');
             $category->prepend('Select Category', '');
 
+            $query = ProductService::where('created_by', Auth::user()->creatorId())->with(['category', 'unit']);
+
             if (!empty($request->category)) {
-                $productServices = ProductService::where('created_by', '=', Auth::user()->creatorId())->where('category_id', $request->category)->with(['category', 'unit'])->get();
-            } else {
-                $productServices = ProductService::where('created_by', '=', Auth::user()->creatorId())->with(['category', 'unit'])->get();
+                $query->where('category_id', $request->category);
             }
+
+            $productServices = $query->orderBy('created_at', 'desc')->get();
 
             return view('productservice.index', compact('productServices', 'category'));
         } catch (Exception $e) {
@@ -56,15 +58,12 @@ class ProductServiceController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-
     public function create()
     {
         try {
             $itemclassifications = ProductsServicesClassification::pluck('itemClsNm', 'itemClsCd');
             $itemtypes = ItemType::pluck('item_type_name', 'item_type_code');
             $countries = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
-            $countrynames = Details::where('cdCls', '05')->pluck('cdNm', 'cd');
-            $taxes = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
             $taxationtype = Details::where('cdCls', '04')->pluck('cdNm', 'cd');
 
 
@@ -101,8 +100,8 @@ class ProductServiceController extends Controller
             $expenseSubAccounts->where('chart_of_accounts.created_by', \Auth::user()->creatorId());
             $expenseSubAccounts = $expenseSubAccounts->get()->toArray();
             $quantityUnitCode = QuantityUnitCode::all()->pluck('name', 'code');
+            $quantityUnitCodes = QuantityUnitCode::all()->pluck('name', 'code');
             $packagingUnitCodes = ProductServicesPackagingUnit::all()->pluck('name', 'code');
-            $productServicesPackagingUnit = ProductServicesPackagingUnit::all()->pluck('name', 'code');
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 'product & service')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
             return view(
@@ -111,16 +110,13 @@ class ProductServiceController extends Controller
                     'itemclassifications',
                     'itemtypes',
                     'countries',
-                    'taxes',
                     'incomeChartAccounts',
                     'incomeSubAccounts',
                     'expenseChartAccounts',
                     'expenseSubAccounts',
                     'quantityUnitCode',
+                    'quantityUnitCodes',
                     'packagingUnitCodes',
-                    'countrynames',
-                    'productServicesPackagingUnit',
-                    'quantityUnitCode',
                     'taxationtype',
                     'category',
                     'customFields'
@@ -136,12 +132,290 @@ class ProductServiceController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * key Note is This We can Post the item First to the Etims Apis 
+     * Then Get Items to post in our Local Database for synchronizing with the correct Etims ItemCd
+     * 
+     *  OR
+     * 
+     * we can do both Post the eTIMS aPIS and also in our Local Db but for this the itemCd Will not match so,
+     * it will be diffcult for edit  the product
+     * 
      */
+
+
+    // public function store(Request $request)
+    // {
+    //     try {
+    //         $data = $request->all();
+
+    //         \Log::info("Data from the Form creating new Product and Service : ");
+    //         \Log::info($data);
+
+    //         $validator = \Validator::make(
+    //             $data,
+    //             [
+    //                 'items' => 'required|array',
+    //                 'items.*.itemCode' => 'required',
+    //                 'items.*.itemClassifiCode' => 'required',
+    //                 'items.*.itemTypeCode' => 'required',
+    //                 'items.*.itemName' => 'required',
+    //                 'items.*.sale_price' => 'required',
+    //                 'items.*.purchase_price' => 'required',
+    //                 'items.*.itemStrdName' => 'required',
+    //                 'items.*.countryCode' => 'required',
+    //                 'items.*.pkgUnitCode' => 'required',
+    //                 'items.*.qtyUnitCode' => 'required',
+    //                 'items.*.taxTypeCode' => 'required',
+    //                 'items.*.batchNo' => 'nullable',
+    //                 'items.*.barcode' => 'nullable',
+    //                 'items.*.saftyQuantity' => 'required',
+    //                 'items.*.isInrcApplicable' => 'required',
+    //                 'items.*.isUsed' => 'required',
+    //                 'items.*.packageQuantity' => 'required',
+    //                 'items.*.category_id' => 'required',
+    //                 'items.*.sale_chartaccount_id' => 'required',
+    //                 'items.*.expense_chartaccount_id' => 'required',
+    //                 'items.*.pro_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+    //                 'items.*.additionalInfo' => 'required',
+    //                 'items.*.quantity' => 'nullable',
+    //                 'items.*.unitPrice' => 'required',
+    //                 'items.*.group1UnitPrice' => 'nullable',
+    //                 'items.*.group2UnitPrice' => 'nullable',
+    //                 'items.*.roup3UnitPrice' => 'nullable',
+    //                 'items.*.group4UnitPrice' => 'nullable',
+    //                 'items.*.group5UnitPrice' => 'nullable',
+    //             ]
+    //         );
+    //         if ($validator->fails()) {
+    //             $messages = $validator->getMessageBag();
+
+    //             return redirect()->back()->with('error', $messages->first());
+    //         }
+
+    //         if (
+    //             \Auth::user()->type == 'company'
+    //             || \Auth::user()->type == 'accountant'
+    //         ) {
+    //             \Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
+    //             \Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
+
+    //             \Log::info('ITEMS');
+    //             \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
+
+    //             $apiData = [];
+
+    //             foreach ($data['items'] as $index => $item) {
+    //                 \Log::info('Product $ Service Item Index: ' . $index);
+
+    //                 $taxTypeId = null;
+    //                 if (isset($item['taxTyCd'])) {
+    //                     $taxType = Tax::where('name', $item['taxTyCd'])->first();
+    //                     $taxTypeId = $taxType ? $taxType->srtOrd : null;
+    //                 }
+
+    //                 $productTypeMapping = null;
+    //                 if (isset($item['itemTyCd'])) {
+    //                     $ItemTypeCode = ItemType::where('item_type_code', $item['itemTyCd'])->first();
+    //                     $productTypeMapping = $ItemTypeCode ? $ItemTypeCode->item_type_name : null;
+    //                 }
+
+    //                 $unitId = null;
+    //                 if (isset($item['qtyUnitCd'])) {
+    //                     $unit = ProductServiceUnit::where('code', $item['qtyUnitCd'])->first();
+    //                     $unitId = $unit ? $unit->id : null;
+    //                 }
+
+    //                 // Handling image upload with storage limit check
+    //                 if (!empty($item['pro_image']) && $item['pro_image']->isValid()) {
+    //                     \Log::info('Image File Object for Item ' . ($index + 1));
+    //                     $image_size = $item['pro_image']->getSize();
+    //                     $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
+
+    //                     if ($result == 1) {
+    //                         $fileName = $item['pro_image']->getClientOriginalName();
+    //                         $dir = 'uploads/pro_image';
+    //                         $path = Utility::upload_file($item, 'pro_image', $fileName, $dir, []);
+
+    //                         \Log::info('product image path:', $path);
+
+    //                         // Assign the file name to the pro_image field
+    //                         $item['pro_image'] = $fileName;
+
+
+    //                         // Prepare data for the API to post product $  service 
+    //                         $apiData[] = $this->constructProductData($item, $index);
+
+    //                         //Prepare data to post Product Service Opeing Stock 
+    //                         // $openingStockData['openingItemsLists'][] = [
+    //                         //     "itemCode" => $item['itemCode'],
+    //                         //     "quantity" => $item['quantity'] ?? 0,
+    //                         //     "packageQuantity" => $item['packageQuantity'] ?? 0
+    //                         // ];
+    //                     } else {
+    //                         \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
+    //                         return redirect()->back()->with('error', 'Storage limit exceeded.');
+    //                     }
+    //                 } else {
+    //                     \Log::info('No valid image uploaded for item ' . ($index + 1));
+    //                 }
+    //             }
+
+    //             // Post data to the external API
+    //             $response = \Http::withOptions([
+    //                 'verify' => false
+    //             ])->withHeaders([
+    //                         'Accept' => 'application/json',
+    //                         'Content-Type' => 'application/json',
+    //                         'key' => '123456'
+    //                     ])->post('https://etims.your-apps.biz/api/AddItemsListV2', $apiData);
+
+    //             // Log response data
+    //             \Log::info('API Response Status Code For Posting Product Data: ' . $response->status());
+    //             \Log::info('API Request Product Data Posted: ' . json_encode($apiData));
+    //             \Log::info('API Response Body For Posting Product Data: ' . $response->body());
+
+    //             if ($response->successful()) {
+    //                 \Log::info('Data successfully posted to the API');
+
+    //                 //then Add the product to the local database
+    //                 $productService = ProductService::create([
+    //                     'name' => $item['itemName'] ?? null,
+    //                     'sku' => $item['itemCode'] ?? null,
+    //                     'sale_price' => $item['sale_price'] ?? null,
+    //                     'purchase_price' => $item['purchase_price'] ?? null,
+    //                     'tax_id' => $taxTypeId,
+    //                     'category_id' => $item['category_id'] ?? null,
+    //                     'unit_id' => $unitId ?? null,
+    //                     'type' => $productTypeMapping ?? null,
+    //                     'quantity' => $item['quantity'],
+    //                     'description' => $item['additionalInfo'] ?? null,
+    //                     'pro_image' => $dir . '/' . $fileName,
+    //                     'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
+    //                     'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
+    //                     'created_by' => \Auth::user()->creatorId(),
+    //                     'tin' => $item['tin'] ?? null,
+    //                     'itemCd' => $item['itemCode'],
+    //                     'itemClsCd' => $item['itemClassifiCode'],
+    //                     'itemTyCd' => $item['itemTypeCode'],
+    //                     'itemNm' => $item['itemName'],
+    //                     'itemStdNm' => $item['itemStrdName'],
+    //                     'orgnNatCd' => $item['countryCode'] ?? null,
+    //                     'pkgUnitCd' => $item['pkgUnitCode'] ?? null,
+    //                     'qtyUnitCd' => $item['qtyUnitCode'] ?? null,
+    //                     'taxTyCd' => $item['taxTypeCode'] ?? null,
+    //                     'btchNo' => $item['batchNo'] ?? null,
+    //                     'regBhfId' => $item['regBhfId'] ?? null,
+    //                     'bcd' => $item['barcode'] ?? null,
+    //                     'dftPrc' => $item['unitPrice'] ?? null,
+    //                     'grpPrcL1' => $item['group1UnitPrice'] ?? null,
+    //                     'grpPrcL2' => $item['group2UnitPrice'] ?? null,
+    //                     'grpPrcL3' => $item['group3UnitPrice'] ?? null,
+    //                     'grpPrcL4' => $item['group4UnitPrice'] ?? null,
+    //                     'grpPrcL5' => $item['group5UnitPrice'] ?? null,
+    //                     'addInfo' => $item['additionalInfo'] ?? null,
+    //                     'sftyQty' => $item['saftyQuantity'] ?? null,
+    //                     'isrcAplcbYn' => $item['isInrcApplicable'] ?? null,
+    //                     'rraModYn' => $item['rraModYn'] ?? null,
+    //                     'packageQuantity' => $item['packageQuantity'] ?? null,
+    //                     'isUsed' => $item['isUsed'] ?? null,
+
+    //                     //Save THE KRA PRODUCT RESPONSE FROM 
+    //                     'kraItemCode' => '',
+    //                     'isKRASync' => '',
+    //                     'isStockIO' => '',
+    //                 ]);
+
+    //                 $productService->save();
+    //             } else {
+    //                 \Log::error('Error posting data to the API: ' . $response->body());
+    //             }
+
+
+    //             // Post data to the ItemOpeningStock API
+    //             // $openingStockResponse = \Http::withOptions([
+    //             //     'verify' => false
+    //             // ])->withHeaders([
+    //             //             'Accept' => 'application/json',
+    //             //             'Content-Type' => 'application/json',
+    //             //             'key' => '123456'
+    //             //         ])->post('https://etims.your-apps.biz/api/ItemOpeningStock', $openingStockData);
+
+    //             // \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $openingStockResponse->status());
+    //             // \Log::info('API Request Opening Stock Data Posted: ' . json_encode($openingStockData));
+    //             // \Log::info('API Response Body For Posting Opening Stock Data: ' . $openingStockResponse->body());
+
+    //             // if ($openingStockResponse->successful()) {
+    //             //     \Log::info('Opening stock data successfully posted to the API');
+    //             // } else {
+    //             //     \Log::error('Error posting opening stock data to the API: ' . $openingStockResponse->body());
+    //             // }
+    //             // Handle different response status codes
+    //             if ($response->successful()) {
+    //                 // Successful response (2xx codes)
+    //                 return redirect()->route('productservice.index')->with('success', 'Product(s) Service(s) Added Successfully. Synchronize or Search By Date to update your Product(s) & Service(s).');
+    //             } elseif ($response->status() === 400) {
+    //                 // Handle 400 Bad Request errors
+    //                 $responseBody = $response->json();
+    //                 Log::error('Error posting data to the API: ' . json_encode($responseBody));
+    //                 return redirect()->route('productservice.index')->with('error', 'Bad Request: ' . $responseBody['message']);
+    //             } elseif ($response->status() === 404) {
+    //                 // Handle 404 Not Found errors
+    //                 return redirect()->route('productservice.index')->with('error', 'API Endpoint Not Found');
+    //             } elseif ($response->status() === 500) {
+    //                 // Handle 500 Internal Server Error
+    //                 return redirect()->route('productservice.index')->with('error', 'Internal Server Error');
+    //             } else {
+    //                 // Handle other status codes as needed
+    //                 return redirect()->route('productservice.index')->with('error', 'Unexpected Error');
+    //             }
+
+    //         } else {
+    //             return redirect()->back()->with('error', __('Permission denied.'));
+    //         }
+    //     } catch (\Exception $e) {
+    //         \Log::error('CREATE PRODUCT SERVICE ERROR');
+    //         \Log::error($e);
+    //         return redirect()->back()->with('error', 'Something Went Wrong');
+    //     }
+    // }
+
+    // private function constructProductData($item, $key)
+    // {
+    //     return [
+    //         "itemCode" => $item["itemCode"],
+    //         "itemClassifiCode" => $item["itemClassifiCode"],
+    //         "itemTypeCode" => $item["itemTypeCode"],
+    //         "itemName" => $item["itemName"],
+    //         "itemStrdName" => $item["itemStrdName"],
+    //         "countryCode" => $item["countryCode"],
+    //         "pkgUnitCode" => $item["pkgUnitCode"],
+    //         "qtyUnitCode" => $item["qtyUnitCode"],
+    //         "taxTypeCode" => $item["taxTypeCode"],
+    //         "batchNo" => $item["batchNo"],
+    //         "barcode" => $item["barcode"],
+    //         "unitPrice" => $item["unitPrice"],
+    //         "group1UnitPrice" => $item["group1UnitPrice"],
+    //         "group2UnitPrice" => $item["group2UnitPrice"],
+    //         "group3UnitPrice" => $item["group3UnitPrice"],
+    //         "group4UnitPrice" => $item["group4UnitPrice"],
+    //         "group5UnitPrice" => $item["group5UnitPrice"],
+    //         "additionalInfo" => $item["additionalInfo"],
+    //         "saftyQuantity" => $item["saftyQuantity"],
+    //         "isInrcApplicable" => $item["isInrcApplicable"],
+    //         "isUsed" => $item["isUsed"],
+    //         "quantity" => $item["quantity"],
+    //         "packageQuantity" => $item["packageQuantity"],
+    //     ];
+    // }
+
 
     public function store(Request $request)
     {
         try {
             $data = $request->all();
+
+            \Log::info("Data from the Form creating new Product and Service : ");
+            \Log::info($data);
 
             $validator = \Validator::make(
                 $data,
@@ -173,60 +447,47 @@ class ProductServiceController extends Controller
                     'items.*.unitPrice' => 'required',
                     'items.*.group1UnitPrice' => 'nullable',
                     'items.*.group2UnitPrice' => 'nullable',
-                    'items.*.roup3UnitPrice' => 'nullable',
+                    'items.*.group3UnitPrice' => 'nullable',
                     'items.*.group4UnitPrice' => 'nullable',
                     'items.*.group5UnitPrice' => 'nullable',
                 ]
             );
+
             if ($validator->fails()) {
                 $messages = $validator->getMessageBag();
-
                 return redirect()->back()->with('error', $messages->first());
             }
 
-            if (
-                \Auth::user()->type == 'company'
-                || \Auth::user()->type == 'accountant'
-            ) {
+            if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
                 \Log::info('CREATE PRODUCT SERVICE REQUEST DATA');
                 \Log::info(json_encode($request->all(), JSON_PRETTY_PRINT));
-
-
 
                 \Log::info('ITEMS');
                 \Log::info(json_encode($data['items'], JSON_PRETTY_PRINT));
 
                 $apiData = [];
-
-                // Define the mapping array for taxTypeCode to tax_id
-                $taxTypeMapping = [
-                    'A' => 1,
-                    'B' => 2,
-                    'C' => 3,
-                    'D' => 4,
-                    'E' => 5,
-                    'F' => 6,
-                ];
-                $productTypeMapping = [
-                    1 => 'Raw Material',
-                    2 => 'Finished Product',
-                    3 => 'Service',
-                ];
+                $localProducts = [];
 
                 foreach ($data['items'] as $index => $item) {
-                    \Log::info('ITEM INDEX: ' . $index);
+                    \Log::info('Product & Service Item Index: ' . $index);
 
-                    // Determine the tax_id based on taxTypeCode
-                    $taxIdCode = isset($item['taxTypeCode']) && array_key_exists($item['taxTypeCode'], $taxTypeMapping)
-                        ? $taxTypeMapping[$item['taxTypeCode']]
-                        : null;
+                    $taxTypeId = null;
+                    if (isset($item['taxTypeCode'])) {
+                        $taxType = Tax::where('name', $item['taxTypeCode'])->first();
+                        $taxTypeId = $taxType ? $taxType->srtOrd : null;
+                    }
 
-                    // Determine the product type  based on itemTypeCode
-                    $productType = isset($item['itemTypeCode']) && array_key_exists($item['itemTypeCode'], $productTypeMapping)
-                        ? $productTypeMapping[$item['itemTypeCode']]
-                        : null;
+                    $productTypeMapping = null;
+                    if (isset($item['itemTypeCode'])) {
+                        $ItemTypeCode = ItemType::where('item_type_code', $item['itemTypeCode'])->first();
+                        $productTypeMapping = $ItemTypeCode ? $ItemTypeCode->item_type_name : null;
+                    }
 
-                    \Log::info('Product Type selected for this Product : ' . $productType);
+                    $unitId = null;
+                    if (isset($item['qtyUnitCode'])) {
+                        $unit = ProductServiceUnit::where('code', $item['qtyUnitCode'])->first();
+                        $unitId = $unit ? $unit->id : null;
+                    }
 
                     // Handling image upload with storage limit check
                     if (!empty($item['pro_image']) && $item['pro_image']->isValid()) {
@@ -239,70 +500,10 @@ class ProductServiceController extends Controller
                             $dir = 'uploads/pro_image';
                             $path = Utility::upload_file($item, 'pro_image', $fileName, $dir, []);
 
-                            \Log::info('product image path:', $path);
+                            \Log::info('Product image path:', $path);
 
                             // Assign the file name to the pro_image field
                             $item['pro_image'] = $fileName;
-
-                            // Determine the unit_id from qtyUnitCode
-                            $unitId = null;
-                            if (isset($item['qtyUnitCode'])) {
-                                $unit = ProductServiceUnit::where('code', $item['qtyUnitCode'])->first();
-                                $unitId = $unit ? $unit->id : null;
-                            }
-                            $productService = ProductService::create([
-                                'name' => $item['itemName'] ?? null,
-                                'sku' => $item['itemCode'] ?? null,
-                                'sale_price' => $item['sale_price'] ?? null,
-                                'purchase_price' => $item['purchase_price'] ?? null,
-                                'tax_id' => $taxIdCode,
-                                'category_id' => $item['category_id'] ?? null,
-                                'unit_id' => $unitId ?? null,
-                                'type' => $productType ?? null,
-                                'quantity' => $item['quantity'],
-                                'description' => $item['additionalInfo'] ?? null,
-                                'pro_image' => $dir . '/' . $fileName,
-                                'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
-                                'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
-                                'created_by' => \Auth::user()->creatorId(),
-                                'tin' => $item['tin'] ?? null,
-                                'itemCd' => $item['itemCode'],
-                                'itemClsCd' => $item['itemClassifiCode'],
-                                'itemTyCd' => $item['itemTypeCode'],
-                                'itemNm' => $item['itemName'],
-                                'itemStdNm' => $item['itemStrdName'],
-                                'orgnNatCd' => $item['countryCode'] ?? null,
-                                'pkgUnitCd' => $item['pkgUnitCode'] ?? null,
-                                'qtyUnitCd' => $item['qtyUnitCode'] ?? null,
-                                'taxTyCd' => $item['taxTypeCode'] ?? null,
-                                'btchNo' => $item['batchNo'] ?? null,
-                                'regBhfId' => $item['regBhfId'] ?? null,
-                                'bcd' => $item['barcode'] ?? null,
-                                'dftPrc' => $item['unitPrice'] ?? null,
-                                'grpPrcL1' => $item['group1UnitPrice'] ?? null,
-                                'grpPrcL2' => $item['group2UnitPrice'] ?? null,
-                                'grpPrcL3' => $item['group3UnitPrice'] ?? null,
-                                'grpPrcL4' => $item['group4UnitPrice'] ?? null,
-                                'grpPrcL5' => $item['group5UnitPrice'] ?? null,
-                                'addInfo' => $item['additionalInfo'] ?? null,
-                                'sftyQty' => $item['saftyQuantity'] ?? null,
-                                'isrcAplcbYn' => $item['isInrcApplicable'] ?? null,
-                                'rraModYn' => $item['rraModYn'] ?? null,
-                                'packageQuantity' => $item['packageQuantity'] ?? null,
-                                'isUsed' => $item['isUsed'] ?? null,
-                            ]);
-
-                            $productService->save();
-
-                            // Prepare data for the API to post product $  service 
-                            $apiData[] = $this->constructProductData($item, $index);
-
-                            //Prepare data to post Product Service Opeing Stock 
-                            // $openingStockData['openingItemsLists'][] = [
-                            //     "itemCode" => $item['itemCode'],
-                            //     "quantity" => $item['quantity'] ?? 0,
-                            //     "packageQuantity" => $item['packageQuantity'] ?? 0
-                            // ];
                         } else {
                             \Log::info('Storage limit exceeded for user ' . \Auth::user()->creatorId());
                             return redirect()->back()->with('error', 'Storage limit exceeded.');
@@ -310,6 +511,57 @@ class ProductServiceController extends Controller
                     } else {
                         \Log::info('No valid image uploaded for item ' . ($index + 1));
                     }
+
+                    // Prepare data for the API to post product & service
+                    $apiData[] = $this->constructProductData($item, $index);
+
+                    // Store the item data locally for later use
+                    $localProducts[$item['itemCode']] = [
+                        'name' => $item['itemName'] ?? null,
+                        'sku' => $item['itemCode'] ?? null,
+                        'sale_price' => $item['sale_price'] ?? null,
+                        'purchase_price' => $item['purchase_price'] ?? null,
+                        'tax_id' => $taxTypeId,
+                        'category_id' => $item['category_id'] ?? null,
+                        'unit_id' => $unitId ?? null,
+                        'type' => $productTypeMapping ?? null,
+                        'quantity' => $item['quantity'],
+                        'description' => $item['additionalInfo'] ?? null,
+                        'pro_image' => isset($fileName) ? ($dir . '/' . $fileName) : null,
+                        'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
+                        'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
+                        'created_by' => \Auth::user()->creatorId(),
+                        'tin' => $item['tin'] ?? null,
+                        'itemCd' => $item['itemCode'],
+                        'itemClsCd' => $item['itemClassifiCode'],
+                        'itemTyCd' => $item['itemTypeCode'],
+                        'itemNm' => $item['itemName'],
+                        'itemStdNm' => $item['itemStrdName'],
+                        'orgnNatCd' => $item['countryCode'] ?? null,
+                        'pkgUnitCd' => $item['pkgUnitCode'] ?? null,
+                        'qtyUnitCd' => $item['qtyUnitCode'] ?? null,
+                        'taxTyCd' => $item['taxTypeCode'] ?? null,
+                        'btchNo' => $item['batchNo'] ?? null,
+                        'regBhfId' => $item['regBhfId'] ?? null,
+                        'bcd' => $item['barcode'] ?? null,
+                        'dftPrc' => $item['unitPrice'] ?? null,
+                        'grpPrcL1' => $item['group1UnitPrice'] ?? null,
+                        'grpPrcL2' => $item['group2UnitPrice'] ?? null,
+                        'grpPrcL3' => $item['group3UnitPrice'] ?? null,
+                        'grpPrcL4' => $item['group4UnitPrice'] ?? null,
+                        'grpPrcL5' => $item['group5UnitPrice'] ?? null,
+                        'addInfo' => $item['additionalInfo'] ?? null,
+                        'sftyQty' => $item['saftyQuantity'] ?? null,
+                        'isrcAplcbYn' => $item['isInrcApplicable'] ?? null,
+                        'rraModYn' => $item['rraModYn'] ?? null,
+                        'packageQuantity' => $item['packageQuantity'] ?? null,
+                        'isUsed' => $item['isUsed'] ?? null,
+
+                        // Initialize KRA product response fields
+                        'kraItemCode' => '',
+                        'isKRASync' => '',
+                        'isStockIO' => '',
+                    ];
                 }
 
                 // Post data to the external API
@@ -319,7 +571,7 @@ class ProductServiceController extends Controller
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
                     'key' => '123456'
-                ])->post('https://etims.your-apps.biz/api/AddItemsList', $apiData);
+                ])->post('https://etims.your-apps.biz/api/AddItemsListV2', $apiData);
 
                 // Log response data
                 \Log::info('API Response Status Code For Posting Product Data: ' . $response->status());
@@ -328,32 +580,45 @@ class ProductServiceController extends Controller
 
                 if ($response->successful()) {
                     \Log::info('Data successfully posted to the API');
+
+                    $responseData = $response->json();
+                    if (isset($responseData['responseData']) && is_array($responseData['responseData'])) {
+                        foreach ($responseData['responseData'] as $responseItem) {
+                            $itemCode = $responseItem['itemCode'];
+                            if (isset($localProducts[$itemCode])) {
+                                $localProducts[$itemCode]['kraItemCode'] = $responseItem['kraItemCode'];
+                                $localProducts[$itemCode]['isKRASync'] = $responseItem['isKRASync'];
+                                $localProducts[$itemCode]['isStockIO'] = $responseItem['isStockIO'];
+                                // Insert or update the product in the local database
+                                \DB::table('product_services')->updateOrInsert(
+                                    ['itemCd' => $itemCode],
+                                    $localProducts[$itemCode]
+                                );
+                            }
+                        }
+                    }
+
+                    return redirect()->route('productservice.index')->with('success', 'Product & Service successfully created.');
                 } else {
-                    \Log::error('Error posting data to the API: ' . $response->body());
+
+                    // Handle different response status codes
+                    if ($response->status() === 200) {
+                        $responseBody = $response->json();
+                        \Log::error('Error posting data to the API: ' . json_encode($responseBody));
+
+                        // Extract message from response and redirect
+                        $errorMessage = $responseBody['message'] ?? 'Bad Request';
+                        return redirect()->route('productservice.index')->with('error', $errorMessage);
+                    } elseif ($response->status() === 400) {
+                        return redirect()->route('productservice.index')->with('error', 'Not Found');
+                    } elseif ($response->status() === 404) {
+                        return redirect()->route('productservice.index')->with('error', 'API Endpoint Not Found');
+                    } elseif ($response->status() === 500) {
+                        return redirect()->route('productservice.index')->with('error', 'Internal Server Error');
+                    } else {
+                        return redirect()->route('productservice.index')->with('error', 'Unexpected Error');
+                    }
                 }
-
-
-                // Post data to the ItemOpeningStock API
-                // $openingStockResponse = \Http::withOptions([
-                //     'verify' => false
-                // ])->withHeaders([
-                //             'Accept' => 'application/json',
-                //             'Content-Type' => 'application/json',
-                //             'key' => '123456'
-                //         ])->post('https://etims.your-apps.biz/api/ItemOpeningStock', $openingStockData);
-
-                // \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $openingStockResponse->status());
-                // \Log::info('API Request Opening Stock Data Posted: ' . json_encode($openingStockData));
-                // \Log::info('API Response Body For Posting Opening Stock Data: ' . $openingStockResponse->body());
-
-                // if ($openingStockResponse->successful()) {
-                //     \Log::info('Opening stock data successfully posted to the API');
-                // } else {
-                //     \Log::error('Error posting opening stock data to the API: ' . $openingStockResponse->body());
-                // }
-
-
-                return redirect()->route('productservice.index')->with('success', 'Product / Service Added Successfully');
             } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
@@ -374,7 +639,7 @@ class ProductServiceController extends Controller
             "itemStrdName" => $item["itemStrdName"],
             "countryCode" => $item["countryCode"],
             "pkgUnitCode" => $item["pkgUnitCode"],
-            "qtyUnitCode" => $item["pkgUnitCode"],
+            "qtyUnitCode" => $item["qtyUnitCode"],
             "taxTypeCode" => $item["taxTypeCode"],
             "batchNo" => $item["batchNo"],
             "barcode" => $item["barcode"],
@@ -392,7 +657,6 @@ class ProductServiceController extends Controller
             "packageQuantity" => $item["packageQuantity"],
         ];
     }
-
 
     public function show($id)
     {
@@ -1023,13 +1287,13 @@ class ProductServiceController extends Controller
                             <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 col-12">
                                 <div class="tab-pane fade show active toacart w-100" data-url="' . url('add-to-cart/' . $product->id . '/' . $lastsegment) . '">
                                     <div class="position-relative card">
-                                        <img alt="Image placeholder" src="' . asset(Storage::url($image_url)) . '" class="card-image avatar shadow hover-shadow-lg" style=" height: 6rem; width: 100%;">
+                                        <img alt="Image placeholder" src="' . asset(Storage::url($image_url)) . '" class="shadow card-image avatar hover-shadow-lg" style=" height: 6rem; width: 100%;">
                                         <div class="p-0 custom-card-body card-body d-flex ">
-                                            <div class="card-body my-2 p-2 text-left card-bottom-content">
+                                            <div class="p-2 my-2 text-left card-body card-bottom-content">
                                                 <h6 class="mb-2 text-dark product-title-name">' . $product->name . '</h6>
-                                                <small class="badge badge-primary mb-0">' . Auth::user()->priceFormat($productprice) . '</small>
+                                                <small class="mb-0 badge badge-primary">' . Auth::user()->priceFormat($productprice) . '</small>
 
-                                                <small class="top-badge badge badge-danger mb-0">' . $quantity . ' ' . $unit . '</small>
+                                                <small class="mb-0 top-badge badge badge-danger">' . $quantity . ' ' . $unit . '</small>
                                             </div>
                                         </div>
                                     </div>
@@ -1041,7 +1305,7 @@ class ProductServiceController extends Controller
 
                 return Response($output);
             } else {
-                $output = '<div class="card card-body col-12 text-center">
+                $output = '<div class="text-center card card-body col-12">
                     <h5>' . __("No Product Available") . '</h5>
                     </div>';
                 return Response($output);
@@ -1120,7 +1384,7 @@ class ProductServiceController extends Controller
 
                 $carthtml .= '<tr data-product-id="' . $id . '" id="product-id-' . $id . '">
                                 <td class="cart-images">
-                                    <img alt="Image placeholder" src="' . asset(Storage::url($image_url)) . '" class="card-image avatar shadow hover-shadow-lg">
+                                    <img alt="Image placeholder" src="' . asset(Storage::url($image_url)) . '" class="shadow card-image avatar hover-shadow-lg">
                                 </td>
     
                                 <td class="name">' . $productname . '</td>
@@ -1142,7 +1406,7 @@ class ProductServiceController extends Controller
     
                                 <td class="">
                                      <a href="#" class="action-btn bg-danger bs-pass-para-pos" data-confirm="' . __("Are You Sure?") . '" data-text="' . __("This action can not be undone. Do you want to continue?") . '" data-confirm-yes=' . $model_delete_id . ' title="' . __('Delete') . '}" data-id="' . $id . '" title="' . __('Delete') . '"   >
-                                       <span class=""><i class="ti ti-trash btn btn-sm text-white"></i></span>
+                                       <span class=""><i class="text-white ti ti-trash btn btn-sm"></i></span>
                                      </a>
                                      <form method="post" action="' . url('remove-from-cart') . '"  accept-charset="UTF-8" id="' . $model_delete_id . '">
                                           <input name="_method" type="hidden" value="DELETE">
@@ -1467,84 +1731,245 @@ class ProductServiceController extends Controller
         }
     }
 
+    // public function synchronize()
+    // {
+    //     try {
+    //         ini_set('max_execution_time', 30000);
+    //         $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20210101120000';
+
+    //         \Log::info('URL: ' . $url);
+
+    //         $response = Http::withOptions(['verify' => false])
+    //             ->withHeaders(['key' => '123456'])
+    //             ->timeout(60)
+    //             ->get($url);
+
+    //         $data = $response->json()['data'];
+
+    //         $remoteItems = $data['data']['itemList'];
+
+    //         \Log::info('REMOTE ITEMS: ', $remoteItems);
+
+    //         $itemsToSync = [];
+
+    //         foreach ($remoteItems as $remoteItem) {
+    //             $taxTypeId = null;
+    //             if (isset($remoteItem['taxTyCd'])) {
+    //                 $taxType = Tax::where('name', $remoteItem['taxTyCd'])->first();
+    //                 $taxTypeId = $taxType ? $taxType->srtOrd : null;
+    //             }
+
+    //             $productTypeMapping = null;
+    //             if (isset($remoteItem['itemTyCd'])) {
+    //                 $ItemTypeCode = ItemType::where('item_type_code', $remoteItem['itemTyCd'])->first();
+    //                 $productTypeMapping = $ItemTypeCode ? $ItemTypeCode->item_type_name : null;
+    //             }
+
+    //             $unitId = null;
+    //             if (isset($remoteItem['qtyUnitCd'])) {
+    //                 $unit = ProductServiceUnit::where('code', $remoteItem['qtyUnitCd'])->first();
+    //                 $unitId = $unit ? $unit->id : null;
+    //             }
+
+    //             $item = [
+    //                 'name' => $remoteItem['itemNm'],
+    //                 'sku' => $remoteItem['itemCd'],
+    //                 'sale_price' => null,
+    //                 'purchase_price' => null,
+    //                 'tax_id' => $taxTypeId,
+    //                 'category_id' => null,
+    //                 'unit_id' => $unitId,
+    //                 'type' => $productTypeMapping,
+    //                 'description' => $remoteItem['addInfo'],
+    //                 'pro_image' => null,
+    //                 'sale_chartaccount_id' => null,
+    //                 'expense_chartaccount_id' => null,
+    //                 'created_by' => \Auth::user()->creatorId(),
+    //                 'tin' => $remoteItem['tin'],
+    //                 'itemCd' => $remoteItem['itemCd'],
+    //                 'itemClsCd' => $remoteItem['itemClsCd'],
+    //                 'itemTyCd' => $remoteItem['itemTyCd'],
+    //                 'itemNm' => $remoteItem['itemNm'],
+    //                 'itemStdNm' => $remoteItem['itemStdNm'],
+    //                 'orgnNatCd' => $remoteItem['orgnNatCd'],
+    //                 'pkgUnitCd' => $remoteItem['pkgUnitCd'],
+    //                 'qtyUnitCd' => $remoteItem['qtyUnitCd'],
+    //                 'taxTyCd' => $remoteItem['taxTyCd'],
+    //                 'btchNo' => $remoteItem['btchNo'],
+    //                 'regBhfId' => $remoteItem['regBhfId'],
+    //                 'bcd' => $remoteItem['bcd'],
+    //                 'dftPrc' => $remoteItem['dftPrc'],
+    //                 'grpPrcL1' => $remoteItem['grpPrcL1'],
+    //                 'grpPrcL2' => $remoteItem['grpPrcL2'],
+    //                 'grpPrcL3' => $remoteItem['grpPrcL3'],
+    //                 'grpPrcL4' => $remoteItem['grpPrcL4'],
+    //                 'grpPrcL5' => $remoteItem['grpPrcL5'],
+    //                 'addInfo' => $remoteItem['addInfo'],
+    //                 'sftyQty' => $remoteItem['sftyQty'],
+    //                 'isrcAplcbYn' => $remoteItem['isrcAplcbYn'],
+    //                 'rraModYn' => $remoteItem['rraModYn'],
+    //                 'useYn' => $remoteItem['useYn'],
+    //                 'isUsed' => null,
+    //                 'packageQuantity' => null
+    //             ];
+    //             array_push($itemsToSync, $item);
+    //         }
+
+    //         \Log::info('ITEMS TO SYNC: ', $itemsToSync);
+
+    //         $syncedItems = 0;
+
+    //         foreach ($itemsToSync as $itemToSync) {
+    //             $exists = ProductService::where('itemCd', $itemToSync['itemCd'])->exists();
+    //             if (!$exists) {
+    //                 ProductService::create($itemToSync);
+    //                 $syncedItems++;
+    //             }
+    //         }
+
+    //         if ($syncedItems > 0) {
+    //             return redirect()->back()->with('success', __('Synced ' . $syncedItems . ' Items Successfully'));
+    //         } else {
+    //             return redirect()->back()->with('success', __('Items Up To Date'));
+    //         }
+    //     } catch (\Exception $e) {
+    //         \Log::error('ERROR SYNCING ITEM INFO: ' . $e->getMessage());
+    //         return redirect()->back()->with('error', __('Error Syncing Item Information'));
+    //     }
+    // }
+
+
+
     public function synchronize()
     {
         try {
-
-            $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20210101120000';
-
-            \Log::info('URL');
-            \Log::info($url);
-
-            $response = Http::withOptions([
-                'verify' => false
-            ])->withHeaders([
-                'key' => '123456'
-            ])->get($url);
-
-            $data = $response->json()['data'];
-
-            $remoteItems = $data['data']['itemList'];
-
-            \Log::info('REMOTE ITEMS');
-            \Log::info($remoteItems);
-
-            $itemsToSync = [];
-
-            foreach ($remoteItems as $remoteItem) {
-                $item = [
-                    'tin' => $remoteItem['tin'],
-                    'itemCd' => $remoteItem['itemCd'],
-                    'itemClsCd' => $remoteItem['itemClsCd'],
-                    'itemTyCd' => $remoteItem['itemTyCd'],
-                    'itemNm' => $remoteItem['itemNm'],
-                    'itemStdNm' => $remoteItem['itemStdNm'],
-                    'orgnNatCd' => $remoteItem['orgnNatCd'],
-                    'pkgUnitCd' => $remoteItem['pkgUnitCd'],
-                    'qtyUnitCd' => $remoteItem['qtyUnitCd'],
-                    'taxTyCd' => $remoteItem['taxTyCd'],
-                    'btchNo' => $remoteItem['btchNo'],
-                    'regBhfId' => $remoteItem['regBhfId'],
-                    'bcd' => $remoteItem['bcd'],
-                    'dftPrc' => $remoteItem['dftPrc'],
-                    'grpPrcL1' => $remoteItem['grpPrcL1'],
-                    'grpPrcL2' => $remoteItem['grpPrcL2'],
-                    'grpPrcL3' => $remoteItem['grpPrcL3'],
-                    'grpPrcL4' => $remoteItem['grpPrcL4'],
-                    'grpPrcL5' => $remoteItem['grpPrcL5'],
-                    'addInfo' => $remoteItem['addInfo'],
-                    'sftyQty' => $remoteItem['sftyQty'],
-                    'isrcAplcbYn' => $remoteItem['isrcAplcbYn'],
-                    'rraModYn' => $remoteItem['rraModYn'],
-                    'useYn' => $remoteItem['useYn']
-                ];
-                array_push($itemsToSync, $item);
-            }
-
-            \Log::info('ITEMS TO SYNC : ');
-            \Log::info("Product & service being sync" . $itemsToSync);
-
+            ini_set('max_execution_time', 30000);
+            $baseUrl = env('ETIMS_API_ENDPOINT') . 'GetItemInformationV2';
+            $apiKey = env('ETIMS_API_KEY');
+            $batchSize = 1000;
             $syncedItems = 0;
 
-            foreach ($itemsToSync as $itemToSync) {
-                $exists = (bool) ProductService::where('itemCd', $itemsToSync['itemCd'])->exists();
-                if (!$exists) {
-                    ProductService::create($itemToSync);
-                    $syncedItems++;
+            // Starting date (you can modify this as needed)
+            $startDate = '20210101120000';
+
+            while (true) {
+                // Fetch data in batches
+                $url = "{$baseUrl}?date={$startDate}&batchSize={$batchSize}";
+
+                \Log::info('Fetching data from Get Item Information URL: ' . $url);
+
+                $response = Http::withOptions(['verify' => false])
+                    ->withHeaders(['key' => $apiKey])
+                    ->timeout(60)
+                    ->get($url);
+
+                Log::info('DATAAAAA::::');
+                Log::info($response->json());
+                $data = $response->json()['responseData'];
+
+
+
+                if (empty($data['itemList'])) {
+                    break;
                 }
+
+                $remoteItems = $data['itemList'];
+
+                \Log::info('REMOTE ITEMS Information : ', $remoteItems);
+
+                $itemsToSync = [];
+
+                foreach ($remoteItems as $remoteItem) {
+                    $taxTypeId = null;
+                    if (isset($remoteItem['taxTyCd'])) {
+                        $taxType = Tax::where('name', $remoteItem['taxTyCd'])->first();
+                        $taxTypeId = $taxType ? $taxType->srtOrd : null;
+                    }
+
+                    $productTypeMapping = null;
+                    if (isset($remoteItem['itemTyCd'])) {
+                        $ItemTypeCode = ItemType::where('item_type_code', $remoteItem['itemTyCd'])->first();
+                        $productTypeMapping = $ItemTypeCode ? $ItemTypeCode->item_type_name : null;
+                    }
+
+                    $unitId = null;
+                    if (isset($remoteItem['qtyUnitCd'])) {
+                        $unit = ProductServiceUnit::where('code', $remoteItem['qtyUnitCd'])->first();
+                        $unitId = $unit ? $unit->id : null;
+                    }
+
+                    $item = [
+                        'name' => $remoteItem['itemNm'],
+                        'sku' => $remoteItem['itemCd'],
+                        'sale_price' => null,
+                        'purchase_price' => null,
+                        'tax_id' => $taxTypeId,
+                        'category_id' => null,
+                        'unit_id' => $unitId,
+                        'type' => $productTypeMapping,
+                        'description' => $remoteItem['addInfo'],
+                        'pro_image' => null,
+                        'sale_chartaccount_id' => null,
+                        'expense_chartaccount_id' => null,
+                        'created_by' => \Auth::user()->creatorId(),
+                        'tin' => $remoteItem['tin'],
+                        'itemCstd' => $remoteItem['itemCd'],
+                        'itemClsCd' => $remoteItem['itemClsCd'],
+                        'itemTyCd' => $remoteItem['itemTyCd'],
+                        'itemNm' => $remoteItem['itemNm'],
+                        'itemStdNm' => $remoteItem['itemStdNm'],
+                        'orgnNatCd' => $remoteItem['orgnNatCd'],
+                        'pkgUnitCd' => $remoteItem['pkgUnitCd'],
+                        'qtyUnitCd' => $remoteItem['qtyUnitCd'],
+                        'taxTyCd' => $remoteItem['taxTyCd'],
+                        'btchNo' => $remoteItem['btchNo'],
+                        'regBhfId' => $remoteItem['regBhfId'],
+                        'bcd' => $remoteItem['bcd'],
+                        'dftPrc' => $remoteItem['dftPrc'],
+                        'grpPrcL1' => $remoteItem['grpPrcL1'],
+                        'grpPrcL2' => $remoteItem['grpPrcL2'],
+                        'grpPrcL3' => $remoteItem['grpPrcL3'],
+                        'grpPrcL4' => $remoteItem['grpPrcL4'],
+                        'grpPrcL5' => $remoteItem['grpPrcL5'],
+                        'addInfo' => $remoteItem['addInfo'],
+                        'sftyQty' => $remoteItem['sftyQty'],
+                        'isrcAplcbYn' => $remoteItem['isrcAplcbYn'],
+                        'rraModYn' => $remoteItem['rraModYn'],
+                        'useYn' => $remoteItem['useYn'],
+                        'isUsed' => null,
+                        'packageQuantity' => null
+                    ];
+                    array_push($itemsToSync, $item);
+                }
+
+                \Log::info('ITEMS TO SYNC: ', $itemsToSync);
+
+                foreach ($itemsToSync as $itemToSync) {
+                    $exists = ProductService::where('itemCd', $itemToSync['itemCd'])->exists();
+                    if (!$exists) {
+                        ProductService::create($itemToSync);
+                        $syncedItems++;
+                    }
+                }
+
+                // Update start date for the next batch based on the last item date in the current batch
+                $lastItemDate = end($remoteItems)['dateField']; // Assuming `dateField` holds the date information
+                $startDate = $lastItemDate;
             }
 
             if ($syncedItems > 0) {
-                return redirect()->back()->with('success', __('Synced ' . $syncedItems . ' Items' . 'Successfully'));
+                return redirect()->back()->with('success', __('Synced ' . $syncedItems . ' Items Successfully'));
             } else {
                 return redirect()->back()->with('success', __('Items Up To Date'));
             }
         } catch (\Exception $e) {
-            \Log::info('ERROR SYNCING ITEM INFO');
-            \Log::info($e);
+            \Log::error('ERROR SYNCING ITEM INFO: ');
+            Log::error($e);
             return redirect()->back()->with('error', __('Error Syncing Item Information'));
         }
     }
+
+
 
     public function synchronizeItemClassifications()
     {
@@ -1631,162 +2056,58 @@ class ProductServiceController extends Controller
     }
     public function getItemInformation()
     {
-        ini_set('max_execution_time', 300);
-        $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20220409120000';
+        ini_set('max_execution_time', 30000);
+        $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20160101000000';
 
-        // $response = Http::withHeaders([
-        //     'key' => '123456'
-        // ])->get($url);
+        $response = Http::withOptions(['verify' => false])
+            ->withHeaders(['key' => '123456'])
+            ->timeout(3000)
+            ->get($url);
 
+        $responseBody = $response->json();
 
-        $response = Http::withOptions([
-            'verify' => false
-        ])->withHeaders([
-            'key' => '123456'
-        ])->timeout(300)->get($url);
-
-        $data = $response->json()['data'];
-
-        \Log::info('API Request Data For All Items Information: ' . json_encode($data));
-        \Log::info('API Response: ' . $response->body());
+        \Log::info('API Response: ' . json_encode($responseBody));
         \Log::info('API Response Status Code: ' . $response->status());
 
-        if (isset($data['data'])) {
-            try {
-                // Define the mapping array for taxTyCd to tax_id
-                $taxTypeMapping = [
-                    'A' => 1,
-                    'B' => 2,
-                    'C' => 3,
-                    'D' => 4,
-                    'E' => 5,
-                    'F' => 6,
-                ];
-
-                foreach ($data['data']['itemList'] as $item) {
-                    // Determine the tax_id based on taxTyCd
-                    $taxIdCode = isset($item['taxTyCd']) && array_key_exists($item['taxTyCd'], $taxTypeMapping)
-                        ? $taxTypeMapping[$item['taxTyCd']]
-                        : null;
-                    ProductService::create([
-                        'name' => $item['itemNm'],
-                        'sku' => null,
-                        'sale_price' => null,
-                        'purchase_price' => null,
-                        'quantity' => null,
-                        'tax_id' => $taxIdCode,
-                        'category_id' => null,
-                        'unit_id' => null,
-                        'type' => 'product',  // Set the type to 'product'
-                        'sale_chartaccount_id' => null,
-                        'expense_chartaccount_id' => null,
-                        'description' => $item['addInfo'],
-                        'pro_image' => null,
-                        'created_by' => \Auth::user()->creatorId(),
-                        'tin' => $item['tin'],
-                        'itemCd' => $item['itemCd'],
-                        'itemClsCd' => $item['itemClsCd'],
-                        'itemTyCd' => $item['itemTyCd'],
-                        'itemNm' => $item['itemNm'],
-                        'itemStdNm' => $item['itemStdNm'],
-                        'orgnNatCd' => $item['orgnNatCd'],
-                        'pkgUnitCd' => $item['pkgUnitCd'],
-                        'qtyUnitCd' => $item['qtyUnitCd'],
-                        'taxTyCd' => $item['taxTyCd'],
-                        'btchNo' => $item['btchNo'],
-                        'regBhfId' => $item['regBhfId'],
-                        'bcd' => $item['bcd'],
-                        'dftPrc' => $item['dftPrc'],
-                        'grpPrcL1' => $item['grpPrcL1'],
-                        'grpPrcL2' => $item['grpPrcL2'],
-                        'grpPrcL3' => $item['grpPrcL3'],
-                        'grpPrcL4' => $item['grpPrcL4'],
-                        'grpPrcL5' => $item['grpPrcL5'],
-                        'addInfo' => $item['addInfo'],
-                        'sftyQty' => $item['sftyQty'],
-                        'isrcAplcbYn' => $item['isrcAplcbYn'],
-                        'rraModYn' => $item['rraModYn'],
-                        'useYn' => $item['useYn']
-                    ]);
-                }
-            } catch (Exception $e) {
-                \Log::error('Error adding Product Service informationfrom the API: ');
-                \Log::error($e);
-                return redirect()->route('productservice.index')->with('success', 'Error adding Product Service informationfrom the API.');
-            }
-        } else {
-            return redirect()->back()->with('error', 'No data found in the API response.');
+        if (!$response->successful() || !isset($responseBody['data']) || !isset($responseBody['data']['data']) || !isset($responseBody['data']['data']['itemList'])) {
+            return redirect()->back()->with('error', 'Invalid API response.');
         }
-    }
 
-    public function productServiceSearchByDate(Request $request)
-    {
-        // Log the incoming request
-        \Log::info('Synchronization Product Search by Date request received:', $request->all());
-
-        // Validate the product service search by date date 
-        $request->validate([
-            'searchByDate' => 'required|date_format:Y-m-d',
-        ], [
-            'searchByDate.required' => __('Date is required for synchronization Search for Product & Services SearchByDate.'),
-            'searchByDate.date_format' => __('Invalid date format.'),
-        ]);
-
-        // Get and format the date
-        $date = $request->input('searchByDate');
-        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
-        \Log::info('Date formatted from synchronization product & Services request:', ['formattedDate' => $formattedDate]);
+        $data = $responseBody['data']['data'];
 
         try {
-            // Make the API call
-            $response = Http::withOptions(['verify' => false])
-                ->withHeaders(['key' => '123456'])
-                ->get("https://etims.your-apps.biz/api/GetItemInformation", [
-                    'date' => $formattedDate,
-                ]);
+            foreach ($data['itemList'] as $item) {
+                $taxTypeId = null;
+                if (isset($item['taxTyCd'])) {
+                    $taxType = Tax::where('name', $item['taxTyCd'])->first();
+                    $taxTypeId = $taxType ? $taxType->srtOrd : null;
+                }
 
-            // Check if the response contains the required data
-            $data = $response->json();
-            \Log::info('REMOTE Item Information Data INFO From API ', ['Item Information Data From API info' => $data]);
+                $productTypeMapping = null;
+                if (isset($item['itemTyCd'])) {
+                    $ItemTypeCode = ItemType::where('item_type_code', $item['itemTyCd'])->first();
+                    $productTypeMapping = $ItemTypeCode ? $ItemTypeCode->item_type_name : null;
+                }
 
-            if (!isset($data['data']['itemClsList'])) {
-                return redirect()->back()->with('error', __('There is no search result.'));
-            }
+                $unitId = null;
+                if (isset($item['qtyUnitCd'])) {
+                    $unit = ProductServiceUnit::where('code', $item['qtyUnitCd'])->first();
+                    $unitId = $unit ? $unit->id : null;
+                }
 
-            $remoteItemInformationinfo = $data['data']['itemClsList'];
-            \Log::info('REMOTE Item Information INFO', ['remoteItemInformationinfo' => $remoteItemInformationinfo]);
-
-            $remoteItemInformationinfoToSync = [];
-
-            // Define the mapping array for taxTyCd to tax_id
-            $taxTypeMapping = [
-                'A' => 1,
-                'B' => 2,
-                'C' => 3,
-                'D' => 4,
-                'E' => 5,
-                'F' => 6,
-            ];
-
-            foreach ($remoteItemInformationinfo as $item) {
-                // Determine the tax_id based on taxTyCd
-                $taxIdCode = $item['taxTyCd'] ?? null;
-                $taxIdCode = $taxIdCode && array_key_exists($taxIdCode, $taxTypeMapping) ? $taxTypeMapping[$taxIdCode] : null;
-
-                $productServiceData = [
+                ProductService::create([
                     'name' => $item['itemNm'],
-                    'sku' => null,
+                    'sku' => $item['itemCd'],
                     'sale_price' => null,
                     'purchase_price' => null,
-                    'quantity' => null,
-                    'tax_id' => $taxIdCode,
+                    'tax_id' => $taxTypeId,
                     'category_id' => null,
-                    'unit_id' => null,
-                    'type' => 'product',  // Set the type to 'product'
-                    'sale_chartaccount_id' => null,
-                    'expense_chartaccount_id' => null,
+                    'unit_id' => $unitId,
+                    'type' => $productTypeMapping,
                     'description' => $item['addInfo'],
                     'pro_image' => null,
+                    'sale_chartaccount_id' => null,
+                    'expense_chartaccount_id' => null,
                     'created_by' => \Auth::user()->creatorId(),
                     'tin' => $item['tin'],
                     'itemCd' => $item['itemCd'],
@@ -1811,7 +2132,219 @@ class ProductServiceController extends Controller
                     'sftyQty' => $item['sftyQty'],
                     'isrcAplcbYn' => $item['isrcAplcbYn'],
                     'rraModYn' => $item['rraModYn'],
-                    'useYn' => $item['useYn']
+                    'useYn' => $item['useYn'],
+                    'isUsed' => null,
+                    'packageQuantity' => null
+                ]);
+            }
+
+            return redirect()->route('productservice.index')->with('success', 'Product Service information added successfully from the API.');
+        } catch (Exception $e) {
+            \Log::error('Error adding Product Service information from the API: ' . $e->getMessage());
+            return redirect()->route('productservice.index')->with('error', 'Error adding Product Service information from the API.');
+        }
+    }
+
+
+    /***
+     * This is Divide in batches  when the data   is alot 
+     * 
+     */
+    //     public function getItemInformation()
+    // {
+    //     ini_set('max_execution_time', 30000);
+    //     $url = 'https://etims.your-apps.biz/api/GetItemInformation?date=20160101000000';
+
+    //     $response = Http::withOptions(['verify' => false])
+    //         ->withHeaders(['key' => '123456'])
+    //         ->timeout(300)
+    //         ->get($url);
+
+    //     $responseBody = $response->json();
+
+    //     \Log::info('API Response: ' . json_encode($responseBody));
+    //     \Log::info('API Response Status Code: ' . $response->status());
+
+    //     if (!$response->successful() || !isset($responseBody['data']) || !isset($responseBody['data']['data']) || !isset($responseBody['data']['data']['itemList'])) {
+    //         return redirect()->back()->with('error', 'Invalid API response.');
+    //     }
+
+    //     $data = $responseBody['data']['data'];
+    //     $itemList = $data['itemList'];
+    //     $chunkSize = 100; // Define your batch size here
+
+    //     try {
+    //         // Process the items in chunks
+    //         collect($itemList)->chunk($chunkSize)->each(function ($chunk) {
+    //             foreach ($chunk as $item) {
+    //                 $taxTypeId = null;
+    //                 if (isset($item['taxTyCd'])) {
+    //                     $taxType = Tax::where('name', $item['taxTyCd'])->first();
+    //                     $taxTypeId = $taxType ? $taxType->srtOrd : null;
+    //                 }
+
+    //                 $productTypeMapping = null;
+    //                 if (isset($item['itemTyCd'])) {
+    //                     $ItemTypeCode = ItemType::where('item_type_code', $item['itemTyCd'])->first();
+    //                     $productTypeMapping = $ItemTypeCode ? $ItemTypeCode->item_type_name : null;
+    //                 }
+
+    //                 $unitId = null;
+    //                 if (isset($item['qtyUnitCd'])) {
+    //                     $unit = ProductServiceUnit::where('code', $item['qtyUnitCd'])->first();
+    //                     $unitId = $unit ? $unit->id : null;
+    //                 }
+
+    //                 ProductService::create([
+    //                     'name' => $item['itemNm'],
+    //                     'sku' => $item['itemCd'],
+    //                     'sale_price' => null,
+    //                     'purchase_price' => null,
+    //                     'tax_id' => $taxTypeId,
+    //                     'category_id' => null,
+    //                     'unit_id' => $unitId,
+    //                     'type' => $productTypeMapping,
+    //                     'description' => $item['addInfo'],
+    //                     'pro_image' => null,
+    //                     'sale_chartaccount_id' => null,
+    //                     'expense_chartaccount_id' => null,
+    //                     'created_by' => \Auth::user()->creatorId(),
+    //                     'tin' => $item['tin'],
+    //                     'itemCd' => $item['itemCd'],
+    //                     'itemClsCd' => $item['itemClsCd'],
+    //                     'itemTyCd' => $item['itemTyCd'],
+    //                     'itemNm' => $item['itemNm'],
+    //                     'itemStdNm' => $item['itemStdNm'],
+    //                     'orgnNatCd' => $item['orgnNatCd'],
+    //                     'pkgUnitCd' => $item['pkgUnitCd'],
+    //                     'qtyUnitCd' => $item['qtyUnitCd'],
+    //                     'taxTyCd' => $item['taxTyCd'],
+    //                     'btchNo' => $item['btchNo'],
+    //                     'regBhfId' => $item['regBhfId'],
+    //                     'bcd' => $item['bcd'],
+    //                     'dftPrc' => $item['dftPrc'],
+    //                     'grpPrcL1' => $item['grpPrcL1'],
+    //                     'grpPrcL2' => $item['grpPrcL2'],
+    //                     'grpPrcL3' => $item['grpPrcL3'],
+    //                     'grpPrcL4' => $item['grpPrcL4'],
+    //                     'grpPrcL5' => $item['grpPrcL5'],
+    //                     'addInfo' => $item['addInfo'],
+    //                     'sftyQty' => $item['sftyQty'],
+    //                     'isrcAplcbYn' => $item['isrcAplcbYn'],
+    //                     'rraModYn' => $item['rraModYn'],
+    //                     'useYn' => $item['useYn'],
+    //                     'isUsed' => null,
+    //                     'packageQuantity' => null
+    //                 ]);
+    //             }
+    //         });
+
+    //         return redirect()->route('productservice.index')->with('success', 'Product Service information added successfully from the API.');
+    //     } catch (Exception $e) {
+    //         \Log::error('Error adding Product Service information from the API: ' . $e->getMessage());
+    //         return redirect()->route('productservice.index')->with('error', 'Error adding Product Service information from the API.');
+    //     }
+    // }
+
+    public function productServiceSearchByDate(Request $request)
+    {
+        // Log the incoming request
+        \Log::info('Synchronization Product Search by Date request received:', $request->all());
+
+        // Validate the product service search by date
+        $request->validate([
+            'searchByDate' => 'required|date_format:Y-m-d',
+        ], [
+            'searchByDate.required' => __('Date is required for synchronization Search for Product & Services SearchByDate.'),
+            'searchByDate.date_format' => __('Invalid date format.'),
+        ]);
+
+        // Get and format the date
+        $date = $request->input('searchByDate');
+        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
+        \Log::info('Date formatted from synchronization product & Services request:', ['formattedDate' => $formattedDate]);
+
+        try {
+            // Make the API call
+            ini_set('max_execution_time', 30000);
+            $response = Http::withOptions(['verify' => false])
+                ->withHeaders(['key' => '123456'])
+                ->get("https://etims.your-apps.biz/api/GetItemInformation", [
+                    'date' => $formattedDate,
+                ]);
+
+            // Check if the response contains the required data
+            $data = $response->json();
+            \Log::info('REMOTE Item Information Data INFO From API ', ['Item Information Data From API info' => $data]);
+
+            if (!isset($data['data']['data']['itemList'])) {
+                return redirect()->back()->with('error', __('There is no search result.'));
+            }
+
+            $remoteItemInformationinfo = $data['data']['data']['itemList'];
+            \Log::info('REMOTE Item Information INFO', ['remoteItemInformationinfo' => $remoteItemInformationinfo]);
+
+            $remoteItemInformationinfoToSync = [];
+
+            foreach ($remoteItemInformationinfo as $item) {
+                $taxTypeId = null;
+                if (isset($item['taxTyCd'])) {
+                    $taxType = Tax::where('name', $item['taxTyCd'])->first();
+                    $taxTypeId = $taxType ? $taxType->srtOrd : null;
+                }
+
+                $productTypeMapping = null;
+                if (isset($item['itemTyCd'])) {
+                    $ItemTypeCode = ItemType::where('item_type_code', $item['itemTyCd'])->first();
+                    $productTypeMapping = $ItemTypeCode ? $ItemTypeCode->item_type_name : null;
+                }
+
+                $unitId = null;
+                if (isset($item['qtyUnitCd'])) {
+                    $unit = ProductServiceUnit::where('code', $item['qtyUnitCd'])->first();
+                    $unitId = $unit ? $unit->id : null;
+                }
+
+                $productServiceData = [
+                    'name' => $item['itemNm'],
+                    'sku' => $item['itemCd'],
+                    'sale_price' => null,
+                    'purchase_price' => null,
+                    'tax_id' => $taxTypeId,
+                    'category_id' => null,
+                    'unit_id' => $unitId,
+                    'type' => $productTypeMapping,
+                    'description' => $item['addInfo'],
+                    'pro_image' => null,
+                    'sale_chartaccount_id' => null,
+                    'expense_chartaccount_id' => null,
+                    'created_by' => \Auth::user()->creatorId(),
+                    'tin' => $item['tin'],
+                    'itemCd' => $item['itemCd'],
+                    'itemClsCd' => $item['itemClsCd'],
+                    'itemTyCd' => $item['itemTyCd'],
+                    'itemNm' => $item['itemNm'],
+                    'itemStdNm' => $item['itemStdNm'],
+                    'orgnNatCd' => $item['orgnNatCd'],
+                    'pkgUnitCd' => $item['pkgUnitCd'],
+                    'qtyUnitCd' => $item['qtyUnitCd'],
+                    'taxTyCd' => $item['taxTyCd'],
+                    'btchNo' => $item['btchNo'],
+                    'regBhfId' => $item['regBhfId'],
+                    'bcd' => $item['bcd'],
+                    'dftPrc' => $item['dftPrc'],
+                    'grpPrcL1' => $item['grpPrcL1'],
+                    'grpPrcL2' => $item['grpPrcL2'],
+                    'grpPrcL3' => $item['grpPrcL3'],
+                    'grpPrcL4' => $item['grpPrcL4'],
+                    'grpPrcL5' => $item['grpPrcL5'],
+                    'addInfo' => $item['addInfo'],
+                    'sftyQty' => $item['sftyQty'],
+                    'isrcAplcbYn' => $item['isrcAplcbYn'],
+                    'rraModYn' => $item['rraModYn'],
+                    'useYn' => $item['useYn'],
+                    'isUsed' => null,
+                    'packageQuantity' => null
                 ];
 
                 array_push($remoteItemInformationinfoToSync, $productServiceData);
@@ -1839,6 +2372,7 @@ class ProductServiceController extends Controller
             return redirect()->back()->with('error', __('Error Syncing Product & Service'));
         }
     }
+
 
 
     public function searchCodeListByDate(Request $request)

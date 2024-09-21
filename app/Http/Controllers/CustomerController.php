@@ -191,15 +191,13 @@ class CustomerController extends Controller
             $customer->customer_id = $this->customerNumber();
             $customer->customerNo = $this->customerNumber();
             $customer->customerTin = $request->customerTin;
-            $customer->name = $request->customerName;
+            $customer->customerName = $request->customerName;
             $customer->email = $request->email;
             $customer->address = $request->address;
-            $customer->tax_number = $request->customerTin;
-            $customer->contact = $request->contact;
+            $customer->telNo = $request->telNo;
             $customer->faxNo = $request->faxNo;
             $customer->isUsed = $request->isUsed;
             $customer->remark = $request->remark;
-            $customer->avatar = $request->avatar;
             $customer->created_by = \Auth::user()->creatorId();
             $customer->billing_name = $request->billing_name;
             $customer->billing_country = $request->billing_country;

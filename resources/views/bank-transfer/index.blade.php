@@ -13,9 +13,11 @@
         {{--        <a class="btn btn-sm btn-primary" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1" data-bs-toggle="tooltip" title="{{__('Filter')}}">--}}
         {{--            <i class="ti ti-filter"></i>--}}
         {{--        </a>--}}
+        @can('create bank transfer')
             <a href="#" data-url="{{ route('bank-transfer.create') }}" data-ajax-popup="true" data-title="{{__('Create Bank-Transfer')}}" data-bs-toggle="tooltip" title="{{__('Create')}}" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
+        @endcan
     </div>
 @endsection
 
