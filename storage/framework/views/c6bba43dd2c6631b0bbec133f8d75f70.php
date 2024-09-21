@@ -158,6 +158,7 @@
                 const url = `http://localhost:8000/getitem/${id}`;
 
                 const response = await fetch(url);
+
                 const {
                     data
                 } = await response.json();
@@ -361,12 +362,12 @@
                                 <?php echo e(Form::select('paymentType', $paymentTypeCodes, null, ['class' => 'form-control select2', 'placeholder' => __('Select Payment Type'), 'required' => 'required'])); ?>
 
                             </div>
-                             <div class="form-group col-md-4">
+                            <div class="form-group col-md-4">
                                 <?php echo e(Form::label('invoiceStatusCode', __('Invoice Status'), ['class' => 'form-label'])); ?>
 
                                 <?php echo e(Form::select('invoiceStatusCode', $invoiceStatusCodes, null, ['class' => 'form-control select2', 'placeholder' => __('Select Invoice Status'), 'required' => 'required'])); ?>
 
-                            </div>                            
+                            </div>
                             <div class="form-group col-md-4">
                                 <?php echo e(Form::label('confirmDate', __('Confirm Date (*)'), ['class' => 'form-label'])); ?>
 
@@ -404,11 +405,11 @@
 
                             </div>
                             <!-- <div class="form-group col-md-4">
-                                <?php echo e(Form::label('isStockIOUpdate', __('Stock IO Update?'), ['class' => 'form-label'])); ?>
+                                            <?php echo e(Form::label('isStockIOUpdate', __('Stock IO Update?'), ['class' => 'form-label'])); ?>
 
-                                <?php echo e(Form::select('isStockIOUpdate', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2'])); ?>
+                                            <?php echo e(Form::select('isStockIOUpdate', ['true' => 'Yes', 'false' => 'No'], null, ['class' => 'form-control select2'])); ?>
 
-                            </div> -->
+                                        </div> -->
                             <div class="form-group col-md-4">
                                 <?php echo e(Form::label('issue_date', __('Issue Date (*)'), ['class' => 'form-label'])); ?>
 
@@ -428,11 +429,11 @@
 
                             </div>
                             <!-- <div class="form-group col-md-4">
-                                        <?php echo e(Form::label('mapping', __('Mapping'), ['class' => 'form-label'])); ?>
+                                                    <?php echo e(Form::label('mapping', __('Mapping'), ['class' => 'form-label'])); ?>
 
-                                        <?php echo e(Form::text('mapping', '', ['class' => 'form-control'])); ?>
+                                                    <?php echo e(Form::text('mapping', '', ['class' => 'form-control'])); ?>
 
-                                    </div> -->
+                                                </div> -->
                             <div class="form-group col-md-4">
                                 <?php echo e(Form::label('ref_number', __('Reference Number'), ['class' => 'form-label'])); ?>
 
@@ -453,9 +454,9 @@
 
 
         <div class="col-12">
-            <h5 class=" d-inline-block mb-4"><?php echo e(__('Product & Services')); ?></h5>
+            <h5 class="mb-4 d-inline-block"><?php echo e(__('Product & Services')); ?></h5>
             <div class="card repeater">
-                <div class="item-section py-2">
+                <div class="py-2 item-section">
                     <div class="row justify-content-between align-items-center">
                         <div class="col-md-12 d-flex align-items-center justify-content-between justify-content-md-end">
                             <div class="all-button-box me-2">
@@ -468,9 +469,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-body table-border-style mt-2">
+                <div class="mt-2 card-body table-border-style">
                     <div class="#">
-                        <table class="table  mb-0 table-custom-style" data-repeater-list="items" id="sortable-table">
+                        <table class="table mb-0 table-custom-style" data-repeater-list="items" id="sortable-table">
                             <thead>
                                 <tr>
                                     <th><?php echo e(__('Items')); ?></th>
@@ -491,7 +492,7 @@
 
                             <tbody class="ui-sortable" data-repeater-item>
                                 <tr>
-                                    <td width="25%" class="form-group pt-0">
+                                    <td width="25%" class="pt-0 form-group">
                                         <?php echo e(Form::select('itemCode', $product_services, '', ['class' => 'form-control select2 itemCode', 'id' => 'itemCode', 'data-url' => route('invoice.product'), 'required' => 'required'])); ?>
 
 
@@ -529,7 +530,7 @@
                                     <td class="text-end amount">0.00</td>
                                     <td>
                                         <a href="#"
-                                            class="ti ti-trash text-white repeater-action-btn bg-danger ms-2 bs-pass-para"
+                                            class="text-white ti ti-trash repeater-action-btn bg-danger ms-2 bs-pass-para"
                                             data-repeater-delete></a>
                                     </td>
                                 </tr>
@@ -542,8 +543,9 @@
                                     </td>
                                     <td colspan="2">
                                         <div class="form-group">
-                                            <?php echo e(Form::label('itemExprDate', __('item Expire Date'), ['class' => 'form-label'])); ?> <i><span
-                                                class="text-success">(Optional)</span></i>
+                                            <?php echo e(Form::label('itemExprDate', __('item Expire Date'), ['class' => 'form-label'])); ?>
+
+                                            <i><span class="text-success">(Optional)</span></i>
                                             <?php echo e(Form::date('itemExprDate', null, ['class' => 'form-control itemExprDt', 'required' => 'required'])); ?>
 
                                         </div>
