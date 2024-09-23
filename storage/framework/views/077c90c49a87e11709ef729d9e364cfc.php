@@ -75,9 +75,23 @@
 
                 if (data.data) {
                     const item = data.data;
-                    const { unitPrice } = item;
+                    const {
+                        dftPrc,
+                        itemNm,
+                        itemStdNm,
+                        packageQuantity,
+                        pkgUnitCd,
+                        quantity,
+                        sku,
+                        taxTyCd
+                    } = item;
 
-                    $(this).closest('tr').find('.unitPrice').val(unitPrice);
+
+                    $(this).closest('tbody').find('.unitPrice').val(dftPrc);
+                    $(this).closest('tbody').find('.quantity').val(quantity);
+                    $(this).closest('tbody').find('.taxTypeCode').val(taxTyCd);
+                    $(this).closest('tbody').find('.pkgQuantity').val(packageQuantity);
+
                 } else {
                     console.error('Item data not found in response');
                 }
@@ -188,7 +202,8 @@
                     <div class="row justify-content-between align-items-center">
                         <div class="col-md-12 d-flex align-items-center justify-content-between justify-content-md-end">
                             <div class="all-button-box me-2">
-                                <a href="#" data-repeater-create="" class="btn btn-primary" data-bs-toggle="modal" data-target="#add-bank">
+                                <a href="#" data-repeater-create="" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-target="#add-bank">
                                     <i class="ti ti-plus"></i> <?php echo e(__('Add item')); ?>
 
                                 </a>
@@ -198,8 +213,10 @@
                 </div>
                 <div class="card-body table-border-style mt-2">
                     <div class="table-responsive">
-                        <table class="table mb-0 table-custom-style" data-repeater-list="items" id="sortable-table" layout="auto">
-                            <tbody class="ui-sortable border-2 border-top border-bottom border-primary p-3 mb-3" data-repeater-item>
+                        <table class="table mb-0 table-custom-style" data-repeater-list="items" id="sortable-table"
+                            layout="auto">
+                            <tbody class="ui-sortable border-2 border-top border-bottom border-primary p-3 mb-3"
+                                data-repeater-item>
                                 <tr class="col-md-12">
                                     <td class="col-md-4">
                                         <?php echo e(Form::label('itemCode', __('Item'), ['class' => 'form-label'])); ?>
@@ -212,14 +229,23 @@
                                         <?php echo e(Form::label('quantity', __('Qty'), ['class' => 'form-label'])); ?>
 
                                         <span class="text-danger">*</span>
-                                        <?php echo e(Form::number('quantity', '', ['class' => 'form-control', 'required' => 'required'])); ?>
+                                        <?php echo e(Form::number('quantity', '', ['class' => 'form-control quantity', 'required' => 'required'])); ?>
 
                                     </td>
                                     <td class="col-md-4">
                                         <?php echo e(Form::label('pkgQuantity', __('Pkg Qty'), ['class' => 'form-label'])); ?>
 
                                         <span class="text-danger">*</span>
-                                        <?php echo e(Form::number('pkgQuantity', '', ['class' => 'form-control', 'required' => 'required'])); ?>
+                                        <?php echo e(Form::number('pkgQuantity', '', ['class' => 'form-control pkgQuantity', 'required' => 'required'])); ?>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-4">
+                                        <?php echo e(Form::label('taxTypeCode', __('tax Type'), ['class' => 'form-label'])); ?>
+
+                                        <span class="text-danger">*</span>
+                                        <?php echo e(Form::text('taxTypeCode', '', ['class' => 'form-control taxTypeCode', 'required' => 'required'])); ?>
 
                                     </td>
                                 </tr>
@@ -247,19 +273,19 @@
                                 <tr>
                                     <td class="col-md-4">
                                         <?php echo e(Form::label('supplrItemCode', __('Supplier Item Code'), ['class' => 'form-label'])); ?><span
-                                                class="text-success">(Optional)</span>
+                                            class="text-success">(Optional)</span>
                                         <?php echo e(Form::text('supplrItemCode', null, ['class' => 'form-control'])); ?>
 
                                     </td>
                                     <td class="col-md-4">
                                         <?php echo e(Form::label('supplrItemClsCode', __('Supplier Item Class Code'), ['class' => 'form-label'])); ?><span
-                                                class="text-success">(Optional)</span>
+                                            class="text-success">(Optional)</span>
                                         <?php echo e(Form::text('supplrItemClsCode', null, ['class' => 'form-control'])); ?>
 
                                     </td>
                                     <td class="col-md-4">
                                         <?php echo e(Form::label('supplrItemName', __('Supplier Item Name'), ['class' => 'form-label'])); ?><span
-                                                class="text-success">(Optional)</span>
+                                            class="text-success">(Optional)</span>
                                         <?php echo e(Form::text('supplrItemName', null, ['class' => 'form-control'])); ?>
 
                                     </td>
@@ -276,7 +302,8 @@
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
                                     <td></td>
-                                    <td><strong><?php echo e(__('Sub Total')); ?> (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
+                                    <td><strong><?php echo e(__('Sub Total')); ?> (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong>
+                                    </td>
                                     <td class="text-end subTotal">0.00</td>
                                 </tr>
                                 <tr>
@@ -300,12 +327,14 @@
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
-                                    <td class="blue-text"><strong><?php echo e(__('Total Amount')); ?> (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
+                                    <td class="blue-text"><strong><?php echo e(__('Total Amount')); ?>
+
+                                            (<?php echo e(\Auth::user()->currencySymbol()); ?>)</strong></td>
                                     <td class="text-end totalAmount blue-text"></td>
                                 </tr>
                             </tfoot>
                         </table>
-                        
+
                     </div>
                 </div>
             </div>

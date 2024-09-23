@@ -323,6 +323,15 @@
                     <a href="{{ route('invoice.resent', $invoice->id) }}"
                         class="btn btn-sm btn-primary me-2">{{ __('Resend Invoice') }}</a>
                 </div>
+                {{-- Check if either isKRASynchronized or isStockIOUpdate is false or 0 --}}
+              @if (!$invoice->isKRASynchronized || !$invoice->isStockIOUpdate)
+                       <div class="all-button-box mr-2">
+                             <form action="{{ route('invoice.syncWithStockIO', $invoice->id) }}" method="POST" style="display:inline;">
+                                   @csrf
+                          <button type="submit" class="btn btn-sm btn-dark me-2">{{ __('Sync With Stock IO') }}</button>
+                     </form>
+                  </div>
+                 @endif
                 <div class="all-button-box">
                     <a href="{{ route('invoice.pdf', Crypt::encrypt($invoice->id)) }}" target="_blank"
                         class="btn btn-sm btn-primary">{{ __('Download') }}</a>
@@ -376,7 +385,7 @@
                                             {{ !empty($customer->billing_name) ? $customer->billing_name : '' }}<br>
                                             {{ !empty($customer->billing_address) ? $customer->billing_address : '' }}<br>
                                             {{ !empty($customer->billing_city) ? $customer->billing_city : '' . ', ' }}<br>
-                                            {{ !empty($customer->billing_state) ? $customer->billing_state : '', ', ' }},
+                                            {{ !empty($customer->billing_state) ? $customer->billing_state : ''. ', ' }},
                                             {{ !empty($customer->billing_zip) ? $customer->billing_zip : '' }}<br>
                                             {{ !empty($customer->billing_country) ? $customer->billing_country : '' }}<br>
                                             {{ !empty($customer->billing_phone) ? $customer->billing_phone : '' }}<br>
