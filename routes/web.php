@@ -166,8 +166,10 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\ProductServiceClassificationController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-
-
+use App\Models\ConfigSettings;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 /*
 |--------------------------------------------------------------------------
@@ -359,7 +361,6 @@ Route::group(['middleware' => ['verified']], function () {
             Route::any('store-language', [LanguageController::class, 'storeLanguage'])->name('store.language');
 
             Route::delete('/lang/{lang}', [LanguageController::class, 'destroyLang'])->name('lang.destroy');
-
         }
     );
 
@@ -407,7 +408,6 @@ Route::group(['middleware' => ['verified']], function () {
             Route::post('cookie-setting', [SystemController::class, 'saveCookieSettings'])->name('cookie.setting');
 
             Route::post('cache-settings', [SystemController::class, 'cacheSettingStore'])->name('cache.settings.store')->middleware(['auth', 'XSS']);
-
         }
     );
 
@@ -562,8 +562,6 @@ Route::group(['middleware' => ['verified']], function () {
             Route::delete('invoice/{id}/credit-note/delete/{cn_id}', [CreditNoteController::class, 'destroy'])->name('invoice.delete.credit.note');
             Route::any('/getItemInformationForAddingDirectCreditNote', [CreditNoteController::class, 'getItemsToAddDirectCreditNote'])->name('invoice.custom.credit.getiteminformation');
             Route::any('/getCustomerDetailsToAddDirectCreditNote', [CreditNoteController::class, 'getCustomerDetailsToAddDirectCreditNote'])->name('invoice.custom.credit.getcustomerDetails');
-
-
         }
     );
 
@@ -677,7 +675,6 @@ Route::group(['middleware' => ['verified']], function () {
             Route::get('report/receivables', [ReportController::class, 'ReceivablesReport'])->name('report.receivables');
             Route::post('export/receivables', [ReportController::class, 'ReceivablesExport'])->name('receivables.export');
             Route::get('report/payables', [ReportController::class, 'PayablesReport'])->name('report.payables');
-
         }
     );
 
@@ -701,7 +698,6 @@ Route::group(['middleware' => ['verified']], function () {
             Route::get('proposal/{id}/resent', [ProposalController::class, 'resent'])->name('proposal.resent');
             Route::resource('proposal', ProposalController::class);
             Route::get('proposal/create/{cid}', [ProposalController::class, 'create'])->name('proposal.create');
-
         }
     );
 
@@ -746,7 +742,6 @@ Route::group(['middleware' => ['verified']], function () {
 
             Route::delete('journal-entry/journal/destroy/{item_id}', [JournalEntryController::class, 'journalDestroy'])->name('journal.destroy');
             Route::resource('journal-entry', JournalEntryController::class);
-
         }
     );
 
@@ -1340,22 +1335,22 @@ Route::group(['middleware' => ['verified']], function () {
     // Custom Landing Page
 
     //    Route::get('/landingpage', [LandingPageSectionController::class, 'index'])->name('custom_landing_page.index')->middleware(['auth', 'XSS']);
-//    Route::get('/LandingPage/show/{id}', [LandingPageSectionController::class, 'show']);
-//
-//    Route::post('/LandingPage/setConetent', [LandingPageSectionController::class, 'setConetent'])->middleware(['auth', 'XSS']);
-//
-//
-//    Route::get(
-//        '/get_landing_page_section/{name}', function ($name) {
-//        $plans = \DB::table('plans')->get();
-//
-//        return view('custom_landing_page.' . $name, compact('plans'));
-//    }
-//    );
-//
-//    Route::post('/LandingPage/removeSection/{id}', [LandingPageSectionController::class, 'removeSection'])->middleware(['auth', 'XSS']);
-//    Route::post('/LandingPage/setOrder', [LandingPageSectionController::class, 'setOrder'])->middleware(['auth', 'XSS']);
-//    Route::post('/LandingPage/copySection', [LandingPageSectionController::class, 'copySection'])->middleware(['auth', 'XSS']);
+    //    Route::get('/LandingPage/show/{id}', [LandingPageSectionController::class, 'show']);
+    //
+    //    Route::post('/LandingPage/setConetent', [LandingPageSectionController::class, 'setConetent'])->middleware(['auth', 'XSS']);
+    //
+    //
+    //    Route::get(
+    //        '/get_landing_page_section/{name}', function ($name) {
+    //        $plans = \DB::table('plans')->get();
+    //
+    //        return view('custom_landing_page.' . $name, compact('plans'));
+    //    }
+    //    );
+    //
+    //    Route::post('/LandingPage/removeSection/{id}', [LandingPageSectionController::class, 'removeSection'])->middleware(['auth', 'XSS']);
+    //    Route::post('/LandingPage/setOrder', [LandingPageSectionController::class, 'setOrder'])->middleware(['auth', 'XSS']);
+    //    Route::post('/LandingPage/copySection', [LandingPageSectionController::class, 'copySection'])->middleware(['auth', 'XSS']);
 
     // Plan Payment Gateways
     Route::post('plan-pay-with-bank', [BankTransferPaymentController::class, 'planPayWithBank'])->name('plan.pay.with.bank')->middleware(['auth', 'XSS', 'revalidate']);
@@ -1446,11 +1441,10 @@ Route::group(['middleware' => ['verified']], function () {
             Route::get('order', [StripePaymentController::class, 'index'])->name('order.index');
             Route::get('/stripe/{code}', [StripePaymentController::class, 'stripe'])->name('stripe');
             Route::post('/stripe', [StripePaymentController::class, 'stripePost'])->name('stripe.post');
-
         }
     );
     //    Route::post('plan-pay-with-paypal', [PaypalController::class, 'planPayWithPaypal'])->name('plan.pay.with.paypal')->middleware(['auth', 'XSS', 'revalidate']);
-//    Route::get('{id}/plan-get-payment-status', [PaypalController::class, 'planGetPaymentStatus'])->name('plan.get.payment.status')->middleware(['auth', 'XSS', 'revalidate']);
+    //    Route::get('{id}/plan-get-payment-status', [PaypalController::class, 'planGetPaymentStatus'])->name('plan.get.payment.status')->middleware(['auth', 'XSS', 'revalidate']);
 
     Route::group(
         [
@@ -1465,7 +1459,6 @@ Route::group(['middleware' => ['verified']], function () {
             Route::post('support/{id}/reply', [SupportController::class, 'replyAnswer'])->name('support.reply.answer');
             Route::get('support/grid', [SupportController::class, 'grid'])->name('support.grid');
             Route::resource('support', SupportController::class);
-
         }
     );
 
@@ -1601,7 +1594,6 @@ Route::group(['middleware' => ['verified']], function () {
             Route::get('purchase/{id}/sent', [PurchaseController::class, 'sent'])->name('purchase.sent');
             Route::get('purchase/{id}/resent', [PurchaseController::class, 'resent'])->name('purchase.resent');
             Route::put('purchase/{id}/update', [PurchaseController::class, 'update'])->name('purchase.update');
-
         }
 
     );
@@ -1788,10 +1780,8 @@ Route::group(['middleware' => ['verified']], function () {
 
             Route::resource('expense', ExpenseController::class);
             Route::get('expense/create/{cid}', [ExpenseController::class, 'create'])->name('expense.create');
-
         }
     );
-
 });
 Route::any('/cookie-consent', [SystemController::class, 'CookieConsent'])->name('cookie-consent');
 Route::get('/code', [CodeController::class, 'getCodesList']);
@@ -1845,7 +1835,6 @@ Route::group(
     ],
     function () {
         Route::resource('compositionlist', CompositionListController::class);
-
     }
 );
 
@@ -1861,7 +1850,6 @@ Route::group(
     ],
     function () {
         Route::resource('insurance', InsurancePlansController::class);
-
     }
 );
 
@@ -1880,20 +1868,15 @@ Route::group(
 // );
 
 
-Route::get('importeditems/index', [ImportedItemsController::class, 'index'])->name('importeditems.index')->middleware(['auth', 'XSS']);
-;
-Route::get('importeditems/map', [ImportedItemsController::class, 'create'])->name('importeditems.mapImportedItem')->middleware(['auth', 'XSS']);
-;
-Route::post('mapimporteditem', [ImportedItemsController::class, 'store'])->name('importeditems.mapimporteditem')->middleware(['auth', 'XSS']);
-;
-Route::get('importeditems/show/{id}', [ImportedItemsController::class, 'show'])->name('importeditems.show')->middleware(['auth', 'XSS']);
-;
+Route::get('importeditems/index', [ImportedItemsController::class, 'index'])->name('importeditems.index')->middleware(['auth', 'XSS']);;
+Route::get('importeditems/map', [ImportedItemsController::class, 'create'])->name('importeditems.mapImportedItem')->middleware(['auth', 'XSS']);;
+Route::post('mapimporteditem', [ImportedItemsController::class, 'store'])->name('importeditems.mapimporteditem')->middleware(['auth', 'XSS']);;
+Route::get('importeditems/show/{id}', [ImportedItemsController::class, 'show'])->name('importeditems.show')->middleware(['auth', 'XSS']);;
 Route::post('importeditems/sync', [ImportedItemsController::class, 'synchronize'])->name('importeditems.sync')->middleware(['auth', 'XSS']);
 
 //  GetImportedProductService
 
-Route::get('GetImportedProductService', [ImportedItemsController::class, 'GetImportedProductService']);
-;
+Route::get('GetImportedProductService', [ImportedItemsController::class, 'GetImportedProductService']);;
 
 Route::group(
     [
@@ -1987,3 +1970,36 @@ Route::middleware(['auth', 'XSS', 'revalidate'])->group(function () {
     // Route for getting stock move list from API
     Route::get('getStockMoveListFromApi', [StockController::class, 'getStockMoveListFromApi'])->name('stock.getStockMoveListFromApi');
 });
+
+Route::post('configuration-settings', function (Request $request) {
+    $data = $request->all();
+
+    $validator = Validator::make($data, [
+        'local_storage' => 'required|string|in:on,off',
+        'stock_update' => 'required|string|in:on,off',
+        'customer_mapping_by_tin' => 'required|string|in:on,off',
+        'item_mapping_by_code' => 'required|string|in:on,off',
+        'api_type' => 'required|string|in:OSCU,VSCU',
+        'api_url' => 'required|string'
+    ]);
+
+    if ($validator->fails()) {
+        Log::info('VALIDATION ERROR');
+        Log::info($validator->errors());
+
+        return redirect()->back()->with('error', $validator->errors()->first());
+    }
+
+    $config_settings = ConfigSettings::first();
+
+    $config_settings->update([
+        'local_storage' => $data['local_storage'],
+        'stock_update' => $data['stock_update'],
+        'customer_mapping_by_tin' => $data['customer_mapping_by_tin'],
+        'item_mapping_by_code' => $data['item_mapping_by_code'],
+        'api_type' => $data['api_type'],
+        'api_url' => $data['api_url']
+    ]);
+
+    return redirect()->back()->with('success', 'Configuration settings updated successfully');
+})->name('configuration-settings');
