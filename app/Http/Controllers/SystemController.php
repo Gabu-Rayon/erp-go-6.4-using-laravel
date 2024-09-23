@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\TestMail;
+use App\Models\ConfigSettings;
 use App\Models\EmailTemplate;
 use App\Models\ExperienceCertificate;
 use App\Models\GenerateOfferLetter;
@@ -24,7 +25,7 @@ class SystemController extends Controller
 {
     public function index()
     {
-        if(\Auth::user()->type == 'super admin'){
+        if (\Auth::user()->type == 'super admin') {
             $settings = Utility::settings();
             $admin_payment_setting = Utility::getAdminPaymentSetting();
             // $emailSetting = Utility::settingsById(\Auth::user()->id);
@@ -34,7 +35,9 @@ class SystemController extends Controller
             }
             $file_size = number_format($file_size / 1000000, 4);
 
-            return view('settings.index', compact('settings', 'admin_payment_setting', 'file_size'));
+            $config_settings = ConfigSettings::first();
+
+            return view('settings.index', compact('settings', 'admin_payment_setting', 'file_size', 'config_settings'));
         } else {
             return redirect()->back()->with('error', 'Permission denied.');
         }
@@ -43,7 +46,7 @@ class SystemController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->type == 'super admin') {
+        if (\Auth::user()->type == 'super admin') {
             if ($request->logo_dark) {
                 $logoName = 'logo-dark.png';
                 $dir = 'uploads/logo/';
@@ -95,10 +98,12 @@ class SystemController extends Controller
 
             $settings = Utility::settings();
 
-            if (!empty($request->title_text) || !empty($request->color) || !empty($request->SITE_RTL)
+            if (
+                !empty($request->title_text) || !empty($request->color) || !empty($request->SITE_RTL)
                 || !empty($request->footer_text) || !empty($request->default_language) || isset($request->display_landing_page)
                 || isset($request->gdpr_cookie) || isset($request->enable_signup) || isset($request->email_verification)
-                || isset($request->color) || !empty($request->cust_theme_bg) || !empty($request->cust_darklayout)) {
+                || isset($request->color) || !empty($request->cust_theme_bg) || !empty($request->cust_darklayout)
+            ) {
                 $post = $request->all();
 
                 $SITE_RTL = $request->has('SITE_RTL') ? $request->SITE_RTL : 'off';
@@ -133,7 +138,8 @@ class SystemController extends Controller
                 foreach ($post as $key => $data) {
                     if (in_array($key, array_keys($settings))) {
                         \DB::insert(
-                            'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
+                            'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                            [
                                 $data,
                                 $key,
                                 \Auth::user()->creatorId(),
@@ -151,7 +157,7 @@ class SystemController extends Controller
 
     public function saveEmailSettings(Request $request)
     {
-        if(\Auth::user()->type == 'super admin') {
+        if (\Auth::user()->type == 'super admin') {
             $request->validate(
                 [
                     'mail_driver' => 'required|string|max:255',
@@ -187,7 +193,6 @@ class SystemController extends Controller
         } else {
             return redirect()->back()->with('error', 'Permission denied.');
         }
-
     }
 
     public function saveCompanyEmailSettings(Request $request)
@@ -232,7 +237,7 @@ class SystemController extends Controller
     public function saveCompanySettings(Request $request)
     {
 
-        if(\Auth::user()->type == 'company'){
+        if (\Auth::user()->type == 'company') {
             $user = \Auth::user();
             $request->validate(
                 [
@@ -251,7 +256,7 @@ class SystemController extends Controller
             } else {
                 $post['ip_restrict'] = 'off';
             }
-        //            dd($post);
+            //            dd($post);
 
 
             unset($post['_token']);
@@ -260,7 +265,8 @@ class SystemController extends Controller
             foreach ($post as $key => $data) {
                 if (in_array($key, array_keys($settings))) {
                     \DB::insert(
-                        'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
+                        'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                        [
                             $data,
                             $key,
                             \Auth::user()->creatorId(),
@@ -277,11 +283,12 @@ class SystemController extends Controller
     public function savePaymentSettings(Request $request)
     {
 
-        if(\Auth::user()->type == 'super admin'){
+        if (\Auth::user()->type == 'super admin') {
             //dd($request);
 
             $validator = \Validator::make(
-                $request->all(), [
+                $request->all(),
+                [
                     'currency' => 'required|string|max:255',
                     'currency_symbol' => 'required|string|max:255',
                 ]
@@ -303,7 +310,7 @@ class SystemController extends Controller
     public function saveSystemSettings(Request $request)
     {
 
-        if(\Auth::user()->type == 'company'){
+        if (\Auth::user()->type == 'company') {
             $user = \Auth::user();
             $request->validate(
                 [
@@ -323,7 +330,8 @@ class SystemController extends Controller
             foreach ($post as $key => $data) {
                 if (in_array($key, array_keys($settings))) {
                     \DB::insert(
-                        'insert into settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
+                        'insert into settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                        [
                             $data,
                             $key,
                             \Auth::user()->creatorId(),
@@ -335,7 +343,6 @@ class SystemController extends Controller
             }
 
             return redirect()->back()->with('success', __('Setting successfully updated.'));
-
         } else {
             return redirect()->back()->with('error', 'Permission denied.');
         }
@@ -348,7 +355,8 @@ class SystemController extends Controller
         $created_by = \Auth::user()->creatorId();
         foreach ($post as $key => $data) {
             \DB::insert(
-                'insert into settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
+                'insert into settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                [
                     $data,
                     $key,
                     $created_by,
@@ -363,7 +371,7 @@ class SystemController extends Controller
     public function saveBusinessSettings(Request $request)
     {
 
-        if(\Auth::user()->type == 'company'){
+        if (\Auth::user()->type == 'company') {
             $post = $request->all();
 
             $user = \Auth::user();
@@ -384,7 +392,8 @@ class SystemController extends Controller
                 }
 
                 \DB::insert(
-                    'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
+                    'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                    [
                         $logoName,
                         'company_logo_dark',
                         \Auth::user()->creatorId(),
@@ -398,7 +407,7 @@ class SystemController extends Controller
                     'mimes:' . 'png',
                     'max:' . '20480',
                 ];
-        //                $logoName = 'logo-light.png';
+                //                $logoName = 'logo-light.png';
                 $logoName = $user->id . '-logo-light.png';
                 $dir = 'uploads/logo';
                 $path = Utility::upload_file($request, 'company_logo_light', $logoName, $dir, $validation);
@@ -409,7 +418,8 @@ class SystemController extends Controller
                 }
 
                 \DB::insert(
-                    'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
+                    'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                    [
                         $logoName,
                         'company_logo_light',
                         \Auth::user()->creatorId(),
@@ -424,7 +434,7 @@ class SystemController extends Controller
                     'max:' . '20480',
                 ];
 
-        //                $favicon = 'favicon.png';
+                //                $favicon = 'favicon.png';
                 $favicon = $user->id . '-favicon.png';
 
                 $dir = 'uploads/logo/';
@@ -435,7 +445,8 @@ class SystemController extends Controller
                 }
 
                 \DB::insert(
-                    'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
+                    'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                    [
                         $favicon,
                         'company_favicon',
                         \Auth::user()->creatorId(),
@@ -445,8 +456,10 @@ class SystemController extends Controller
 
             $settings = Utility::settings();
 
-            if (!empty($request->title_text) || !empty($request->color) || !empty($request->cust_theme_bg)
-                || !empty($request->footer_text) || !empty($request->default_language) || !empty($request->cust_darklayout)) {
+            if (
+                !empty($request->title_text) || !empty($request->color) || !empty($request->cust_theme_bg)
+                || !empty($request->footer_text) || !empty($request->default_language) || !empty($request->cust_darklayout)
+            ) {
 
                 $SITE_RTL = $request->has('SITE_RTL') ? $request->SITE_RTL : 'off';
                 $post['SITE_RTL'] = $SITE_RTL;
@@ -466,7 +479,8 @@ class SystemController extends Controller
                     if (in_array($key, array_keys($settings))) {
 
                         \DB::insert(
-                            'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
+                            'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                            [
                                 $data,
                                 $key,
                                 \Auth::user()->creatorId(),
@@ -484,7 +498,7 @@ class SystemController extends Controller
 
     public function companyIndex(Request $request)
     {
-        if(\Auth::user()->type == 'company'){
+        if (\Auth::user()->type == 'company') {
 
             if ($request->offerlangs) {
                 $offerlang = $request->offerlangs;
@@ -540,10 +554,29 @@ class SystemController extends Controller
 
             $post = $request->all();
 
-            return view('settings.company', compact('setting', 'company_payment_setting', 'timezones',
-                'ips', 'EmailTemplates', 'currOfferletterLang', 'Offerletter', 'offerlang', 'Joiningletter',
-                'currjoiningletterLang', 'joininglang', 'experience_certificate', 'curr_exp_cetificate_Lang',
-                'explang', 'noc_certificate', 'currnocLang', 'noclang', 'offerlangName', 'joininglangName', 'explangName', 'noclangName'));
+            return view('settings.company', compact(
+                'setting',
+                'company_payment_setting',
+                'timezones',
+                'ips',
+                'EmailTemplates',
+                'currOfferletterLang',
+                'Offerletter',
+                'offerlang',
+                'Joiningletter',
+                'currjoiningletterLang',
+                'joininglang',
+                'experience_certificate',
+                'curr_exp_cetificate_Lang',
+                'explang',
+                'noc_certificate',
+                'currnocLang',
+                'noclang',
+                'offerlangName',
+                'joininglangName',
+                'explangName',
+                'noclangName'
+            ));
         } else {
             return redirect()->back()->with('error', 'Permission denied.');
         }
@@ -910,7 +943,7 @@ class SystemController extends Controller
         } else {
             $post['is_xendit_enabled'] = 'off';
         }
-        
+
         if (isset($request->is_nepalste_enabled) && $request->is_nepalste_enabled == 'on') {
             $request->validate(
                 [
@@ -933,9 +966,9 @@ class SystemController extends Controller
                 \Auth::user()->id,
             ];
             \DB::insert(
-                'insert into company_payment_settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', $arr
+                'insert into company_payment_settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                $arr
             );
-
         }
 
         return redirect()->back()->with('success', __('Payment setting successfully updated.'));
@@ -960,7 +993,8 @@ class SystemController extends Controller
     {
 
         $validator = \Validator::make(
-            $request->all(), [
+            $request->all(),
+            [
                 'email' => 'required|email',
                 'mail_driver' => 'required',
                 'mail_host' => 'required',
@@ -982,8 +1016,7 @@ class SystemController extends Controller
             // return redirect()->back()->with('error', $messages->first());
         }
 
-        try
-        {
+        try {
             config(
                 [
                     'mail.driver' => $request->mail_driver,
@@ -1017,10 +1050,10 @@ class SystemController extends Controller
 
     public function printIndex()
     {
-        if(
+        if (
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
-        ){
+        ) {
             $settings = Utility::settings();
 
             return view('settings.print', compact('settings'));
@@ -1031,7 +1064,7 @@ class SystemController extends Controller
 
     public function posPrintIndex()
     {
-        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant'){
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
             $settings = Utility::settings();
 
             return view('settings.pos', compact('settings'));
@@ -1042,7 +1075,7 @@ class SystemController extends Controller
 
     public function quotationPrintIndex()
     {
-        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant'){
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
             $settings = Utility::settings();
 
             return view('settings.pos', compact('settings'));
@@ -1417,7 +1450,7 @@ class SystemController extends Controller
         } else {
             $post['is_xendit_enabled'] = 'off';
         }
-        
+
         if (isset($request->is_nepalste_enabled) && $request->is_nepalste_enabled == 'on') {
             $request->validate(
                 [
@@ -1439,11 +1472,10 @@ class SystemController extends Controller
                 \Auth::user()->id,
             ];
             \DB::insert(
-                'insert into admin_payment_settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', $arr
+                'insert into admin_payment_settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                $arr
             );
-
         }
-
     }
 
     public function savePusherSettings(Request $request)
@@ -1451,7 +1483,8 @@ class SystemController extends Controller
         if (\Auth::user()->type == 'super admin') {
 
             $validator = \Validator::make(
-                $request->all(), [
+                $request->all(),
+                [
                     'pusher_app_id' => 'required',
                     'pusher_app_key' => 'required',
                     'pusher_app_secret' => 'required',
@@ -1459,32 +1492,31 @@ class SystemController extends Controller
                 ]
             );
 
-        if ($validator->fails()) {
-            $messages = $validator->getMessageBag();
+            if ($validator->fails()) {
+                $messages = $validator->getMessageBag();
 
-            return redirect()->back()->with('error', $messages->first());
-        }
-
-        $post = $request->all();
-
-        unset($post['_token']);
-        $settings = Utility::settings();
-
-        foreach ($post as $key => $data) {
-            if (in_array($key, array_keys($settings))) {
-                \DB::insert(
-                    'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
-                    [
-                        $data,
-                        $key,
-                        \Auth::user()->creatorId(),
-                    ]
-                );
+                return redirect()->back()->with('error', $messages->first());
             }
-        }          
-            return redirect()->back()->with('success', __('Pusher Settings updated successfully'));
-    }
 
+            $post = $request->all();
+
+            unset($post['_token']);
+            $settings = Utility::settings();
+
+            foreach ($post as $key => $data) {
+                if (in_array($key, array_keys($settings))) {
+                    \DB::insert(
+                        'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                        [
+                            $data,
+                            $key,
+                            \Auth::user()->creatorId(),
+                        ]
+                    );
+                }
+            }
+            return redirect()->back()->with('success', __('Pusher Settings updated successfully'));
+        }
     }
 
     public function saveSlackSettings(Request $request)
@@ -1518,7 +1550,8 @@ class SystemController extends Controller
 
             foreach ($post as $key => $data) {
                 DB::insert(
-                    'INSERT INTO settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`), `updated_at` = VALUES(`updated_at`) ', [
+                    'INSERT INTO settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`), `updated_at` = VALUES(`updated_at`) ',
+                    [
                         $data,
                         $key,
                         Auth::user()->id,
@@ -1564,7 +1597,8 @@ class SystemController extends Controller
 
             foreach ($post as $key => $data) {
                 DB::insert(
-                    'INSERT INTO settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`), `updated_at` = VALUES(`updated_at`) ', [
+                    'INSERT INTO settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`), `updated_at` = VALUES(`updated_at`) ',
+                    [
                         $data,
                         $key,
                         Auth::user()->id,
@@ -1598,7 +1632,8 @@ class SystemController extends Controller
 
             foreach ($post as $key => $data) {
                 DB::insert(
-                    'INSERT INTO settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`), `updated_at` = VALUES(`updated_at`) ', [
+                    'INSERT INTO settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`), `updated_at` = VALUES(`updated_at`) ',
+                    [
                         $data,
                         $key,
                         Auth::user()->id,
@@ -1647,8 +1682,8 @@ class SystemController extends Controller
                     ]
                 );
             }
-        }          
-            return redirect()->back()->with('success', __('Recaptcha Settings updated successfully'));
+        }
+        return redirect()->back()->with('success', __('Recaptcha Settings updated successfully'));
     }
 
     public function storageSettingStore(Request $request)
@@ -1668,7 +1703,6 @@ class SystemController extends Controller
             $local_storage_validation = implode(',', $request->local_storage_validation);
             $post['local_storage_validation'] = $local_storage_validation;
             $post['local_storage_max_upload_size'] = $request->local_storage_max_upload_size;
-
         }
 
         if (isset($request->storage_setting) && $request->storage_setting == 's3') {
@@ -1730,12 +1764,12 @@ class SystemController extends Controller
             ];
 
             \DB::insert(
-                'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', $arr
+                'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                $arr
             );
         }
 
         return redirect()->back()->with('success', 'Storage setting successfully updated.');
-
     }
 
     public function offerletterupdate($lang, Request $request)
@@ -1746,9 +1780,9 @@ class SystemController extends Controller
             [
                 'is_success' => true,
                 'success' => __('Offer Letter successfully saved!'),
-            ], 200
+            ],
+            200
         );
-
     }
     public function joiningletterupdate($lang, Request $request)
     {
@@ -1759,9 +1793,9 @@ class SystemController extends Controller
             [
                 'is_success' => true,
                 'success' => __('Joing Letter successfully saved!'),
-            ], 200
+            ],
+            200
         );
-
     }
     public function experienceCertificateupdate($lang, Request $request)
     {
@@ -1772,9 +1806,9 @@ class SystemController extends Controller
             [
                 'is_success' => true,
                 'success' => __('Experience Certificate successfully saved!'),
-            ], 200
+            ],
+            200
         );
-
     }
     public function NOCupdate($lang, Request $request)
     {
@@ -1785,9 +1819,9 @@ class SystemController extends Controller
             [
                 'is_success' => true,
                 'success' => __('NOC successfully saved!'),
-            ], 200
+            ],
+            200
         );
-
     }
 
     //Save Google calendar settings
@@ -1797,7 +1831,8 @@ class SystemController extends Controller
         if (isset($request->google_calendar_enable) && $request->google_calendar_enable == 'on') {
 
             $validator = \Validator::make(
-                $request->all(), [
+                $request->all(),
+                [
                     'google_calender_json_file' => 'required',
                     'google_clender_id' => 'required',
                 ]
@@ -1822,7 +1857,6 @@ class SystemController extends Controller
             $file = $request->file('google_calender_json_file');
             $file->move($dir, $file_path);
             $post['google_calender_json_file'] = $file_path;
-
         }
 
         if ($request->google_clender_id) {
@@ -1886,7 +1920,7 @@ class SystemController extends Controller
     public function webhook()
     {
 
-        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
             $webhookSettings = WebhookSetting::where('created_by', '=', \Auth::user()->creatorId())->get();
 
             return redirect()->back()->with('success', __('Webhook successfully created.'));
@@ -1897,7 +1931,7 @@ class SystemController extends Controller
 
     public function webhookCreate()
     {
-        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
 
             $modules = WebhookSetting::$modules;
             $methods = WebhookSetting::$method;
@@ -1911,10 +1945,11 @@ class SystemController extends Controller
     public function webhookStore(Request $request)
     {
 
-        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
 
             $validator = \Validator::make(
-                $request->all(), [
+                $request->all(),
+                [
                     'module' => 'required',
                     'url' => 'required',
                     'method' => 'required',
@@ -1934,7 +1969,6 @@ class SystemController extends Controller
             $webhookSetting->save();
 
             return redirect()->back()->with('success', __('Webhook successfully created.'));
-
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -1951,7 +1985,7 @@ class SystemController extends Controller
     public function webhookUpdate(Request $request, $id)
     {
 
-        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
 
             $validator = \Validator::make(
                 $request->all(),
@@ -1981,7 +2015,7 @@ class SystemController extends Controller
 
     public function webhookDestroy($id)
     {
-        if(\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
+        if (\Auth::user()->type == 'company' || \Auth::user()->type == 'accountant') {
             $webhookSetting = WebhookSetting::find($id);
             $webhookSetting->delete();
             return redirect()->back()->with('success', __('Webhook successfully deleted.'));
@@ -1994,7 +2028,8 @@ class SystemController extends Controller
     {
 
         $validator = \Validator::make(
-            $request->all(), [
+            $request->all(),
+            [
                 'cookie_title' => 'required',
                 'cookie_description' => 'required',
                 'strictly_cookie_title' => 'required',
@@ -2031,7 +2066,8 @@ class SystemController extends Controller
 
             if (in_array($key, array_keys($settings))) {
                 \DB::insert(
-                    'insert into settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
+                    'insert into settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                    [
                         $data,
                         $key,
                         \Auth::user()->creatorId(),
@@ -2068,8 +2104,23 @@ class SystemController extends Controller
             $date = (new \DateTime())->format('Y-m-d');
             $time = (new \DateTime())->format('H:i:s') . ' UTC';
 
-            $new_line = implode(',', [$ip, $date, $time, json_encode($request['cookie']), $device_type, $browser_language, $browser_name, $os_name,
-                isset($query) ? $query['country'] : '', isset($query) ? $query['region'] : '', isset($query) ? $query['regionName'] : '', isset($query) ? $query['city'] : '', isset($query) ? $query['zip'] : '', isset($query) ? $query['lat'] : '', isset($query) ? $query['lon'] : '']);
+            $new_line = implode(',', [
+                $ip,
+                $date,
+                $time,
+                json_encode($request['cookie']),
+                $device_type,
+                $browser_language,
+                $browser_name,
+                $os_name,
+                isset($query) ? $query['country'] : '',
+                isset($query) ? $query['region'] : '',
+                isset($query) ? $query['regionName'] : '',
+                isset($query) ? $query['city'] : '',
+                isset($query) ? $query['zip'] : '',
+                isset($query) ? $query['lat'] : '',
+                isset($query) ? $query['lon'] : ''
+            ]);
 
             if (!file_exists(storage_path() . '/uploads/sample/data.csv')) {
 
@@ -2107,7 +2158,8 @@ class SystemController extends Controller
 
             if (in_array($key, array_keys($settings))) {
                 \DB::insert(
-                    'insert into settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
+                    'insert into settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                    [
                         $data,
                         $key,
                         \Auth::user()->creatorId(),
@@ -2122,9 +2174,9 @@ class SystemController extends Controller
             [
                 'is_success' => true,
                 'success' => __('Note successfully saved!'),
-            ], 200
+            ],
+            200
         );
-
     }
 
     //for time-tracker setting
@@ -2164,7 +2216,8 @@ class SystemController extends Controller
         $created_by = \Auth::user()->creatorId();
         foreach ($post as $key => $data) {
             \DB::insert(
-                'insert into settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
+                'insert into settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                [
                     $data,
                     $key,
                     $created_by,
@@ -2184,7 +2237,7 @@ class SystemController extends Controller
 
     public function storeIp(Request $request)
     {
-        if(\Auth::user()->type == 'company'){
+        if (\Auth::user()->type == 'company') {
             $validator = \Validator::make(
                 $request->all(),
                 [
@@ -2251,5 +2304,4 @@ class SystemController extends Controller
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
-
 }
