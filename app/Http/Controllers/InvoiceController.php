@@ -162,14 +162,20 @@ class InvoiceController extends Controller
                 \Log::info('Invoice  REQ DATA To Be Posted to the Api ', ['apiRequestData' => $apiRequestData]);
 
                 //Send data to AddSale API
-                $url = env('ETIMS_API_ENDPOINT') . 'AddSaleV2';
-                $response = Http::withOptions(['verify' => false])
-                    ->withHeaders(['key' => env('ETIMS_API_KEY')])
-                    ->post($url, $apiRequestData);
+                // $url = env('ETIMS_API_ENDPOINT') . 'AddSaleV2';
+                // $response = Http::withOptions(['verify' => false])
+                //     ->withHeaders(['key' => env('ETIMS_API_KEY')])
+                //     ->post($url, $apiRequestData);
+
+                $url = 'https://etims.your-apps.biz/api/AddSaleV2';
+
+                $response = Http::withHeaders([
+                    'key' => '123456'
+                ])->withOptions(['verify' => false])->post($url, $apiRequestData);
 
 
                 if ($response->failed()) {
-                    if ($response->json('statusCode') == 400 && $response->json('message') == 'Trader invoice number is alrady exist') {
+                    if ($response->json('status') == false && $response->json('message') == 'Trader invoice number already exists.') {
                         return redirect()->back()->with('error', 'Trader invoice number already exists.');
                     }
                     return redirect()->back()->with('error', 'Failed to post invoice data.');
@@ -181,7 +187,7 @@ class InvoiceController extends Controller
                 \Log::info('API Request Invoice Being Posted: ' . json_encode($apiRequestData));
                 \Log::info('API Response Body For Posting Invoice Data: ' . $response->body());
 
-                if ($response['statusCode'] == 400) {
+                if ($response['status'] == false) {
                     return redirect()->back()->with('error', $response['message']);
                 }
 
@@ -258,7 +264,7 @@ class InvoiceController extends Controller
             'items' => 'required|array',
             'items.*.itemCode' => 'required',
             'items.*.quantity' => 'required',
-            'items.*.pkgQauntity' => 'required',
+            'items.*.pkgQuantity' => 'required',
             'items.*.price' => 'required',
             'items.*.discount' => 'required',
             'items.*.tax' => 'required',
@@ -386,8 +392,8 @@ class InvoiceController extends Controller
             'shipping_display' => null,
             'discount_apply' => null,
             'created_by' => \Auth::user()->creatorId(),
-            'response_trderInvoiceNo' => $apiResponseData['data']['tranderInvoiceNo'],
-            'response_invoiceNo' => $apiResponseData['data']['invoiceNo'],
+            'response_trderInvoiceNo' => $apiResponseData['responseData']['traderInvoiceNo'],
+            'response_invoiceNo' => $apiResponseData['responseData']['invoiceNo'],
             'orgInvoiceNo' => $data['orgInvoiceNo'] ?? null,
             'customerTin' => $customer->customerTin,
             'customerName' => $customer->name,
@@ -434,20 +440,20 @@ class InvoiceController extends Controller
             'receipt_BtmMsg' => null,
             'receipt_PrchrAcptcYn' => null,
             'createdDate' => null,
-            'isKRASynchronized' => null,
-            'kraSynchronizedDate' => null,
-            'isStockIOUpdate' => $apiResponseData['data']['isStockIOUpdate'],
-            'resultCd' => $apiResponseData['statusCode'],
+            'isKRASynchronized' =>  $apiResponseData['responseData']['isKRASync'],
+            'kraSynchronizedDate' => $apiResponseData['responseData']['sdcDateTime'],
+            'isStockIOUpdate' => $apiResponseData['responseData']['isStockIO'],
+            'resultCd' => $apiResponseData['status'],
             'resultMsg' => $apiResponseData['message'],
             'resultDt' => null,
             'response_CurRcptNo' => null,
             'response_TotRcptNo' => null,
-            'response_IntrlData' => $apiResponseData['data']['scuInternalData'],
-            'response_RcptSign' => $apiResponseData['data']['scuReceiptSignature'],
-            'response_SdcDateTime' => $apiResponseData['data']['sdcDateTime'],
-            'response_SdcId' => $apiResponseData['data']['sdcid'],
-            'response_MrcNo' => $apiResponseData['data']['sdcmrcNo'],
-            'qrCodeURL' => $apiResponseData['data']['scuqrCode'],
+            'response_IntrlData' => $apiResponseData['responseData']['scuInternalData'],
+            'response_RcptSign' => $apiResponseData['responseData']['scuReceiptSignature'],
+            'response_SdcDateTime' => $apiResponseData['responseData']['sdcDateTime'],
+            'response_SdcId' => $apiResponseData['responseData']['sdcid'],
+            'response_MrcNo' => $apiResponseData['responseData']['sdcmrcNo'],
+            'qrCodeURL' => $apiResponseData['responseData']['scuqrCode'],
         ]);
     }
 
