@@ -62,7 +62,8 @@ class ConfigSettingsController extends Controller
             'customer_mapping_by_tin' => 'required|string|in:on,off',
             'item_mapping_by_code' => 'required|string|in:on,off',
             'api_type' => 'required|string|in:OSCU,VSCU',
-            'api_url' => 'required|string'
+            'api_url' => 'required|string',
+            'api_key' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -80,7 +81,9 @@ class ConfigSettingsController extends Controller
             'customer_mapping_by_tin' => $data['customer_mapping_by_tin'],
             'item_mapping_by_code' => $data['item_mapping_by_code'],
             'api_type' => $data['api_type'],
-            'api_url' => $data['api_url']
+            'api_url' => $data['api_url'],
+            'api_key' => $data['api_key']
+
         ]);
 
         return redirect()->back()->with('success', 'Configuration settings updated successfully');

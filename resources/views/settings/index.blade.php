@@ -3390,6 +3390,12 @@
                                     <label for="apiUrlInput" class="form-label">{{ __('API URL') }}</label>
                                     {{ Form::text('api_url', '', ['class' => 'form-control', 'id' => 'apiUrlInput', 'placeholder' => __('API URL')]) }}
                                 </div>
+                                <div class="form-group col-md-8">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="apiKeyInput" class="form-label">{{ __('API Key') }}</label>
+                                    {{ Form::text('api_key', '', ['class' => 'form-control', 'id' => 'apilKeyInput', 'placeholder' => __('API Key')]) }}
+                                </div>
                             </div>
 
                             <div class="card-footer text-end">

@@ -15,6 +15,8 @@ class ConfigSettings extends Model
         'customer_mapping_by_tin',
         'item_mapping_by_code',
         'api_type',
-        'api_url'
+        'api_url',
+        'api_key',
+        'created_by'
     ];
 }

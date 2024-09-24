@@ -20,6 +20,7 @@ class ConfigSettingsSeeder extends Seeder
             'item_mapping_by_code' => 'off',
             'api_type' => 'VSCU',
             'api_url' => 'vscu',
+            'api_key' => '123456'
         ]);
     }
 }
