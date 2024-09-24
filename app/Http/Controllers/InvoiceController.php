@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use App\Models\Plan;
 use App\Models\User;
 use App\Models\Details;
@@ -17,6 +16,7 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Models\SalesTypeCode;
 use App\Exports\InvoiceExport;
+use App\Models\ConfigSettings;
 use App\Models\InvoicePayment;
 use App\Models\InvoiceProduct;
 use App\Models\ProductService;
@@ -24,31 +24,33 @@ use App\Models\PaymentTypeCodes;
 use App\Models\TransactionLines;
 use App\Models\WarehouseProduct;
 use App\Models\InvoiceStatusCode;
-use App\Models\ItemClassification;
 use Illuminate\Support\Facades\DB;
 use App\Models\InvoiceBankTransfer;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\FacadesLog;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\ProductServiceCategory;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
         if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
+            Auth::user()->type == 'company'
+            || Auth::user()->type == 'accountant'
         ) {
-            $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('customerName', 'id');
+            $customer = Customer::where('created_by', '=', Auth::user()->creatorId())->get()->pluck('customerName', 'id');
             $customer->prepend('Select Customer', '');
             $status = Invoice::$statues;
-            \Log::info('CREATOR ID');
-            \Log::info(\Auth::user()->creatorId());
-            $query = Invoice::where('created_by', '=', \Auth::user()->creatorId());
+            Log::info('CREATOR ID');
+            Log::info(Auth::user()->creatorId());
+            $query = Invoice::where('created_by', '=', Auth::user()->creatorId());
 
             if (!empty($request->customer)) {
                 $query->where('customer_id', '=', $request->customer);
@@ -74,15 +76,14 @@ class InvoiceController extends Controller
     public function create($customerId)
     {
         if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
+            Auth::user()->type == 'company'
+            || Auth::user()->type == 'accountant'
         ) {
-            $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
-            $invoice_number = \Auth::user()->invoiceNumberFormat($this->invoiceNumber());
-            $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('customerName', 'id');
+            $customFields = CustomField::where('created_by', '=', Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
+            $invoice_number = Auth::user()->invoiceNumberFormat($this->invoiceNumber());
+            $customers = Customer::where('created_by', Auth::user()->creatorId())->get()->pluck('customerName', 'id');
             $customers->prepend('Select Customer', '');
-            $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'income')->get()->pluck('name', 'id');
-            $category->prepend('Select Category', '');
+            $category = ProductServiceCategory::all()->pluck('name', 'id');
             $product_services = ProductService::all()->pluck('itemNm', 'itemCd');
             $product_services->prepend('--', '');
             $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'code');
@@ -138,12 +139,12 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         // Log the entire request data
-        \Log::info('Invoice Data received From the Form:', $request->all());
+        Log::info('Invoice Data received From the Form:', $request->all());
 
         try {
             if (
-                \Auth::user()->type == 'company'
-                || \Auth::user()->type == 'accountant'
+                Auth::user()->type == 'company'
+                || Auth::user()->type == 'accountant'
             ) {
                 $validator = $this->validateInvoice($request);
                 if ($validator->fails()) {
@@ -152,26 +153,25 @@ class InvoiceController extends Controller
                 }
                 $data = $request->all();
                 $customer = Customer::find($data['customer_id']);
-                \Log::info('Invoice Customer', ['customer' => $customer]);
+                Log::info('Invoice Customer', ['customer' => $customer]);
 
                 $apiRequestData = $this->prepareApiRequestData($data, $customer);
-                \Log::info('Invoice Api Data to being Posted :', ['apiRequestData' => $apiRequestData]);
+                Log::info('Invoice Api Data to being Posted :', ['apiRequestData' => $apiRequestData]);
 
                 $saleItemList = $this->prepareSaleItemList($data['items']);
                 $apiRequestData['saleItemList'] = $saleItemList;
-                \Log::info('Invoice  REQ DATA To Be Posted to the Api ', ['apiRequestData' => $apiRequestData]);
+                Log::info('Invoice  REQ DATA To Be Posted to the Api ', ['apiRequestData' => $apiRequestData]);
 
-                //Send data to AddSale API
-                // $url = env('ETIMS_API_ENDPOINT') . 'AddSaleV2';
-                // $response = Http::withOptions(['verify' => false])
-                //     ->withHeaders(['key' => env('ETIMS_API_KEY')])
-                //     ->post($url, $apiRequestData);
+                $config = ConfigSettings::first();
 
-                $url = 'https://etims.your-apps.biz/api/AddSaleV2';
+                $url = $config->api_url . 'AddSaleV2';
 
                 $response = Http::withHeaders([
-                    'key' => '123456'
+                    'key' => $config->api_key,
                 ])->withOptions(['verify' => false])->post($url, $apiRequestData);
+
+                Log::info('ADD SALE RESPONSE');
+                Log::info($response);
 
 
                 if ($response->failed()) {
@@ -181,43 +181,12 @@ class InvoiceController extends Controller
                     return redirect()->back()->with('error', 'Failed to post invoice data.');
                 }
 
-                // Log the response of the AddSale API call
-                \Log::info('SALES Invoice API RESPONSE', ['response' => $response->json()]);
-                \Log::info('API Response Status Code For Posting Invoice Data: ' . $response->status());
-                \Log::info('API Request Invoice Being Posted: ' . json_encode($apiRequestData));
-                \Log::info('API Response Body For Posting Invoice Data: ' . $response->body());
 
                 if ($response['status'] == false) {
                     return redirect()->back()->with('error', $response['message']);
                 }
 
-                // Store API response data in local database
                 $apiResponseData = $response->json();
-
-                // Prepare data for ItemOpeningStock API
-                // $openingItemsLists = $this->prepareOpeningItemsList($saleItemList);
-                // $itemOpeningStockRequestData = [
-                //     "openingItemsLists" => $openingItemsLists
-                // ];
-
-                // // Send data to ItemOpeningStock API
-                // $url = 'https://etims.your-apps.biz/api/ItemOpeningStock';
-                // $response = Http::withOptions(['verify' => false])
-                //     ->withHeaders([
-                //         'accept' => '*/*',
-                //         'key' => '123456',
-                //         'Content-Type' => 'application/json'
-                //     ])
-                //     ->post($url, $itemOpeningStockRequestData);
-
-                // \Log::info('ITEM OPENING STOCK API RESPONSE', ['response' => $response->json()]);
-                // \Log::info('API Response Status Code For Posting Opening Stock Data: ' . $response->status());
-                // \Log::info('API Request Opening Stock Data Posted: ' . json_encode($itemOpeningStockRequestData));
-                // \Log::info('API Response Body For Posting Opening Stock Data: ' . json_encode($response->body()));
-
-                // if ($response->failed()) {
-                //     return redirect()->back()->with('error', 'Failed to sync item opening stock');
-                // }
 
                 $totalAmount = $this->calculateTotalAmount($saleItemList);
                 $inv = $this->createInvoice($data, $customer, $totalAmount, $apiResponseData);
@@ -231,8 +200,8 @@ class InvoiceController extends Controller
                         $productService->quantity -= $item['quantity'];
                         $productService->save();
                     }
-                    \Log::info('TOTAL AMT');
-                    \Log::info($totalAmount);
+                    Log::info('TOTAL AMT');
+                    Log::info($totalAmount);
 
                     // Update quantity in warehouse_products
                     $warehouseProduct = WarehouseProduct::where('product_id', $productService->id)->first();
@@ -248,14 +217,14 @@ class InvoiceController extends Controller
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
         } catch (\Exception $e) {
-            \Log::error('ADD INV ERROR', ['exception' => $e]);
+            Log::error('ADD INV ERROR', ['exception' => $e]);
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
     private function validateInvoice($request)
     {
-        return \Validator::make($request->all(), [
+        return Validator::make($request->all(), [
             'customer_id' => 'required',
             'issue_date' => 'required',
             'due_date' => 'required',
@@ -308,8 +277,6 @@ class InvoiceController extends Controller
         $saleItemList = [];
 
         foreach ($items as $item) {
-            \Log::info('MAVITU');
-            \Log::info($item);
             $itemDetails = ProductService::where('itemCd', $item['itemCode'])->first();
             $itemExprDate = $this->formatDate($item['itemExprDate']);
             $saleItemList[] = [
@@ -391,7 +358,7 @@ class InvoiceController extends Controller
             'status' => 0,
             'shipping_display' => null,
             'discount_apply' => null,
-            'created_by' => \Auth::user()->creatorId(),
+            'created_by' => Auth::user()->creatorId(),
             'response_trderInvoiceNo' => $apiResponseData['responseData']['traderInvoiceNo'],
             'response_invoiceNo' => $apiResponseData['responseData']['invoiceNo'],
             'orgInvoiceNo' => $data['orgInvoiceNo'] ?? null,
@@ -497,18 +464,18 @@ class InvoiceController extends Controller
     public function edit($ids)
     {
         if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
+            Auth::user()->type == 'company'
+            || Auth::user()->type == 'accountant'
         ) {
             $id = Crypt::decrypt($ids);
             $invoice = Invoice::find($id);
-            $invoice_number = \Auth::user()->invoiceNumberFormat($invoice->invoice_id);
-            $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'income')->get()->pluck('name', 'id');
+            $invoice_number = Auth::user()->invoiceNumberFormat($invoice->invoice_id);
+            $customers = Customer::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $category = ProductServiceCategory::where('created_by', Auth::user()->creatorId())->where('type', 'income')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
-            $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $product_services = ProductService::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
             $invoice->customField = CustomField::getData($invoice, 'invoice');
-            $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
+            $customFields = CustomField::where('created_by', '=', Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
 
             return view('invoice.edit', compact('customers', 'product_services', 'invoice', 'invoice_number', 'category', 'customFields'));
         } else {
@@ -520,11 +487,11 @@ class InvoiceController extends Controller
     {
 
         if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
+            Auth::user()->type == 'company'
+            || Auth::user()->type == 'accountant'
         ) {
-            if ($invoice->created_by == \Auth::user()->creatorId()) {
-                $validator = \Validator::make(
+            if ($invoice->created_by == Auth::user()->creatorId()) {
+                $validator = Validator::make(
                     $request->all(),
                     [
                         'customer_id' => 'required',
@@ -585,7 +552,7 @@ class InvoiceController extends Controller
                     $type = 'invoice';
                     $type_id = $invoice->id;
                     StockReport::where('type', '=', 'invoice')->where('type_id', '=', $invoice->id)->delete();
-                    $description = $products[$i]['quantity'] . '  ' . __(' quantity sold in invoice') . ' ' . \Auth::user()->invoiceNumberFormat($invoice->invoice_id);
+                    $description = $products[$i]['quantity'] . '  ' . __(' quantity sold in invoice') . ' ' . Auth::user()->invoiceNumberFormat($invoice->invoice_id);
                     if (empty($products[$i]['id'])) {
                         Utility::addProductStock($products[$i]['item'], $products[$i]['quantity'], $type, $description, $type_id);
                     }
@@ -630,7 +597,7 @@ class InvoiceController extends Controller
 
     public function invoiceNumber()
     {
-        $latest = Invoice::where('created_by', '=', \Auth::user()->creatorId())->latest()->first();
+        $latest = Invoice::where('created_by', '=', Auth::user()->creatorId())->latest()->first();
         if (!$latest) {
             return 1;
         }
@@ -642,9 +609,9 @@ class InvoiceController extends Controller
     {
 
         if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
-            || \Auth::user()->type == 'customer'
+            Auth::user()->type == 'company'
+            || Auth::user()->type == 'accountant'
+            || Auth::user()->type == 'customer'
         ) {
             try {
                 $id = Crypt::decrypt($ids);
@@ -654,14 +621,14 @@ class InvoiceController extends Controller
             $id = Crypt::decrypt($ids);
             $invoice = Invoice::with(['creditNote', 'payments.bankAccount', 'items.product'])->find($id);
 
-            if (!empty($invoice->created_by) == \Auth::user()->creatorId()) {
+            if (!empty($invoice->created_by) == Auth::user()->creatorId()) {
                 $invoicePayment = InvoicePayment::where('invoice_id', $invoice->id)->first();
 
                 $customer = $invoice->customer;
                 // Retrieve associated sales products
                 $iteams = InvoiceProduct::where('invoice_id', $invoice->invoice_id)->get();
 
-                $user = \Auth::user();
+                $user = Auth::user();
 
                 // start for storage limit note
                 $invoice_user = User::find($invoice->created_by);
@@ -669,7 +636,7 @@ class InvoiceController extends Controller
                 // end for storage limit note
 
                 $invoice->customField = CustomField::getData($invoice, 'invoice');
-                $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
+                $customFields = CustomField::where('created_by', '=', Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
 
                 return view('invoice.view', compact('invoice', 'customer', 'iteams', 'invoicePayment', 'customFields', 'user', 'invoice_user', 'user_plan'));
             } else {
@@ -683,10 +650,10 @@ class InvoiceController extends Controller
     public function destroy(Invoice $invoice, Request $request)
     {
         if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
+            Auth::user()->type == 'company'
+            || Auth::user()->type == 'accountant'
         ) {
-            if ($invoice->created_by == \Auth::user()->creatorId()) {
+            if ($invoice->created_by == Auth::user()->creatorId()) {
                 foreach ($invoice->payments as $invoices) {
                     Utility::bankAccountBalance($invoices->account_id, $invoices->amount, 'debit');
 
@@ -720,8 +687,8 @@ class InvoiceController extends Controller
     {
 
         if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
+            Auth::user()->type == 'company'
+            || Auth::user()->type == 'accountant'
         ) {
             $invoiceProduct = InvoiceProduct::find($request->id);
 
@@ -745,10 +712,10 @@ class InvoiceController extends Controller
 
     public function customerInvoice(Request $request)
     {
-        if (\Auth::user()->type == 'customer') {
+        if (Auth::user()->type == 'customer') {
 
             $status = Invoice::$statues;
-            $query = Invoice::where('customer_id', '=', \Auth::user()->id)->where('status', '!=', '0')->where('created_by', \Auth::user()->creatorId());
+            $query = Invoice::where('customer_id', '=', Auth::user()->id)->where('status', '!=', '0')->where('created_by', Auth::user()->creatorId());
 
             if (!empty($request->issue_date)) {
                 $date_range = explode(' - ', $request->issue_date);
@@ -790,8 +757,8 @@ class InvoiceController extends Controller
     {
 
         if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
+            Auth::user()->type == 'company'
+            || Auth::user()->type == 'accountant'
         ) {
             // Send Email
             $setings = Utility::settings();
@@ -804,7 +771,7 @@ class InvoiceController extends Controller
 
                 $customer = Customer::where('id', $invoice->customer_id)->first();
                 $invoice->name = !empty($customer) ? $customer->name : '';
-                $invoice->invoice = \Auth::user()->invoiceNumberFormat($invoice->invoice_id);
+                $invoice->invoice = Auth::user()->invoiceNumberFormat($invoice->invoice_id);
 
                 $invoiceId = Crypt::encrypt($invoice->id);
                 $invoice->url = route('invoice.pdf', $invoiceId);
@@ -867,14 +834,14 @@ class InvoiceController extends Controller
     public function resent($id)
     {
         if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
+            Auth::user()->type == 'company'
+            || Auth::user()->type == 'accountant'
         ) {
             $invoice = Invoice::where('id', $id)->first();
 
             $customer = Customer::where('id', $invoice->customer_id)->first();
             $invoice->name = !empty($customer) ? $customer->name : '';
-            $invoice->invoice = \Auth::user()->invoiceNumberFormat($invoice->invoice_id);
+            $invoice->invoice = Auth::user()->invoiceNumberFormat($invoice->invoice_id);
 
             $invoiceId = Crypt::encrypt($invoice->id);
             $invoice->url = route('invoice.pdf', $invoiceId);
@@ -898,14 +865,14 @@ class InvoiceController extends Controller
     public function payment($invoice_id)
     {
         if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
+            Auth::user()->type == 'company'
+            || Auth::user()->type == 'accountant'
         ) {
             $invoice = Invoice::where('id', $invoice_id)->first();
 
-            $customers = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $accounts = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $customers = Customer::where('created_by', '=', Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $categories = ProductServiceCategory::where('created_by', '=', Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $accounts = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
 
             return view('invoice.payment', compact('customers', 'categories', 'accounts', 'invoice'));
         } else {
@@ -921,10 +888,10 @@ class InvoiceController extends Controller
         }
 
         if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
+            Auth::user()->type == 'company'
+            || Auth::user()->type == 'accountant'
         ) {
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(),
                 [
                     'date' => 'required',
@@ -949,7 +916,7 @@ class InvoiceController extends Controller
             if (!empty($request->add_receipt)) {
                 //storage limit
                 $image_size = $request->file('add_receipt')->getSize();
-                $result = Utility::updateStorageLimit(\Auth::user()->creatorId(), $image_size);
+                $result = Utility::updateStorageLimit(Auth::user()->creatorId(), $image_size);
                 if ($result == 1) {
                     $fileName = time() . "_" . $request->add_receipt->getClientOriginalName();
                     $request->add_receipt->storeAs('', $fileName);
@@ -977,7 +944,7 @@ class InvoiceController extends Controller
             $invoicePayment->user_id = $invoice->customer_id;
             $invoicePayment->user_type = 'Customer';
             $invoicePayment->type = 'Partial';
-            $invoicePayment->created_by = \Auth::user()->id;
+            $invoicePayment->created_by = Auth::user()->id;
             $invoicePayment->payment_id = $invoicePayment->id;
             $invoicePayment->category = 'Invoice';
             $invoicePayment->account = $request->account_id;
@@ -987,10 +954,10 @@ class InvoiceController extends Controller
 
             $payment = new InvoicePayment();
             $payment->name = $customer['name'];
-            $payment->date = \Auth::user()->dateFormat($request->date);
-            $payment->amount = \Auth::user()->priceFormat($request->amount);
-            $payment->invoice = 'invoice ' . \Auth::user()->invoiceNumberFormat($invoice->invoice_id);
-            $payment->dueAmount = \Auth::user()->priceFormat($invoice->getDue());
+            $payment->date = Auth::user()->dateFormat($request->date);
+            $payment->amount = Auth::user()->priceFormat($request->amount);
+            $payment->invoice = 'invoice ' . Auth::user()->invoiceNumberFormat($invoice->invoice_id);
+            $payment->dueAmount = Auth::user()->priceFormat($invoice->getDue());
 
             Utility::updateUserBalance('customer', $invoice->customer_id, $request->amount, 'debit');
 
@@ -1048,8 +1015,8 @@ class InvoiceController extends Controller
         //        dd($invoice_id,$payment_id);
 
         if (
-            \Auth::user()->type == 'company'
-            || \Auth::user()->type == 'accountant'
+            Auth::user()->type == 'company'
+            || Auth::user()->type == 'accountant'
         ) {
             $payment = InvoicePayment::find($payment_id);
 
@@ -1072,7 +1039,7 @@ class InvoiceController extends Controller
             if (!empty($payment->add_receipt)) {
                 //storage limit
                 $file_path = '/uploads/payment/' . $payment->add_receipt;
-                $result = Utility::changeStorageLimit(\Auth::user()->creatorId(), $file_path);
+                $result = Utility::changeStorageLimit(Auth::user()->creatorId(), $file_path);
             }
 
             $invoice->save();
@@ -1096,18 +1063,18 @@ class InvoiceController extends Controller
         //        dd($invoice_id);
         $invoice = Invoice::find($invoice_id);
         $customer = Customer::where('id', $invoice->customer_id)->first();
-        $invoice->dueAmount = \Auth::user()->priceFormat($invoice->getDue());
+        $invoice->dueAmount = Auth::user()->priceFormat($invoice->getDue());
         $invoice->name = $customer['name'];
-        $invoice->date = \Auth::user()->dateFormat($invoice->send_date);
-        $invoice->invoice = \Auth::user()->invoiceNumberFormat($invoice->invoice_id);
+        $invoice->date = Auth::user()->dateFormat($invoice->send_date);
+        $invoice->invoice = Auth::user()->invoiceNumberFormat($invoice->invoice_id);
 
         //For Notification
-        $setting = Utility::settings(\Auth::user()->creatorId());
+        $setting = Utility::settings(Auth::user()->creatorId());
         $customer = Customer::find($invoice->customer_id);
         $reminderNotificationArr = [
-            'invoice_number' => \Auth::user()->invoiceNumberFormat($invoice->invoice_id),
+            'invoice_number' => Auth::user()->invoiceNumberFormat($invoice->invoice_id),
             'customer_name' => $customer->name,
-            'user_name' => \Auth::user()->name,
+            'user_name' => Auth::user()->name,
         ];
 
         //Twilio Notification
@@ -1120,10 +1087,10 @@ class InvoiceController extends Controller
         if ($setings['new_payment_reminder'] == 1) {
             $invoice = Invoice::find($invoice_id);
             $customer = Customer::where('id', $invoice->customer_id)->first();
-            $invoice->dueAmount = \Auth::user()->priceFormat($invoice->getDue());
+            $invoice->dueAmount = Auth::user()->priceFormat($invoice->getDue());
             $invoice->name = $customer['name'];
-            $invoice->date = \Auth::user()->dateFormat($invoice->send_date);
-            $invoice->invoice = \Auth::user()->invoiceNumberFormat($invoice->invoice_id);
+            $invoice->date = Auth::user()->dateFormat($invoice->send_date);
+            $invoice->invoice = Auth::user()->invoiceNumberFormat($invoice->invoice_id);
 
             $reminderArr = [
 
@@ -1147,7 +1114,7 @@ class InvoiceController extends Controller
 
     public function customerInvoiceSendMail(Request $request, $invoice_id)
     {
-        $validator = \Validator::make(
+        $validator = Validator::make(
             $request->all(),
             [
                 'email' => 'required|email',
@@ -1164,7 +1131,7 @@ class InvoiceController extends Controller
 
         $customer = Customer::where('id', $invoice->customer_id)->first();
         $invoice->name = !empty($customer) ? $customer->name : '';
-        $invoice->invoice = \Auth::user()->invoiceNumberFormat($invoice->invoice_id);
+        $invoice->invoice = Auth::user()->invoiceNumberFormat($invoice->invoice_id);
 
         $invoiceId = Crypt::encrypt($invoice->id);
         $invoice->url = route('invoice.pdf', $invoiceId);
@@ -1194,7 +1161,7 @@ class InvoiceController extends Controller
 
     public function duplicate($invoice_id)
     {
-        if (\Auth::user()->type == 'company') {
+        if (Auth::user()->type == 'company') {
             $invoice = Invoice::where('id', $invoice_id)->first();
             $duplicateInvoice = new Invoice();
             $duplicateInvoice->invoice_id = $this->invoiceNumber();
@@ -1232,7 +1199,7 @@ class InvoiceController extends Controller
     public function previewInvoice($template, $color)
     {
 
-        $objUser = \Auth::user();
+        $objUser = Auth::user();
         $settings = Utility::settings();
         $invoice = new Invoice();
 
@@ -1374,8 +1341,8 @@ class InvoiceController extends Controller
         $invoice->taxesData = $taxesData;
         $invoice->customField = CustomField::getData($invoice, 'invoice');
         $customFields = [];
-        if (!empty(\Auth::user())) {
-            $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
+        if (!empty(Auth::user())) {
+            $customFields = CustomField::where('created_by', '=', Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
         }
         //
         //        $logo         = asset(Storage::url('uploads/logo/'));
@@ -1396,8 +1363,8 @@ class InvoiceController extends Controller
             $color = '#' . $settings['invoice_color'];
             $font_color = Utility::getFontColor($color);
 
-            \Log::info('iteam(item)');
-            \Log::info($items);
+            Log::info('iteam(item)');
+            Log::info($items);
 
             return view('invoice.templates.' . $settings['invoice_template'], compact('items', 'invoice', 'color', 'settings', 'customer', 'img', 'font_color', 'customFields'));
         } else {
@@ -1417,7 +1384,7 @@ class InvoiceController extends Controller
 
         if ($request->invoice_logo) {
             $dir = 'invoice_logo/';
-            $invoice_logo = \Auth::user()->id . '_invoice_logo.png';
+            $invoice_logo = Auth::user()->id . '_invoice_logo.png';
             $validation = [
                 'mimes:' . 'png',
                 'max:' . '20480',
@@ -1436,7 +1403,7 @@ class InvoiceController extends Controller
                 [
                     $data,
                     $key,
-                    \Auth::user()->creatorId(),
+                    Auth::user()->creatorId(),
                 ]
             );
         }
@@ -1460,12 +1427,12 @@ class InvoiceController extends Controller
         }
 
         $id = Crypt::decrypt($invoiceId);
-        \Log::info('INVOICE ID');
-        \Log::info($invoiceId);
+        Log::info('INVOICE ID');
+        Log::info($invoiceId);
         $invoice = Invoice::with(['creditNote', 'payments.bankAccount', 'items.product.unit'])->where('invoice_id', $id)->first();
 
-        \Log::info('INVOICE');
-        \Log::info($invoice);
+        Log::info('INVOICE');
+        Log::info($invoice);
 
         $settings = Utility::settingsById($invoice->created_by);
 
@@ -1508,8 +1475,8 @@ class InvoiceController extends Controller
                 'data' => $itemInfo
             ]);
         } catch (\Exception $e) {
-            \Log::info('Get Item Error');
-            \Log::info($e);
+            Log::info('Get Item Error');
+            Log::info($e);
             return response()->json([
                 'message' => 'error',
                 'error' => $e->getMessage()
@@ -1521,10 +1488,11 @@ class InvoiceController extends Controller
         $invoice = Invoice::findOrFail($id);
         Log::info('Invoice Id Being Sync with Stock IO:', ['invoice_id' => $id]);
         Log::info('Invoice Details:', ['invoice' => $invoice]);
-        $invoiceNo = $invoice->response_invoiceNo; // Assuming 'response_invoiceNo' is the correct column name
+        $invoiceNo = $invoice->response_invoiceNo;
 
-        Log::info('Invoice No Being Sync with Stock IO:', ['invoice_no' => $invoiceNo]);
-        $url = "https://etims.your-apps.biz/api/StockUpdateV2/ByInvoiceNo?InvoiceNo={$invoiceNo}";
+        $config = ConfigSettings::first();
+
+        $url = $config->api_url . 'StockUpdate/ByInvoiceNo?InvoiceNo=' . $invoiceNo;
 
         // Make the API request using Laravel's Http client
         $response = Http::withHeaders([
@@ -1565,7 +1533,7 @@ class InvoiceController extends Controller
     public function getSalesByTraderInvoiceNo(Request $request)
     {
         // Log the incoming request
-        \Log::info('Synchronization request received:', $request->all());
+        Log::info('Synchronization request received:', $request->all());
 
         // Validate the trader invoice number input
         $request->validate([
@@ -1576,15 +1544,17 @@ class InvoiceController extends Controller
 
         // Get the trader invoice number
         $traderInvoiceNo = $request->input('SalesByTraderInvoiceNo');
-        \Log::info('Trader Invoice No for synchronization request:', ['Trader Invoice' => $traderInvoiceNo]);
+        Log::info('Trader Invoice No for synchronization request:', ['Trader Invoice' => $traderInvoiceNo]);
 
         try {
-            // Make the API call
+
+            $config = ConfigSettings::first();
+
+            $url = $config->api_url . 'GetSalesByTraderInvoiceNo?traderInvoiceNo=' . $traderInvoiceNo;
+
             $response = Http::withOptions(['verify' => false])
-                ->withHeaders(['key' => '123456'])
-                ->get("https://etims.your-apps.biz/api/GetSalesByTraderInvoiceNo", [
-                    'traderInvoiceNo' => $traderInvoiceNo,
-                ]);
+                ->withHeaders(['key' => $config->api_key])
+                ->get($url);
 
             // Check if the response contains the required data
             $data = $response->json();
@@ -1592,7 +1562,7 @@ class InvoiceController extends Controller
                 return redirect()->back()->with('error', __('There is no search result.'));
             }
 
-            \Log::info('Remote Sales Data:', $data);
+            Log::info('Remote Sales Data:', $data);
 
             $invoiceData = [
                 'srNo' => $data['id'],
@@ -1606,7 +1576,7 @@ class InvoiceController extends Controller
                 'status' => $data['salesSttsCode'],
                 'shipping_display' => null,
                 'discount_apply' => null,
-                'created_by' => \Auth::user()->creatorId(),
+                'created_by' => Auth::user()->creatorId(),
                 'trderInvoiceNo' => $data['trderInvoiceNo'],
                 'invoiceNo' => $data['invoiceNo'],
                 'orgInvoiceNo' => $data['orgInvoiceNo'],
@@ -1670,7 +1640,7 @@ class InvoiceController extends Controller
                 'qrCodeURL' => $data['qrCodeURL'],
             ];
 
-            \Log::info('Invoice Data to Sync:', $invoiceData);
+            Log::info('Invoice Data to Sync:', $invoiceData);
 
             // Check if the invoice already exists and sync if not
             $exists = Invoice::where('trderInvoiceNo', $invoiceData['trderInvoiceNo'])->exists();
@@ -1681,7 +1651,7 @@ class InvoiceController extends Controller
                 return redirect()->back()->with('success', __('Sales record is up to date.'));
             }
         } catch (\Exception $e) {
-            \Log::error('Error syncing sales Trader Invoice No:', ['error' => $e->getMessage()]);
+            Log::error('Error syncing sales Trader Invoice No:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', __('Sales Trader Invoice No, Not Found !'));
         }
     }

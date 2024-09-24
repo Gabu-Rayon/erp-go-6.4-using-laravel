@@ -4,9 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\BranchUser;
 use App\Http\Controllers\Controller;
+use App\Models\ConfigSettings;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class BranchUserController extends Controller
 {
@@ -19,8 +24,8 @@ class BranchUserController extends Controller
             $branchUsers = BranchUser::all();
             return view('branchuser.index', compact('branchUsers'));
         } catch (\Exception $e) {
-            \Log::info('BRANCH USER INDEX ERROR RENDER');
-            \Log::info($e);
+            Log::info('BRANCH USER INDEX ERROR RENDER');
+            Log::info($e);
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
@@ -32,9 +37,9 @@ class BranchUserController extends Controller
     {
         try {
             return view('branchuser.create');
-        } catch (\Exception $e) {
-            \Log::info('BRANCH USER CREATE ERROR RENDER');
-            \Log::info($e);
+        } catch (Exception $e) {
+            Log::info('BRANCH USER CREATE ERROR RENDER');
+            Log::info($e);
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
@@ -44,57 +49,55 @@ class BranchUserController extends Controller
      */
     public function store(Request $request)
     {
-            $validator = \Validator::make(
-                $request->all(),
-                [
-                    'branchUserName' => 'required|max:120',
-                    'address' => 'required',
-                    'contactNo' => 'required',
-                    'remark' => 'required',
-                    'password' => 'required|min:6',
-                ]
-            );
-            if ($validator->fails()) {
-                $messages = $validator->getMessageBag();
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'branchUserName' => 'required|max:120',
+                'address' => 'required',
+                'contactNo' => 'required',
+                'remark' => 'required',
+                'password' => 'required|min:6',
+            ]
+        );
+        if ($validator->fails()) {
+            $messages = $validator->getMessageBag();
 
-                return redirect()->back()->with('error', $messages->first());
-            }
-            // $uuid = Str::uuid()->toString();
-            // $branchUserId = substr($uuid, 0, 20);
+            return redirect()->back()->with('error', $messages->first());
+        }
+        // $uuid = Str::uuid()->toString();
+        // $branchUserId = substr($uuid, 0, 20);
 
-            $branchUserId = mt_rand(100000, 999999);
-            $authenticationCode = mt_rand(1000, 9999);
+        $branchUserId = mt_rand(100000, 999999);
+        $authenticationCode = mt_rand(1000, 9999);
 
-            //array containing the data to be sent to the API
-            $requestData = [
-                'branchUserId' => $branchUserId,
-                'branchUserName' => $request->branchUserName,
-                'password' => Hash::make($request->password),
-                'address' => $request->address,
-                'contactNo' => $request->contactNo,
-                'authenticationCode' => $authenticationCode,
-                'remark' => $request->remark,
-                'isUsed' => true,
-            ];
+        //array containing the data to be sent to the API
+        $requestData = [
+            'branchUserId' => $branchUserId,
+            'branchUserName' => $request->branchUserName,
+            'password' => Hash::make($request->password),
+            'address' => $request->address,
+            'contactNo' => $request->contactNo,
+            'authenticationCode' => $authenticationCode,
+            'remark' => $request->remark,
+            'isUsed' => true,
+        ];
 
-            $response = Http::withOptions([
-                'verify' => false
-            ])->withHeaders([
-                'accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'key' => '123456',
-            ])->timeout(600)->post('https://etims.your-apps.biz/api/AddBranchUser', $requestData);
+        $config = ConfigSettings::first();
 
-            // Log the API response
-            \Log::info('API Request Data: ' . json_encode($requestData));
-            \Log::info('API Response: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
+        $url = $config->api_url . 'AddBranchUserV2';
 
-            if ($response['statusCode'] != 200) {
-                return redirect()->back()->with('error', __('Failed to create Branch User.'));
-            }
+        $response = Http::withOptions([
+            'verify' => false
+        ])->withHeaders([
+            'accept' => 'application/json',
+            'Content-Type' => 'application/json',
+            'key' => '123456',
+        ])->timeout(600)->post($url, $requestData);
 
+        Log::info('BRANCH USER RESPONSE');
+        Log::info($response);
 
+        if ($response['status']) {
             BranchUser::create([
                 'branchUserId' => $branchUserId,
                 'branchUserName' => $request->branchUserName,
@@ -104,16 +107,13 @@ class BranchUserController extends Controller
                 'authenticationCode' => $authenticationCode,
                 'remark' => $request->remark,
                 'isUsed' => true,
-                "created_by" => \Auth::user()->creatorId()
+                "created_by" => Auth::user()->creatorId(),
+                'isKRASync' => $response["responseData"]["isKRASync"],
             ]);
+            return redirect()->route('branchuser.index')->with('success', __('Branch User successfully created.'));
+        }
 
-            // Check if API call was successful
-            if ($response->successful()) {
-                return redirect()->route('branchuser.index')->with('success', __('Branch User successfully created.'));
-            } else {
-                // If API call failed, return with error message
-                return redirect()->back()->with('error', __('Failed to create Branch User.'));
-            }
+        return redirect()->back()->with('error', __('Failed to create Branch User.'));
     }
 
     /**
@@ -133,8 +133,8 @@ class BranchUserController extends Controller
             $branchUser = BranchUser::find($id);
             return view('branchuser.edit', compact('branchUser'));
         } catch (\Exception $e) {
-            \Log::info('BRANCH USER EDIT ERROR RENDER');
-            \Log::info($e);
+            Log::info('BRANCH USER EDIT ERROR RENDER');
+            Log::info($e);
             return redirect()->back()->with('error', $e->getMessage());
         }
     }

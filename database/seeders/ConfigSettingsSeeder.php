@@ -19,7 +19,7 @@ class ConfigSettingsSeeder extends Seeder
             'customer_mapping_by_tin' => 'off',
             'item_mapping_by_code' => 'off',
             'api_type' => 'VSCU',
-            'api_url' => 'vscu',
+            'api_url' => 'https://etims.your-apps.biz/api/',
             'api_key' => '123456'
         ]);
     }
