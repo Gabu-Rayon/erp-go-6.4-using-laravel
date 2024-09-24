@@ -423,6 +423,7 @@ class PurchaseController extends Controller
                 'items.*.pkgQuantity' => 'required|numeric',
                 'items.*.unitPrice' => 'required|numeric',
                 'items.*.discountRate' => 'required|numeric',
+                'items.*.taxTypeCode' => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -469,6 +470,7 @@ class PurchaseController extends Controller
                     'quantity' => $givenItem['quantity'],
                     'unitPrice' => $givenItem['unitPrice'],
                     'pkgQuantity' => $givenItem['pkgQuantity'],
+                    'taxTypeCode' => $givenItem['taxTypeCode'],
                     'discountRate' => $discountRate,
                     'discountAmt' => $discountAmt,
                     'itemExprDt' => $givenItem['itemExprDt'] ? date('Ymd', strtotime($givenItem['itemExprDt'])) : null,
@@ -492,11 +494,23 @@ class PurchaseController extends Controller
 
             Log::info('API RESPONSE');
             Log::info($response);
-            if ($response['statusCode'] == 200) {
+
+            $responseContent = $response->json(); // Get the full JSON response as an array
+
+            if ($responseContent['statusCode'] = 200) {
+                // Handle internal statusCode not 200
+                $apiErrors = $responseContent['message'];
+                if (isset($responseContent['data']['message'])) {
+                    $apiErrors .= ' - ' . $responseContent['data']['message'];
+                }
+                return redirect()->back()->with('error', $apiErrors);
+            } elseif ($responseContent['statusCode'] == 200 && strtolower($responseContent['message']) != 'failed') {
                 return redirect()->route('purchase.index')->with('success', __('Purchase successfully created.'));
             } else {
                 return redirect()->back()->with('error', __('Error creating purchase.'));
             }
+
+
         } catch (\Exception $e) {
             Log::error('STORE PURCHASE ERROR');
             Log::error($e);

@@ -118,6 +118,7 @@
                                     <th>{{ __('Due Date') }}</th>
                                     <th>{{ __('Due Amount') }}</th>
                                     <th>{{ __('Status') }}</th>
+                                    <th>{{ __('Stock IO') }}</th>
                                     <th>{{ __('Action') }}</th>
                                     {{-- <th>
                                 <td class="barcode">
@@ -164,6 +165,16 @@
                                                     class="status_badge badge bg-primary p-2 px-3 rounded">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
                                             @endif
                                         </td>
+                                        <td>
+                                            @if ($invoice->isKRASynchronized == 0 || $invoice->isStockIOUpdate == 0)
+                                                <span
+                                                    class="status_badge badge bg-danger p-2 px-3 rounded">Unsynchronized</span>
+                                            @elseif ($invoice->isKRASynchronized == 1 && $invoice->isStockIOUpdate == 1)
+                                                <span
+                                                    class="status_badge badge bg-primary p-2 px-3 rounded">Synchronized</span>
+                                            @endif
+                                        </td>
+
                                         <td class="Action">
                                             <span>
                                                 @php $invoiceID= Crypt::encrypt($invoice->id); @endphp

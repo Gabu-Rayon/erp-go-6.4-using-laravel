@@ -126,7 +126,7 @@
             <div class="form-group">
                 <?php echo e(Form::label('saftyQuantity', __('Safety Quantity'), ['class' => 'form-label'])); ?>
 
-                <?php echo e(Form::number('saftyQuantity', $productServiceinformation->sftyQty, ['class' => 'form-control', 'placeholder' => __('Enter Safty Quantity')])); ?>
+                <?php echo e(Form::number('sftyQty', $productServiceinformation->sftyQty, ['class' => 'form-control', 'placeholder' => __('Enter Safty Quantity')])); ?>
 
             </div>
         </div>

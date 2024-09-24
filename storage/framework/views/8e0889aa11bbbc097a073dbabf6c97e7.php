@@ -131,6 +131,7 @@
                                     <th><?php echo e(__('Due Date')); ?></th>
                                     <th><?php echo e(__('Due Amount')); ?></th>
                                     <th><?php echo e(__('Status')); ?></th>
+                                    <th><?php echo e(__('Stock IO')); ?></th>
                                     <th><?php echo e(__('Action')); ?></th>
                                     
                                 </tr>
@@ -174,6 +175,16 @@
                                                     class="status_badge badge bg-primary p-2 px-3 rounded"><?php echo e(__(\App\Models\Invoice::$statues[$invoice->status])); ?></span>
                                             <?php endif; ?>
                                         </td>
+                                        <td>
+                                            <?php if($invoice->isKRASynchronized == 0 || $invoice->isStockIOUpdate == 0): ?>
+                                                <span
+                                                    class="status_badge badge bg-danger p-2 px-3 rounded">Unsynchronized</span>
+                                            <?php elseif($invoice->isKRASynchronized == 1 && $invoice->isStockIOUpdate == 1): ?>
+                                                <span
+                                                    class="status_badge badge bg-primary p-2 px-3 rounded">Synchronized</span>
+                                            <?php endif; ?>
+                                        </td>
+
                                         <td class="Action">
                                             <span>
                                                 <?php $invoiceID= Crypt::encrypt($invoice->id); ?>

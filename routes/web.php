@@ -301,6 +301,8 @@ Route::post('customer/{id}/payment', [StripePaymentController::class, 'addpaymen
 
 Route::get('invoice/pdf/{id}', [InvoiceController::class, 'invoice'])->name('invoice.pdf')->middleware(['XSS', 'revalidate']);
 
+Route::post('invoice/syncWithStockIO/{id}', [InvoiceController::class, 'invoiceSyncWithStockIO'])->name('invoice.syncWithStockIO')->middleware(['XSS', 'revalidate']);
+
 Route::get('users/{id}/login-with-company', [UserController::class, 'LoginWithCompany'])->name('login.with.company')->middleware(['auth']);
 Route::get('login-with-company/exit', [UserController::class, 'ExitCompany'])->name('exit.company')->middleware(['auth']);
 
@@ -554,6 +556,7 @@ Route::group(['middleware' => ['verified']], function () {
 
             Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('invoice.get');
             Route::get('invoice/{id}/credit-note', [CreditNoteController::class, 'create'])->name('invoice.credit.note');
+            
             Route::post('invoice/{id}/credit-note', [CreditNoteController::class, 'store'])->name('invoice.credit.note');
             Route::get('invoice/{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'edit'])->name('invoice.edit.credit.note');
             Route::post('invoice/{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'update'])->name('invoice.edit.credit.note');

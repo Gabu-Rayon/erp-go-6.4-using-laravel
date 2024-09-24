@@ -32,7 +32,12 @@ class InvoiceProduct extends Model
 
     public function product()
     {
-        return $this->hasOne('App\Models\ProductService', 'id', 'product_id');
+        return $this->belongsTo('App\Models\ProductService', 'product_id', 'id');
+    }
+
+    public function invoice()
+    {
+        return $this->belongsTo('App\Models\Invoice', 'invoice_id', 'id');
     }
 
 

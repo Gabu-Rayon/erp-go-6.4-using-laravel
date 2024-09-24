@@ -722,17 +722,17 @@ class ProductServiceController extends Controller
                     'qtyUnitCd' => 'required',
                     'taxTyCd' => 'required',
                     'dftPrc' => 'required',
-                    'isrcAplcbYn' => 'required',
+                    'isrcAplcbYn' => 'nullable',
                     'bcd' => 'nullable',
-                    'btchNo' => 'required',
+                    'btchNo' => 'nullable',
                     'isUsed' => 'required',
-                    'grpPrcL1' => 'required',
-                    'grpPrcL2' => 'required',
-                    'grpPrcL3' => 'required',
-                    'grpPrcL4' => 'required',
-                    'grpPrcL5' => 'required',
-                    'packageQuantity' => 'required',
-                    'sftyQty' => 'required'
+                    'grpPrcL1' => 'nullable',
+                    'grpPrcL2' => 'nullable',
+                    'grpPrcL3' => 'nullable',
+                    'grpPrcL4' => 'nullable',
+                    'grpPrcL5' => 'nullable',
+                    'packageQuantity' => 'nullable',
+                    'sftyQty' => 'nullable'
                 ]
             );
             if ($validator->fails()) {
@@ -746,7 +746,7 @@ class ProductServiceController extends Controller
             \Log::info('Product Service INFO being edited and posted to the API:', $data);
 
             $reqData = [
-                "itemCode" => $data['itemCd'],
+                "itemCode" => 'AS2BZBX0005019',
                 "itemClassifiCode" => $data['itemClsCd'],
                 "itemTypeCode" => $data['itemTyCd'],
                 "itemName" => $data['itemNm'],
@@ -785,6 +785,8 @@ class ProductServiceController extends Controller
 
             if ($res['statusCode'] != 200) {
                 return redirect()->route('productservice.index')->with('error', 'Error updating Item Information.');
+            }elseif($res['statusCode'] == 500){
+                return redirect()->route('productservice.index')->with('error', 'Internal Server Error.An error occurred while sending the request.');
             }
 
             // Mapping array for taxTypeCode to tax_id

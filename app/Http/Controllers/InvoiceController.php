@@ -43,7 +43,7 @@ class InvoiceController extends Controller
             \Auth::user()->type == 'company'
             || \Auth::user()->type == 'accountant'
         ) {
-            $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('customerName', 'id');
             $customer->prepend('Select Customer', '');
             $status = Invoice::$statues;
             \Log::info('CREATOR ID');
@@ -440,7 +440,7 @@ class InvoiceController extends Controller
             'receipt_BtmMsg' => null,
             'receipt_PrchrAcptcYn' => null,
             'createdDate' => null,
-            'isKRASynchronized' =>  $apiResponseData['responseData']['isKRASync'],
+            'isKRASynchronized' => $apiResponseData['responseData']['isKRASync'],
             'kraSynchronizedDate' => $apiResponseData['responseData']['sdcDateTime'],
             'isStockIOUpdate' => $apiResponseData['responseData']['isStockIO'],
             'resultCd' => $apiResponseData['status'],
@@ -1516,7 +1516,49 @@ class InvoiceController extends Controller
             ]);
         }
     }
+    public function invoiceSyncWithStockIO(Request $request, $id)
+    {
+        $invoice = Invoice::findOrFail($id);
+        Log::info('Invoice Id Being Sync with Stock IO:', ['invoice_id' => $id]);
+        Log::info('Invoice Details:', ['invoice' => $invoice]);
+        $invoiceNo = $invoice->response_invoiceNo; // Assuming 'response_invoiceNo' is the correct column name
 
+        Log::info('Invoice No Being Sync with Stock IO:', ['invoice_no' => $invoiceNo]);
+        $url = "https://etims.your-apps.biz/api/StockUpdateV2/ByInvoiceNo?InvoiceNo={$invoiceNo}";
+
+        // Make the API request using Laravel's Http client
+        $response = Http::withHeaders([
+            'accept' => '*/*',
+            'key' => '123456'
+        ])->withOptions(['verify' => false])->post($url);
+
+        // Log the response of the API call
+        Log::info('API Response for Sync with Stock IO:', [
+            'response' => $response->json(),
+            'status_code' => $response->status(),
+            'body' => $response->body()
+        ]);
+
+        if ($response->successful()) {
+            $responseData = $response->json();
+
+            if ($responseData['status'] === true) {
+                // Update the invoice in the local database
+                $invoice->isKRASynchronized = true;
+                $invoice->isStockIOUpdate = true;
+                $invoice->save();
+
+                Log::info('Invoice synchronization successful:', ['invoice_id' => $id]);
+                return redirect()->back()->with('success', $responseData['message']);
+            } else {
+                Log::info('Invoice synchronization failed:', ['message' => $responseData['message']]);
+                return redirect()->back()->with('error', $responseData['message']);
+            }
+        } else {
+            Log::info('Failed to connect to the API:', ['status_code' => $response->status()]);
+            return redirect()->back()->with('error', 'Failed to connect to the API.');
+        }
+    }
 
 
 

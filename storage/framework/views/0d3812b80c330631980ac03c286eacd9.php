@@ -328,6 +328,15 @@
                     <a href="<?php echo e(route('invoice.resent', $invoice->id)); ?>"
                         class="btn btn-sm btn-primary me-2"><?php echo e(__('Resend Invoice')); ?></a>
                 </div>
+                
+              <?php if(!$invoice->isKRASynchronized || !$invoice->isStockIOUpdate): ?>
+                       <div class="all-button-box mr-2">
+                             <form action="<?php echo e(route('invoice.syncWithStockIO', $invoice->id)); ?>" method="POST" style="display:inline;">
+                                   <?php echo csrf_field(); ?>
+                          <button type="submit" class="btn btn-sm btn-dark me-2"><?php echo e(__('Sync With Stock IO')); ?></button>
+                     </form>
+                  </div>
+                 <?php endif; ?>
                 <div class="all-button-box">
                     <a href="<?php echo e(route('invoice.pdf', Crypt::encrypt($invoice->id))); ?>" target="_blank"
                         class="btn btn-sm btn-primary"><?php echo e(__('Download')); ?></a>
@@ -381,7 +390,7 @@
                                             <?php echo e(!empty($customer->billing_name) ? $customer->billing_name : ''); ?><br>
                                             <?php echo e(!empty($customer->billing_address) ? $customer->billing_address : ''); ?><br>
                                             <?php echo e(!empty($customer->billing_city) ? $customer->billing_city : '' . ', '); ?><br>
-                                            <?php echo e(!empty($customer->billing_state) ? $customer->billing_state : '', ', '); ?>,
+                                            <?php echo e(!empty($customer->billing_state) ? $customer->billing_state : ''. ', '); ?>,
                                             <?php echo e(!empty($customer->billing_zip) ? $customer->billing_zip : ''); ?><br>
                                             <?php echo e(!empty($customer->billing_country) ? $customer->billing_country : ''); ?><br>
                                             <?php echo e(!empty($customer->billing_phone) ? $customer->billing_phone : ''); ?><br>
