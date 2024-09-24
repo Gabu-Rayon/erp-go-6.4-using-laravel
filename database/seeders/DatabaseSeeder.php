@@ -35,5 +35,6 @@ class DatabaseSeeder extends Seeder
                 $this->call(CreditNoteReasonsSeeder::class);
                 $this->call(ItemTypeSeeder::class);
                 $this->call(StockReleaseTypesSeeder::class);
+                $this->call(ConfigSettingsSeeder::class);
         }
 }

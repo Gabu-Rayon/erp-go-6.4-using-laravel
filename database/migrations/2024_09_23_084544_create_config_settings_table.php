@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('item_mapping_by_code', ['on', 'off'])->default('off');
             $table->enum('api_type', ['OSCU', 'VSCU'])->default('OSCU');
             $table->string('api_url')->nullable();
+            $table->string('api_key')->nullable();
             $table->timestamps();
         });
     }
