@@ -1956,7 +1956,6 @@ Route::middleware(['auth', 'XSS', 'revalidate'])->group(function () {
     //stockmove.searchByDate
     Route::post('stockmove/searchbydate', [StockController::class, 'stockMoveSearchByDate'])->name('stockmove.searchByDate');
 
-
     // Routes for stock updates by invoice number
     Route::get('stockinfo', [StockController::class, 'stockUpdateByInvoiceNoIndex'])->name('stockinfo.index');
     Route::get('stockinfo/create', [StockController::class, 'stockUpdateByInvoiceNoCreate'])->name('stockinfo.create');
