@@ -7,6 +7,7 @@ use App\Models\ReleaseType;
 use App\Models\BranchesList;
 use Illuminate\Http\Request;
 use App\Models\StockMoveList;
+use App\Models\BranchTransfer;
 use App\Models\ConfigSettings;
 use App\Models\ProductService;
 use App\Models\StockAdjustment;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
+use App\Models\BranchTransferProduct;
 use Illuminate\Support\Facades\Validator;
 use App\Models\StockAdjustmentProductList;
 
@@ -203,10 +205,26 @@ class StockController extends Controller
      * Show the form for creating a new resource.
      * 
      */
+
+    public function stockTranfer()
+    {
+        try {
+            if (\Auth::user()->type == 'company') {
+                $stockMoveList = BranchesList::all();
+                return view('stockmove.index', compact('stockMoveList'));
+            } else {
+                return redirect()->back()->with('error', 'Permission Denied');
+            }
+        } catch (\Exception $e) {
+            \Log::info('errorrrrr');
+            \Log::info($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
     public function stockMoveCreate()
     {
         $branches = BranchesList::all()->pluck('bhfNm', 'bhfId');
-        $items = ProductService::all()->pluck('itemNm', 'itemCd');
+        $items = ProductService::all()->pluck('itemNm', 'kraItemCode');
         $releaseTypes = StockReleaseType::all()->pluck('type', 'id');
         return view('stockmove.create', compact('branches', 'items', 'releaseTypes'));
     }
@@ -216,16 +234,87 @@ class StockController extends Controller
      */
     public function stockMoveStore(Request $request)
     {
+        // Retrieve all the request data
+        $data = $request->all();
+
+        // Log the initial data received from the request
+        Log::info("STOCK MOVE DATA BEFORE POSTING:");
+        Log::info($data);
+
+        // Define the validation rules
+        $validator = \Validator::make(
+            $data,
+            [
+                'branchFrom' => 'required|string',
+                'branchTo' => 'required|string',
+                'occurredDate' => 'required|date',
+                'items' => 'required|array',
+                'items.*.itemCode' => 'required|string',
+                'items.*.quantity' => 'required|integer',
+                'items.*.pkgQuantity' => 'required|integer',
+            ]
+        );
+
+        // If validation fails, redirect back with error message
+        if ($validator->fails()) {
+            $messages = $validator->getMessageBag();
+            return redirect()->back()->with('error', $messages->first());
+        }
+
         try {
-            \Log::info('STOCK MOVE DEYTA');
+            // Log the validated data
+            \Log::info('STOCK MOVE DATA VALIDATED:');
             \Log::info($request->all());
 
-            return redirect()->to('stockinfo')->with('success', 'Stock Move Successful');
+            // Prepare the data for the API request
+            $apiData = [
+                'branchId' => $request->branchFrom,
+                'occurredDate' => $request->occurredDate,
+                'transferItems' => $request->items,
+            ];
+
+            // Retrieve the API key and URL from the config
+            $config = ConfigSettings::first();
+            $url = $config->api_url . 'BranchTransferV2';
+
+            // Make the API request
+            $response = Http::withHeaders([
+                'accept' => '*/*',
+                'key' => $config->api_key,
+                'Content-Type' => 'application/json',
+            ])->post($url, $apiData);
+
+            // Log the API response
+            \Log::info('API Request Data: ' . json_encode($apiData));
+            \Log::info('API Response: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+
+            if ($response->successful()) {
+                // Save the data to the local database only if the API call is successful
+                $branchTransfer = BranchTransfer::create([
+                    'from_branch' => $request->branchFrom,
+                    'to_branch' => $request->branchTo,
+                    'product_id' => null, // Product ID will be populated based on the transfer items
+                ]);
+
+                foreach ($request->items as $item) {
+                    BranchTransferProduct::create([
+                        'itemCode' => $item['itemCode'],
+                        'quantity' => $item['quantity'],
+                        'pkgQuantity' => $item['pkgQuantity'],
+                        'branch_transfer_id' => $branchTransfer->id,
+                    ]);
+                }
+
+                return redirect()->to('stockmove.index')->with('success', 'Stock Move Successful');
+            } else {
+                return redirect()->to('stockmove.index')->with('error', __('Failed to post data to API.'));
+            }
         } catch (\Exception $e) {
             \Log::info('STOCK MOVE ERROR');
             \Log::info($e);
 
-            return redirect()->to('stockinfo')->with('error', $e->getMessage());
+            return redirect()->to('stockmove.index')->with('error', $e->getMessage());
         }
     }
 

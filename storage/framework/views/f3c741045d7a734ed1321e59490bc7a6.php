@@ -1,15 +1,16 @@
-@extends('layouts.admin')
-@section('page-title')
-    {{ __('Move Stock') }}
-@endsection
-@section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
-    <li class="breadcrumb-item"><a href="{{ route('stockinfo.index') }}">{{ __('Stock Move List') }}</a></li>
-    <li class="breadcrumb-item">{{ __('Move Stock') }}</li>
-@endsection
-@push('script-page')
-    <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.repeater.min.js') }}"></script>
+
+<?php $__env->startSection('page-title'); ?>
+    <?php echo e(__('Move Stock')); ?>
+
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('breadcrumb'); ?>
+    <li class="breadcrumb-item"><a href="<?php echo e(route('dashboard')); ?>"><?php echo e(__('Dashboard')); ?></a></li>
+    <li class="breadcrumb-item"><a href="<?php echo e(route('stockinfo.index')); ?>"><?php echo e(__('Stock Move List')); ?></a></li>
+    <li class="breadcrumb-item"><?php echo e(__('Move Stock')); ?></li>
+<?php $__env->stopSection(); ?>
+<?php $__env->startPush('script-page'); ?>
+    <script src="<?php echo e(asset('js/jquery-ui.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('js/jquery.repeater.min.js')); ?>"></script>
     <script>
         var selector = "body";
         if ($(selector + " .repeater").length) {
@@ -325,39 +326,37 @@
             $(".discount").change();
         });
     </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="row">
-        {{ Form::open(['url' => 'stockmove', 'class' => 'w-100']) }}
+        <?php echo e(Form::open(['url' => 'stockmove', 'class' => 'w-100'])); ?>
+
         <div class="col-12">
-            <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
+            <input type="hidden" name="_token" id="token" value="<?php echo e(csrf_token()); ?>">
             <div class="card">
                 <div class="card-body">
                     <div class="row">
                         <div class="form-group col-md-4">
-                            {{ Form::label('branchId', __('Branch From(*)'), ['class' => 'form-label']) }}
-                            {{ Form::select('branchFrom', $branches, null, ['class' => 'form-control select2']) }}
+                            <?php echo e(Form::label('branchId', __('Branch (*)'), ['class' => 'form-label'])); ?>
+
+                            <?php echo e(Form::select('branchId', $branches, null, ['class' => 'form-control select2'])); ?>
+
                         </div>
                         <div class="form-group col-md-4">
-                            {{ Form::label('branchId', __('Branch To (*)'), ['class' => 'form-label']) }}
-                            {{ Form::select('branchTo', $branches, null, ['class' => 'form-control select2']) }}
+                            <?php echo e(Form::label('occurredDate', __('Occurred Date(*)'),['class'=>'form-label'])); ?>
+
+                            <?php echo e(Form::date('occurredDate', null, ['class' => 'form-control select2'])); ?>
+
                         </div>
-                        <div class="form-group col-md-4">
-                            {{ Form::label('occurredDate', __('Occurred Date(*)'),['class'=>'form-label']) }}
-                            {{ Form::date('occurredDate', null, ['class' => 'form-control select2']) }}
-                        </div>
-                        {{-- <div class="form-group col-md-4">
-                            {{ Form::label('releaseType', __('Stored / Release Type (*)'),['class'=>'form-label']) }}
-                            {{ Form::select('releaseType', $releaseTypes, null, ['class' => 'form-control select2']) }}
-                        </div> --}}
+                        
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="col-12">
-            <h5 class=" d-inline-block mb-4">{{ __('Product & Services') }}</h5>
+            <h5 class=" d-inline-block mb-4"><?php echo e(__('Product & Services')); ?></h5>
             <div class="card repeater">
                 <div class="item-section py-2">
                     <div class="row justify-content-between align-items-center">
@@ -365,7 +364,8 @@
                             <div class="all-button-box me-2">
                                 <a href="#" data-repeater-create="" class="btn btn-primary" data-bs-toggle="modal"
                                     data-target="#add-bank">
-                                    <i class="ti ti-plus"></i> {{ __('Add item') }}
+                                    <i class="ti ti-plus"></i> <?php echo e(__('Add item')); ?>
+
                                 </a>
                             </div>
                         </div>
@@ -379,16 +379,22 @@
                             <tbody class="ui-sortable" data-repeater-item data-clone>
                                 <tr>
                                     <td class="form-group col-md-4">
-                                        {{ Form::label('item', __('Item'), ['class' => 'form-label']) }}
-                                        {{ Form::select('itemCode', $items, null, ['class' => 'form-control select2']) }}
+                                        <?php echo e(Form::label('item', __('Item'), ['class' => 'form-label'])); ?>
+
+                                        <?php echo e(Form::select('itemCode', $items, null, ['class' => 'form-control select2'])); ?>
+
                                     </td>
                                     <td class="form-group col-md-4">
-                                        {{ Form::label('quantity', __('Quantity'),['class'=>'form-label']) }}
-                                        {{ Form::text('quantity', '', array('class' => 'form-control', 'required' => 'required')) }}
+                                        <?php echo e(Form::label('quantity', __('Quantity'),['class'=>'form-label'])); ?>
+
+                                        <?php echo e(Form::text('quantity', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+
                                     </td>
                                     <td class="form-group col-md-4">
-                                        {{ Form::label('pkgQuantity', __('PackageQuantity'),['class'=>'form-label']) }}
-                                        {{ Form::text('pkgQuantity', '', array('class' => 'form-control', 'required' => 'required')) }}
+                                        <?php echo e(Form::label('pkgQuantity', __('PackageQuantity'),['class'=>'form-label'])); ?>
+
+                                        <?php echo e(Form::text('pkgQuantity', '', array('class' => 'form-control', 'required' => 'required'))); ?>
+
                                     </td>
                                     <td class="ti ti-trash text-white repeater-action-btn bg-danger ms-2" data-repeater-delete></td>
                                 </tr>
@@ -400,10 +406,13 @@
         </div>
 
         <div class="modal-footer">
-            <input type="button" value="{{ __('Cancel') }}" onclick="location.href = '{{ route('purchase.index') }}';"
+            <input type="button" value="<?php echo e(__('Cancel')); ?>" onclick="location.href = '<?php echo e(route('purchase.index')); ?>';"
                 class="btn btn-light">
-            <input type="submit" value="{{ __('Create') }}" class="btn  btn-primary">
+            <input type="submit" value="<?php echo e(__('Create')); ?>" class="btn  btn-primary">
         </div>
-        {{ Form::close() }}
+        <?php echo e(Form::close()); ?>
+
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/stockmove/create.blade.php ENDPATH**/ ?>
