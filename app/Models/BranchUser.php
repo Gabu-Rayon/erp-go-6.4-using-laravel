@@ -21,6 +21,7 @@ class BranchUser extends Model
         "authenticationCode",
         "remark",
         "isUsed",
-        "created_by"
+        "created_by",
+        'isKRASync'
     ];
 }

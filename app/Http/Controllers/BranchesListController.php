@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BranchesList;
+use App\Models\ConfigSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -17,11 +18,12 @@ class BranchesListController extends Controller
     }
     public function getBranchesList()
     {
-        $url = 'https://etims.your-apps.biz/api/GetBranchList?date=20220409120000';
+        $config = ConfigSettings::first();
+        $url = $config->api_url . 'GetBranchListV2?date=20210101120000';
 
         try {
             $response = Http::withHeaders([
-                'key' => '123456'
+                'key' => $config->api_key,
             ])->get($url);
             $data = $response->json();
             $branchesList = $data['data']['data']['bhfList'];
