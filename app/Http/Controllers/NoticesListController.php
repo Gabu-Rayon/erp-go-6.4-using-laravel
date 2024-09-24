@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ConfigSettings;
 use Carbon\Carbon;
 use App\Models\Notice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class NoticesListController extends Controller
 {
@@ -14,18 +16,22 @@ class NoticesListController extends Controller
     {
         $notices = Notice::all();
         return view('noticelist.index', compact('notices'));
-    } 
-    
+    }
+
     public function getNoticeList()
     {
-        $url = 'https://etims.your-apps.biz/api/GetNoticeList?date=20210101120000';
+        $config = ConfigSettings::first();
+
+
+
+        $url = $config->api_url . 'GetNoticeListV2?date=20210101120000';
 
         try {
             $response = Http::withHeaders([
-                'key' => '123456'
+                $config->api_key
             ])->get($url);
             $data = $response->json();
-            $noticeList = $data['data']['data']['noticeList'];
+            $noticeList = $data['responseData']['noticeList'];
 
             if (isset($noticeList)) {
                 foreach ($noticeList as $notice) {
@@ -47,28 +53,32 @@ class NoticesListController extends Controller
         }
     }
 
-     //to show the  show blade page 
-    public function show(){
-        
-     }
-     
-    public function synchronize () {
+    //to show the  show blade page 
+    public function show() {}
+
+    public function synchronize()
+    {
         try {
 
-            $url = 'https://etims.your-apps.biz/api/GetNoticeList?date=20210101120000';
+            $config = ConfigSettings::first();
+
+            $url = $config->api_url . 'GetNoticeListV2?date=20210101120000';
 
             $response = Http::withOptions([
                 'verify' => false
             ])->withHeaders([
-                'key' => '123456'
+                'key' => $config->api_key
             ])->timeout(60)->get($url);
 
-            $data = $response->json()['data'];
+            $data = $response->json();
 
-            $remoteNotices = $data['data']['noticeList'];
+            Log::info('DEYTTA');
+            Log::info($data);
 
-            \Log::info('REMOTE NOTICES');
-            \Log::info($remoteNotices);
+            $remoteNotices = $data['responseData']['noticeList'];
+
+            Log::info('REMOTE NOTICES');
+            Log::info($remoteNotices);
 
             $noticesToSync = [];
 
@@ -84,27 +94,26 @@ class NoticesListController extends Controller
                 array_push($noticesToSync, $notice);
             }
 
-            \Log::info('NOTICES RECENT TO SYNC', $noticesToSync);
+            Log::info('NOTICES RECENT TO SYNC', $noticesToSync);
 
             $syncedNotices = 0;
 
             foreach ($noticesToSync as $noticeToSync) {
-                $exists = (boolean)Notice::where('noticeNo', $noticeToSync['noticeNo'])->exists();
+                $exists = (bool)Notice::where('noticeNo', $noticeToSync['noticeNo'])->exists();
                 if (!$exists) {
                     Notice::create($noticeToSync);
                     $syncedNotices++;
                 }
             }
-    
+
             if ($syncedNotices > 0) {
                 return redirect()->back()->with('success', __('Synced ' . $syncedNotices . ' Notices' . 'Successfully'));
             } else {
                 return redirect()->back()->with('success', __('Notices Up To Date'));
             }
-            
         } catch (\Exception $e) {
-            \Log::info('ERROR SYNCING NOTICE LIST');
-            \Log::info($e);
+            Log::info('ERROR SYNCING NOTICE LIST');
+            Log::info($e);
             return redirect()->back()->with('error', __('Error Syncing Code List'));
         }
     }
@@ -113,7 +122,7 @@ class NoticesListController extends Controller
     public function noticeListSearchByDate(Request $request)
     {
         // Log the request from the form
-        \Log::info('Synchronization request received From Searching the Notice List Search Form:', $request->all());
+        Log::info('Synchronization request received From Searching the Notice List Search Form:', $request->all());
 
         // Get the date passed from the search form
         $date = $request->input('searchByDate');
@@ -124,28 +133,24 @@ class NoticesListController extends Controller
         // Format the date using Carbon
         $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
 
-        \Log::info('Date Formatted for Synchronization request:', ['formattedDate' => $formattedDate]);
+        Log::info('Date Formatted for Synchronization request:', ['formattedDate' => $formattedDate]);
 
         try {
-            $url = 'https://etims.your-apps.biz/api/GetNoticeList?date=' . $formattedDate;
+            $config = ConfigSettings::first();
+
+            $url = $config->api_url . 'GetNoticeListV2?date=' . $formattedDate;
 
             $response = Http::withOptions(['verify' => false])
-                ->withHeaders(['key' => '123456'])
+                ->withHeaders([$config->api_key])
                 ->get($url);
 
-            $data = $response->json()['data'];
+            $data = $response->json();
 
-            \Log::error('noticeList  found in response', ['response' => $data]);
-            
+            Log::error('noticeList  found in response', ['response' => $data]);
 
-            // Check if 'data' and 'noticeList' keys exist in the response
-            if (!isset($data['data']) || !isset($data['data']['noticeList'])) {
-                \Log::error('Error: noticeList key not found in response', ['response' => $data]);
-                return redirect()->back()->with('error', __('There is no search result.'));
-            }
 
-            $remoteNoticeListinfo = $data['data']['noticeList'];
-            \Log::info('REMOTE Notice List INFO', ['remoteNoticeListinfo' => $remoteNoticeListinfo]);
+            $remoteNoticeListinfo = $data['responseData']['noticeList'];
+            Log::info('REMOTE Notice List INFO', ['remoteNoticeListinfo' => $remoteNoticeListinfo]);
 
             $remoteNoticeListinfoToSync = [];
             foreach ($remoteNoticeListinfo as $remoteNoticeList) {
@@ -160,7 +165,7 @@ class NoticesListController extends Controller
                 array_push($remoteNoticeListinfoToSync, $noticeList);
             }
 
-            \Log::info('REMOTE NOTICE LIST INFO TO SYNC:', ['remoteNoticeListinfoToSync' => $remoteNoticeListinfoToSync]);
+            Log::info('REMOTE NOTICE LIST INFO TO SYNC:', ['remoteNoticeListinfoToSync' => $remoteNoticeListinfoToSync]);
 
             $syncedLocalNoticeListinfo = 0;
             foreach ($remoteNoticeListinfoToSync as $remoteNoticeListInfo) {
@@ -177,10 +182,8 @@ class NoticesListController extends Controller
                 return redirect()->back()->with('success', __('Notice List/s Up To Date'));
             }
         } catch (\Exception $e) {
-            \Log::error('Error syncing Notice List:', ['error' => $e->getMessage()]);
+            Log::error('Error syncing Notice List:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', __('Error Syncing Notice List'));
         }
     }
-
-
 }
