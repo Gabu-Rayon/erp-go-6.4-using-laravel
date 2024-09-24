@@ -11,6 +11,7 @@ use App\Models\Utility;
 use App\Models\Purchase;
 use App\Models\warehouse;
 use App\Models\BankAccount;
+use App\Models\ConfigSettings;
 use App\Models\CustomField;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -23,16 +24,17 @@ use App\Models\ReceiptTypeCodes;
 use App\Models\WarehouseProduct;
 use App\Models\PurchaseTypeCodes;
 use App\Models\WarehouseTransfer;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\FacadesDB;
 use App\Models\PurchaseStatusCodes;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\ProductServiceCategory;
 use App\Models\MappedPurchaseItemList;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
-
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class PurchaseController extends Controller
 {
@@ -44,7 +46,7 @@ class PurchaseController extends Controller
     public function index(Request $request)
     {
         try {
-            if (\Auth::user()->type == 'company') {
+            if (Auth::user()->type == 'company') {
                 $vender = Vender::all()->pluck('name', 'id');
                 $vender->prepend('Select Vendor', '');
                 $status = Purchase::$statues;
@@ -54,9 +56,9 @@ class PurchaseController extends Controller
             } else {
                 return redirect()->back()->with('error', 'Permission Denied');
             }
-        } catch (\Exception $e) {
-            \Log::info('RENDER PURCHASE INDEX ERROR : ');
-            \Log::info($e);
+        } catch (Exception $e) {
+            Log::info('RENDER PURCHASE INDEX ERROR : ');
+            Log::info($e);
 
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -65,31 +67,29 @@ class PurchaseController extends Controller
     public function getPurchaseSalesItemsFromApi()
     {
         try {
-            if (\Auth::user()->type == 'company') {
+            if (Auth::user()->type == 'company') {
                 ini_set('max_execution_time', 300);
 
-                $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
+                $config = ConfigSettings::first();
+
+                $url = $config->api_url . 'GetPurchaseListV2?date=20210101120000';
 
                 $response = Http::withHeaders([
-                    'key' => '123456'
+                    'key' => $config->api_key
                 ])->timeout(300)->get($url);
 
-                if ($response->failed()) {
-                    throw new \Exception('Failed to fetch data from the API. Status: ' . $response->status());
-                }
+                Log::info('GET PURCHASE SALES RESPONSE');
+                Log::info($response);
 
                 $data = $response->json();
-                $purchaseSalesList = $data['data']['data']['saleList'];
+                $purchaseSalesList = $data['responseData']['saleList'];
 
-                \Log::info('API Request Data of Sales and Purchases: ' . json_encode($purchaseSalesList));
-                \Log::info('API Response: ' . $response->body());
-                \Log::info('API Response Status Code: ' . $response->status());
 
                 if (isset($purchaseSalesList)) {
                     foreach ($purchaseSalesList as $class) {
                         // Initialize $saleItemCode as null
                         $saleItemCode = $class['spplrInvcNo'] ?? null;
-                        \Log::info('API Request Data of Sales and Purchases All Invoices No: ' . json_encode($saleItemCode));
+                        Log::info('API Request Data of Sales and Purchases All Invoices No: ' . json_encode($saleItemCode));
 
                         if (!empty($saleItemCode)) {
                             // Fetch the purchase_id using the saleItemCode (spplrInvcNo)
@@ -103,7 +103,7 @@ class PurchaseController extends Controller
                                     $batches = array_chunk($itemlists, 100);
                                     foreach ($batches as $batch) {
                                         foreach ($batch as $item) {
-                                            \Log::info('Processing item with spplrInvcNo: ' . $saleItemCode . ' and item: ' . json_encode($item));
+                                            Log::info('Processing item with spplrInvcNo: ' . $saleItemCode . ' and item: ' . json_encode($item));
 
                                             // Initialize the tax code variable
                                             $taxCode = null;
@@ -164,7 +164,7 @@ class PurchaseController extends Controller
                                     }
                                 }
                             } else {
-                                \Log::warning('No matching Purchase found for spplrInvcNo: ' . $saleItemCode);
+                                Log::warning('No matching Purchase found for spplrInvcNo: ' . $saleItemCode);
                             }
                         }
                     }
@@ -174,9 +174,9 @@ class PurchaseController extends Controller
             } else {
                 return redirect()->route('purchase.index')->with('error', __('Permission Denied'));
             }
-        } catch (\Exception $e) {
-            \Log::error('Error adding Item Information from the API: ' . $e->getMessage());
-            \Log::info($e);
+        } catch (Exception $e) {
+            Log::error('Error adding Item Information from the API: ' . $e->getMessage());
+            Log::info($e);
             return redirect()->route('purchase.index')->with('error', __('Error adding Sales Items Lists Details from the API.'));
         }
     }
@@ -185,30 +185,27 @@ class PurchaseController extends Controller
     {
         try {
             ini_set('max_execution_time', 300);
-            $url = 'https://etims.your-apps.biz/api/GetPurchaseList?date=20220409120000';
+
+            $config = ConfigSettings::first();
+
+            $url = $config->api_url . 'GetPurchaseListV2?date=20210101120000';
 
             $response = Http::withHeaders([
-                'key' => '123456'
+                'key' => $config->api_key
             ])->timeout(300)->get($url);
 
-            $data = $response->json()['data'];
-            $purchaseSalesSuppliers = $data['data']['saleList'];
+            Log::info('GET PURCHASE SALES SUPPLIERS RESPONSE');
+            Log::info($response);
 
-            // Log API request and response details
-            \Log::info('API Request Data of Suppliers of Sales and Purchases: ' . json_encode($data));
-            \Log::info('API Request Data of Suppliers of Sales and Purchases: ' . json_encode($purchaseSalesSuppliers));
-            \Log::info('API Response: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
+            $data = $response->json();
+            $purchaseSalesSuppliers = $data['responseData']['saleList'];
 
-
-            // Initialize purchase_id counter
             $purchaseId = 1;
-            // Divide the data into batches of 100 items each
+
             $batches = array_chunk($purchaseSalesSuppliers, 100);
 
             foreach ($batches as $batch) {
                 foreach ($batch as $item) {
-                    // Process each batch
                     Purchase::create([
                         'purchase_id' => $purchaseId++,
                         'vender_id' => null,
@@ -217,7 +214,7 @@ class PurchaseController extends Controller
                         'purchase_number' => null,
                         'discount_apply' => null,
                         'category_id' => null,
-                        'created_by' => \Auth::user()->creatorId(),
+                        'created_by' => Auth::user()->creatorId(),
                         'spplrTin' => $item['spplrTin'],
                         'spplrNm' => $item['spplrNm'],
                         'spplrBhfId' => $item['spplrBhfId'],
@@ -254,9 +251,9 @@ class PurchaseController extends Controller
             }
 
             return redirect()->route('purchase.index')->with('success', __('Sales Lists Suppliers Details successfully created From Api.'));
-        } catch (\Exception $e) {
-            \Log::error('Error adding Sales Lists Suppliers Details  from the API: ');
-            \Log::info($e);
+        } catch (Exception $e) {
+            Log::error('Error adding Sales Lists Suppliers Details  from the API: ');
+            Log::info($e);
             return redirect()->route('purchase.index')->with('error', __('Error adding Sales Lists Suppliers Details  from the API.'));
         }
     }
@@ -273,14 +270,19 @@ class PurchaseController extends Controller
 
             $date = $request->input('getpurchaseByDate');
             $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
+
+            $config = ConfigSettings::first();
+
+            $url = $config->api_url . 'GetPurchaseListV2?date=' . $formattedDate;
+
             $response = Http::withOptions(['verify' => false])
-                ->withHeaders(['key' => '123456'])
-                ->get("https://etims.your-apps.biz/api/GetPurchaseList?date={$formattedDate}");
+                ->withHeaders(['key' => $config->api_key])
+                ->get($url);
 
             Log::info('API RESPONSE');
             Log::info($response);
-        } catch (\Exception $e) {
-            \Log::error('Error syncing purchases:', ['error' => $e->getMessage()]);
+        } catch (Exception $e) {
+            Log::error('Error syncing purchases:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', __('Error syncing purchases.'));
         }
     }
@@ -314,7 +316,7 @@ class PurchaseController extends Controller
                     }
                 }
 
-                \Log::info("Synced $syncedPurchaseItemCount item lists for purchase ID {$newPurchase->id}");
+                Log::info("Synced $syncedPurchaseItemCount item lists for purchase ID {$newPurchase->id}");
             }
         }
 
@@ -329,10 +331,10 @@ class PurchaseController extends Controller
     // public function index(Request $request)
     // {
 
-    //     $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+    //     $vender = Vender::where('created_by', '=', Auth::user()->creatorId())->get()->pluck('name', 'id');
     //     $vender->prepend('Select Vendor', '');
     //     $status = Purchase::$statues;
-    //     $purchases = Purchase::where('created_by', '=', \Auth::user()->creatorId())->with(['vender','category'])->get();
+    //     $purchases = Purchase::where('created_by', '=', Auth::user()->creatorId())->with(['vender','category'])->get();
 
 
     //     return view('purchase.index', compact('purchases', 'status','vender'));
@@ -348,23 +350,23 @@ class PurchaseController extends Controller
     public function create($vendorId)
     {
         try {
-            $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
-            $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
+            $customFields = CustomField::where('created_by', '=', Auth::user()->creatorId())->where('module', '=', 'purchase')->get();
+            $category = ProductServiceCategory::where('created_by', Auth::user()->creatorId())->where('type', 'expense')->get()->pluck('name', 'id');
             $category->prepend('Select Category', '');
 
-            $purchase_number = \Auth::user()->purchaseNumberFormat($this->purchaseNumber());
+            $purchase_number = Auth::user()->purchaseNumberFormat($this->purchaseNumber());
             $venders = Vender::all()->pluck('name', 'spplrTin');
             $venders->prepend('Select Vender', '');
 
-            \Log::info('Venders:');
-            \Log::info($venders);
+            Log::info('Venders:');
+            Log::info($venders);
 
-            $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $warehouse = warehouse::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
             $warehouse->prepend('Select Warehouse', '');
 
-            // $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->where('type','!=', 'service')->get()->pluck('name', 'id');
+            // $product_services = ProductService::where('created_by', Auth::user()->creatorId())->where('type','!=', 'service')->get()->pluck('name', 'id');
             // $product_services->prepend('--', '');
-            $items = ProductService::where('created_by', \Auth::user()->creatorId())->pluck('itemNm', 'itemCd');
+            $items = ProductService::where('created_by', Auth::user()->creatorId())->pluck('itemNm', 'itemCd');
             $items->prepend('Select Item', '');
             Log::info('Items');
             Log::info($items);
@@ -394,7 +396,7 @@ class PurchaseController extends Controller
                 'countries',
                 'taxes'
             ));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('CREATE PURCHASE ERROR');
             Log::error($e);
             return redirect()->back()->with('error', __('Error creating purchase.'));
@@ -411,7 +413,7 @@ class PurchaseController extends Controller
 
             $data = $request->all();
 
-            $validator = \Validator::make($data, [
+            $validator = Validator::make($data, [
                 'purchTypeCode' => 'required|string|min:1|max:1',
                 'purchStatusCode' => 'required|string|min:2|max:2',
                 'pmtTypeCode' => 'required|string|min:2|max:2',
@@ -434,13 +436,13 @@ class PurchaseController extends Controller
 
             $apiData = [];
             $items = [];
-            \Log::info('Purchase FoRM Data being Posted  : ');
-            \Log::info($data);
+            Log::info('Purchase FoRM Data being Posted  : ');
+            Log::info($data);
 
             if ($data['supplierTin']) {
                 $supplier = Vender::where('spplrTin', $data['supplierTin'])->first();
-                \Log::info('Supplier Info  : ');
-                \Log::info($supplier);
+                Log::info('Supplier Info  : ');
+                Log::info($supplier);
 
                 $apiData['supplierTin'] = $data['supplierTin'];
                 $apiData['supplierBhfId'] = $supplier->spplrBhfId;
@@ -482,14 +484,15 @@ class PurchaseController extends Controller
 
             $apiData['itemsDataList'] = $items;
 
-            \Log::info('Api Data Info Being Posted : ');
-            \Log::info($apiData);
+            Log::info('Api Data Info Being Posted : ');
+            Log::info($apiData);
 
+            $config = ConfigSettings::first();
 
-            $url = 'https://etims.your-apps.biz/api/AddPurchase';
+            $url = $config->api_url . 'AddPurchaseV2';
 
             $response = Http::withHeaders([
-                'key' => '123456'
+                'key' => $config->api_key
             ])->withOptions(['verify' => false])->post($url, $apiData);
 
             Log::info('API RESPONSE');
@@ -509,9 +512,7 @@ class PurchaseController extends Controller
             } else {
                 return redirect()->back()->with('error', __('Error creating purchase.'));
             }
-
-
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('STORE PURCHASE ERROR');
             Log::error($e);
             return redirect()->back()->with('error', __('Something went wrong'));
@@ -536,17 +537,17 @@ class PurchaseController extends Controller
     public function show($ids)
     {
 
-        if (\Auth::user()->type == 'company') {
+        if (Auth::user()->type == 'company') {
             try {
-                \Log::info('The Ecrypt when user click  show kids :');
+                Log::info('The Ecrypt when user click  show kids :');
 
-                \Log::info($ids);
+                Log::info($ids);
 
                 $id = Crypt::decrypt($ids);
             } catch (\Throwable $e) {
-                \Log::info('Exception Error if the Purchase is not Found :');
+                Log::info('Exception Error if the Purchase is not Found :');
 
-                \Log::info($e);
+                Log::info($e);
 
                 return redirect()->back()->with('error', __('Purchase Not Found.'));
             }
@@ -555,29 +556,29 @@ class PurchaseController extends Controller
 
             $purchase = Purchase::find($id);
 
-            \Log::info('PURCHASE Fetched  to show in the View Blade: ');
+            Log::info('PURCHASE Fetched  to show in the View Blade: ');
 
-            \Log::info($purchase);
+            Log::info($purchase);
 
-            if ($purchase->created_by == \Auth::user()->creatorId()) {
+            if ($purchase->created_by == Auth::user()->creatorId()) {
 
                 $purchasePayment = PurchasePayment::where('purchase_id', $purchase->id)->first();
 
                 $vendor = $purchase->vender;
 
-                \Log::info('Vender For this Purchase  Fetched  to show in the View Blade : ');
+                Log::info('Vender For this Purchase  Fetched  to show in the View Blade : ');
 
-                \Log::info($vendor);
+                Log::info($vendor);
 
-                \Log::info('Purchase Id Fetched  to show in the View Blade : ');
+                Log::info('Purchase Id Fetched  to show in the View Blade : ');
 
-                \Log::info($purchase->id);
+                Log::info($purchase->id);
 
                 $iteams = PurchaseProduct::where('purchase_id', $purchase->id)->get();
 
-                \Log::info('Iteams For the Purchase  Fetched  to show in the View Blade : ');
+                Log::info('Iteams For the Purchase  Fetched  to show in the View Blade : ');
 
-                \Log::info($iteams);
+                Log::info($iteams);
 
                 return view('purchase.view', compact('purchase', 'vendor', 'iteams', 'purchasePayment'));
             } else {
@@ -590,7 +591,7 @@ class PurchaseController extends Controller
 
     public function details($spplrInvcNo)
     {
-        if (\Auth::user()->type == 'company') {
+        if (Auth::user()->type == 'company') {
             try {
                 $purchase = Purchase::where('spplrInvcNo', $spplrInvcNo)->first();
                 if ($purchase) {
@@ -602,8 +603,8 @@ class PurchaseController extends Controller
                 } else {
                     return view('errors.not_found'); // Create a custom error view
                 }
-            } catch (\Exception $e) {
-                \Log::error($e);
+            } catch (Exception $e) {
+                Log::error($e);
                 return redirect()->back()->with('error', __('Something went wrong.'));
             }
         } else {
@@ -615,13 +616,13 @@ class PurchaseController extends Controller
 
     public function edit($id)
     {
-        if (\Auth::user()->type == 'company') {
-            \Log::info('EDIT ID');
-            \Log::info($id);
+        if (Auth::user()->type == 'company') {
+            Log::info('EDIT ID');
+            Log::info($id);
             $purchase = PurchaseProduct::find($id);
             $purchase_number = $id;
-            \Log::info('EDIT ITEM');
-            \Log::info($purchase);
+            Log::info('EDIT ITEM');
+            Log::info($purchase);
             $category = ProductServiceCategory::all()->pluck('name', 'id');
             $warehouse = warehouse::all()->pluck('name', 'id');
             $purchase_number = $purchase->id;
@@ -636,16 +637,16 @@ class PurchaseController extends Controller
     public function update(Request $request, PurchaseProduct $purchase)
     {
         try {
-            if (\Auth::user()->type == 'company') {
-                \Log::info('Permitted');
-                \Log::info('Request: ');
-                \Log::info($request->all());
-                \Log::info('Purchase: ');
-                \Log::info($purchase);
+            if (Auth::user()->type == 'company') {
+                Log::info('Permitted');
+                Log::info('Request: ');
+                Log::info($request->all());
+                Log::info('Purchase: ');
+                Log::info($purchase);
             }
-        } catch (\Exception $e) {
-            \Log::error('Update Purchase Error');
-            \Log::error($e);
+        } catch (Exception $e) {
+            Log::error('Update Purchase Error');
+            Log::error($e);
             return redirect()->back()->with('error', __('Something went wrong.'));
         }
     }
@@ -658,8 +659,8 @@ class PurchaseController extends Controller
      */
     public function destroy(Purchase $purchase)
     {
-        if (\Auth::user()->type == 'company') {
-            if ($purchase->created_by == \Auth::user()->creatorId()) {
+        if (Auth::user()->type == 'company') {
+            if ($purchase->created_by == Auth::user()->creatorId()) {
                 $purchase_products = PurchaseProduct::where('purchase_id', $purchase->id)->get();
 
                 $purchasepayments = $purchase->payments;
@@ -714,7 +715,7 @@ class PurchaseController extends Controller
 
     function purchaseNumber()
     {
-        $latest = Purchase::where('created_by', '=', \Auth::user()->creatorId())->latest()->first();
+        $latest = Purchase::where('created_by', '=', Auth::user()->creatorId())->latest()->first();
         if (!$latest) {
             return 1;
         }
@@ -723,7 +724,7 @@ class PurchaseController extends Controller
     }
     public function sent($id)
     {
-        if (\Auth::user()->type == 'company') {
+        if (Auth::user()->type == 'company') {
             $purchase = Purchase::where('id', $id)->first();
             $purchase->send_date = date('Y-m-d');
             $purchase->status = 1;
@@ -732,7 +733,7 @@ class PurchaseController extends Controller
             $vender = Vender::where('id', $purchase->vender_id)->first();
 
             $purchase->name = !empty($vender) ? $vender->name : '';
-            $purchase->purchase = \Auth::user()->purchaseNumberFormat($purchase->purchase_id);
+            $purchase->purchase = Auth::user()->purchaseNumberFormat($purchase->purchase_id);
 
             $purchaseId = Crypt::encrypt($purchase->id);
             $purchase->url = route('purchase.pdf', $purchaseId);
@@ -755,13 +756,13 @@ class PurchaseController extends Controller
     public function resent($id)
     {
 
-        if (\Auth::user()->type == 'company') {
+        if (Auth::user()->type == 'company') {
             $purchase = Purchase::where('id', $id)->first();
 
             $vender = Vender::where('id', $purchase->vender_id)->first();
 
             $purchase->name = !empty($vender) ? $vender->name : '';
-            $purchase->purchase = \Auth::user()->purchaseNumberFormat($purchase->purchase_id);
+            $purchase->purchase = Auth::user()->purchaseNumberFormat($purchase->purchase_id);
 
             $purchaseId = Crypt::encrypt($purchase->id);
             $purchase->url = route('purchase.pdf', $purchaseId);
@@ -775,7 +776,7 @@ class PurchaseController extends Controller
             //            $bill = Bill::where('id', $id)->first();
             //            $vender = Vender::where('id', $bill->vender_id)->first();
             //            $bill->name = !empty($vender) ? $vender->name : '';
-            //            $bill->bill = \Auth::user()->billNumberFormat($bill->bill_id);
+            //            $bill->bill = Auth::user()->billNumberFormat($bill->bill_id);
             //            $billId    = Crypt::encrypt($bill->id);
             //            $bill->url = route('bill.pdf', $billId);
             //            $billResendArr = [
@@ -795,7 +796,7 @@ class PurchaseController extends Controller
 
             /*******
 
-            if (\Auth::user()->can('send purchase')) {
+            if (Auth::user()->can('send purchase')) {
                 $purchase = Purchase::where('id', $id)->first();
 
                 if (!$purchase) {
@@ -817,7 +818,7 @@ class PurchaseController extends Controller
                 $purchaseId = $purchasePayment ? $purchasePayment->purchase_id : null;
 
                 // Format the purchase number
-                $purchase->purchase = \Auth::user()->purchaseNumberFormat($purchaseId);
+                $purchase->purchase = Auth::user()->purchaseNumberFormat($purchaseId);
 
 
 
@@ -883,8 +884,8 @@ class PurchaseController extends Controller
         $items = [];
 
         foreach ($purchase->items as $product) {
-            \Log::info('ITEMUUU');
-            \Log::info(json_encode($product));
+            Log::info('ITEMUUU');
+            Log::info(json_encode($product));
             $item = new \stdClass();
             $item->name = !empty($product) ? $product->itemNm : '';
             $item->quantity = $product->quantity;
@@ -936,7 +937,7 @@ class PurchaseController extends Controller
 
     public function previewPurchase($template, $color)
     {
-        $objUser = \Auth::user();
+        $objUser = Auth::user();
         $settings = Utility::settings();
         $purchase = new Purchase();
 
@@ -1036,7 +1037,7 @@ class PurchaseController extends Controller
 
         if ($request->purchase_logo) {
             $dir = 'purchase_logo/';
-            $purchase_logo = \Auth::user()->id . '_purchase_logo.png';
+            $purchase_logo = Auth::user()->id . '_purchase_logo.png';
             $validation = [
                 'mimes:' . 'png',
                 'max:' . '20480',
@@ -1050,12 +1051,12 @@ class PurchaseController extends Controller
 
 
         foreach ($post as $key => $data) {
-            \DB::insert(
+            DB::insert(
                 'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
                 [
                     $data,
                     $key,
-                    \Auth::user()->creatorId(),
+                    Auth::user()->creatorId(),
                 ]
             );
         }
@@ -1099,12 +1100,12 @@ class PurchaseController extends Controller
     //Show the create Payment Form 
     public function payment($purchase_id)
     {
-        if (\Auth::user()->type == 'company') {
+        if (Auth::user()->type == 'company') {
             $purchase = Purchase::where('id', $purchase_id)->first();
-            $venders = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $venders = Vender::where('created_by', '=', Auth::user()->creatorId())->get()->pluck('name', 'id');
 
-            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $accounts = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $categories = ProductServiceCategory::where('created_by', '=', Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $accounts = BankAccount::select('*', DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
 
             return view('purchase.payment', compact('venders', 'categories', 'accounts', 'purchase'));
         } else {
@@ -1116,8 +1117,8 @@ class PurchaseController extends Controller
 
     public function createPayment(Request $request, $purchase_id)
     {
-        if (\Auth::user()->type == 'company') {
-            $validator = \Validator::make(
+        if (Auth::user()->type == 'company') {
+            $validator = Validator::make(
                 $request->all(),
                 [
                     'date' => 'required',
@@ -1166,7 +1167,7 @@ class PurchaseController extends Controller
             $purchasePayment->user_id = $purchase->vender_id;
             $purchasePayment->user_type = 'Vender';
             $purchasePayment->type = 'Partial';
-            $purchasePayment->created_by = \Auth::user()->id;
+            $purchasePayment->created_by = Auth::user()->id;
             $purchasePayment->payment_id = $purchasePayment->id;
             $purchasePayment->category = 'Bill';
             $purchasePayment->account = $request->account_id;
@@ -1177,9 +1178,9 @@ class PurchaseController extends Controller
             $payment = new PurchasePayment();
             $payment->name = $vender['name'];
             $payment->method = '-';
-            $payment->date = \Auth::user()->dateFormat($request->date);
-            $payment->amount = \Auth::user()->priceFormat($request->amount);
-            $payment->bill = 'bill ' . \Auth::user()->purchaseNumberFormat($purchasePayment->purchase_id);
+            $payment->date = Auth::user()->dateFormat($request->date);
+            $payment->amount = Auth::user()->priceFormat($request->amount);
+            $payment->bill = 'bill ' . Auth::user()->purchaseNumberFormat($purchasePayment->purchase_id);
 
             Utility::userBalance('vendor', $purchase->vender_id, $request->amount, 'debit');
 
@@ -1215,7 +1216,7 @@ class PurchaseController extends Controller
     public function paymentDestroy(Request $request, $purchase_id, $payment_id)
     {
 
-        if (\Auth::user()->type == 'company') {
+        if (Auth::user()->type == 'company') {
             $payment = PurchasePayment::find($payment_id);
             PurchasePayment::where('id', '=', $payment_id)->delete();
 
@@ -1267,12 +1268,12 @@ class PurchaseController extends Controller
     public function productDestroy(Request $request)
     {
 
-        if (\Auth::user()->type == 'company') {
+        if (Auth::user()->type == 'company') {
 
             $res = PurchaseProduct::where('id', '=', $request->id)->first();
             //            $res1 = PurchaseProduct::where('purchase_id', '=', $res->purchase_id)->where('product_id', '=', $res->product_id)->get();
 
-            $purchase = Purchase::where('created_by', '=', \Auth::user()->creatorId())->first();
+            $purchase = Purchase::where('created_by', '=', Auth::user()->creatorId())->first();
             $warehouse_id = $purchase->warehouse_id;
 
             $ware_pro = WarehouseProduct::where('warehouse_id', $warehouse_id)->where('product_id', $res->product_id)->first();
@@ -1317,9 +1318,9 @@ class PurchaseController extends Controller
                 'message' => 'success',
                 'data' => $itemInfo
             ]);
-        } catch (\Exception $e) {
-            \Log::info('Get Item Error');
-            \Log::info($e);
+        } catch (Exception $e) {
+            Log::info('Get Item Error');
+            Log::info($e);
             return response()->json([
                 'message' => 'error',
                 'error' => $e->getMessage()
@@ -1332,9 +1333,9 @@ class PurchaseController extends Controller
     {
         try {
             // Log received request data
-            \Log::info('Received request data From Mapping Purchases:', $request->all());
+            Log::info('Received request data From Mapping Purchases:', $request->all());
 
-            if (\Auth::user()->type == 'company') {
+            if (Auth::user()->type == 'company') {
                 $rules = [
                     'supplierInvcNo' => 'nullable|string',
                     'purchaseTypeCode' => 'nullable|string',
@@ -1345,7 +1346,7 @@ class PurchaseController extends Controller
                 ];
 
                 // Validate request data
-                $validator = \Validator::make($request->all(), $rules);
+                $validator = Validator::make($request->all(), $rules);
 
                 if ($validator->fails()) {
                     $messages = $validator->getMessageBag();
@@ -1370,22 +1371,23 @@ class PurchaseController extends Controller
                 ];
 
                 // Log request data
-                \Log::info('API Request Mapping Purchase Data Posted:', $requestData);
+                Log::info('API Request Mapping Purchase Data Posted:', $requestData);
 
-                // Send request to API endpoint
-                // $response = Http::post('https://etims.your-apps.biz/api/MapPurchase', $requestData);
+                $config = ConfigSettings::first();
+
+                $url = $config->api_url . 'MapPurchase';
 
                 $response = Http::withHeaders([
                     'accept' => 'application/json',
-                    'key' => '123456',
+                    'key' => $config->api_key,
                     'Content-Type' => 'application/json',
-                ])->post('https://etims.your-apps.biz/api/MapPurchase', $requestData);
+                ])->post($url, $requestData);
 
 
 
                 // Log response data
-                \Log::info('API Response Status Code For Posting Mapping Purchase Data: ' . $response->status());
-                \Log::info('API Response Body For Posting Mapping Purchase Data: ' . $response->body());
+                Log::info('API Response Status Code For Posting Mapping Purchase Data: ' . $response->status());
+                Log::info('API Response Body For Posting Mapping Purchase Data: ' . $response->body());
 
                 // Check if the request was successful
                 if ($response->successful()) {
@@ -1397,18 +1399,20 @@ class PurchaseController extends Controller
                     Purchase::where('supplierInvcNo', $request->input('supplierInvcNo'))
                         ->update(['isDBImport' => true]);
 
-                    $endpoint = 'https://etims.your-apps.biz/api/MapPurchase/UpdateMapPurchaseStatus';
+                    $config = ConfigSettings::first();
+
+                    $url = $config->api_url . 'MapPurchase/UpdateMapPurchaseStatus';
 
                     $secondResponse = Http::withHeaders([
                         'accept' => 'application/json',
-                        'key' => '123456',
+                        'key' => $config->api_key,
                         'Content-Type' => 'application/json',
-                    ])->post($endpoint, [
+                    ])->post($url, [
                         'invoiceNo' => $request->input('supplierInvcNo'),
                         'isUpdate' => true
                     ]);
 
-                    \Log::info('Api Response For Updating the Map Purchase Status: ' . $secondResponse);
+                    Log::info('Api Response For Updating the Map Purchase Status: ' . $secondResponse);
 
                     return redirect()->back()->with('success', 'Purchase Mapped Successfully And Updated purchase Status Also ');
                 } else {
@@ -1417,8 +1421,8 @@ class PurchaseController extends Controller
             } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
-        } catch (\Exception $e) {
-            \Log::info($e);
+        } catch (Exception $e) {
+            Log::info($e);
 
             return redirect()->back()->with('error', 'Something Went Wrong.');
         }
@@ -1436,9 +1440,9 @@ class PurchaseController extends Controller
 
             // Pass both $mappedPurchases and $filteredPurchases to the view
             return view('purchase.mapPurchases', compact('mappedPurchases', 'filteredPurchases'));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Log the error for debugging purposes
-            \Log::error('Error retrieving mapped purchases: ' . $e->getMessage());
+            Log::error('Error retrieving mapped purchases: ' . $e->getMessage());
             // Return an error view or redirect with an error message
             return back()->withError('Failed to retrieve mapped purchases. Please try again later.');
         }
@@ -1447,23 +1451,23 @@ class PurchaseController extends Controller
 
     public function MapPurchasesDetails($id)
     {
-        if (\Auth::user()->type == 'company') {
+        if (Auth::user()->type == 'company') {
             try {
                 $mappedpurchase = mappedPurchases::where('id', $id)->first();
                 if ($mappedpurchase) {
                     // Fetch related purchase Lists items
                     $mappedpurchaseItemsList = MappedPurchaseItemList::where('mapped_purchase_id', $id)->get();
 
-                    \Log::info('mapped Purchases: ' . $mappedpurchase);
+                    Log::info('mapped Purchases: ' . $mappedpurchase);
 
-                    \Log::info(' Mapped Purchase Item List: ' . $mappedpurchaseItemsList);
+                    Log::info(' Mapped Purchase Item List: ' . $mappedpurchaseItemsList);
 
                     return view('purchase.mappedPurchasesDetails', compact('mappedpurchase', 'mappedpurchaseItemsList'));
                 } else {
                     return view('errors.not_found');
                 }
-            } catch (\Exception $e) {
-                \Log::error($e);
+            } catch (Exception $e) {
+                Log::error($e);
                 return redirect()->back()->with('error', __('Something went wrong.'));
             }
         } else {
@@ -1475,18 +1479,22 @@ class PurchaseController extends Controller
 
     public function getMapPurchaseSearchByDate()
     {
-        $url = 'https://etims.your-apps.biz/api/MapPurchase/SearchByDate?date=19990101';
+
+        $config = ConfigSettings::first();
+
+
+        $url = $config->api_url . 'MapPurchase/SearchByDate?date=19990101';
 
         try {
             $response = Http::withHeaders([
-                'key' => '123456'
+                'key' => $config->api_key
             ])->get($url);
             $data = $response->json();
             $mappedPurchases = $data['data'];
 
-            \Log::info('API Request Data: ' . json_encode($response));
-            \Log::info('API Response: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
+            Log::info('API Request Data: ' . json_encode($response));
+            Log::info('API Response: ' . $response->body());
+            Log::info('API Response Status Code: ' . $response->status());
 
             if (isset($mappedPurchases)) {
                 foreach ($mappedPurchases as $purchase) {
@@ -1545,14 +1553,16 @@ class PurchaseController extends Controller
 
     public function getMapPurchaseSearchByDateItemLists()
     {
-        $url = 'https://etims.your-apps.biz/api/MapPurchase/SearchByDate?date=19990101';
+        $config = ConfigSettings::first();
+
+        $url = $config->api_url . 'MapPurchase/SearchByDate?date=19990101';
 
         try {
             $response = Http::withHeaders([
-                'key' => '123456'
+                'key' => $config->api_key
             ])->get($url);
             $data = $response->json();
-            \Log::info('API Request Data: ' . json_encode($data));
+            Log::info('API Request Data: ' . json_encode($data));
 
             if (isset($data['data'])) {
                 foreach ($data['data'] as $purchaseclassList) {
@@ -1587,7 +1597,7 @@ class PurchaseController extends Controller
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'message' => 'Error getting Map Purchase Search By Date Item Lists',
                 'error' => $e->getMessage()
@@ -1600,7 +1610,7 @@ class PurchaseController extends Controller
     public function mapPurchaseSearchByDate(Request $request)
     {
         // Log the request from the form
-        \Log::info('Synchronization request received from Searching the MapPurchase SearchByDate Form:', $request->all());
+        Log::info('Synchronization request received from Searching the MapPurchase SearchByDate Form:', $request->all());
 
         // Validate the date input
         $request->validate([
@@ -1613,13 +1623,16 @@ class PurchaseController extends Controller
         // Get and format the date
         $date = $request->input('searchByDate');
         $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd');
-        \Log::info('Date formatted from synchronization request:', ['formattedDate' => $formattedDate]);
+        Log::info('Date formatted from synchronization request:', ['formattedDate' => $formattedDate]);
 
         try {
-            // Make the API call
+            $config = ConfigSettings::first();
+
+            $url = $config->api_url . 'MapPurchase/SearchByDate?date=' . $formattedDate;
+
             $response = Http::withOptions(['verify' => false])
-                ->withHeaders(['key' => '123456'])
-                ->get("https://etims.your-apps.biz/api/MapPurchase/SearchByDate?date={$formattedDate}");
+                ->withHeaders(['key' => $config->api_key])
+                ->get($url);
 
             $data = $response->json();
             // if (!isset($data['data'])) {
@@ -1627,7 +1640,7 @@ class PurchaseController extends Controller
             // }
 
             $remoteMapPurchaseSearchByDateinfo = $data['data'];
-            \Log::info('Remote item info:', $remoteMapPurchaseSearchByDateinfo);
+            Log::info('Remote item info:', $remoteMapPurchaseSearchByDateinfo);
 
             // Prepare data for synchronization
             $remoteMapPurchaseSearchByDateinfoToSync = [];
@@ -1638,15 +1651,15 @@ class PurchaseController extends Controller
 
                 if (isset($remoteItem['mapPurchaseItemList']) && is_array($remoteItem['mapPurchaseItemList'])) {
                     foreach ($remoteItem['mapPurchaseItemList'] as $itemList) {
-                        \Log::info('Remote item list::');
-                        \Log::info($itemList);
+                        Log::info('Remote item list::');
+                        Log::info($itemList);
                         $remoteMapPurchaseItemListsToSync[] = $this->prepareMapPurchaseItemListData($itemList);
                     }
                 }
             }
 
-            \Log::info('Remote mapped purchase search by date info to sync:', $remoteMapPurchaseSearchByDateinfoToSync);
-            \Log::info('Remote mapped purchase item lists to sync:', $remoteMapPurchaseItemListsToSync);
+            Log::info('Remote mapped purchase search by date info to sync:', $remoteMapPurchaseSearchByDateinfoToSync);
+            Log::info('Remote mapped purchase item lists to sync:', $remoteMapPurchaseItemListsToSync);
 
             // Synchronize the purchases
             $syncedCount = $this->synchronizeMapPurchases($remoteMapPurchaseSearchByDateinfoToSync, $remoteMapPurchaseItemListsToSync);
@@ -1656,8 +1669,8 @@ class PurchaseController extends Controller
             } else {
                 return redirect()->back()->with('success', __('Map purchases up to date.'));
             }
-        } catch (\Exception $e) {
-            \Log::error('Error syncing map purchases:', ['error' => $e->getMessage()]);
+        } catch (Exception $e) {
+            Log::error('Error syncing map purchases:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', __('Error syncing map purchases.'));
         }
     }
@@ -1667,7 +1680,7 @@ class PurchaseController extends Controller
         return [
             'mappedPurchaseId' => $remoteItem['id'],
             'invcNo' => $remoteItem['invcNo'],
-            'created_by' => \Auth::user()->creatorId(),
+            'created_by' => Auth::user()->creatorId(),
             'orgInvcNo' => $remoteItem['orgInvcNo'],
             'supplrTin' => $remoteItem['supplrTin'],
             'supplrBhfId' => $remoteItem['supplrBhfId'],
@@ -1761,8 +1774,8 @@ class PurchaseController extends Controller
                         // Create the mapped purchase item list
                         MappedPurchaseItemList::create($itemList);
 
-                        \Log::info('ITEMS LIST');
-                        \Log::info($itemList);
+                        Log::info('ITEMS LIST');
+                        Log::info($itemList);
 
                         //Also creating  new product for the warehouse 
                         WarehouseProduct::create([
@@ -1771,13 +1784,13 @@ class PurchaseController extends Controller
                             'itemCd' => $itemList['mapping'],
                             'quantity' => $itemList['qty'],
                             'packageQuantity' => $itemList['pkg'],
-                            'created_by' => \Auth::user()->creatorId()
+                            'created_by' => Auth::user()->creatorId()
                         ]);
                         $syncedPurchaseItemCount++;
                     }
                 }
 
-                \Log::info("Synced $syncedPurchaseItemCount item lists for purchase ID {$mappedPurchase->id}");
+                Log::info("Synced $syncedPurchaseItemCount item lists for purchase ID {$mappedPurchase->id}");
             }
         }
 
