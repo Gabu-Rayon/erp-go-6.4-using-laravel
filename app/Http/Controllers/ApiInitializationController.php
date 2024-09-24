@@ -6,15 +6,17 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ApiInitialization;
 use App\Models\BranchesList;
+use App\Models\ConfigSettings;
 use Illuminate\Support\Facades\Http;
-
+use Illuminate\Support\Facades\Log;
 
 class ApiInitializationController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index() {
+    public function index()
+    {
         try {
             if (\Auth::user()->type == 'super admin') {
                 $apiinitializations = ApiInitialization::all();
@@ -50,84 +52,89 @@ class ApiInitializationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
         if (\Auth::user()->type == 'super admin') {
-        
-        $validator = \Validator::make($request->all(), [
-            'taxpayeridno' => 'required',
-            'bhfId' => 'required',
-            'devicesrlno' => 'required'
-        ]);
 
-        if ($validator->fails()) {
-            $messages = $validator->getMessageBag();
-            return redirect()->back()->with('error', $messages->first());
-        }
-
-        try {
-            $url = 'https://etims.your-apps.biz/api/Initialization';
-
-            $taxpayeridno = $request->taxpayeridno;
-            $bhfId = $request->bhfId;
-            $devicesrlno = $request->devicesrlno;
-
-            $response = Http::withOptions([
-                'verify' => false
-            ])->withHeaders([
-                'key' => '123456'
-            ])->post($url, [
-                'tin' => $taxpayeridno,
-                'bhfId' => $bhfId,
-                'dvcSrlNo' => $devicesrlno
+            $validator = \Validator::make($request->all(), [
+                'taxpayeridno' => 'required',
+                'bhfId' => 'required',
+                'devicesrlno' => 'required'
             ]);
 
-            \Log::info('CREATE API INITIALIZATION API RESPONSE');
-            \Log::info($response);
-
-            $data = $response->json();
-
-            if ($data['data']['resultCd'] != '0000') {
-                \Log::info($data);
-                return redirect()->back()->with('error', $data['data']['resultMsg']);
+            if ($validator->fails()) {
+                $messages = $validator->getMessageBag();
+                return redirect()->back()->with('error', $messages->first());
             }
-            $apiInitialization = new ApiInitialization();
-            $apiInitialization->tin = $data['tin'];
-            $apiInitialization->bhfId = $data['bhfId'];
-            $apiInitialization->dvcSrlNo = $data['dvcSrlNo'];
-            $apiInitialization->taxprNm = $data['taxprNm'];
-            $apiInitialization->bsnsActv = $data['bsnsActv'];
-            $apiInitialization->bhfNm = $data['bhfNm'];
-            $apiInitialization->bhfOpenDt = $data['bhfOpenDt'];
-            $apiInitialization->prvncNm = $data['prvncNm'];
-            $apiInitialization->dstrtNm = $data['dstrtNm'];
-            $apiInitialization->sctrNm = $data['sctrNm'];
-            $apiInitialization->locDesc = $data['locDesc'];
-            $apiInitialization->hqYn = $data['hqYn'];
-            $apiInitialization->mgrNm = $data['mgrNm'];
-            $apiInitialization->mgrTelNo = $data['mgrTelNo'];
-            $apiInitialization->mgrEmail = $data['mgrEmail'];
-            $apiInitialization->dvcId = $data['dvcId'];
-            $apiInitialization->sdcId = $data['sdcId'];
-            $apiInitialization->mrcNo = $data['mrcNo'];
-            $apiInitialization->cmcKey = $data['cmcKey'];
-            $apiInitialization->resultCd = $data['resultCd'];
-            $apiInitialization->resultMsg = $data['resultMsg'];
-            $apiInitialization->resultDt = $data['resultDt'];
 
-            $apiInitialization->save();
+            try {
+                $config = ConfigSettings::first();
+
+                $url = $config->api_url . 'InitializationV2';
+
+                $taxpayeridno = $request->taxpayeridno;
+                $bhfId = $request->bhfId;
+                $devicesrlno = $request->devicesrlno;
+
+                $response = Http::withOptions([
+                    'verify' => false
+                ])->withHeaders([
+                    'key' => $config->api_key,
+                ])->post($url, [
+                    'tin' => $taxpayeridno,
+                    'bhfId' => $bhfId,
+                    'dvcSrlNo' => $devicesrlno
+                ]);
+
+                \Log::info('CREATE API INITIALIZATION API RESPONSE');
+                \Log::info($response);
+
+                if (!$response['status']) {
+                    return redirect()->back()->with('error', $response['message']);
+                }
+
+                $data = $response->json();
+
+                if ($data['data']['resultCd'] != '0000') {
+                    \Log::info($data);
+                    return redirect()->back()->with('error', $data['data']['resultMsg']);
+                }
+                $apiInitialization = new ApiInitialization();
+                $apiInitialization->tin = $data['tin'];
+                $apiInitialization->bhfId = $data['bhfId'];
+                $apiInitialization->dvcSrlNo = $data['dvcSrlNo'];
+                $apiInitialization->taxprNm = $data['taxprNm'];
+                $apiInitialization->bsnsActv = $data['bsnsActv'];
+                $apiInitialization->bhfNm = $data['bhfNm'];
+                $apiInitialization->bhfOpenDt = $data['bhfOpenDt'];
+                $apiInitialization->prvncNm = $data['prvncNm'];
+                $apiInitialization->dstrtNm = $data['dstrtNm'];
+                $apiInitialization->sctrNm = $data['sctrNm'];
+                $apiInitialization->locDesc = $data['locDesc'];
+                $apiInitialization->hqYn = $data['hqYn'];
+                $apiInitialization->mgrNm = $data['mgrNm'];
+                $apiInitialization->mgrTelNo = $data['mgrTelNo'];
+                $apiInitialization->mgrEmail = $data['mgrEmail'];
+                $apiInitialization->dvcId = $data['dvcId'];
+                $apiInitialization->sdcId = $data['sdcId'];
+                $apiInitialization->mrcNo = $data['mrcNo'];
+                $apiInitialization->cmcKey = $data['cmcKey'];
+                $apiInitialization->resultCd = $data['resultCd'];
+                $apiInitialization->resultMsg = $data['resultMsg'];
+                $apiInitialization->resultDt = $data['resultDt'];
+
+                $apiInitialization->save();
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+                return redirect()->back()->with('error', 'An error occurred while initializing the API');
+            }
 
 
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            return redirect()->back()->with('error', 'An error occurred while initializing the API');
+            return redirect()->route('apiinitialization.index')->with('success', __('Successfully Initialized.'));
+        } else {
+            return redirect()->back()->with('error', 'Permission Denied');
         }
-        
-        
-        return redirect()->route('apiinitialization.index')->with('success', __('Successfully Initialized.'));
-    } else {
-        return redirect()->back()->with('error', 'Permission Denied');
-    }
     }
     /**
      * Display the specified resource.
@@ -192,7 +199,8 @@ class ApiInitializationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id){
+    public function destroy(string $id)
+    {
         try {
             if (\Auth::user()->type == 'super admin') {
                 $apiInitialization = ApiInitialization::find($id);

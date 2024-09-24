@@ -13,7 +13,7 @@ class BranchesListController extends Controller
     {
         $branches = BranchesList::all();
 
-        return view('brancheslist.index', compact('branches'));
+        return view('branch.index', compact('branches'));
     }
     public function getBranchesList()
     {
@@ -52,7 +52,8 @@ class BranchesListController extends Controller
         }
     }
 
-    public function getBranchByName($bhfNm) {
+    public function getBranchByName($bhfNm)
+    {
         try {
             $branch = BranchesList::where('bhfNm', $bhfNm)->first();
             return response()->json([
