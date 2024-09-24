@@ -3344,20 +3344,18 @@
                                         class="form-label">{{ __('Local Storage') }}</label>
                                     <div class="form-check form-switch">
                                         {{ Form::hidden('local_storage', 'off') }}
-                                        <!-- Hidden input for unchecked state -->
-                                        {{ Form::checkbox('local_storage', 'on', isset($config_settings['local_storage']) && $config_settings['local_storage'] === 'on', ['class' => 'form-check-input', 'id' => 'localStorageToggle', 'role' => 'switch']) }}
+                                        {{ Form::checkbox('local_storage', 'on', old('local_storage', isset($config_settings->local_storage) && $config_settings->local_storage === 'on'), ['class' => 'form-check-input', 'id' => 'localStorageToggle', 'role' => 'switch']) }}
                                         <span
-                                            class="toggle-text">{{ isset($config_settings['local_storage']) && $config_settings['local_storage'] === 'on' ? 'On' : 'Off' }}</span>
+                                            class="toggle-text">{{ isset($config_settings->local_storage) && $config_settings->local_storage === 'on' ? 'On' : 'Off' }}</span>
                                     </div>
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label for="stockUpdateToggle" class="form-label">{{ __('Stock Update') }}</label>
                                     <div class="form-check form-switch">
                                         {{ Form::hidden('stock_update', 'off') }}
-                                        <!-- Hidden input for unchecked state -->
-                                        {{ Form::checkbox('stock_update', 'on', isset($config_settings['stock_update']) && $config_settings['stock_update'] === 'on', ['class' => 'form-check-input', 'id' => 'stockUpdateToggle', 'role' => 'switch']) }}
+                                        {{ Form::checkbox('stock_update', 'on', old('stock_update', isset($config_settings->stock_update) && $config_settings->stock_update === 'on'), ['class' => 'form-check-input', 'id' => 'stockUpdateToggle', 'role' => 'switch']) }}
                                         <span
-                                            class="toggle-text">{{ isset($config_settings['stock_update']) && $config_settings['stock_update'] === 'on' ? 'On' : 'Off' }}</span>
+                                            class="toggle-text">{{ isset($config_settings->stock_update) && $config_settings->stock_update === 'on' ? 'On' : 'Off' }}</span>
                                     </div>
                                 </div>
                                 <div class="form-group col-md-4">
@@ -3365,10 +3363,9 @@
                                         class="form-label">{{ __('Customer Mapping (TIN)') }}</label>
                                     <div class="form-check form-switch">
                                         {{ Form::hidden('customer_mapping_by_tin', 'off') }}
-                                        <!-- Hidden input for unchecked state -->
-                                        {{ Form::checkbox('customer_mapping_by_tin', 'on', isset($config_settings['customer_mapping_by_tin']) && $config_settings['customer_mapping_by_tin'] === 'on', ['class' => 'form-check-input', 'id' => 'customerMappingToggle', 'role' => 'switch']) }}
+                                        {{ Form::checkbox('customer_mapping_by_tin', 'on', old('customer_mapping_by_tin', isset($config_settings->customer_mapping_by_tin) && $config_settings->customer_mapping_by_tin === 'on'), ['class' => 'form-check-input', 'id' => 'customerMappingToggle', 'role' => 'switch']) }}
                                         <span
-                                            class="toggle-text">{{ isset($config_settings['customer_mapping_by_tin']) && $config_settings['customer_mapping_by_tin'] === 'on' ? 'On' : 'Off' }}</span>
+                                            class="toggle-text">{{ isset($config_settings->customer_mapping_by_tin) && $config_settings->customer_mapping_by_tin === 'on' ? 'On' : 'Off' }}</span>
                                     </div>
                                 </div>
                                 <div class="form-group col-md-4">
@@ -3376,25 +3373,24 @@
                                         class="form-label">{{ __('Item Mapping (Code)') }}</label>
                                     <div class="form-check form-switch">
                                         {{ Form::hidden('item_mapping_by_code', 'off') }}
-                                        <!-- Hidden input for unchecked state -->
-                                        {{ Form::checkbox('item_mapping_by_code', 'on', isset($config_settings['item_mapping_by_code']) && $config_settings['item_mapping_by_code'] === 'on', ['class' => 'form-check-input', 'id' => 'itemMappingToggle', 'role' => 'switch']) }}
+                                        {{ Form::checkbox('item_mapping_by_code', 'on', old('item_mapping_by_code', isset($config_settings->item_mapping_by_code) && $config_settings->item_mapping_by_code === 'on'), ['class' => 'form-check-input', 'id' => 'itemMappingToggle', 'role' => 'switch']) }}
                                         <span
-                                            class="toggle-text">{{ isset($config_settings['item_mapping_by_code']) && $config_settings['item_mapping_by_code'] === 'on' ? 'On' : 'Off' }}</span>
+                                            class="toggle-text">{{ isset($config_settings->item_mapping_by_code) && $config_settings->item_mapping_by_code === 'on' ? 'On' : 'Off' }}</span>
                                     </div>
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label for="apiTypeSelect" class="form-label">{{ __('API Type') }}</label>
-                                    {{ Form::select('api_type', ['OSCU' => 'OSCU', 'VSCU' => 'VSCU'], null, ['class' => 'form-select', 'id' => 'apiTypeSelect']) }}
+                                    {{ Form::select('api_type', ['OSCU' => 'OSCU', 'VSCU' => 'VSCU'], old('api_type', $config_settings->api_type ?? null), ['class' => 'form-select', 'id' => 'apiTypeSelect']) }}
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label for="apiUrlInput" class="form-label">{{ __('API URL') }}</label>
-                                    {{ Form::text('api_url', '', ['class' => 'form-control', 'id' => 'apiUrlInput', 'placeholder' => __('API URL')]) }}
+                                    {{ Form::text('api_url', old('api_url', $config_settings->api_url ?? ''),
+                                     ['class' => 'form-control', 'id' => 'apiUrlInput', 'placeholder' => __('API URL')]) }}
                                 </div>
-                                <div class="form-group col-md-8">
-                                </div>
+                                <div class="form-group col-md-8"></div>
                                 <div class="form-group col-md-4">
                                     <label for="apiKeyInput" class="form-label">{{ __('API Key') }}</label>
-                                    {{ Form::text('api_key', '', ['class' => 'form-control', 'id' => 'apilKeyInput', 'placeholder' => __('API Key')]) }}
+                                    {{ Form::text('api_key', old('api_key', $config_settings->api_key ?? ''), ['class' => 'form-control', 'id' => 'apilKeyInput', 'placeholder' => __('API Key')]) }}
                                 </div>
                             </div>
 
@@ -3402,9 +3398,10 @@
                                 <input class="btn btn-print-invoice btn-primary m-r-10" type="submit"
                                     value="{{ __('Save Changes') }}">
                             </div>
-                            {{ Form::close() }}
                         </div>
+                        {{ Form::close() }}
                     </div>
+
 
                 </div>
             </div>

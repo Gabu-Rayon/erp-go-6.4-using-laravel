@@ -3698,11 +3698,10 @@ unset($__errorArgs, $__bag); ?>
                                     <div class="form-check form-switch">
                                         <?php echo e(Form::hidden('local_storage', 'off')); ?>
 
-                                        <!-- Hidden input for unchecked state -->
-                                        <?php echo e(Form::checkbox('local_storage', 'on', isset($config_settings['local_storage']) && $config_settings['local_storage'] === 'on', ['class' => 'form-check-input', 'id' => 'localStorageToggle', 'role' => 'switch'])); ?>
+                                        <?php echo e(Form::checkbox('local_storage', 'on', old('local_storage', isset($config_settings->local_storage) && $config_settings->local_storage === 'on'), ['class' => 'form-check-input', 'id' => 'localStorageToggle', 'role' => 'switch'])); ?>
 
                                         <span
-                                            class="toggle-text"><?php echo e(isset($config_settings['local_storage']) && $config_settings['local_storage'] === 'on' ? 'On' : 'Off'); ?></span>
+                                            class="toggle-text"><?php echo e(isset($config_settings->local_storage) && $config_settings->local_storage === 'on' ? 'On' : 'Off'); ?></span>
                                     </div>
                                 </div>
                                 <div class="form-group col-md-4">
@@ -3710,11 +3709,10 @@ unset($__errorArgs, $__bag); ?>
                                     <div class="form-check form-switch">
                                         <?php echo e(Form::hidden('stock_update', 'off')); ?>
 
-                                        <!-- Hidden input for unchecked state -->
-                                        <?php echo e(Form::checkbox('stock_update', 'on', isset($config_settings['stock_update']) && $config_settings['stock_update'] === 'on', ['class' => 'form-check-input', 'id' => 'stockUpdateToggle', 'role' => 'switch'])); ?>
+                                        <?php echo e(Form::checkbox('stock_update', 'on', old('stock_update', isset($config_settings->stock_update) && $config_settings->stock_update === 'on'), ['class' => 'form-check-input', 'id' => 'stockUpdateToggle', 'role' => 'switch'])); ?>
 
                                         <span
-                                            class="toggle-text"><?php echo e(isset($config_settings['stock_update']) && $config_settings['stock_update'] === 'on' ? 'On' : 'Off'); ?></span>
+                                            class="toggle-text"><?php echo e(isset($config_settings->stock_update) && $config_settings->stock_update === 'on' ? 'On' : 'Off'); ?></span>
                                     </div>
                                 </div>
                                 <div class="form-group col-md-4">
@@ -3723,11 +3721,10 @@ unset($__errorArgs, $__bag); ?>
                                     <div class="form-check form-switch">
                                         <?php echo e(Form::hidden('customer_mapping_by_tin', 'off')); ?>
 
-                                        <!-- Hidden input for unchecked state -->
-                                        <?php echo e(Form::checkbox('customer_mapping_by_tin', 'on', isset($config_settings['customer_mapping_by_tin']) && $config_settings['customer_mapping_by_tin'] === 'on', ['class' => 'form-check-input', 'id' => 'customerMappingToggle', 'role' => 'switch'])); ?>
+                                        <?php echo e(Form::checkbox('customer_mapping_by_tin', 'on', old('customer_mapping_by_tin', isset($config_settings->customer_mapping_by_tin) && $config_settings->customer_mapping_by_tin === 'on'), ['class' => 'form-check-input', 'id' => 'customerMappingToggle', 'role' => 'switch'])); ?>
 
                                         <span
-                                            class="toggle-text"><?php echo e(isset($config_settings['customer_mapping_by_tin']) && $config_settings['customer_mapping_by_tin'] === 'on' ? 'On' : 'Off'); ?></span>
+                                            class="toggle-text"><?php echo e(isset($config_settings->customer_mapping_by_tin) && $config_settings->customer_mapping_by_tin === 'on' ? 'On' : 'Off'); ?></span>
                                     </div>
                                 </div>
                                 <div class="form-group col-md-4">
@@ -3736,28 +3733,27 @@ unset($__errorArgs, $__bag); ?>
                                     <div class="form-check form-switch">
                                         <?php echo e(Form::hidden('item_mapping_by_code', 'off')); ?>
 
-                                        <!-- Hidden input for unchecked state -->
-                                        <?php echo e(Form::checkbox('item_mapping_by_code', 'on', isset($config_settings['item_mapping_by_code']) && $config_settings['item_mapping_by_code'] === 'on', ['class' => 'form-check-input', 'id' => 'itemMappingToggle', 'role' => 'switch'])); ?>
+                                        <?php echo e(Form::checkbox('item_mapping_by_code', 'on', old('item_mapping_by_code', isset($config_settings->item_mapping_by_code) && $config_settings->item_mapping_by_code === 'on'), ['class' => 'form-check-input', 'id' => 'itemMappingToggle', 'role' => 'switch'])); ?>
 
                                         <span
-                                            class="toggle-text"><?php echo e(isset($config_settings['item_mapping_by_code']) && $config_settings['item_mapping_by_code'] === 'on' ? 'On' : 'Off'); ?></span>
+                                            class="toggle-text"><?php echo e(isset($config_settings->item_mapping_by_code) && $config_settings->item_mapping_by_code === 'on' ? 'On' : 'Off'); ?></span>
                                     </div>
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label for="apiTypeSelect" class="form-label"><?php echo e(__('API Type')); ?></label>
-                                    <?php echo e(Form::select('api_type', ['OSCU' => 'OSCU', 'VSCU' => 'VSCU'], null, ['class' => 'form-select', 'id' => 'apiTypeSelect'])); ?>
+                                    <?php echo e(Form::select('api_type', ['OSCU' => 'OSCU', 'VSCU' => 'VSCU'], old('api_type', $config_settings->api_type ?? null), ['class' => 'form-select', 'id' => 'apiTypeSelect'])); ?>
 
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label for="apiUrlInput" class="form-label"><?php echo e(__('API URL')); ?></label>
-                                    <?php echo e(Form::text('api_url', '', ['class' => 'form-control', 'id' => 'apiUrlInput', 'placeholder' => __('API URL')])); ?>
+                                    <?php echo e(Form::text('api_url', old('api_url', $config_settings->api_url ?? ''),
+                                     ['class' => 'form-control', 'id' => 'apiUrlInput', 'placeholder' => __('API URL')])); ?>
 
                                 </div>
-                                <div class="form-group col-md-8">
-                                </div>
+                                <div class="form-group col-md-8"></div>
                                 <div class="form-group col-md-4">
                                     <label for="apiKeyInput" class="form-label"><?php echo e(__('API Key')); ?></label>
-                                    <?php echo e(Form::text('api_key', '', ['class' => 'form-control', 'id' => 'apilKeyInput', 'placeholder' => __('API Key')])); ?>
+                                    <?php echo e(Form::text('api_key', old('api_key', $config_settings->api_key ?? ''), ['class' => 'form-control', 'id' => 'apilKeyInput', 'placeholder' => __('API Key')])); ?>
 
                                 </div>
                             </div>
@@ -3766,10 +3762,11 @@ unset($__errorArgs, $__bag); ?>
                                 <input class="btn btn-print-invoice btn-primary m-r-10" type="submit"
                                     value="<?php echo e(__('Save Changes')); ?>">
                             </div>
-                            <?php echo e(Form::close()); ?>
-
                         </div>
+                        <?php echo e(Form::close()); ?>
+
                     </div>
+
 
                 </div>
             </div>

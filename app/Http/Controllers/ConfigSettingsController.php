@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\ConfigSettings;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
 
 class ConfigSettingsController extends Controller
 {
@@ -83,10 +84,33 @@ class ConfigSettingsController extends Controller
             'api_type' => $data['api_type'],
             'api_url' => $data['api_url'],
             'api_key' => $data['api_key']
-
         ]);
 
-        return redirect()->back()->with('success', 'Configuration settings updated successfully');
+        // Update .env file
+        $this->setEnvironmentValue([
+            'OSCU_URL' => $data['api_type'] == 'OSCU' ? $data['api_url'] : env('OSCU_URL'),
+            'VSCU_URL' => $data['api_type'] == 'VSCU' ? $data['api_url'] : env('VSCU_URL'),
+            'API_KEY' => $data['api_key']
+        ]);
+
+        // Pass updated settings to the view
+        return redirect()->back()->with('success', 'Configuration settings updated successfully')->with('config_settings', $config_settings);
+    }
+
+    protected function setEnvironmentValue(array $values)
+    {
+        $envFile = base_path('.env');
+        $str = file_get_contents($envFile);
+        foreach ($values as $envKey => $envValue) {
+            $str .= "\n"; // ensure newline at end of file
+            $str = preg_replace("/^{$envKey}=.*$/m", "{$envKey}={$envValue}", $str);
+            if (!preg_match("/^{$envKey}=.*$/m", $str)) {
+                $str .= "{$envKey}={$envValue}\n";
+            }
+        }
+        file_put_contents($envFile, rtrim($str));
+        // Refresh the environment variables
+        // Artisan::call('config:cache');
     }
 
     /**

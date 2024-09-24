@@ -2,26 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\CustomerExport;
-use App\Imports\CustomerImport;
+use Auth;
+use File;
+use App\Models\Plan;
+use App\Models\User;
+use App\Models\Utility;
 use App\Models\Customer;
 use App\Models\CustomField;
 use App\Models\Transaction;
-use App\Models\Utility;
-use Auth;
-use App\Models\User;
-use App\Models\Plan;
-use File;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Http\Client\Response;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
+use App\Models\ConfigSettings;
+use App\Exports\CustomerExport;
+use App\Imports\CustomerImport;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
-use Spatie\Permission\Models\Role;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Crypt;
 
 class CustomerController extends Controller
 {
@@ -156,6 +157,11 @@ class CustomerController extends Controller
     {
 
 
+        //retrievie the Api endpoint config from the database that is api_url and api_key  
+        $config = ConfigSettings::first();
+        \Log::info('Api Endpoint Config data from my local Database :');
+        \Log::info($config);        
+
         \Log::info('creacting customer Request : ');
         \Log::info($request);
         if(
@@ -232,26 +238,27 @@ class CustomerController extends Controller
                 'isUsed' => true,
                 'remark' => $request->remark,
             ];
-            $response = Http::withOptions(['verify' => false])->withHeaders([
-                'accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'key' => '123456', 
-            ])->post('https://etims.your-apps.biz/api/AddCustomer', $requestData);
+            try {
+                $response = Http::withOptions(['verify' => false])
+                    ->withHeaders([
+                        'accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                        'key' => $config->api_key,
+                    ])
+                    ->post($config->api_url . 'AddCustomer', $requestData);
 
+                \Log::info('API Request Data: ' . json_encode($requestData));
+                \Log::info('API Response: ' . $response->body());
 
-            // Log the response status code
-            \Log::info('API Response Status Code: ' . $response->status());
-            \Log::info('API Request Data: ' . json_encode($requestData));
-            \Log::info('API Response: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
-
-
-            // Check if API call was successful
-            if ($response->successful()) {
-                return redirect()->route('customer.index')->with('success', __('Customer successfully created.'));
-            } else {
-                // If API call failed, return with error message
-                return redirect()->back()->with('error', __('Failed to create customer.'));
+                // Check if API call was successful
+                if ($response->successful()) {
+                    return redirect()->route('customer.index')->with('success', __('Customer successfully created.'));
+                } else {
+                    return redirect()->back()->with('error', __('Failed to create customer. Error: ') . $response->body());
+                }
+            } catch (\Exception $e) {
+                \Log::error('API Request Exception: ' . $e->getMessage());
+                return redirect()->back()->with('error', __('Failed to create customer due to an error.'));
             }
 
         } else {
