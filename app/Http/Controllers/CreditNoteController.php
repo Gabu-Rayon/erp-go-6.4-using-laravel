@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ConfigSettings;
 use App\Models\Invoice;
 use App\Models\Utility;
 use App\Models\Customer;
@@ -9,12 +10,14 @@ use App\Models\CreditNote;
 use Illuminate\Http\Request;
 use App\Models\SalesTypeCode;
 use App\Models\CreditNoteItem;
-use App\Models\InvoiceProduct;
 use App\Models\ProductService;
 use App\Models\CreditNoteReason;
 use App\Models\PaymentTypeCodes;
 use App\Models\InvoiceStatusCode;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class CreditNoteController extends Controller
 {
@@ -27,10 +30,10 @@ class CreditNoteController extends Controller
     {
 
         if (
-            \Auth::user()->type == 'accountant'
-            || \Auth::user()->type == 'company'
+            Auth::user()->type == 'accountant'
+            || Auth::user()->type == 'company'
         ) {
-            $invoices = Invoice::where('created_by', \Auth::user()->creatorId())->get();
+            $invoices = Invoice::where('created_by', Auth::user()->creatorId())->get();
 
             return view('creditNote.index', compact('invoices'));
         } else {
@@ -42,8 +45,8 @@ class CreditNoteController extends Controller
     {
 
         if (
-            \Auth::user()->type == 'accountant'
-            || \Auth::user()->type == 'company'
+            Auth::user()->type == 'accountant'
+            || Auth::user()->type == 'company'
         ) {
 
             // Fetch the invoice by ID
@@ -82,240 +85,25 @@ class CreditNoteController extends Controller
         }
     }
 
-    // public function store(Request $request, $id)
-    // {
-    //     try {
-    //         if (
-    //             \Auth::user()->type == 'accountant'
-    //             || \Auth::user()->type == 'company'
-    //         ) {
-
-    //             $data = $request->all();
-    //             $invoice = Invoice::find($id);
-    //             $invoice_id = \Auth::user()->invoiceNumberFormat($id);
-
-    //             \Log::info('CREDIT NOTE REQUEST DATA');
-    //             \Log::info($data);
-
-    //             \Log::info('INVOICE ID');
-    //             \Log::info($invoice_id);
-
-    //             \Log::info('INVOICE');
-    //             \Log::info($invoice);
-
-    //             $validator = \Validator::make(
-    //                 $data,
-    //                 [
-    //                     'customerName' => 'required',
-    //                     'customerTin' => 'required',
-    //                     'creditNoteReason' => 'required',
-    //                     'traderInvoiceNo' => 'required',
-    //                     'confirmDate' => 'required',
-    //                     'salesDate' => 'required',
-    //                     'receiptPublishDate' => 'required',
-    //                     'occurredDate' => 'required'
-    //                 ]
-    //             );
-
-    //             if ($validator->fails()) {
-    //                 $messages = $validator->getMessageBag();
-    //                 return redirect()->back()->with('error', $messages->first());
-    //             }
-
-    //             $salesDate = str_replace('-', '', $data['salesDate']);
-    //             $salesDate = date('Ymd', strtotime($salesDate));
-
-    //             $occurredDate = str_replace('-', '', $data['occurredDate']);
-    //             $occurredDate = date('Ymd', strtotime($occurredDate));
-
-
-    //             $creditNoteDate = str_replace('-', '', $data['creditNoteDate']);
-    //             $creditNoteDate = date('YmdHis', strtotime($creditNoteDate));
-
-
-    //             $stockReleseDate = str_replace('-', '', $data['stockReleseDate']);
-    //             $stockReleseDate = date('YmdHis', strtotime($stockReleseDate));
-
-
-    //             $receiptPublishDate = str_replace('-', '', $data['receiptPublishDate']);
-    //             $receiptPublishDate = date('YmdHis', strtotime($receiptPublishDate));
-
-    //             $confirmDate = str_replace('-', '', $data['confirmDate']);
-    //             $confirmDate = date('YmdHis', strtotime($confirmDate));
-
-    //             $apiCreditNoteItemsList = [];
-    //             $totalAmount = 0;
-
-    //             foreach ($data['items'] as $item) {
-    //                 // $givenItem = ProductService::where('itemCd', $item['item'])->first();
-    //                 $givenItem = ProductService::where('kraItemCode', $item['item_'])->first();
-
-
-    //                 $itemExprDate = str_replace('-', '', $item['itemExprDate']);
-    //                 $itemExprDate = date('Ymd', strtotime($itemExprDate));
-
-    //                 $totalForEachProduct = ($item['price'] * $item['quantity'] * $item['pkgQuantity']) - $item['discountAmt'];
-    //                 $totalAmount += $totalForEachProduct;
-
-    //                 $apiItemData = [
-    //                     // 'itemCode' => $item['item'],
-    //                     'itemCode' => $item['item_'],
-    //                     'itemClassCode' => $givenItem['itemClsCd'],
-    //                     "itemTypeCode" => $givenItem['itemTyCd'],
-    //                     "itemName" => $givenItem['itemNm'],
-    //                     "orgnNatCd" => $givenItem['orgnNatCd'],
-    //                     "taxTypeCode" => $givenItem['taxTyCd'],
-    //                     "unitPrice" => $item['price'],
-    //                     "isrcAplcbYn" => $givenItem['isrcAplcbYn'],
-    //                     "pkgUnitCode" => $givenItem['pkgUnitCd'],
-    //                     "pkgQuantity" => $item['pkgQuantity'],
-    //                     "qtyUnitCd" => $givenItem['qtyUnitCd'],
-    //                     "quantity" => $item['quantity'],
-    //                     "discountRate" => $item['discountRate'],
-    //                     "discountAmt" => $item['discountAmt'],
-    //                     'itemExprDate' => $itemExprDate
-    //                 ];
-
-    //                 array_push($apiCreditNoteItemsList, $apiItemData);
-    //             }
-
-    //             $apiRequestData = [
-    //                 'orgInvoiceNo' => $id,
-    //                 'customerTin' => $data['customerTin'],
-    //                 'customerName' => $data['customerName'],
-    //                 'salesType' => $data['salesType'] ?? null,
-    //                 'paymentType' => $data['paymentType'] ?? null,
-    //                 'creditNoteReason' => $data['creditNoteReason'],
-    //                 'creditNoteDate' => $creditNoteDate,
-    //                 'traderInvoiceNo' => $data['traderInvoiceNo'],
-    //                 'confirmDate' => $confirmDate,
-    //                 'salesDate' => $salesDate,
-    //                 'stockReleseDate' => $stockReleseDate,
-    //                 'receiptPublishDate' => $receiptPublishDate,
-    //                 'occurredDate' => $occurredDate,
-    //                 "invoiceStatusCode" => $data['invoiceStatusCode'] ?? null,
-    //                 "remark" => $data['remark'] ?? null,
-    //                 "isPurchaseAccept" => $data['isPurchaseAccept'] ?? null,
-    //                 "isStockIOUpdate" => $data['isStockIOUpdate'] ?? null,
-    //                 "mapping" => $data['mapping'] ?? null,
-    //                 "creditNoteItemsList" => $apiCreditNoteItemsList
-    //             ];
-
-    //             \Log::info('FINAL API REQUEST DATA');
-    //             \Log::info($apiRequestData);
-
-    //             $url = 'https://etims.your-apps.biz/api/AddSaleCreditNote';
-
-    //             $response = Http::withOptions([
-    //                 'verify' => false
-    //             ])->withHeaders([
-    //                 'key' => '123456'
-    //                 ])->post($url, $apiRequestData);
-
-    //             \Log::info('ADD SALE CREDIT NOTE API RESPONSE');
-    //             \Log::info($response);
-
-    //             if ($response['status'] == 200) {
-    //                 return redirect()->back()->with('error', $response['message']);
-    //             }
-    //             elseif($response['status'] == 400){
-    //                 return redirect()->back()->with('error', $response['message']); 
-    //             }
-
-    //             $creditNoteCustomer = Customer::where('customerTin', $data['customerTin'])->first();
-    //             $creditNote = CreditNote::create([
-    //                 'invoice' => $id,
-    //                 'orgInvoiceNo' => $invoice_id,
-    //                 'customerTin' => $data['customerTin'] ?? null,
-    //                 'customer' => $creditNoteCustomer->id,
-    //                 'customerName' => $creditNoteCustomer->name,
-    //                 'salesType' => $data['salesType'] ?? null,
-    //                 'paymentType' => $data['paymentType'] ?? null,
-    //                 'creditNoteReason' => $data['creditNoteReason'] ?? null,
-    //                 'creditNoteDate' => $data['creditNoteDate'] ?? null,
-    //                 'traderInvoiceNo' => $data['traderInvoiceNo'] ?? null,
-    //                 'confirmDate' => $data['confirmDate'] ?? null,
-    //                 'salesDate' => $data['salesDate'] ?? null,
-    //                 'stockReleseDate' => $data['stockReleseDate'] ?? null,
-    //                 'receiptPublishDate' => $data['receiptPublishDate'] ?? null,
-    //                 'occurredDate' => $data['occurredDate'] ?? null,
-    //                 'invoiceStatusCode' => $data['invoiceStatusCode'] ?? null,
-    //                 'remark' => $data['remark'] ?? null,
-    //                 'isPurchaseAccept' => $data['isPurchaseAccept'] ?? null,
-    //                 'isStockIOUpdate' => $data['isStockIOUpdate'] ?? null,
-    //                 'mapping' => $data['mapping'] ?? null,
-    //                 'amount' => $totalAmount ?? null,
-    //                 'response_invoiceNo' => $data['response_invoiceNo'] ?? null,
-    //                 'response_tranderInvoiceNo' => $data['response_tranderInvoiceNo'] ?? null,
-    //                 'response_scuInternalData' => $data['response_scuInternalData'] ?? null,
-    //                 'response_scuReceiptSignature' => $data['response_scuReceiptSignature'] ?? null,
-    //                 'response_sdcid' => $data['response_sdcid'] ?? null,
-    //                 'response_sdcmrcNo' => $data['response_sdcmrcNo'] ?? null,
-    //                 'response_sdcDateTime' => $data['response_sdcDateTime'] ?? null,
-    //                 'response_scuqrCode' => $data['response_scuqrCode'] ?? null,
-    //                 'response_isStockIOUpdate' => $data['response_isStockIOUpdate'] ?? null
-    //             ]);
-
-    //             $totAmt = 0;
-
-    //             foreach ($apiCreditNoteItemsList as $item) {
-
-    //                 $totalForEachProduct = ($item['unitPrice'] * $item['quantity'] * $item['pkgQuantity']) - $item['discountAmt'];
-    //                 $totAmt += $totalForEachProduct;
-    //                 CreditNoteItem::create([
-    //                     'sales_credit_note_id' => $creditNote->id,
-    //                     'itemCode' => $item['itemCode'] ?? null,
-    //                     'itemClassCode' => $item['itemClassCode'] ?? null,
-    //                     'itemTypeCode' => $item['itemTypeCode'] ?? null,
-    //                     'itemName' => $item['itemName'] ?? null,
-    //                     'orgnNatCd' => $item['orgnNatCd'] ?? null,
-    //                     'taxTypeCode' => $item['taxTypeCode'] ?? null,
-    //                     'unitPrice' => $item['unitPrice'] ?? null,
-    //                     'isrcAplcbYn' => $item['isrcAplcbYn'] ?? null,
-    //                     'pkgUnitCode' => $item['pkgUnitCode'] ?? null,
-    //                     'pkgQuantity' => $item['pkgQuantity'] ?? null,
-    //                     'qtyUnitCd' => $item['qtyUnitCd'] ?? null,
-    //                     'quantity' => $item['quantity'] ?? null,
-    //                     'discountRate' => $item['discountRate'] ?? null,
-    //                     'discountAmt' => $item['discountAmt'] ?? null,
-    //                     'itemExprDate' => $item['itemExprDate'] ?? null,
-    //                 ]);
-    //             }
-
-    //             Utility::updateUserBalance('customer', $invoice->customer_id, $totAmt, 'debit');
-
-    //             return redirect()->to('credit-note')->with('success', __('Credit Note successfully created.'));
-
-    //         } else {
-    //             return redirect()->back()->with('error', 'Permission denied.');
-    //         }
-    //     } catch (\Exception $e) {
-    //         \Log::info('STORE CREDIT NOTE ERROR');
-    //         \Log::info($e);
-
-    //         return redirect()->back()->with('error', $e->getMessage());
-    //     }
-    // }
-
     public function store(Request $request, $id)
     {
         try {
-            if (\Auth::user()->type == 'accountant' || \Auth::user()->type == 'company') {
+            if (Auth::user()->type == 'accountant' || Auth::user()->type == 'company') {
 
                 $data = $request->all();
                 $invoice = Invoice::find($id);
-                $invoice_id = \Auth::user()->invoiceNumberFormat($id);
+                $invoice_id = Auth::user()->invoiceNumberFormat($id);
 
-                \Log::info('CREDIT NOTE REQUEST DATA');
-                \Log::info($data);
+                Log::info('CREDIT NOTE REQUEST DATA');
+                Log::info($data);
 
-                \Log::info('INVOICE ID');
-                \Log::info($invoice_id);
+                Log::info('INVOICE ID');
+                Log::info($invoice_id);
 
-                \Log::info('INVOICE');
-                \Log::info($invoice);
+                Log::info('INVOICE');
+                Log::info($invoice);
 
-                $validator = \Validator::make(
+                $validator = Validator::make(
                     $data,
                     [
                         'customerName' => 'required',
@@ -398,17 +186,19 @@ class CreditNoteController extends Controller
                     "creditNoteItemsList" => $apiCreditNoteItemsList
                 ];
 
-                \Log::info('FINAL API REQUEST DATA');
-                \Log::info($apiRequestData);
+                Log::info('FINAL API REQUEST DATA');
+                Log::info($apiRequestData);
 
-                $url = 'https://etims.your-apps.biz/api/AddSaleCreditNote';
+                $config = ConfigSettings::first();
+
+                $url = $config->api_url . 'AddSaleCreditNoteV2';
 
                 $response = Http::withOptions(['verify' => false])
-                    ->withHeaders(['key' => '123456'])
+                    ->withHeaders(['key' => $config->api_key])
                     ->post($url, $apiRequestData);
 
-                \Log::info('ADD SALE CREDIT NOTE API RESPONSE');
-                \Log::info($response);
+                Log::info('ADD SALE CREDIT NOTE API RESPONSE');
+                Log::info($response);
 
                 if ($response->status() != 200) {
                     $apiErrors = $response->json('message');
@@ -485,8 +275,8 @@ class CreditNoteController extends Controller
                 return redirect()->back()->with('error', 'Permission denied.');
             }
         } catch (\Exception $e) {
-            \Log::info('STORE CREDIT NOTE ERROR');
-            \Log::info($e);
+            Log::info('STORE CREDIT NOTE ERROR');
+            Log::info($e);
 
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -495,8 +285,8 @@ class CreditNoteController extends Controller
     public function edit($invoice_id, $creditNote_id)
     {
         if (
-            \Auth::user()->type == 'accountant'
-            || \Auth::user()->type == 'company'
+            Auth::user()->type == 'accountant'
+            || Auth::user()->type == 'company'
         ) {
 
             $creditNote = CreditNote::find($creditNote_id);
@@ -512,11 +302,11 @@ class CreditNoteController extends Controller
     {
 
         if (
-            \Auth::user()->type == 'accountant'
-            || \Auth::user()->type == 'company'
+            Auth::user()->type == 'accountant'
+            || Auth::user()->type == 'company'
         ) {
 
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(),
                 [
                     'amount' => 'required|numeric',
@@ -533,7 +323,7 @@ class CreditNoteController extends Controller
             $invoiceDue = Invoice::where('id', $invoice_id)->first();
             $credit = CreditNote::find($creditNote_id);
             if ($request->amount > $invoiceDue->getDue() + $credit->amount) {
-                return redirect()->back()->with('error', 'Maximum ' . \Auth::user()->priceFormat($invoiceDue->getDue()) . ' credit limit of this invoice.');
+                return redirect()->back()->with('error', 'Maximum ' . Auth::user()->priceFormat($invoiceDue->getDue()) . ' credit limit of this invoice.');
             }
 
 
@@ -557,8 +347,8 @@ class CreditNoteController extends Controller
     public function destroy($invoice_id, $creditNote_id)
     {
         if (
-            \Auth::user()->type == 'accountant'
-            || \Auth::user()->type == 'company'
+            Auth::user()->type == 'accountant'
+            || Auth::user()->type == 'company'
         ) {
 
             $creditNote = CreditNote::find($creditNote_id);
@@ -567,7 +357,6 @@ class CreditNoteController extends Controller
             Utility::updateUserBalance('customer', $creditNote->customer, $creditNote->amount, 'credit');
 
             return redirect()->back()->with('success', __('Credit Note successfully deleted.'));
-
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -576,15 +365,14 @@ class CreditNoteController extends Controller
     public function customCreate()
     {
         if (
-            \Auth::user()->type == 'accountant'
-            || \Auth::user()->type == 'company'
+            Auth::user()->type == 'accountant'
+            || Auth::user()->type == 'company'
         ) {
 
-            $invoices = Invoice::where('created_by', \Auth::user()->creatorId())->get()->pluck('invoice_id', 'id');
+            $invoices = Invoice::where('created_by', Auth::user()->creatorId())->get()->pluck('invoice_id', 'id');
 
-            // Retrieve customer details
-            $customer = Customer::all()->pluck('name', 'id');
-            $invoices = Invoice::all()->pluck('invoiceNo', 'id');
+            $customer = Customer::all()->pluck('customerName', 'id');
+            $invoices = Invoice::all()->pluck('response_invoiceNo', 'id');
             $creditNoteReasons = CreditNoteReason::all()->pluck('reason', 'reason');
             $salesTypeCodes = SalesTypeCode::all()->pluck('saleTypeCode', 'saleTypeCode');
             $paymentTypeCodes = PaymentTypeCodes::all()->pluck('payment_type_code', 'payment_type_code');
@@ -613,8 +401,8 @@ class CreditNoteController extends Controller
 
     // public function customStore(Request $request)
     // {
-    //     if (\Auth::user()->can('create credit note')) {
-    //         $validator = \Validator::make(
+    //     if (Auth::user()->can('create credit note')) {
+    //         $validator = Validator::make(
     //             $request->all(),
     //             [
     //                 'invoice' => 'required|numeric',
@@ -631,7 +419,7 @@ class CreditNoteController extends Controller
     //         $invoiceDue = Invoice::where('id', $invoice_id)->first();
 
     //         if ($request->amount > $invoiceDue->getDue()) {
-    //             return redirect()->back()->with('error', 'Maximum ' . \Auth::user()->priceFormat($invoiceDue->getDue()) . ' credit limit of this invoice.');
+    //             return redirect()->back()->with('error', 'Maximum ' . Auth::user()->priceFormat($invoiceDue->getDue()) . ' credit limit of this invoice.');
     //         }
     //         $invoice = Invoice::where('id', $invoice_id)->first();
     //         $credit = new CreditNote();
@@ -656,21 +444,21 @@ class CreditNoteController extends Controller
     public function customStore(Request $request)
     {
         try {
-            \Log::info('Raw Data from the Add Direct Credit Note form:', $request->all());
+            Log::info('Raw Data from the Add Direct Credit Note form:', $request->all());
 
             if (
-                \Auth::user()->type == 'accountant'
-                || \Auth::user()->type == 'company'
+                Auth::user()->type == 'accountant'
+                || Auth::user()->type == 'company'
             ) {
 
                 $data = $request->all();
 
                 $selectedInvoice = Invoice::findOrFail($data['invoice']);
 
-                \Log::info('Adding A Direct CREDIT NOTE REQUEST Form  DATA');
-                \Log::info($data);
+                Log::info('Adding A Direct CREDIT NOTE REQUEST Form  DATA');
+                Log::info($data);
 
-                $validator = \Validator::make(
+                $validator = Validator::make(
                     $data,
                     [
                         "customerName" => 'required',
@@ -791,23 +579,25 @@ class CreditNoteController extends Controller
                     "directCreditNoteItemsList" => $apiDirectCreditNoteItemsList
                 ];
 
-                \Log::info('FINAL API REQUEST DATA');
-                \Log::info($apiRequestData);
+                Log::info('FINAL API REQUEST DATA');
+                Log::info($apiRequestData);
 
-                // $url = 'https://etims.your-apps.biz/api/AddDirectCreditNote';
+                $config = ConfigSettings::first();
 
-                // $response = Http::withOptions([
-                //     'verify' => false
-                // ])->withHeaders([
-                //     'key' => '123456'
-                //     ])->post($url, $apiRequestData);
+                $url = $config->api_url . 'AddSaleCreditNoteV2';
 
-                // \Log::info('ADD SALE CREDIT NOTE API RESPONSE');
-                // \Log::info($response);
+                $response = Http::withOptions([
+                    'verify' => false
+                ])->withHeaders([
+                    'key' => $config->api_key
+                ])->post($url, $apiRequestData);
 
-                // if ($response['statusCode'] == 400) {
-                //     return redirect()->back()->with('error', $response['message']);
-                // }
+                Log::info('ADD SALE CREDIT NOTE API RESPONSE');
+                Log::info($response);
+
+                if ($response['statusCode'] == 400) {
+                    return redirect()->back()->with('error', $response['message']);
+                }
 
                 $creditNoteCustomer = Customer::where('customerTin', $data['customerTin'])->first();
                 $creditNote = CreditNote::create([
@@ -872,13 +662,12 @@ class CreditNoteController extends Controller
                 Utility::updateUserBalance('customer', $selectedInvoice->customer_id, $totAmt, 'debit');
 
                 return redirect()->to('credit-note')->with('success', __('Credit Note successfully created.'));
-
             } else {
                 return redirect()->back()->with('error', 'Permission denied.');
             }
         } catch (\Exception $e) {
-            \Log::info('STORE CREDIT NOTE ERROR');
-            \Log::info($e);
+            Log::info('STORE CREDIT NOTE ERROR');
+            Log::info($e);
 
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -909,7 +698,7 @@ class CreditNoteController extends Controller
         // Fetch Customer information based on the item code
         $customerId = $request->input('customer');
 
-        \Log::info('Customer Id: ' . $customerId);
+        Log::info('Customer Id: ' . $customerId);
 
         $customerInfo['data'] = Customer::where('id', $customerId)->first();
 
@@ -921,5 +710,4 @@ class CreditNoteController extends Controller
             return response()->json([]);
         }
     }
-
 }

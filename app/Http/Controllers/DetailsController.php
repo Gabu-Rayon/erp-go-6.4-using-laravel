@@ -29,8 +29,15 @@ class DetailsController extends Controller
                 'key' => $config->api_key,
             ])->get($url);
 
+            Log::info('SYNC CODESSSS RESPONSE');
+            Log::info($response);
+
+            if (!$response['status']) {
+                return redirect()->back()->with('error', $response['message']);
+            }
+
             $data = $response->json();
-            $classList = $data['data']['data']['clsList'];
+            $classList = $data['responseData']['clsList'];
 
             Log::info('CLASSLIST');
             Log::info(json_encode($classList));
@@ -72,7 +79,8 @@ class DetailsController extends Controller
                 return redirect()->back()->with('success', __(ucfirst($detailToSync) . ' Up To Date'));
             }
         } catch (Exception $e) {
-            Log::error('Synchronization failed: ' . $e->getMessage());
+            Log::error('Synchronization failed: ');
+            Log::error($e);
             return redirect()->back()->with('error', __('Synchronization failed. Please try again.'));
         }
     }
