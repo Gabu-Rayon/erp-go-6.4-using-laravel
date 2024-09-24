@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Exception;
 use App\Models\Code;
+use App\Models\ConfigSettings;
+use Illuminate\Support\Facades\Log;
 
 class CodeController extends Controller
 {
@@ -13,18 +14,22 @@ class CodeController extends Controller
 
     public function getCodesList()
     {
-        $url = 'https://etims.your-apps.biz/api/GetCodeList?date=20210101120000';
+        $config = ConfigSettings::first();
+
+        $url = $config->api_url . 'GetCodeListV2?date=20210101120000';
 
         try {
             $response = Http::withHeaders([
-                'key' => '123456'
+                'key' => $config->api_key,
             ])->get($url);
-            $data = $response->json();                    
+
+            Log::info('CODE LIST RESPONSE');
+            Log::info($response);
+
+
+            $data = $response->json();
             $classList = $data['data']['data']['clsList'];
-            
-            \Log::info('API Request Data: ' . json_encode($response));
-            \Log::info('API Response: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
+
 
             if (isset($classList)) {
                 foreach ($classList as $class) {
