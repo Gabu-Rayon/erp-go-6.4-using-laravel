@@ -25,7 +25,6 @@ use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProductServiceExport;
 use App\Imports\ProductServiceImport;
-use App\Models\ConfigSettings;
 use App\Models\ProductServiceCategory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -865,112 +864,87 @@ class ProductServiceController extends Controller
   }
      ***/
 
-    public function import(Request $request)
-    {
+public function import(Request $request)
+{
+    $config = ConfigSettings::first();
+    $rules = [
+        'file' => 'required',
+    ];
 
-        $config = ConfigSettings::first();
-        $rules = [
-            'file' => 'required',
+    $validator = \Validator::make($request->all(), $rules);
+
+    if ($validator->fails()) {
+        $messages = $validator->getMessageBag();
+        return redirect()->back()->with('error', $messages->first());
+    }
+
+    // Read and process the CSV file
+    $products = (new ProductServiceImport)->toArray(request()->file('file'))[0];
+
+    // Construct the data array in the required JSON format
+    $jsonData = [];
+    foreach ($products as $product) {
+        $jsonData[] = [
+            'created_by' => Auth::user()->creatorId(),
+            "itemCode" => $product[0],
+            "itemClassifiCode" => $product[1],
+            "itemTypeCode" => $product[2],
+            "itemName" => $product[3],
+            "itemStrdName" => $product[4],
+            "countryCode" => $product[5],
+            "pkgUnitCode" => $product[6],
+            "qtyUnitCode" => $product[7],
+            "taxTypeCode" => $product[8],
+            "batchNo" => $product[9],
+            "barcode" => $product[10],
+            "unitPrice" => (float) $product[11],
+            "group1UnitPrice" => (float) $product[12],
+            "group2UnitPrice" => (float) $product[13],
+            "group3UnitPrice" => (float) $product[14],
+            "group4UnitPrice" => (float) $product[15],
+            "group5UnitPrice" => (float) $product[16],
+            "additionalInfo" => $product[17],
+            "saftyQuantity" => (int) $product[18],
+            "isInrcApplicable" => (bool) $product[19],
+            "isUsed" => (bool) $product[20],
+            "openingBalance" => (float) $product[21],
+            "packageQuantity" => (int) $product[22]
         ];
+    }
 
-        $validator = \Validator::make($request->all(), $rules);
+    $url = $config->api_url . 'SaveItemsV2';
 
-        if ($validator->fails()) {
-            $messages = $validator->getMessageBag();
+    $response = Http::withHeaders([
+        'accept' => '*/*',
+        'key' => $config->api_key,
+        'Content-Type' => 'application/json-patch+json',
+    ])->post($url, $jsonData);
 
-            return redirect()->back()->with('error', $messages->first());
-        }
+    // Log the API response
+    \Log::info('API Request Data: ' . json_encode($jsonData));
+    \Log::info('API Response: ' . $response->body());
+    \Log::info('API Response Status Code: ' . $response->status());
 
-        // Read and process the CSV file
-        $products = (new ProductServiceImport)->toArray(request()->file('file'))[0];
+    // Check if API call was successful
+    if ($response->successful()) {
+        return redirect()->route('productservice.index')->with('success', __('Data imported and posted to API successfully.'));
+    } else {
+        // If API call failed, log error and handle error message
+        \Log::error('API Error: ' . $response->body());
 
-        // Construct the data array in the required JSON format
-        $jsonData = [];
-        foreach ($products as $product) {
-            $jsonData[] = [
-                // 'name' => $item['itemName'] ?? null,
-                // 'sku' => $item['sku'] ?? null,
-                // 'sale_price' => $item['sale_price'] ?? null,
-                // 'purchase_price' => $item['purchase_price'] ?? null,
-                // 'quantity' => $item['quantity'],
-                // 'tax_id' => $taxIdCode,
-                // 'category_id' => $item['category_id'] ?? null,
-                // 'unit_id' => $item['unit_id'] ?? null,
-                // 'type' => $item['type'] ?? null,
-                // 'sale_chartaccount_id' => $item['sale_chartaccount_id'] ?? null,
-                // 'expense_chartaccount_id' => $item['expense_chartaccount_id'] ?? null,
-                // 'description' => $item['description'] ?? null,
-                // 'pro_image' => $storedFilePath,
-                'created_by' => Auth::user()->creatorId(),
-                "itemCode" => $product[0],
-                "itemClassifiCode" => $product[1],
-                "itemTypeCode" => $product[2],
-                "itemName" => $product[3],
-                "itemStrdName" => $product[4],
-                "countryCode" => $product[5],
-                "pkgUnitCode" => $product[6],
-                "qtyUnitCode" => $product[7],
-                "taxTypeCode" => $product[8],
-                "batchNo" => $product[9],
-                "barcode" => $product[10],
-                "unitPrice" => (float) $product[11],
-                "group1UnitPrice" => (float) $product[12],
-                "group2UnitPrice" => (float) $product[13],
-                "group3UnitPrice" => (float) $product[14],
-                "group4UnitPrice" => (float) $product[15],
-                "group5UnitPrice" => (float) $product[16],
-                "additionalInfo" => $product[17],
-                "saftyQuantity" => (int) $product[18],
-                "isInrcApplicable" => (bool) $product[19],
-                "isUsed" => (bool) $product[20],
-                "openingBalance" => (float) $product[21],
-                "packageQuantity" => (int) $product[22]
-            ];
-        }
+        // Get the error message from the API response
+        $errorMessage = $response->json()['message'] ?? __('Failed to import data or post to API.');
 
-        $config = ConfigSettings::first();
-
-        $url = $config->api_url . 'SaveItems';
-
-        $response = Http::withHeaders([
-            'accept' => '*/*',
-            'key' => $config->api_key,
-            'Content-Type' => 'application/json-patch+json',
-        ])->post($config->api_url . 'SaveItemsV2', $jsonData);
-
-        // Log the API response
-        \Log::info('API Request Data: ' . json_encode($products));
-        \Log::info('API Response: ' . $response->body());
-        \Log::info('API Response Status Code: ' . $response->status());
-
-        // Check if API call was successful
-        // if ($response->successful()) {
-        //     // API request was successful
-        //     return redirect()->route('productservice.index')->with('success', __('Data imported and posted to API successfully.'));
-        // } else {
-        //     // If API call failed, log error and handle error message
-        //     \Log::error('API Error: ' . $response->body());
-
-            // Get the error message from the API response
-            $errorMessage = $response->json()['message'] ?? __('Failed to import data or post to API.');
-
-            // Check if there are any failed products
-            if (!empty($jsonData)) {
-                // There are failed products, so return with error message
-                return redirect()->back()->with('error', $errorMessage)->with('failedProducts', $jsonData);
-            } else {
-                // No products were imported, so just return with error message
-                return redirect()->back()->with('error', $errorMessage);
-            }
-        }
-        if ($response->successful()) {
-            // API request was successful
-            return redirect()->route('productservice.index')->with('success', __('Data imported and posted to API successfully.'));
+        // Check if there are any failed products
+        if (!empty($jsonData)) {
+            // There are failed products, so return with error message
+            return redirect()->back()->with('error', $errorMessage)->with('failedProducts', $jsonData);
         } else {
-            // If API call failed, return with error message
-            return redirect()->back()->with('error', __('Failed to import data or post to API.'));
+            // No products were imported, so just return with error message
+            return redirect()->back()->with('error', $errorMessage);
         }
     }
+}
 
 
     public function warehouseDetail($id)
