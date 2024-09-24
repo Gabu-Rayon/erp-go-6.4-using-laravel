@@ -260,7 +260,6 @@ class CustomerController extends Controller
                 \Log::error('API Request Exception: ' . $e->getMessage());
                 return redirect()->back()->with('error', __('Failed to create customer due to an error.'));
             }
-
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }

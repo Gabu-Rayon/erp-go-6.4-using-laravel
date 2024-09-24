@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ImportedItems;
-use Illuminate\Support\Carbon;
+use App\Models\ConfigSettings;
 use App\Models\ProductService;
+use Illuminate\Support\Carbon;
 use App\Models\ImportItemStatusCode;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -48,7 +49,8 @@ class ImportedItemsController extends Controller
      */
     public function store(Request $request)
     {
-
+        //retrievie the Api endpoint config from the database that is api_url and api_key  
+        $config = ConfigSettings::first();
         if(\Auth::user()->type == 'company') {
             try {
 
@@ -101,12 +103,12 @@ class ImportedItemsController extends Controller
                 $occurredDate = date("Ymd");
                 $remark = $request['remark'];
 
-                $url = 'https://etims.your-apps.biz/api/MapImportedItem';
+                $url = $config->api_url . 'MapImportedItemV2';
 
                 $response = Http::withOptions([
                     'verify' => false
                 ])->withHeaders([
-                            'key' => '123456',
+                            'key' => $config->api_key,
                             'accept' => '*/*',
                             'Content-Type' => 'application/json'
                         ])->post($url, [
@@ -159,72 +161,7 @@ class ImportedItemsController extends Controller
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
         }
-    }
-
-    public function GetImportedProductService()
-    {
-        try {
-            ini_set('max_execution_time', 300);
-            $url = 'https://etims.your-apps.biz/api/GetImportedProductService?date=20220409';
-
-            $response = Http::withHeaders([
-                'key' => '123456'
-            ])->get($url);
-
-            $data = $response->json()['data'];
-
-            \Log::info('API  Data Request for getting Imported Item Information : ' . json_encode($data));
-            \Log::info('API Body Data Request for getting Imported Item Information: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
-
-            if (isset($data['data'])) {
-                try {
-                    foreach ($data['data']['itemClsList'] as $importedItem) {
-                        ImportedItems::create([
-                            'srNo' => $importedItem['srNo'],
-                            'taskCode' => $importedItem['taskCode'],
-                            'itemName' => $importedItem['itemName'],
-                            'hsCode' => $importedItem['hsCode'],
-                            'pkgUnitCode' => $importedItem['pkgUnitCode'],
-                            'netWeight' => $importedItem['netWeight'],
-                            'invForCode' => $importedItem['invForCode'],
-                            'declarationDate' => $importedItem['declarationDate'],
-                            'orginNationCode' => $importedItem['orginNationCode'],
-                            'qty' => $importedItem['qty'],
-                            'supplierName' => $importedItem['supplierName'],
-                            'nvcfcurExcrt' => $importedItem['nvcfcurExcrt'],
-                            'itemSeq' => $importedItem['itemSeq'],
-                            'exprtNatCode' => $importedItem['exprtNatCode'],
-                            'qtyUnitCode' => $importedItem['qtyUnitCode'],
-                            'agentName' => $importedItem['agentName'],
-                            'declarationNo' => $importedItem['declaratioNo'],
-                            'package' => $importedItem['package'],
-                            'grossWeight' => $importedItem['grossWeight'],
-                            'invForCurrencyAmount' => $importedItem['invForCurrencyAmount'],
-                            'status' => $importedItem['status'],
-                            'mapped_product_id' => null,
-                            'mapped_date' => null,
-                            'created_by' => \Auth::user()->creatorId()
-                        ]);
-                    }
-                    // return redirect()->back()->with('success', 'Item Information added successfully.');
-                    return redirect()->route('importeditems.index')->with('success', __('Imported Items  Created successfully .'));
-                } catch (\Exception $e) {
-                    \Log::error('Error adding Imported Items from the API: ');
-                    \Log::error($e);
-                    // return redirect()->back()->with('error', 'Error adding Item Information from the API.');
-                    return redirect()->route('importeditems.index')->with('error', __('Error adding Imported Items from the API.'));
-                }
-            } else {
-                // return redirect()->back()->with('error', 'No data found in the API response.');
-                return redirect()->route('importeditems.index')->with('error', __('No data found in the API response.'));
-            }
-        } catch (\Exception $e) {
-            \Log::error($e);
-            // return redirect()->back()->with('error', 'Error adding Item Information from the API.');
-            return redirect()->route('importeditems.index')->with('error', __('Error adding Imported Items from the API.'));
-        }
-    }
+    }   
 
     /**
      * Show the form for editing the specified resource.
@@ -279,10 +216,13 @@ class ImportedItemsController extends Controller
         \Log::info('Date Formatted Synchronization request received From Searching the Imported Items Search Form:'. $formattedDate);
 
         try {
-            $url = 'https://etims.your-apps.biz/api/GetImportedItemInformation?date=' . $formattedDate;
+            //retrievie the Api endpoint config from the database that is api_url and api_key  
+            $config = ConfigSettings::first();
+
+            $url = $config->api_url . 'GetImportedItemInformationV2?date=' . $formattedDate;
 
             $response = Http::withOptions(['verify' => false])
-                ->withHeaders(['key' => '123456'])
+                ->withHeaders(['key' => $config->api_key])
                 ->get($url);
 
             $data = $response->json();
@@ -343,6 +283,77 @@ class ImportedItemsController extends Controller
         } catch (\Exception $e) {
             \Log::error('Error syncing imported items:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', __('Error Syncing Imported Items'));
+        }
+    }
+
+
+
+
+    public function GetImportedProductService()
+    {
+        try {
+            ini_set('max_execution_time', 300);
+            //retrievie the Api endpoint config from the database that is api_url and api_key  
+            $config = ConfigSettings::first();
+
+            $url = $config->api_url . 'GetImportedProductServiceV2?date=20220409';
+
+            $response = Http::withHeaders([
+                'key' => $config->api_key
+            ])->get($url);
+
+            $data = $response->json()['data'];
+
+            \Log::info('API  Data Request for getting Imported Item Information : ' . json_encode($data));
+            \Log::info('API Body Data Request for getting Imported Item Information: ' . $response->body());
+            \Log::info('API Response Status Code: ' . $response->status());
+
+            if (isset($data['data'])) {
+                try {
+                    foreach ($data['data']['itemClsList'] as $importedItem) {
+                        ImportedItems::create([
+                            'srNo' => $importedItem['srNo'],
+                            'taskCode' => $importedItem['taskCode'],
+                            'itemName' => $importedItem['itemName'],
+                            'hsCode' => $importedItem['hsCode'],
+                            'pkgUnitCode' => $importedItem['pkgUnitCode'],
+                            'netWeight' => $importedItem['netWeight'],
+                            'invForCode' => $importedItem['invForCode'],
+                            'declarationDate' => $importedItem['declarationDate'],
+                            'orginNationCode' => $importedItem['orginNationCode'],
+                            'qty' => $importedItem['qty'],
+                            'supplierName' => $importedItem['supplierName'],
+                            'nvcfcurExcrt' => $importedItem['nvcfcurExcrt'],
+                            'itemSeq' => $importedItem['itemSeq'],
+                            'exprtNatCode' => $importedItem['exprtNatCode'],
+                            'qtyUnitCode' => $importedItem['qtyUnitCode'],
+                            'agentName' => $importedItem['agentName'],
+                            'declarationNo' => $importedItem['declaratioNo'],
+                            'package' => $importedItem['package'],
+                            'grossWeight' => $importedItem['grossWeight'],
+                            'invForCurrencyAmount' => $importedItem['invForCurrencyAmount'],
+                            'status' => $importedItem['status'],
+                            'mapped_product_id' => null,
+                            'mapped_date' => null,
+                            'created_by' => \Auth::user()->creatorId()
+                        ]);
+                    }
+                    // return redirect()->back()->with('success', 'Item Information added successfully.');
+                    return redirect()->route('importeditems.index')->with('success', __('Imported Items  Created successfully .'));
+                } catch (\Exception $e) {
+                    \Log::error('Error adding Imported Items from the API: ');
+                    \Log::error($e);
+                    // return redirect()->back()->with('error', 'Error adding Item Information from the API.');
+                    return redirect()->route('importeditems.index')->with('error', __('Error adding Imported Items from the API.'));
+                }
+            } else {
+                // return redirect()->back()->with('error', 'No data found in the API response.');
+                return redirect()->route('importeditems.index')->with('error', __('No data found in the API response.'));
+            }
+        } catch (\Exception $e) {
+            \Log::error($e);
+            // return redirect()->back()->with('error', 'Error adding Item Information from the API.');
+            return redirect()->route('importeditems.index')->with('error', __('Error adding Imported Items from the API.'));
         }
     }
 }

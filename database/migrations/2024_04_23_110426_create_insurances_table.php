@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('insuranceName');
             $table->decimal('premiumRate', 8, 2);
             $table->boolean('isUsed')->default(true);
+            $table->boolean('isKRASync');
             $table->timestamps();
         });
     }

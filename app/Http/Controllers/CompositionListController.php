@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CompositionItem;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Http;
-use App\Models\CompositionList;
-use App\Models\ProductService;
 use App\Models\ItemType;
+use Illuminate\Http\Request;
+use App\Models\ConfigSettings;
+use App\Models\ProductService;
+use App\Models\CompositionItem;
+use App\Models\CompositionList;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 
 class CompositionListController extends Controller
 {
@@ -51,12 +52,12 @@ class CompositionListController extends Controller
                  */
                 $mainItemCode = $productServices->filter(function ($item) {
                     return $item->itemTyCd == 2 || $item->itemTyCd == 3;
-                })->pluck('itemNm', 'itemCd');
+                })->pluck('itemNm', 'kraItemCode');
 
                 // Filter component item codes (Raw material type)
                 $compoItemCode = $productServices->filter(function ($item) {
                     return $item->itemTyCd == 1;
-                })->pluck('itemNm', 'itemCd');
+                })->pluck('itemNm', 'kraItemCode');
 
                 return view('compositionlist.create', compact('mainItemCode', 'compoItemCode'));
             } catch (\Exception $e) {
@@ -72,8 +73,10 @@ class CompositionListController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->type == 'company')
-        {
+        // Retrieve the API endpoint config from the database
+        $config = ConfigSettings::first();
+
+        if (\Auth::user()->type == 'company') {
             try {
                 // Validation code 
                 $validator = \Validator::make(
@@ -85,12 +88,13 @@ class CompositionListController extends Controller
                         'items.*.compoItemQty' => 'required|integer',
                     ]
                 );
+
                 if ($validator->fails()) {
                     $messages = $validator->getMessageBag();
                     return redirect()->back()->with('error', $messages->first());
                 }
 
-                \Log::info('COMPOSITION ITEMS LIST DATA  FROM THE FORM: ');
+                \Log::info('COMPOSITION ITEMS LIST DATA FROM THE FORM: ');
                 \Log::info($request->all());
 
                 $data = $request->all();
@@ -100,56 +104,66 @@ class CompositionListController extends Controller
 
                 $apiCompositionDataRequest = [
                     'mainItemCode' => $mainItemCode,
-                    'CompositionLists' => $CompositionLists
+                    'compositionItems' => $CompositionLists
                 ];
 
                 \Log::info('apiCompositionDataRequest to be sent to API:', $apiCompositionDataRequest);
 
-                $url = 'https://etims.your-apps.biz/api/AddCompositionListList';
+                $url = $config->api_url . 'AddCompositionItemListV2';
 
                 $response = Http::withOptions(['verify' => false])->withHeaders([
-                    'key' => '123456',
+                    'key' => $config->api_key,
                 ])->post($url, $apiCompositionDataRequest);
 
-
-                //Log response data
-                \Log::info('API Response  Body For Posting Composition List: ' . $response->body());
+                // Log response data
+                \Log::info('API Response Body For Posting Composition List: ' . $response->body());
                 \Log::info('API Response Status Code For Posting Composition List: ' . $response->status());
 
-                \Log::info('Composition List Api  API RESPONSE');
-                \Log::info('Response Details : ' . $response);
+                $responseData = $response->json(); // Decode the response to an array
 
-                // if ($response['statusCode'] == 400) {
-                //     return redirect()->back()->with('error', 'Composition List Cannot Be added');
-                // }
-                // CompositionList has a column named `mainItemCode` and `compositionItems_count`
-                $compositionList = CompositionList::create([
-                    'mainItemCode' => $mainItemCode,
-                    'compositionItems_count' => $compositionItemsCount,
-                    'created_by' => \Auth::user()->creatorId(),
-                ]);
+                if ($responseData['status']) {
+                    // Create the composition list once
+                    $isKRASync = false; // Default value
+                    // Loop through responseData to save each item and isKRASync
+                    foreach ($responseData['responseData'] as $itemResponse) {
+                        // Update isKRASync based on the response
+                        $isKRASync = $itemResponse['isKRASync'] ?? false; // Default to false if not set
+                    }
 
-                //composition items for each composition list referencing the id of the composition list on each item column
-                foreach ($CompositionLists as $item) {
-                    \Log::info($item);
-                    CompositionItem::create([
-                        'mainItemCode_id' => $compositionList->id,
-                        'compoItemCode' => $item['compoItemCode'],
-                        'compoItemQty' => $item['compoItemQty'],
-                        'created_by'=> \Auth::user()->creatorId(), 
+                    // Save the CompositionList with the isKRASync value
+                    $compositionList = CompositionList::create([
+                        'mainItemCode' => $mainItemCode,
+                        'compositionItems_count' => $compositionItemsCount,
+                        'created_by' => \Auth::user()->creatorId(),
+                        'isKRASync' => $isKRASync,
                     ]);
+
+                    // Save each composition item
+                    foreach ($CompositionLists as $item) {
+                        \Log::info($item);
+                        CompositionItem::create([
+                            'mainItemCode_id' => $compositionList->id,
+                            'compoItemCode' => $item['compoItemCode'],
+                            'compoItemQty' => $item['compoItemQty'],
+                            'created_by' => \Auth::user()->creatorId(),
+                        ]);
+                    }
+
+                    return redirect()->route('compositionlist.index')->with('success', 'Composition List Item Added');
+                } else {
+                    // Handle case where API returns a failure message
+                    return redirect()->back()->with('error', $responseData['message'] ?? 'Failed to add composition items.');
                 }
-                return redirect()->route('compositionlist.index')->with('success', 'Composition List Item Added');
 
             } catch (\Exception $e) {
                 \Log::info($e);
                 return redirect()->back()->with('error', $e->getMessage());
             }
-
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
+
 
 
     public function show($id)

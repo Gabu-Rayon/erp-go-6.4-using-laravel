@@ -39,8 +39,8 @@
                         <tbody class="list">
                         @foreach ($compositionslistitems as $compositionlistitem)
                             <tr>
-                                <td>{{ \App\Models\ProductService::where('itemCd', $compositionlistitem->mainItemCode)->first()->itemNm }}</td>
-                                <td>{{ $compositionlistitem->compositionItems_count }}</td>
+                                <td>{{ \App\Models\ProductService::where('kraItemCode', $compositionlistitem->mainItemCode)->first()->itemNm ?? null }} </td>
+                                <td>{{ $compositionlistitem->compositionItems_count ?? null}}</td>
 
                                  @if(Gate::check('edit purchase') || Gate::check('delete purchase') || Gate::check('show purchase'))
                                         <td class="Action">

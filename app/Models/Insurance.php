@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Insurance extends Model
 {
     use HasFactory;
-    protected $fillable = ['insuranceCode', 'insuranceName', 'premiumRate', 'isUsed'];
+    protected $fillable = ['insuranceCode', 'insuranceName', 'premiumRate', 'isUsed','isKRASync'];
    protected  $table = 'insurances';
 }

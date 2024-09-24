@@ -28,6 +28,7 @@
                                 <th> {{__('InsuranceName')}}</th>
                                 <th> {{__('PremiumRate')}}</th>
                                 <th>{{__('isUsed')}}</th>
+                                <th>{{__('isKRASync')}}</th>
                             </tr>
                             </thead>
                             <tbody>                                
@@ -38,6 +39,7 @@
                                         <td>{{$insurance->insuranceName }}</td>
                                         <td>{{$insurance->premiumRate }}</td>
                                         <td>{{$insurance->isUsed ? 'Y' : 'N'}}
+                                        <td>{{$insurance->isKRASync ? 'Y' : 'N'}}
 
                                             </td>
                                     </tr>

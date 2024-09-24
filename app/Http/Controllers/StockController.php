@@ -7,15 +7,16 @@ use App\Models\ReleaseType;
 use App\Models\BranchesList;
 use Illuminate\Http\Request;
 use App\Models\StockMoveList;
+use App\Models\ConfigSettings;
 use App\Models\ProductService;
 use App\Models\StockAdjustment;
 use App\Models\StockReleaseType;
-use Illuminate\Support\Facades\Validator;
 use App\Models\StockMoveListItem;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 use App\Models\StockAdjustmentProductList;
 
 class StockController extends Controller
@@ -60,6 +61,8 @@ class StockController extends Controller
      */
 
     public function stockAdjustmentStore(Request $request) {
+        $config = ConfigSettings::first();
+        
         try {
 
             $data = $request->all();
@@ -79,10 +82,10 @@ class StockController extends Controller
                 return redirect()->back()->with('error', $validator->errors()->first());
             }
 
-            $url = 'https://etims.your-apps.biz/api/StockAdjustment';
+            $url = $config ->api_url . 'StockAdjustmentV2';
 
             $response = Http::withOptions(['verify' => false])->withHeaders([
-                'key' => '123456',
+                'key' => $config->api_key,
             ])->post($url, [
                 'storeReleaseTypeCode' => $data['storeReleaseTypeCode'],
                 'remark' => $data['remark'],
@@ -307,15 +310,17 @@ class StockController extends Controller
      */
     public function stockUpdateByInvoiceNoStore(Request $request)
     {
+
+        $config = ConfigSettings::first();
         try {
             $data = $request->all();
             \Log::info('Inv No');
             \Log::info($request->all());
 
-            $url = 'https://etims.your-apps.biz/api/StockUpdate/ByInvoiceNo?InvoiceNo=' . $data['invoiceNo'];
+            $url = $config->api_url . 'StockUpdate/ByInvoiceNo?InvoiceNo=' . $data['invoiceNo'];
 
             $response = Http::withOptions(['verify' => false])->withHeaders([
-                'key' => '123456',
+                'key' => $config->api_key,
                 'accept' => '*/*',
                 'Content-Type' => 'application/json'
             ])->post($url);
@@ -379,11 +384,12 @@ class StockController extends Controller
 
     public function getStockMoveListFromApi()
     {
-        $url = 'https://etims.your-apps.biz/api/GetMoveList?date=20210101120000';
+        $config = ConfigSettings::first();
+        $url = $config->api_url . 'GetMoveList?date=20210101120000';
 
         try {
             $response = \Http::withHeaders([
-                'key' => '123456'
+                'key' => $config->api_url
             ])->get($url);
 
             $data = $response->json();
@@ -401,6 +407,7 @@ class StockController extends Controller
     //Search Stock Move bY Date
     public function stockMoveSearchByDate(Request $request)
     {
+        $config = ConfigSettings::first();
         // Log the request from the form
         \Log::info('Synchronization request received from Searching the Stock Move SearchByDate Form:', $request->all());
 
@@ -420,8 +427,8 @@ class StockController extends Controller
         try {
             // Make the API call
             $response = Http::withOptions(['verify' => false])
-                ->withHeaders(['key' => '123456'])
-                ->get("https://etims.your-apps.biz/api/GetMoveList?date={$formattedDate}");
+                ->withHeaders(['key' => $config->api_key])
+                ->get($config->api_url . "GetMoveList?date={$formattedDate}");
 
             $data = $response->json()['data'];
             if (!isset($data['data']['stockList'])) {

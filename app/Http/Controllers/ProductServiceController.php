@@ -13,10 +13,13 @@ use App\Models\ItemType;
 use App\Models\CustomField;
 use Illuminate\Http\Request;
 use App\Models\ChartOfAccount;
+use App\Models\ConfigSettings;
 use App\Models\ProductService;
+use App\Models\QuantityUnitCode;
 use App\Models\WarehouseProduct;
 use App\Models\ProductServiceUnit;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
@@ -24,11 +27,9 @@ use App\Exports\ProductServiceExport;
 use App\Imports\ProductServiceImport;
 use App\Models\ProductServiceCategory;
 use Illuminate\Support\Facades\Storage;
-use App\Models\ProductsServicesClassification;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use App\Models\QuantityUnitCode;
 use App\Models\ProductServicesPackagingUnit;
+use App\Models\ProductsServicesClassification;
 
 class ProductServiceController extends Controller
 {
@@ -411,6 +412,8 @@ class ProductServiceController extends Controller
 
     public function store(Request $request)
     {
+        //retrievie the Api endpoint config from the database that is api_url and api_key  
+        $config = ConfigSettings::first();
         try {
             $data = $request->all();
 
@@ -570,8 +573,8 @@ class ProductServiceController extends Controller
                 ])->withHeaders([
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
-                    'key' => '123456'
-                ])->post('https://etims.your-apps.biz/api/AddItemsListV2', $apiData);
+                    'key' => $$config->api_key
+                ])->post($$config->api_url . 'AddItemsListV2', $apiData);
 
                 // Log response data
                 \Log::info('API Response Status Code For Posting Product Data: ' . $response->status());
@@ -705,6 +708,7 @@ class ProductServiceController extends Controller
 
     public function update(Request $request, $id)
     {
+        $config = ConfigSettings::first();
         $iteminformation = ProductService::find($id);
         \Log::info('Product Service INFO being edited :', ['item' => $iteminformation]);
         try {
@@ -775,8 +779,8 @@ class ProductServiceController extends Controller
             ])->withHeaders([
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
-                'key' => '123456'
-            ])->post('https://etims.your-apps.biz/api/UpdateItem', $reqData);
+                'key' => $config->api_key
+            ])->post($config->api_url . 'UpdateItemV2', $reqData);
 
             $res = $response->json();
 
@@ -1124,6 +1128,8 @@ class ProductServiceController extends Controller
 
     public function import(Request $request)
     {
+
+        $config = ConfigSettings::first();
         $rules = [
             'file' => 'required',
         ];
@@ -1186,9 +1192,9 @@ class ProductServiceController extends Controller
         // Make a POST request to the API endpoint
         $response = Http::withHeaders([
             'accept' => '*/*',
-            'key' => '123456',
+            'key' => $config->api_key,
             'Content-Type' => 'application/json-patch+json',
-        ])->post('https://etims.your-apps.biz/api/SaveItems', $jsonData);
+        ])->post($config->api_url . 'SaveItemsV2', $jsonData);
 
         // Log the API response
         \Log::info('API Request Data: ' . json_encode($products));

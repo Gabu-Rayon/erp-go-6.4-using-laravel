@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->id();
             $table->string('mainItemCode');
             $table->bigInteger('compositionItems_count');
+            $table->boolean('isKRASync'); 
             $table->timestamps();
         });
     }
