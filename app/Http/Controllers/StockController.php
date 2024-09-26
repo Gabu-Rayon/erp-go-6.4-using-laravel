@@ -14,12 +14,15 @@ use App\Models\StockAdjustment;
 use App\Models\StockReleaseType;
 use App\Models\StockMoveListItem;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\FacadesLog;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use App\Models\BranchTransferProduct;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\FacadesValidator;
 use App\Models\StockAdjustmentProductList;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class StockController extends Controller
 {
@@ -43,9 +46,9 @@ class StockController extends Controller
     public function stockAdjustmentCreate()
     {
 
-        if (\Auth::user()->type == 'company') {
+        if (Auth::user()->type == 'company') {
             try {
-                $items = ProductService::where('created_by', \Auth::user()->id)->get()->pluck('itemNm', 'itemCd');
+                $items = ProductService::where('created_by', Auth::user()->id)->get()->pluck('itemNm', 'itemCd');
                 $releaseTypes = ReleaseType::all()->pluck('type', 'code');
                 return view('stockadjustment.create', compact('items', 'releaseTypes'));
             } catch (\Exception $e) {
@@ -70,8 +73,8 @@ class StockController extends Controller
         try {
 
             $data = $request->all();
-            \Log::info("Data  from the form  Adjust Stock :");
-            \Log::info($data);
+            Log::info("Data  from the form  Adjust Stock :");
+            Log::info($data);
 
             $validator = Validator::make($data, [
                 'storeReleaseTypeCode' => 'required',
@@ -100,9 +103,9 @@ class StockController extends Controller
                 return redirect()->back()->with('error', 'Check your credentials and try again');
             }
             // Log response data
-            \Log::info('API Response Status Code For Posting Stock Adjustment : ' . $response->status());
-            \Log::info('API Request  Stock Adjustment Data Posted: ' . json_encode($response));
-            \Log::info('API Response Body For Posting  Stock Adjustment Data: ' . $response->body());
+            Log::info('API Response Status Code For Posting Stock Adjustment : ' . $response->status());
+            Log::info('API Request  Stock Adjustment Data Posted: ' . json_encode($response));
+            Log::info('API Response Body For Posting  Stock Adjustment Data: ' . $response->body());
 
             $updatedItems = [];
 
@@ -144,8 +147,8 @@ class StockController extends Controller
             return redirect()->route('stockadjustment.index')->with('success', 'Stock Adjustment Added.');
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::info('STOCK ADJUSTMENT STORE ERROR');
-            \Log::info($e);
+            Log::info('STOCK ADJUSTMENT STORE ERROR');
+            Log::info($e);
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
@@ -190,15 +193,15 @@ class StockController extends Controller
     public function stockMoveIndex()
     {
         try {
-            if (\Auth::user()->type == 'company') {
+            if (Auth::user()->type == 'company') {
                 $stockMoveList = StockMoveList::all();
                 return view('stockinfo.index', compact('stockMoveList'));
             } else {
                 return redirect()->back()->with('error', 'Permission Denied');
             }
         } catch (\Exception $e) {
-            \Log::info('errorrrrr');
-            \Log::info($e);
+            Log::info('errorrrrr');
+            Log::info($e);
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
@@ -210,15 +213,15 @@ class StockController extends Controller
     public function stockTranfer()
     {
         try {
-            if (\Auth::user()->type == 'company') {
+            if (Auth::user()->type == 'company') {
                 $stockMoveList = BranchesList::all();
                 return view('stockmove.index', compact('stockMoveList'));
             } else {
                 return redirect()->back()->with('error', 'Permission Denied');
             }
         } catch (\Exception $e) {
-            \Log::info('errorrrrr');
-            \Log::info($e);
+            Log::info('errorrrrr');
+            Log::info($e);
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
@@ -243,7 +246,7 @@ class StockController extends Controller
         Log::info($data);
 
         // Define the validation rules
-        $validator = \Validator::make(
+        $validator = Validator::make(
             $data,
             [
                 'branchFrom' => 'required|string',
@@ -264,8 +267,8 @@ class StockController extends Controller
 
         try {
             // Log the validated data
-            \Log::info('STOCK MOVE DATA VALIDATED:');
-            \Log::info($request->all());
+            Log::info('STOCK MOVE DATA VALIDATED:');
+            Log::info($request->all());
 
             // Prepare the data for the API request
             $apiData = [
@@ -286,9 +289,9 @@ class StockController extends Controller
             ])->post($url, $apiData);
 
             // Log the API response
-            \Log::info('API Request Data: ' . json_encode($apiData));
-            \Log::info('API Response: ' . $response->body());
-            \Log::info('API Response Status Code: ' . $response->status());
+            Log::info('API Request Data: ' . json_encode($apiData));
+            Log::info('API Response: ' . $response->body());
+            Log::info('API Response Status Code: ' . $response->status());
 
             if ($response->successful()) {
                 // Save the data to the local database only if the API call is successful
@@ -312,8 +315,8 @@ class StockController extends Controller
                 return redirect()->to('stockmove.index')->with('error', __('Failed to post data to API.'));
             }
         } catch (\Exception $e) {
-            \Log::info('STOCK MOVE ERROR');
-            \Log::info($e);
+            Log::info('STOCK MOVE ERROR');
+            Log::info($e);
 
             return redirect()->to('stockmove.index')->with('error', $e->getMessage());
         }
@@ -332,7 +335,7 @@ class StockController extends Controller
             $stockMoveItems = StockMoveListItem::where('stockMoveListID', $id)->get();
 
             // Log the retrieved stock move details
-            \Log::info('Stock Move details retrieved:', [
+            Log::info('Stock Move details retrieved:', [
                 'stockMove' => $stockMove,
                 'stockMoveItems' => $stockMoveItems,
             ]);
@@ -343,7 +346,7 @@ class StockController extends Controller
                 'stockMoveItems' => $stockMoveItems,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error retrieving stock move details:', ['error' => $e->getMessage()]);
+            Log::error('Error retrieving stock move details:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', __('Error retrieving stock move details.'));
         }
     }
@@ -409,8 +412,8 @@ class StockController extends Controller
         $config = ConfigSettings::first();
         try {
             $data = $request->all();
-            \Log::info('Inv No');
-            \Log::info($request->all());
+            Log::info('Inv No');
+            Log::info($request->all());
 
             $url = $config->api_url . 'StockUpdate/ByInvoiceNo?InvoiceNo=' . $data['invoiceNo'];
 
@@ -420,8 +423,8 @@ class StockController extends Controller
                 'Content-Type' => 'application/json'
             ])->post($url);
 
-            \Log::info('STOCK INV NO API RESPONSE');
-            \Log::info($response->json()); // Log the JSON response
+            Log::info('STOCK INV NO API RESPONSE');
+            Log::info($response->json()); // Log the JSON response
 
             if ($response->json()['statusCode'] == 400 && $response->json()['message'] == 'Sale Details Not Found') {
                 return redirect()->route('stockmove.index')->with('error', 'Sale Details Not Found');
@@ -429,7 +432,7 @@ class StockController extends Controller
 
             return redirect()->route('stockmove.index')->with('success', 'Updated Successfully');
         } catch (\Exception $e) {
-            \Log::error('Error in stockUpdateByInvoiceNoStore:', ['message' => $e->getMessage()]);
+            Log::error('Error in stockUpdateByInvoiceNoStore:', ['message' => $e->getMessage()]);
             return redirect()->route('stockmove.index')->with('error', $e->getMessage());
         }
     }
@@ -441,8 +444,8 @@ class StockController extends Controller
     public function stockUpdateByInvoiceNoShow($id)
     {
         $stockMoveList = StockMoveList::find($id)->first();
-        \Log::info('STOCK MOVE LIST controller');
-        \Log::info($stockMoveList);
+        Log::info('STOCK MOVE LIST controller');
+        Log::info($stockMoveList);
         $items = StockMoveListItem::where('stockMoveListID', $stockMoveList->id)->get();
         return view('stockinfo.show', compact('stockMoveList', 'items'));
     }
@@ -483,18 +486,18 @@ class StockController extends Controller
         $url = $config->api_url . 'GetMoveList?date=20210101120000';
 
         try {
-            $response = \Http::withHeaders([
+            $response = Http::withHeaders([
                 'key' => $config->api_url
             ])->get($url);
 
             $data = $response->json();
-            \Log::info('DATA GOTTEN FROM API:');
-            \Log::info($data['data']['data']['stockList']);
+            Log::info('DATA GOTTEN FROM API:');
+            Log::info($data['data']['data']['stockList']);
 
             return redirect()->to('/stockinfo')->with('success', 'Successfully Retrieved Stock Move List from API');
         } catch (\Exception $e) {
-            \Log::error('GET STOCK MOVE LIST FROM API ERROR: ');
-            \Log::error($e);
+            Log::error('GET STOCK MOVE LIST FROM API ERROR: ');
+            Log::error($e);
             return redirect()->to('/stockinfo')->with('error', $e->getMessage());
         }
     }
@@ -504,7 +507,7 @@ class StockController extends Controller
     {
         $config = ConfigSettings::first();
         // Log the request from the form
-        \Log::info('Synchronization request received from Searching the Stock Move SearchByDate Form:', $request->all());
+        Log::info('Synchronization request received from Searching the Stock Move SearchByDate Form:', $request->all());
 
         // Validate the date input
         $request->validate([
@@ -517,7 +520,7 @@ class StockController extends Controller
         // Get and format the date
         $date = $request->input('searchByDate');
         $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
-        \Log::info('Date formatted from synchronization request:', ['formattedDate' => $formattedDate]);
+        Log::info('Date formatted from synchronization request:', ['formattedDate' => $formattedDate]);
 
         try {
             // Make the API call
@@ -531,7 +534,7 @@ class StockController extends Controller
             }
 
             $remoteStockMoveSearchByDateinfo = $data['data']['stockList'];
-            \Log::info('Remote item info:', $remoteStockMoveSearchByDateinfo);
+            Log::info('Remote item info:', $remoteStockMoveSearchByDateinfo);
 
             // Prepare data for synchronization
             $remoteStockMoveSearchByDateinfoToSync = [];
@@ -549,8 +552,8 @@ class StockController extends Controller
                 }
             }
 
-            \Log::info('Remote Stock Move search by date info to sync:', $remoteStockMoveSearchByDateinfoToSync);
-            \Log::info('Remote Stock Move item lists to sync:', $remoteStockMoveSearchByDateItemListinfoToSync);
+            Log::info('Remote Stock Move search by date info to sync:', $remoteStockMoveSearchByDateinfoToSync);
+            Log::info('Remote Stock Move item lists to sync:', $remoteStockMoveSearchByDateItemListinfoToSync);
 
             // Synchronize the Stock move list
             $syncedCount = $this->synchronizeStockMove($remoteStockMoveSearchByDateinfoToSync, $remoteStockMoveSearchByDateItemListinfoToSync);
@@ -561,7 +564,7 @@ class StockController extends Controller
                 return redirect()->back()->with('success', __('Stock Move List up to date.'));
             }
         } catch (\Exception $e) {
-            \Log::error('Error syncing stock Move list:', ['error' => $e->getMessage()]);
+            Log::error('Error syncing stock Move list:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', __('Error syncing stock move list.'));
         }
     }
@@ -634,7 +637,7 @@ class StockController extends Controller
                     }
                 }
 
-                \Log::info("Synced $syncedStockMoveItemCount stock Move list items for stock move list ID {$stockMove->id}");
+                Log::info("Synced $syncedStockMoveItemCount stock Move list items for stock move list ID {$stockMove->id}");
             }
         }
 
