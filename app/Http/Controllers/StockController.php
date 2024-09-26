@@ -319,63 +319,6 @@ class StockController extends Controller
         }
     }
 
-
-    public function synchronizegetStockMoveListFromApi()
-    {
-        $config = ConfigSettings::first();
-
-        // Get and format the date
-        $date = "2022-01-01";
-        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
-        \Log::info('Date formatted from synchronization request:', ['formattedDate' => $formattedDate]);
-
-        try {
-            // Make the API call
-            $response = Http::withOptions(['verify' => false])
-                ->withHeaders(['key' => $config->api_key])
-                ->get($config->api_url . "GetMoveList?date={$formattedDate}");
-
-            $data = $response->json()['data'];
-            if (!isset($data['data']['stockList'])) {
-                return redirect()->back()->with('error', __('There is no search result.'));
-            }
-
-            $remoteStockMoveSearchByDateinfo = $data['data']['stockList'];
-            \Log::info('Remote item info:', $remoteStockMoveSearchByDateinfo);
-
-            // Prepare data for synchronization
-            $remoteStockMoveSearchByDateinfoToSync = [];
-            $remoteStockMoveSearchByDateItemListinfoToSync = [];
-            foreach ($remoteStockMoveSearchByDateinfo as $remoteItem) {
-                $item = $this->prepareStockMoveData($remoteItem);
-                $remoteStockMoveSearchByDateinfoToSync[] = $item;
-
-                if (isset($remoteItem['itemList']) && is_array($remoteItem['itemList'])) {
-                    foreach ($remoteItem['itemList'] as $itemList) {
-                        $itemListData = $this->prepareStockMoveItemListData($itemList);
-                        $itemListData['stockMoveListID'] = null;  // Placeholder, will be set during sync
-                        $remoteStockMoveSearchByDateItemListinfoToSync[] = $itemListData;
-                    }
-                }
-            }
-
-            \Log::info('Remote Stock Move search by date info to sync:', $remoteStockMoveSearchByDateinfoToSync);
-            \Log::info('Remote Stock Move item lists to sync:', $remoteStockMoveSearchByDateItemListinfoToSync);
-
-            // Synchronize the Stock move list
-            $syncedCount = $this->synchronizeStockMove($remoteStockMoveSearchByDateinfoToSync, $remoteStockMoveSearchByDateItemListinfoToSync);
-
-            if ($syncedCount > 0) {
-                return redirect()->back()->with('success', __('Synced ' . $syncedCount . ' Stock Move successfully.'));
-            } else {
-                return redirect()->back()->with('success', __('Stock Move List up to date.'));
-            }
-        } catch (\Exception $e) {
-            \Log::error('Error syncing stock Move list:', ['error' => $e->getMessage()]);
-            return redirect()->back()->with('error', __('Error syncing stock move list.'));
-        }
-    }
-
     public function getStockMoveListFromApi()
     {
         $config = ConfigSettings::first();
