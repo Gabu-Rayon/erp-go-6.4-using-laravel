@@ -279,8 +279,17 @@ class PurchaseController extends Controller
                 ->withHeaders(['key' => $config->api_key])
                 ->get($url);
 
-            Log::info('API RESPONSE');
-            Log::info($response);
+
+            if (!$response['status']) {
+                return redirect()->back()->with('error', $response['message']);
+            }
+
+            $data = $response->json();
+
+            $purchases = $data['responseData']['saleList'];
+
+            Log::info('GET PURCHASES RESPONSE');
+            Log::info($purchases);
         } catch (Exception $e) {
             Log::error('Error syncing purchases:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', __('Error syncing purchases.'));
@@ -355,7 +364,7 @@ class PurchaseController extends Controller
             $category->prepend('Select Category', '');
 
             $purchase_number = Auth::user()->purchaseNumberFormat($this->purchaseNumber());
-            $venders = Vender::all()->pluck('name', 'spplrTin');
+            $venders = Vender::all()->pluck('spplrNm', 'spplrTin');
             $venders->prepend('Select Vender', '');
 
             Log::info('Venders:');
@@ -500,14 +509,13 @@ class PurchaseController extends Controller
 
             $responseContent = $response->json(); // Get the full JSON response as an array
 
-            if ($responseContent['statusCode'] = 200) {
-                // Handle internal statusCode not 200
+            if (!$responseContent['status']) {
                 $apiErrors = $responseContent['message'];
                 if (isset($responseContent['data']['message'])) {
                     $apiErrors .= ' - ' . $responseContent['data']['message'];
                 }
                 return redirect()->back()->with('error', $apiErrors);
-            } elseif ($responseContent['statusCode'] == 200 && strtolower($responseContent['message']) != 'failed') {
+            } elseif ($responseContent['status'] && strtolower($responseContent['message']) != 'failed') {
                 return redirect()->route('purchase.index')->with('success', __('Purchase successfully created.'));
             } else {
                 return redirect()->back()->with('error', __('Error creating purchase.'));
