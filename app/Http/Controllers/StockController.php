@@ -23,9 +23,7 @@ use App\Models\StockAdjustmentProductList;
 
 class StockController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Stock Adjustment Methods
     public function stockAdjustmentIndex()
     {
         try {
@@ -37,12 +35,8 @@ class StockController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function stockAdjustmentCreate()
     {
-
         if (\Auth::user()->type == 'company') {
             try {
                 $items = ProductService::where('created_by', \Auth::user()->id)->get()->pluck('itemNm', 'itemCd');
@@ -57,11 +51,6 @@ class StockController extends Controller
             return redirect()->back()->with('error', __('Permission Denied.'));
         }
     }
-
-    /**
-     * Store a newly created resource in storage.
-     * 
-     */
 
     public function stockAdjustmentStore(Request $request)
     {
@@ -91,10 +80,10 @@ class StockController extends Controller
             $response = Http::withOptions(['verify' => false])->withHeaders([
                 'key' => $config->api_key,
             ])->post($url, [
-                'storeReleaseTypeCode' => $data['storeReleaseTypeCode'],
-                'remark' => $data['remark'],
-                'stockItemList' => $data['items']
-            ]);
+                        'storeReleaseTypeCode' => $data['storeReleaseTypeCode'],
+                        'remark' => $data['remark'],
+                        'stockItemList' => $data['items']
+                    ]);
 
             if ($response['statusCode'] !== 200) {
                 return redirect()->back()->with('error', 'Check your credentials and try again');
@@ -150,49 +139,33 @@ class StockController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function stockAdjustmentShow(StockAdjustment $stockAdjustmentList)
+    public function stockAdjustmentShow($id)
     {
-        //
+        // Code to show a specific stock adjustment
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function stockAdjustmentEdit(StockAdjustment $stockAdjustmentList)
+    public function stockAdjustmentEdit($id)
     {
-        //
+        // Code to show edit form
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function stockAdjustmentUpdate(Request $request, StockAdjustment $stockAdjustmentList)
+    public function stockAdjustmentUpdate(Request $request, $id)
     {
-        //
+        // Code to update a specific stock adjustment
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function stockAdjustmentDestroy(StockAdjustment $stockAdjustmentList)
+    public function stockAdjustmentDestroy($id)
     {
-        //
+        // Code to delete a specific stock adjustment
     }
 
-
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function stockMoveIndex()
+    // Stock Move List Methods
+    public function stockMoveListIndex()
     {
         try {
             if (\Auth::user()->type == 'company') {
                 $stockMoveList = StockMoveList::all();
-                return view('stockinfo.index', compact('stockMoveList'));
+                return view('stockgetmovelist.index', compact('stockMoveList'));
             } else {
                 return redirect()->back()->with('error', 'Permission Denied');
             }
@@ -202,323 +175,59 @@ class StockController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
-    /**
-     * Show the form for creating a new resource.
-     * 
-     */
 
-    public function stockTranfer()
+    public function stockMoveListShow($id)
     {
         try {
-            if (\Auth::user()->type == 'company') {
-                // Get all the branches  that have tranfer 
-              $branchTransfer = BranchTransfer::all();
-              //product for each branch that have transfer
-              $branchTransferProduct = BranchTransferProduct::all();
-                return view('stockmove.index', compact('branchTransfer','branchTransferProduct'));
-            } else {
-                return redirect()->back()->with('error', 'Permission Denied');
-            }
-        } catch (\Exception $e) {
-            \Log::info('errorrrrr');
-            \Log::info($e);
-            return redirect()->back()->with('error', $e->getMessage());
-        }
-    }
-    public function stockMoveCreate()
-    {
-        $branches = BranchesList::all()->pluck('bhfNm', 'bhfId');
-        $items = ProductService::all()->pluck('itemNm', 'kraItemCode');
-        $releaseTypes = StockReleaseType::all()->pluck('type', 'id');
-        return view('stockmove.create', compact('branches', 'items', 'releaseTypes'));
-    }
+            // Find list by ID
+            $stockMoveList = StockMoveList::findOrFail($id);
 
-    /**
-     * Store a newly created Stock Tranfer to a new Branch.
-     */
-    public function stockMoveStore(Request $request)
-    {
-        // Retrieve all the request data
-        $data = $request->all();
-
-        // Log the initial data received from the request
-        Log::info("STOCK MOVE DATA BEFORE POSTING:");
-        Log::info($data);
-
-        // Define the validation rules
-        $validator = \Validator::make(
-            $data,
-            [
-                'branchFrom' => 'required|string',
-                'branchTo' => 'required|string',
-                'occurredDate' => 'required|date',
-                'items' => 'required|array',
-                'items.*.itemCode' => 'required|string',
-                'items.*.quantity' => 'required|integer',
-                'items.*.pkgQuantity' => 'required|integer',
-            ]
-        );
-
-        // If validation fails, redirect back with error message
-        if ($validator->fails()) {
-            $messages = $validator->getMessageBag();
-            return redirect()->back()->with('error', $messages->first());
-        }
-
-        try {
-            // Log the validated data
-            Log::info('STOCK MOVE DATA VALIDATED:');
-            Log::info($request->all());
-
-            // Prepare the occurredDate in the required format
-            $occurredDate = Carbon::createFromFormat('Y-m-d H:i:s', $request->occurredDate)->format('YmdHis');
-
-            // Prepare the data for the API request
-            $apiData = [
-                'branchId' => $request->branchFrom,
-                'occurredDate' => $occurredDate,
-                'transferItems' => $request->items,
-            ];
-
-            Log::info('Data to be posted to the Api in JSON : '. $apiData);
-
-            // Retrieve the API key and URL from the config
-            $config = ConfigSettings::first();
-            $url = $config->api_url . 'BranchTransferV2';
-
-            // Make the API request
-            $response = Http::withHeaders([
-                'accept' => '*/*',
-                'key' => $config->api_key,
-                'Content-Type' => 'application/json',
-            ])->post($url, $apiData);
-
-            // Log the API response
-            Log::info('API Request Data: ' . json_encode($apiData));
-            Log::info('API Response: ' . $response->body());
-            Log::info('API Response Status Code: ' . $response->status());
-
-            if ($response->successful()) {
-                // Use a transaction to ensure atomicity
-                DB::transaction(function () use ($request) {
-                    // Save the data to the local database only if the API call is successful
-                    $branchTransfer = BranchTransfer::create([
-                        'from_branch' => $request->branchFrom,
-                        'to_branch' => $request->branchTo,
-                        'product_id' => null, 
-                    ]);
-                    foreach ($request->items as $item) {
-                        BranchTransferProduct::create([
-                            'itemCode' => $item['itemCode'],
-                            'quantity' => $item['quantity'],
-                            'pkgQuantity' => $item['pkgQuantity'],
-                            'branch_transfer_id' => $branchTransfer->id,
-                        ]);
-                    }
-                });
-
-                return redirect()->route('stock.move.branch.tranfer.index')->with('success', 'Stock Move Successful');
-            } else {
-                return redirect()->route('stock.move.branch.tranfer.index')->with('error', __('Failed to post data to API.'));
-            }
-        } catch (\Exception $e) {
-            // Log detailed error information
-            Log::error('STOCK MOVE ERROR:', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            return redirect()->route('stock.move.branch.tranfer.index')->with('error', $e->getMessage());
-        }
-    }
-    public function stockMovebranchTranferIndex(){
-        return view('stockmove.index');
-    }
-    public function stockMovebranchTranferShow(string $id){
-        return view('stockmove.show');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function stockMoveShow(string $id)
-    {
-        try {
-            // Find the stock move list by ID
-            $stockMove = StockMoveList::findOrFail($id);
-
-            // Retrieve associated stock move list items
-            $stockMoveItems = StockMoveListItem::where('stockMoveListID', $id)->get();
+            // Retrieve associated list items
+            $stockMoveListItems = StockMoveListItem::where('stockMoveListID', $id)->get();
 
             // Log the retrieved stock move details
-            \Log::info('Stock Move details retrieved:', [
-                'stockMove' => $stockMove,
-                'stockMoveItems' => $stockMoveItems,
+            \Log::info('Stock Branch Transfer details retrieved:', [
+                'StockMoveList' => $stockMoveList,
+                'Stock Move List Items' => $stockMoveListItems,
             ]);
 
             // Return the stock move details to the view
-            return view('stockinfo.show', [
-                'stockMove' => $stockMove,
-                'stockMoveItems' => $stockMoveItems,
+            return view('stockgetmovelist.show', [
+                'stockMoveList' => $stockMoveList,
+                'stockMoveListItems' => $stockMoveListItems,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error retrieving stock move details:', ['error' => $e->getMessage()]);
-            return redirect()->back()->with('error', __('Error retrieving stock move details.'));
+            \Log::error('Error retrieving StockMoveList details:', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', __('Error StockMoveList details.'));
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function stockMoveEdit(string $id)
+    public function stockMoveListCreate()
     {
-        //
+        // Code to show create form
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function stockMoveUpdate(Request $request, string $id)
+    public function stockMoveListStore(Request $request)
     {
-        //
+        // Code to store new stock move
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function stockMoveDestroy(string $id)
+    public function stockMoveListUpdate(Request $request, $id)
     {
-        //
+        // Code to update a specific stock move
     }
 
-
-
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function stockUpdateByInvoiceNoIndex()
+    public function stockMoveListDelete($id)
     {
-        try {
-            $branchTransfer = BranchTransfer::all();
-            return view('stockinfo.index', compact('branchTransfer'));
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
-        }
+        // Code to delete a specific stock move
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function stockUpdateByInvoiceNoCreate()
+    public function stockMoveListDestroy($id)
     {
-        try {
-            return view('stockinfo.create');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
-        }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function stockUpdateByInvoiceNoStore(Request $request)
-    {
-
-        $config = ConfigSettings::first();
-        try {
-            $data = $request->all();
-            \Log::info('Inv No');
-            \Log::info($request->all());
-
-            $url = $config->api_url . 'StockUpdate/ByInvoiceNo?InvoiceNo=' . $data['invoiceNo'];
-
-            $response = Http::withOptions(['verify' => false])->withHeaders([
-                'key' => $config->api_key,
-                'accept' => '*/*',
-                'Content-Type' => 'application/json'
-            ])->post($url);
-
-            \Log::info('STOCK INV NO API RESPONSE');
-            \Log::info($response->json()); // Log the JSON response
-
-            if ($response->json()['statusCode'] == 400 && $response->json()['message'] == 'Sale Details Not Found') {
-                return redirect()->route('stockmove.index')->with('error', 'Sale Details Not Found');
-            }
-
-            return redirect()->route('stockmove.index')->with('success', 'Updated Successfully');
-        } catch (\Exception $e) {
-            \Log::error('Error in stockUpdateByInvoiceNoStore:', ['message' => $e->getMessage()]);
-            return redirect()->route('stockmove.index')->with('error', $e->getMessage());
-        }
+        // Code to destroy a specific stock move
     }
 
 
-    /**
-     * Display the specified resource.
-     */
-    public function stockUpdateByInvoiceNoShow($id)
-    {
-        $stockMoveList = StockMoveList::find($id)->first();
-        \Log::info('STOCK MOVE LIST controller');
-        \Log::info($stockMoveList);
-        $items = StockMoveListItem::where('stockMoveListID', $stockMoveList->id)->get();
-        return view('stockinfo.show', compact('stockMoveList', 'items'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function stockUpdateByInvoiceNoEdit(StockMoveList $stockMoveList)
-    {
-        //
-    }
-
-    public function stockUpdateByInvoiceNoCancel(StockMoveList $stockMoveList)
-    {
-        //
-    }
-
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function stockUpdateByInvoiceNoUpdate(Request $request, StockMoveList $stockMoveList)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function stockUpdateByInvoiceNoDestroy(StockMoveList $stockMoveList)
-    {
-        //
-    }
-
-    public function getStockMoveListFromApi()
-    {
-        $config = ConfigSettings::first();
-        $url = $config->api_url . 'GetMoveList?date=20210101120000';
-
-        try {
-            $response = \Http::withHeaders([
-                'key' => $config->api_url
-            ])->get($url);
-
-            $data = $response->json();
-            \Log::info('DATA GOTTEN FROM API:');
-            \Log::info($data['data']['data']['stockList']);
-
-            return redirect()->to('/stockinfo')->with('success', 'Successfully Retrieved Stock Move List from API');
-        } catch (\Exception $e) {
-            \Log::error('GET STOCK MOVE LIST FROM API ERROR: ');
-            \Log::error($e);
-            return redirect()->to('/stockinfo')->with('error', $e->getMessage());
-        }
-    }
-
-    //Search Stock Move bY Date
     public function stockMoveSearchByDate(Request $request)
     {
         $config = ConfigSettings::first();
@@ -584,6 +293,379 @@ class StockController extends Controller
             return redirect()->back()->with('error', __('Error syncing stock move list.'));
         }
     }
+
+    public function getStockMoveListFromApi()
+    {
+        $config = ConfigSettings::first();
+        $url = $config->api_url . 'GetMoveList?date=20210101120000';
+
+        try {
+            $response = \Http::withHeaders([
+                'key' => $config->api_url
+            ])->get($url);
+
+            $data = $response->json();
+            \Log::info('DATA GOTTEN FROM API:');
+            \Log::info($data['data']['data']['stockList']);
+
+            return redirect()->to('/stockinfo')->with('success', 'Successfully Retrieved Stock Move List from API');
+        } catch (\Exception $e) {
+            \Log::error('GET STOCK MOVE LIST FROM API ERROR: ');
+            \Log::error($e);
+            return redirect()->to('/stockinfo')->with('error', $e->getMessage());
+        }
+    }
+
+
+    public function synchronizegetStockMoveListFromApi()
+    {
+        $config = ConfigSettings::first();
+
+        // Get and format the date
+        $date = "2022-01-01";
+        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
+        \Log::info('Date formatted from synchronization request:', ['formattedDate' => $formattedDate]);
+
+        try {
+            // Make the API call
+            $response = Http::withOptions(['verify' => false])
+                ->withHeaders(['key' => $config->api_key])
+                ->get($config->api_url . "GetMoveList?date={$formattedDate}");
+
+            $data = $response->json()['data'];
+            if (!isset($data['data']['stockList'])) {
+                return redirect()->back()->with('error', __('There is no search result.'));
+            }
+
+            $remoteStockMoveSearchByDateinfo = $data['data']['stockList'];
+            \Log::info('Remote item info:', $remoteStockMoveSearchByDateinfo);
+
+            // Prepare data for synchronization
+            $remoteStockMoveSearchByDateinfoToSync = [];
+            $remoteStockMoveSearchByDateItemListinfoToSync = [];
+            foreach ($remoteStockMoveSearchByDateinfo as $remoteItem) {
+                $item = $this->prepareStockMoveData($remoteItem);
+                $remoteStockMoveSearchByDateinfoToSync[] = $item;
+
+                if (isset($remoteItem['itemList']) && is_array($remoteItem['itemList'])) {
+                    foreach ($remoteItem['itemList'] as $itemList) {
+                        $itemListData = $this->prepareStockMoveItemListData($itemList);
+                        $itemListData['stockMoveListID'] = null;  // Placeholder, will be set during sync
+                        $remoteStockMoveSearchByDateItemListinfoToSync[] = $itemListData;
+                    }
+                }
+            }
+
+            \Log::info('Remote Stock Move search by date info to sync:', $remoteStockMoveSearchByDateinfoToSync);
+            \Log::info('Remote Stock Move item lists to sync:', $remoteStockMoveSearchByDateItemListinfoToSync);
+
+            // Synchronize the Stock move list
+            $syncedCount = $this->synchronizeStockMove($remoteStockMoveSearchByDateinfoToSync, $remoteStockMoveSearchByDateItemListinfoToSync);
+
+            if ($syncedCount > 0) {
+                return redirect()->back()->with('success', __('Synced ' . $syncedCount . ' Stock Move successfully.'));
+            } else {
+                return redirect()->back()->with('success', __('Stock Move List up to date.'));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error syncing stock Move list:', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', __('Error syncing stock move list.'));
+        }
+    }
+
+    // Branch Transfer Methods
+    // Branch Transfer Methods
+    public function branchTransferIndex()
+    {
+        try {
+            if (\Auth::user()->type == 'company') {
+                // Get all the branches that have transfer
+                $branchTransfers = BranchTransfer::all();
+                // // Get products for each branch that have transfer
+                $branchTransferProducts = BranchTransferProduct::all();
+                return view('stockbranchtransfer.index', compact('branchTransfers', 'branchTransferProducts'));
+                // return view('stockbranchtransfer.index');
+            } else {
+                return redirect()->back()->with('error', 'Permission Denied');
+            }
+        } catch (\Exception $e) {
+            Log::info('Error:');
+            Log::info($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function branchTransferShow($id)
+    {
+        try {
+            // Find list by ID
+            $branchTransfer = BranchTransfer::findOrFail($id);
+
+            // Retrieve associated list items
+            $branchTransferProducts = BranchTransferProduct::where('branch_transfer_id', $id)->get();
+
+            // Log the retrieved stock move details
+            \Log::info('Stock Branch Transfer details retrieved:', [
+                'Branch' => $branchTransfer,
+                'stock Items' => $branchTransferProducts,
+            ]);
+
+            // Return the stock move details to the view
+            return view('stockbranchtransfer.show', [
+                'branch' => $branchTransfer,
+                'branchTransferProducts' => $branchTransferProducts,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error retrieving branch Transfer Products details:', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', __('Error retrieving branch Transfer Products details.'));
+        }
+    }
+
+
+    public function branchTransferCreate()
+    {
+        $branches = BranchesList::all()->pluck('bhfNm', 'bhfId');
+        $items = ProductService::all()->pluck('itemNm', 'kraItemCode');
+        $releaseTypes = StockReleaseType::all()->pluck('type', 'id');
+        return view('stockbranchtransfer.create', compact('branches', 'items', 'releaseTypes'));
+    }
+
+    public function branchTransferStore(Request $request)
+    {
+        try {
+            // Retrieve all the request data
+            $data = $request->all();
+
+            // Log the initial data received from the request
+            Log::info("Branch Transfer Stock BEFORE POSTING:", $data);
+
+            // Define the validation rules
+            $validator = \Validator::make($data, [
+                'branchFrom' => 'required|string',
+                'branchTo' => 'required|string',
+                'occurredDate' => 'required|date',
+                'items' => 'required|array',
+                'items.*.itemCode' => 'required|string',
+                'items.*.quantity' => 'required|integer',
+                'items.*.pkgQuantity' => 'required|integer',
+            ]);
+
+            // If validation fails, redirect back with error message
+            if ($validator->fails()) {
+                $messages = $validator->getMessageBag()->toArray();
+                return redirect()->back()->withErrors($messages)->withInput();
+            }
+
+            // Log the validated data
+            Log::info('Branch Transfer Stock DATA VALIDATED:', $data);
+
+            // Prepare the occurredDate in the required format
+            $occurredDate = date('Ymdhis', strtotime($data['occurredDate']));
+            Log::info('Date to be posted to the Api in JSON: ' . $occurredDate);
+
+            // Prepare the data for the API request
+            $apiData = [
+                'branchId' => $request->branchFrom,
+                'occurredDate' => $occurredDate,
+                'transferItems' => $request->items,
+            ];
+
+            Log::info('Data to be posted to the Api in JSON: ' . json_encode($apiData));
+
+            // Retrieve the API key and URL from the config
+            $config = ConfigSettings::first();
+            $url = $config->api_url . 'BranchTransferV2';
+            $apiKey = $config->api_key;
+
+            Log::info('The Api Url is: ' . $url);
+
+            // Post to Api
+            $response = Http::withOptions(['verify' => false])
+                ->withHeaders(['key' => $apiKey])
+                ->post($url, $apiData);
+
+            // Log the API response
+            Log::info('API Request Data For Branch Transfer Stock: ' . json_encode($apiData));
+            Log::info('API Response Branch Transfer Stock: ' . $response->body());
+            Log::info('API Response Status Code For Branch Transfer Stock: ' . $response->status());
+            $responseBody = $response->json();
+
+            if (!$responseBody['status'] == false) {
+                // Use a transaction to ensure atomicity
+                DB::transaction(function () use ($request) {
+                    // Save the data to the local database only if the API call is successful
+                    $branchTransfer = BranchTransfer::create([
+                        'from_branch' => $request->branchFrom,
+                        'to_branch' => $request->branchTo,
+                        'product_id' => null, // You may want to change this later
+                        'totItemCnt' => count($request->items),
+                        'status' => 1, 
+                    ]);
+
+                    foreach ($request->items as $item) {
+                        // Retrieve product_id based on itemCode
+                        $product = ProductService::where('kraItemCode', $item['itemCode'])->first();
+                        $productId = $product ? $product->id : null;
+
+                        BranchTransferProduct::create([
+                            'itemCode' => $item['itemCode'],
+                            'quantity' => $item['quantity'],
+                            'pkgQuantity' => $item['pkgQuantity'],
+                            'branch_transfer_id' => $branchTransfer->id,
+                            'product_id' => $productId,
+                        ]);
+                    }
+                });
+
+                return redirect()->route('branch.transfer.index')->with('success', 'Stock Move Successful');
+            } else {
+                // Check for API error response
+                if ($responseBody['status'] == false) {
+                    return redirect()->route('branch.transfer.index')->with('error', $response->json()['message']);
+                } else {
+                    return redirect()->route('branch.transfer.index')->with('error', __('Failed to post data to API.'));
+                }
+            }
+        } catch (\Exception $e) {
+            // Log detailed error information
+            Log::error('Branch Transfer Stock ERROR:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('branch.transfer.index')->with('error', $e->getMessage());
+        }
+    }
+
+    public function branchTransferUpdate(Request $request, $id)
+    {
+        // Code to update a specific branch transfer
+    }
+
+    public function branchTransferDelete($id)
+    {
+        // Code to delete a specific branch transfer
+    }
+
+    public function branchTransferDestroy($id)
+    {
+        // Code to destroy a specific branch transfer
+    }
+
+    // Stock Master Save Request Methods
+    public function stockMasterSaveRequestIndex()
+    {
+        // Code to list stock master save requests
+    }
+
+    public function stockMasterSaveRequestShow($id)
+    {
+        // Code to show a specific stock master save request
+    }
+
+    public function stockMasterSaveRequestCreate()
+    {
+        // Code to show create form
+    }
+
+    public function stockMasterSaveRequestStore(Request $request)
+    {
+        // Code to store new stock master save request
+    }
+
+    public function stockMasterSaveRequestUpdate(Request $request, $id)
+    {
+        // Code to update a specific stock master save request
+    }
+
+    public function stockMasterSaveRequestDelete($id)
+    {
+        // Code to delete a specific stock master save request
+    }
+
+    public function stockMasterSaveRequestDestroy($id)
+    {
+        // Code to destroy a specific stock master save request
+    }
+
+    // Stock Update by Invoice Methods
+    public function stockUpdateByInvoiceIndex()
+    {
+        try {
+            $branchTransfer = BranchTransfer::all();
+            return view('stockinfo.index', compact('branchTransfer'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function stockUpdateByInvoiceShow($id)
+    {
+        $stockMoveList = StockMoveList::find($id)->first();
+        \Log::info('STOCK MOVE LIST controller');
+        \Log::info($stockMoveList);
+        $items = StockMoveListItem::where('stockMoveListID', $stockMoveList->id)->get();
+        return view('stockinfo.show', compact('stockMoveList', 'items'));
+    }
+
+    public function stockUpdateByInvoiceCreate()
+    {
+        try {
+            return view('stockinfo.create');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function stockUpdateByInvoiceStore(Request $request)
+    {
+        $config = ConfigSettings::first();
+        try {
+            $data = $request->all();
+            \Log::info('Inv No');
+            \Log::info($request->all());
+
+            $url = $config->api_url . 'StockUpdate/ByInvoiceNo?InvoiceNo=' . $data['invoiceNo'];
+
+            $response = Http::withOptions(['verify' => false])->withHeaders([
+                'key' => $config->api_key,
+                'accept' => '*/*',
+                'Content-Type' => 'application/json'
+            ])->post($url);
+
+            \Log::info('STOCK INV NO API RESPONSE');
+            \Log::info($response->json()); // Log the JSON response
+
+            if ($response->json()['statusCode'] == 400 && $response->json()['message'] == 'Sale Details Not Found') {
+                return redirect()->route('stockmove.index')->with('error', 'Sale Details Not Found');
+            }
+
+            return redirect()->route('stockmove.index')->with('success', 'Updated Successfully');
+        } catch (\Exception $e) {
+            \Log::error('Error in stockUpdateByInvoiceNoStore:', ['message' => $e->getMessage()]);
+            return redirect()->route('stockmove.index')->with('error', $e->getMessage());
+        }
+    }
+
+    public function stockUpdateByInvoiceUpdate(Request $request, $id)
+    {
+        // Code to update a specific stock update by invoice
+    }
+
+    public function stockUpdateByInvoiceDelete($id)
+    {
+        // Code to delete a specific stock update by invoice
+    }
+
+    public function stockUpdateByInvoiceDestroy($id)
+    {
+        // Code to destroy a specific stock update by invoice
+    }
+
+
+
+
+    //Search Stock Move bY Date
 
     private function prepareStockMoveData($remoteItem)
     {
