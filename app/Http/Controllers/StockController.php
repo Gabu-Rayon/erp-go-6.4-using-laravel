@@ -26,15 +26,16 @@ class StockController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function stockAdjustmentIndex(){
-            try {
-                $stockadjustments = StockAdjustmentProductList::all();
-                return view('stockadjustment.index', compact('stockadjustments'));
-            } catch (\Exception $e) {
-                Log::error($e);
-                return redirect()->back()->with('error', $e->getMessage());
-            }
+    public function stockAdjustmentIndex()
+    {
+        try {
+            $stockadjustments = StockAdjustmentProductList::all();
+            return view('stockadjustment.index', compact('stockadjustments'));
+        } catch (\Exception $e) {
+            Log::error($e);
+            return redirect()->back()->with('error', $e->getMessage());
         }
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -62,15 +63,16 @@ class StockController extends Controller
      * 
      */
 
-    public function stockAdjustmentStore(Request $request) {
+    public function stockAdjustmentStore(Request $request)
+    {
         $config = ConfigSettings::first();
-        
+
         try {
 
             $data = $request->all();
-            \Log::info("Data  from the form  Adjust Stock :" );
+            \Log::info("Data  from the form  Adjust Stock :");
             \Log::info($data);
-            
+
             $validator = Validator::make($data, [
                 'storeReleaseTypeCode' => 'required',
                 'items' => 'required|array',
@@ -79,12 +81,12 @@ class StockController extends Controller
                 'items.*.quantity' => 'required|numeric',
             ]);
 
-            
+
             if ($validator->fails()) {
                 return redirect()->back()->with('error', $validator->errors()->first());
             }
 
-            $url = $config ->api_url . 'StockAdjustmentV2';
+            $url = $config->api_url . 'StockAdjustmentV2';
 
             $response = Http::withOptions(['verify' => false])->withHeaders([
                 'key' => $config->api_key,
@@ -140,7 +142,6 @@ class StockController extends Controller
             DB::commit();
 
             return redirect()->route('stockadjustment.index')->with('success', 'Stock Adjustment Added.');
-
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::info('STOCK ADJUSTMENT STORE ERROR');
@@ -398,7 +399,12 @@ class StockController extends Controller
      */
     public function stockUpdateByInvoiceNoIndex()
     {
-      //
+        try {
+            $branchTransfer = BranchTransfer::all();
+            return view('stockinfo.index', compact('branchTransfer'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     /**
@@ -529,7 +535,7 @@ class StockController extends Controller
 
         // Get and format the date
         $date = $request->input('searchByDate');
-        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd').'000000';
+        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('Ymd') . '000000';
         \Log::info('Date formatted from synchronization request:', ['formattedDate' => $formattedDate]);
 
         try {
@@ -574,7 +580,7 @@ class StockController extends Controller
                 return redirect()->back()->with('success', __('Stock Move List up to date.'));
             }
         } catch (\Exception $e) {
-           \Log::error('Error syncing stock Move list:', ['error' => $e->getMessage()]);
+            \Log::error('Error syncing stock Move list:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', __('Error syncing stock move list.'));
         }
     }
