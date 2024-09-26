@@ -1949,7 +1949,12 @@ Route::middleware(['auth', 'XSS', 'revalidate'])->group(function () {
     // Routes for stock moves
     Route::get('stockmove', [StockController::class, 'stockMoveIndex'])->name('stockmove.index');
     Route::get('stockmove/create', [StockController::class, 'stockMoveCreate'])->name('stockmove.create');
+    
     Route::post('stockmove', [StockController::class, 'stockMoveStore'])->name('stockmove.store');
+    //Branch Transfer Code for the 
+    Route::get('stockmove/branchTransfer', [StockController::class, 'stockMovebranchTranferIndex'])->name('stock.move.branch.tranfer.index');
+    Route::get('stockmove/branchTransfer/show/{id}', [StockController::class, 'stockMoveBranchtTransferShow'])->name('stock.move.branch.transfer.show');
+    
     Route::get('stockmove/{stockMove}', [StockController::class, 'stockMoveShow'])->name('stockmove.show');
     Route::get('stockmove/{stockMove}/edit', [StockController::class, 'stockMoveEdit'])->name('stockmove.edit');
     Route::put('stockmove/{stockMove}', [StockController::class, 'stockMoveUpdate'])->name('stockmove.update');

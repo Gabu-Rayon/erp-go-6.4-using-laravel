@@ -234,7 +234,7 @@ class StockController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created Stock Tranfer to a new Branch.
      */
     public function stockMoveStore(Request $request)
     {
@@ -273,9 +273,11 @@ class StockController extends Controller
             // Prepare the data for the API request
             $apiData = [
                 'branchId' => $request->branchFrom,
-                'occurredDate' => $request->occurredDate,
+                'occurredDate' => $occurredDate,
                 'transferItems' => $request->items,
             ];
+
+            Log::info('Data to be posted to the Api in JSON : ' . $apiData);
 
             // Retrieve the API key and URL from the config
             $config = ConfigSettings::first();
@@ -294,32 +296,42 @@ class StockController extends Controller
             Log::info('API Response Status Code: ' . $response->status());
 
             if ($response->successful()) {
-                // Save the data to the local database only if the API call is successful
-                $branchTransfer = BranchTransfer::create([
-                    'from_branch' => $request->branchFrom,
-                    'to_branch' => $request->branchTo,
-                    'product_id' => null, // Product ID will be populated based on the transfer items
-                ]);
-
-                foreach ($request->items as $item) {
-                    BranchTransferProduct::create([
-                        'itemCode' => $item['itemCode'],
-                        'quantity' => $item['quantity'],
-                        'pkgQuantity' => $item['pkgQuantity'],
-                        'branch_transfer_id' => $branchTransfer->id,
+                // Use a transaction to ensure atomicity
+                DB::transaction(function () use ($request) {
+                    // Save the data to the local database only if the API call is successful
+                    $branchTransfer = BranchTransfer::create([
+                        'from_branch' => $request->branchFrom,
+                        'to_branch' => $request->branchTo,
+                        'product_id' => null,
                     ]);
-                }
+                    foreach ($request->items as $item) {
+                        BranchTransferProduct::create([
+                            'itemCode' => $item['itemCode'],
+                            'quantity' => $item['quantity'],
+                            'pkgQuantity' => $item['pkgQuantity'],
+                            'branch_transfer_id' => $branchTransfer->id,
+                        ]);
+                    }
+                });
 
-                return redirect()->to('stockmove.index')->with('success', 'Stock Move Successful');
+                return redirect()->route('stock.move.branch.tranfer.index')->with('success', 'Stock Move Successful');
             } else {
-                return redirect()->to('stockmove.index')->with('error', __('Failed to post data to API.'));
+                return redirect()->route('stock.move.branch.tranfer.index')->with('error', __('Failed to post data to API.'));
             }
         } catch (\Exception $e) {
             Log::info('STOCK MOVE ERROR');
             Log::info($e);
 
-            return redirect()->to('stockmove.index')->with('error', $e->getMessage());
+            return redirect()->route('stock.move.branch.tranfer.index')->with('error', $e->getMessage());
         }
+    }
+    public function stockMovebranchTranferIndex()
+    {
+        return view('stockmove.index');
+    }
+    public function stockMovebranchTranferShow(string $id)
+    {
+        return view('stockmove.show');
     }
 
     /**
