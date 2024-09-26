@@ -319,28 +319,6 @@ class StockController extends Controller
         }
     }
 
-    public function getStockMoveListFromApi()
-    {
-        $config = ConfigSettings::first();
-        $url = $config->api_url . 'GetMoveList?date=20210101120000';
-
-        try {
-            $response = \Http::withHeaders([
-                'key' => $config->api_url
-            ])->get($url);
-
-            $data = $response->json();
-            \Log::info('DATA GOTTEN FROM API:');
-            \Log::info($data['data']['data']['stockList']);
-
-            return redirect()->to('/stockinfo')->with('success', 'Successfully Retrieved Stock Move List from API');
-        } catch (\Exception $e) {
-            \Log::error('GET STOCK MOVE LIST FROM API ERROR: ');
-            \Log::error($e);
-            return redirect()->to('/stockinfo')->with('error', $e->getMessage());
-        }
-    }
-
 
     public function synchronizegetStockMoveListFromApi()
     {
