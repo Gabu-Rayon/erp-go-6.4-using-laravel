@@ -1370,20 +1370,23 @@
                                 <ul class="dash-submenu">
                                     <li class="dash-item {{ request()->is('productstock.index') ? 'active' : '' }}">
                                         <a class="dash-link"
-                                            href="{{ route('productstock.index') }}">{{ __('Stock') }}</a>
+                                            href="{{ route('productstock.index') }}">{{ __('Product Stock') }}</a>
                                     </li>
-                                    <li class="dash-item {{ request()->is('stockmove.index') ? 'active' : '' }}">
+
+                                    <li class="dash-item {{ request()->is('branch.transfer.index') ? 'active' : '' }}">
                                         <a class="dash-link"
-                                            href="{{ route('stockmove.index') }}">{{ __('Get Move List') }}</a>
+                                            href="{{ route('branch.transfer.index') }}">{{ __('Stock Branch Transfer') }}</a>
+                                    </li>
+
+                                    <li class="dash-item {{ request()->is('stockmovelist.index') ? 'active' : '' }}">
+                                        <a class="dash-link"
+                                            href="{{ route('stockmovelist.index') }}">{{ __('Get Stock Move List') }}</a>
                                     </li>
                                     <li class="dash-item {{ request()->is('stockadjustment') ? 'active' : '' }}">
                                         <a class="dash-link"
                                             href="{{ route('stockadjustment.index') }}">{{ __('Stock Adjustment') }}</a>
                                     </li>
-                                    <li class="dash-item {{ request()->is('stockmove.create') ? 'active' : '' }}">
-                                        <a class="dash-link"
-                                            href="{{ route('stockmove.create') }}">{{ __('Move Stock') }}</a>
-                                    </li>
+                                    
                                 </ul>
                             </li>
                         @endif

@@ -1892,28 +1892,8 @@ Route::group(
     }
 );
 
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'XSS',
-            'revalidate',
-        ],
-    ],
-    function () {
-        Route::resource('salescreditnote', SalesCreditNoteController::class);
-    }
-);
-
 
 Route::post('salescreditnote/{salescreditnote}', 'SalesCreditNoteController@update')->name('salescreditnote.update');
-
-Route::get('sales/saletransactions', [SalesController::class, 'sendSalesTransactions'])->name('sales.saletransactions');
-Route::get('sales/print', [SalesController::class, 'print'])->name('sales.print');
-Route::get('sales/cancel/{sale}', [SalesController::class, 'cancel'])->name('sales.cancel');
-Route::get('sales/creditnote', [SalesController::class, 'creditNote'])->name('sales.creditnote');
-
-
 
 Route::get('/getPurchaseSalesItemsFromApi', [PurchaseController::class, 'getPurchaseSalesItemsFromApi']);
 
@@ -1946,34 +1926,68 @@ Route::middleware(['auth', 'XSS', 'revalidate'])->group(function () {
     Route::delete('stockadjustment/{stockAdjustment}', [StockController::class, 'stockAdjustmentDestroy'])
         ->name('stockadjustment.destroy');
 
-    // Routes for stock moves
-    Route::get('stockmove', [StockController::class, 'stockMoveIndex'])->name('stockmove.index');
-    Route::get('stockmove/create', [StockController::class, 'stockMoveCreate'])->name('stockmove.create');
+    // Routes for stock move List
+    Route::get('stockmovelist', [StockController::class, 'stockMoveListIndex'])->name('stockmovelist.index');
+    Route::get('stockmovelist/show/{id}', [StockController::class, 'stockMoveListShow'])->name('stockmovelist.show');
     
-    Route::post('stockmove', [StockController::class, 'stockMoveStore'])->name('stockmove.store');
-    //Branch Transfer Code for the 
-    Route::get('stockmove/branchTransfer', [StockController::class, 'stockMovebranchTranferIndex'])->name('stock.move.branch.tranfer.index');
-    Route::get('stockmove/branchTransfer/show/{id}', [StockController::class, 'stockMoveBranchtTransferShow'])->name('stock.move.branch.transfer.show');
+    Route::get('stockmovelist/create', [StockController::class, 'stockMoveListCreate'])->name('stockmovelist.create');    
+    Route::post('stockmovelist/store', [StockController::class, 'stockMoveListStore'])->name('stockmovelist.store');
     
-    Route::get('stockmove/{stockMove}', [StockController::class, 'stockMoveShow'])->name('stockmove.show');
-    Route::get('stockmove/{stockMove}/edit', [StockController::class, 'stockMoveEdit'])->name('stockmove.edit');
-    Route::put('stockmove/{stockMove}', [StockController::class, 'stockMoveUpdate'])->name('stockmove.update');
-    Route::delete('stockmove/{stockMove}', [StockController::class, 'stockMoveDestroy'])->name('stockmove.destroy');
-    //stockmove.searchByDate
-    Route::post('stockmove/searchbydate', [StockController::class, 'stockMoveSearchByDate'])->name('stockmove.searchByDate');
-
-    // Routes for stock updates by invoice number
-    Route::get('stockinfo', [StockController::class, 'stockUpdateByInvoiceNoIndex'])->name('stockinfo.index');
-    Route::get('stockinfo/create', [StockController::class, 'stockUpdateByInvoiceNoCreate'])->name('stockinfo.create');
-    Route::post('stockinfo', [StockController::class, 'stockUpdateByInvoiceNoStore'])->name('stockinfo.store');
-    Route::get('stockinfo/{stockMoveList}', [StockController::class, 'stockUpdateByInvoiceNoShow'])->name('stockinfo.show');
-    Route::get('stockinfo/{stockMoveList}/edit', [StockController::class, 'stockUpdateByInvoiceNoEdit'])->name('stockinfo.edit');
-    Route::put('stockinfo/{stockMoveList}', [StockController::class, 'stockUpdateByInvoiceNoUpdate'])->name('stockinfo.update');
-    Route::delete('stockinfo/{stockMoveList}', [StockController::class, 'stockUpdateByInvoiceNoDestroy'])->name('stockinfo.destroy');
-    Route::post('stockinfo/{stockMoveList}/cancel', [StockController::class, 'stockUpdateByInvoiceNoCancel'])->name('stockinfo.cancel');
-
+    Route::post('stockmovelist/edit/{id}', [StockController::class, 'stockMoveListUpdate'])->name('stockmovelist.delete');
+    Route::post('stockmovelist/update/{id}', [StockController::class, 'stockMoveListUpdate'])->name('stockmovelist.update');
+    
+    Route::post('stockmovelist/delete/{id}', [StockController::class, 'stockMoveListDelete'])->name('stockmovelist.delete');
+    Route::post('stockmovelist/destroy/{id}', [StockController::class, 'stockMoveListDestroy'])->name('stockmovelist.destroy');
+    //stockmovelist.searchByDate
+    Route::post('stockmovelist/searchbydate', [StockController::class, 'stockMoveSearchByDate'])->name('stockmovelist.searchByDate');
     // Route for getting stock move list from API
     Route::get('getStockMoveListFromApi', [StockController::class, 'getStockMoveListFromApi'])->name('stock.getStockMoveListFromApi');
+    // stockmovelist.synchronize
+    Route::get('synchronizegetStockMoveList', [StockController::class, 'synchronizegetStockMoveListFromApi'])->name('stockmovelist.synchronize');
+    
+    //Branch Transfer Code for the product Stock 
+    Route::get('branch/transfer/stock', [StockController::class, 'branchTransferIndex'])->name('branch.transfer.index');
+    Route::get('branch/transfer/stock/show/{id}', [StockController::class, 'branchTransferShow'])->name('branch.transfer.Show');
+
+    Route::get('branch/transfer/stock/create', [StockController::class, 'branchTransferCreate'])->name('branch.transfer.create');
+    Route::post('branch/transfer/stock/store', [StockController::class, 'branchTransferStore'])->name('branch.transfer.store');
+
+    Route::post('branch/transfer/stock/edit/{id}', [StockController::class, 'branchTransferUpdate'])->name('branch.transfer.edit');
+    Route::post('branch/transfer/stock/update/{id}', [StockController::class, 'branchTransferUpdate'])->name('branch.transfer.update');
+
+    Route::post('branch/transfer/stock/delete/{id}', [StockController::class, 'branchTransferDelete'])->name('branch.transfer.delete');
+    Route::post('branch/transfer/stock/destroy/{id}', [StockController::class, 'branchTransferDestroy'])->name('branch.transfer.destroy');
+   
+
+    // Routes for stockMaster Save Request V2 updates by invoice number
+    Route::get('stock/master/save/request', [StockController::class, 'stockMasterSaveRequestIndex'])->name('stock.master.save.request.index');
+    Route::get('stock/master/save/request/{id}', [StockController::class, 'stockMasterSaveRequestShow'])->name('stock.master.save.request.Show');
+
+    Route::get('stock/master/save/request/create', [StockController::class, 'stockMasterSaveRequestCreate'])->name('stock.master.save.request.create');
+    Route::post('stock/master/save/request/store', [StockController::class, 'stockMasterSaveRequestStore'])->name('stock.master.save.request.store');
+
+    Route::post('stock/master/save/request/edit/{id}', [StockController::class, 'stockMasterSaveRequestUpdate'])->name('stock.master.save.request.edit');
+    Route::post('stock/master/save/request/update/{id}', [StockController::class, 'stockMasterSaveRequestUpdate'])->name('stock.master.save.request.update');
+
+    Route::post('stock/master/save/request/delete/{id}', [StockController::class, 'stockMasterSaveRequestDelete'])->name('stock.master.save.request.delete');
+    Route::post('stock/master/save/request/destroy/{id}', [StockController::class, 'stockMasterSaveRequestDestroy'])->name('stock.master.save.request.destroy');
+
+
+
+
+    // Routes for stock Update  By Invoice No V2 updates by invoice number
+    Route::get('stock/update/by/invoice', [StockController::class, 'stockUpdateByInvoiceIndex'])->name('stock.update.by.invoice.no.index');
+    Route::get('stock/update/by/invoice/show/{id}', [StockController::class, 'stockUpdateByInvoiceShow'])->name('stock.update.by.invoice.no.Show');
+
+    Route::get('stock/update/by/invoice/create', [StockController::class, 'stockUpdateByInvoiceCreate'])->name('stock.update.by.invoice.no.create');
+    Route::post('stock/update/by/invoice/store', [StockController::class, 'stockUpdateByInvoiceStore'])->name('stock.update.by.invoice.no.store');
+
+    Route::post('stock/update/by/invoice/{id}', [StockController::class, 'stockUpdateByInvoiceUpdate'])->name('stock.update.by.invoice.no.delete');
+    Route::post('stock/update/by/invoice/{id}', [StockController::class, 'stockUpdateByInvoiceUpdate'])->name('stock.update.by.invoice.no.update');
+
+    Route::post('stock/update/by/invoice/delete/{id}', [StockController::class, 'stockUpdateByInvoiceDelete'])->name('stock.update.by.invoice.no.delete');
+    Route::post('stock/update/by/invoice/destroy/{id}', [StockController::class, 'stockUpdateByInvoiceDestroy'])->name('stock.update.by.invoice.no.destroy');
+    
 });
 
 Route::post('configuration-settings', [ConfigSettingsController::class, 'update'])->name('configuration-settings');

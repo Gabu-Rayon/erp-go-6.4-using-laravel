@@ -16,6 +16,8 @@ class BranchTransfer extends Model
     protected $fillable = [
         'from_branch',
         'to_branch',
+        'totItemCnt',
+        'status',
         'product_id',
     ];
 

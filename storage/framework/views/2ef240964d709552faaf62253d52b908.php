@@ -1381,20 +1381,23 @@
                                 <ul class="dash-submenu">
                                     <li class="dash-item <?php echo e(request()->is('productstock.index') ? 'active' : ''); ?>">
                                         <a class="dash-link"
-                                            href="<?php echo e(route('productstock.index')); ?>"><?php echo e(__('Stock')); ?></a>
+                                            href="<?php echo e(route('productstock.index')); ?>"><?php echo e(__('Product Stock')); ?></a>
                                     </li>
-                                    <li class="dash-item <?php echo e(request()->is('stockmove.index') ? 'active' : ''); ?>">
+
+                                    <li class="dash-item <?php echo e(request()->is('branch.transfer.index') ? 'active' : ''); ?>">
                                         <a class="dash-link"
-                                            href="<?php echo e(route('stockmove.index')); ?>"><?php echo e(__('Get Move List')); ?></a>
+                                            href="<?php echo e(route('branch.transfer.index')); ?>"><?php echo e(__('Stock Branch Transfer')); ?></a>
+                                    </li>
+
+                                    <li class="dash-item <?php echo e(request()->is('stockmovelist.index') ? 'active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('stockmovelist.index')); ?>"><?php echo e(__('Get Stock Move List')); ?></a>
                                     </li>
                                     <li class="dash-item <?php echo e(request()->is('stockadjustment') ? 'active' : ''); ?>">
                                         <a class="dash-link"
                                             href="<?php echo e(route('stockadjustment.index')); ?>"><?php echo e(__('Stock Adjustment')); ?></a>
                                     </li>
-                                    <li class="dash-item <?php echo e(request()->is('stockmove.create') ? 'active' : ''); ?>">
-                                        <a class="dash-link"
-                                            href="<?php echo e(route('stockmove.create')); ?>"><?php echo e(__('Move Stock')); ?></a>
-                                    </li>
+                                    
                                 </ul>
                             </li>
                         <?php endif; ?>
