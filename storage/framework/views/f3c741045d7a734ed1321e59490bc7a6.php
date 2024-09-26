@@ -338,9 +338,15 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <?php echo e(Form::label('branchId', __('Branch (*)'), ['class' => 'form-label'])); ?>
+                            <?php echo e(Form::label('branchId', __('Branch From(*)'), ['class' => 'form-label'])); ?>
 
-                            <?php echo e(Form::select('branchId', $branches, null, ['class' => 'form-control select2'])); ?>
+                            <?php echo e(Form::select('branchFrom', $branches, null, ['class' => 'form-control select2'])); ?>
+
+                        </div>
+                        <div class="form-group col-md-4">
+                            <?php echo e(Form::label('branchId', __('Branch To (*)'), ['class' => 'form-label'])); ?>
+
+                            <?php echo e(Form::select('branchTo', $branches, null, ['class' => 'form-control select2'])); ?>
 
                         </div>
                         <div class="form-group col-md-4">
