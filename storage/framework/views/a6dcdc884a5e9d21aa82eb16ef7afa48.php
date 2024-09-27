@@ -111,8 +111,6 @@
             border-top: 1px solid var(--theme-color);
         }
 
-
-
         tfoot tr:first-of-type {
             border-bottom: 1px solid var(--theme-color);
         }
@@ -174,6 +172,7 @@
             margin-bottom: 0;
         }
     </style>
+
     <?php if($settings_data['SITE_RTL'] == 'on'): ?>
         <link rel="stylesheet" href="<?php echo e(asset('css/bootstrap-rtl.css')); ?>">
     <?php endif; ?>
@@ -181,19 +180,29 @@
 
 <body>
     <div class="invoice-preview-main" id="boxes">
-        <div class="invoice-header" style="">
+        <div class="invoice-header">
             <table class="vertical-align-top">
                 <tbody>
                     <tr>
                         <td>
                             <h3
-                                style="text-transform: uppercase; font-size: 20px; font-weight: bold; color: <?php echo e($color); ?>;">
+                                style=" display: inline-block; text-transform: uppercase; font-size: 40px; font-weight: bold; border-top: 5px solid var(--theme-color); padding-top: 5px;">
                                 <?php echo e(__('INVOICE')); ?></h3>
+                            <div class="view-qrcode" style="margin-top: 5px; margin-left: 0; margin-right: 0;">
+                                
 
+                                <?php if(isset($invoice->qrCodeURL) && !empty($invoice->qrCodeURL)): ?>
+                                    <div class="view-qrcode" style="margin-top: 0;">
+                                        <?php echo DNS2D::getBarcodeHTML($invoice->qrCodeURL, 'QRCODE', 2, 2); ?>
+
+                                    </div>
+                                <?php else: ?>
+                                    <p>QR Code data not available</p>
+                                <?php endif; ?>
+                            </div>
                         </td>
-
                         <td class="text-right">
-                           <img class="invoice-logo" src="<?php echo e(asset($img)); ?>" alt="lOGO">
+                            <img class="invoice-logo" src="<?php echo e(asset($img)); ?>" alt="lOGO">
                         </td>
                     </tr>
                 </tbody>
@@ -254,19 +263,18 @@
                             </td>
                         <?php endif; ?>
                         <td>
-                            <table class="no-space">
+                            <table class="no-space" style="width: 45%;margin-left: auto;">
                                 <tbody>
                                     <tr>
-                                        <td><?php echo e(__('Number')); ?>:</td>
+                                        <td><b><?php echo e(__('Number:')); ?></b> </td>
                                         <td class="text-right">
                                             <?php echo e(Utility::invoiceNumberFormat($settings, $invoice->invoice_id)); ?></td>
                                     </tr>
                                     <tr>
-                                        <td><?php echo e(__('Issue Date')); ?>:</td>
+                                        <td><b><?php echo e(__('Issue Date:')); ?></b></td>
                                         <td class="text-right">
                                             <?php echo e(Utility::dateFormat($settings, $invoice->issue_date)); ?></td>
                                     </tr>
-
                                     <tr>
                                         <td><b><?php echo e(__('Due Date:')); ?></b></td>
                                         <td class="text-right"><?php echo e(Utility::dateFormat($settings, $invoice->due_date)); ?>
@@ -283,23 +291,6 @@
                                             </tr>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     <?php endif; ?>
-                                    <tr>
-                                        <td colspan="2">
-                                            <div class="view-qrcode">
-                                                
-
-
-                                                <?php if(isset($invoice->qrCodeURL) && !empty($invoice->qrCodeURL)): ?>
-                                                    <div class="view-qrcode" style="margin-top: 0;">
-                                                        <?php echo DNS2D::getBarcodeHTML($invoice->qrCodeURL, 'QRCODE', 2, 2); ?>
-
-                                                    </div>
-                                                <?php else: ?>
-                                                    <p>QR Code data not available</p>
-                                                <?php endif; ?>
-                                            </div>
-                                        </td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </td>
@@ -367,7 +358,7 @@
                     </tr>
                 </tbody>
             </table>
-            <table class=" invoice-summary" style="border-bottom:1px solid <?php echo e($color); ?>;">
+            <table class="add-border invoice-summary" style="margin-top: 30px;">
                 <thead style="background: <?php echo e($color); ?>;color:<?php echo e($font_color); ?>">
                     <tr>
                         <th><?php echo e(__('Item')); ?></th>
@@ -381,7 +372,7 @@
                 <tbody>
                     <?php if(isset($invoice->itemData) && count($invoice->itemData) > 0): ?>
                         <?php $__currentLoopData = $invoice->itemData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <tr style="border-bottom:1px solid <?php echo e($color); ?>;">
+                            <tr>
                                 <td><?php echo e($item->name); ?></td>
                                 <?php
                                     $unitName = App\Models\ProductServiceUnit::find($item->unit);
@@ -410,8 +401,9 @@
 
                                 </td>
                                 <?php if(!empty($item->description)): ?>
-                            <tr class=" itm-description ">
-                                <td colspan="6"><?php echo e($item->description); ?></td>
+                            <tr class="border-0 itm-description">
+                                <td colspan="6" style="border-bottom:1px solid <?php echo e($color); ?>;">
+                                    <?php echo e($item->description); ?></td>
                             </tr>
                         <?php endif; ?>
                         </tr>
@@ -420,7 +412,7 @@
                     <?php endif; ?>
                 </tbody>
                 <tfoot>
-                    <tr style="border-bottom:1px solid <?php echo e($color); ?>;">
+                    <tr>
                         <td><?php echo e(__('Total')); ?></td>
                         <td><?php echo e($invoice->totalQuantity); ?></td>
                         <td><?php echo e(Utility::priceFormat($settings, $invoice->totalRate)); ?></td>
@@ -436,12 +428,10 @@
                                     <td><?php echo e(__('Subtotal')); ?>:</td>
                                     <td><?php echo e(Utility::priceFormat($settings, $invoice->getSubTotal())); ?></td>
                                 </tr>
-                                <?php if($invoice->getTotalDiscount()): ?>
-                                    <tr>
-                                        <td><?php echo e(__('Discount')); ?>:</td>
-                                        <td><?php echo e(Utility::priceFormat($settings, $invoice->getTotalDiscount())); ?></td>
-                                    </tr>
-                                <?php endif; ?>
+                                <tr>
+                                    <td><?php echo e(__('Discount')); ?>:</td>
+                                    <td><?php echo e(Utility::priceFormat($settings, $invoice->getTotalDiscount())); ?></td>
+                                </tr>
                                 <?php if(!empty($invoice->taxesData)): ?>
                                     <?php $__currentLoopData = $invoice->taxesData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $taxName => $taxPrice): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <tr>
@@ -470,7 +460,6 @@
                                     <td><?php echo e(__('Due Amount')); ?>:</td>
                                     <td><?php echo e(Utility::priceFormat($settings, $invoice->getDue())); ?></td>
                                 </tr>
-
                             </table>
                         </td>
                     </tr>
@@ -483,10 +472,13 @@
             </div>
         </div>
     </div>
+
     <?php if(!isset($preview)): ?>
         <?php echo $__env->make('invoice.script', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>;
     <?php endif; ?>
+
+
 </body>
 
 </html>
-<?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/invoice/templates/template3.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\xampp\htdocs\erp-go-6.4-using-laravel\resources\views/invoice/templates/template10.blade.php ENDPATH**/ ?>

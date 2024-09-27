@@ -242,8 +242,8 @@
                         </td>
 
                         <td>
-                            <img class="invoice-logo" src="{{ $img }}" alt=""
-                                style="margin-bottom: 15px;">
+
+                                <img class="invoice-logo" src="{{ asset($img) }}" alt="lOGO"  style="margin-bottom: 15px;">
 
                             <table class="no-space">
                                 <tbody>

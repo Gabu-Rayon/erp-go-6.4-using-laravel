@@ -186,7 +186,11 @@
                 <tbody>
                     <tr>
                         <td>
-                            <img class="invoice-logo" src="<?php echo e($img); ?>" alt="">
+                        <?php echo e(Log::info('IMAGEEEEE')); ?>
+
+                        <?php echo e(Log::info($img)); ?>
+
+                              <img class="invoice-logo" src="<?php echo e(asset($img)); ?>" alt="lOGO">
                         </td>
                         <td class="text-right">
                             <p>
@@ -232,7 +236,8 @@
                                 <br>
                                 <?php if($settings['vat_gst_number_switch'] == 'on'): ?>
                                     <?php if(!empty($settings['tax_type']) && !empty($settings['vat_number'])): ?>
-                                        <?php echo e($settings['tax_type'] . ' ' . __('Number')); ?> : <?php echo e($settings['vat_number']); ?>
+                                        <?php echo e($settings['tax_type'] . ' ' . __('Number')); ?> :
+                                        <?php echo e($settings['vat_number']); ?>
 
                                         <br>
                                     <?php endif; ?>
@@ -385,7 +390,9 @@
 
                                 </td>
                                 <td><?php echo e(Utility::priceFormat($settings, $item->price)); ?></td>
-                                <td><?php echo e($item->discount != 0 ? Utility::priceFormat($settings, $item->discount) : '-'); ?></td>
+                                <td><?php echo e($item->discount != 0 ? Utility::priceFormat($settings, $item->discount) : '-'); ?>
+
+                                </td>
                                 <?php
                                     $itemtax = 0;
                                 ?>

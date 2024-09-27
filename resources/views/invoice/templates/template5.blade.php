@@ -233,7 +233,7 @@
                         </td>
 
                         <td class="text-right">
-                            <img class="invoice-logo" src="{{ $img }}" alt="">
+                             <img class="invoice-logo" src="{{ asset($img) }}" alt="lOGO">
                             <p>
                                 @if ($settings['company_name'])
                                     {{ $settings['company_name'] }}

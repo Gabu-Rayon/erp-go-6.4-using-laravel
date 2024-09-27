@@ -237,7 +237,7 @@
                         </td>
 
                         <td class="text-right">
-                            <img class="invoice-logo" src="<?php echo e($img); ?>" alt="">
+                             <img class="invoice-logo" src="<?php echo e(asset($img)); ?>" alt="lOGO">
                             <p>
                                 <?php if($settings['company_name']): ?>
                                     <?php echo e($settings['company_name']); ?>
