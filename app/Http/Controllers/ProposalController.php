@@ -685,10 +685,10 @@ class ProposalController extends Controller
 
         if (isset($proposal_logo) && !empty($proposal_logo)) {
             // Use public path for proposal logo
-            $img = asset('uploads/proposal_logo/' . $proposal_logo);
+            $img = 'proposal_logo/' . $proposal_logo;
         } else {
             // Fallback to company logo
-            $img = asset('uploads/logo/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png'));
+            $img = 'uploads/logo/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png');
         }
 
         return view('proposal.templates.' . $template, compact('proposal', 'preview', 'color', 'img', 'settings', 'customer', 'font_color', 'customFields'));

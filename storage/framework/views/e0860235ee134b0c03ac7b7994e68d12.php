@@ -186,7 +186,7 @@
                 <tbody>
                     <tr>
                         <td>
-                            <img class="invoice-logo" src="<?php echo e($img); ?>" alt="">
+                            <img class="invoice-logo" src="<?php echo e(asset($img)); ?>" alt="lOGO">
                         </td>
                         <td class="text-right">
                             <p>

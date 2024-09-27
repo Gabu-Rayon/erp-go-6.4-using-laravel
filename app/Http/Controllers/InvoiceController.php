@@ -1277,15 +1277,13 @@ class InvoiceController extends Controller
         $color = '#' . $color;
         $font_color = Utility::getFontColor($color);
 
-        $logo = Storage::url('uploads/logo/');
+        $logo = 'uploads/logo/';
         $company_logo = Utility::getValByName('company_logo_dark');
         $invoice_logo = Utility::getValByName('invoice_logo');
         if (isset($invoice_logo) && !empty($invoice_logo)) {
-            $img = Utility::get_file('invoice_logo/') . $invoice_logo;
+            $img = 'invoice_logo/' . $invoice_logo;
         } else {
-            $img = asset($logo . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png'));
-            Log::info('IMAGEE');
-            Log::info($img);
+            $img = $logo . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png');
         }
 
         return view('invoice.templates.' . $template, compact('invoice', 'preview', 'color', 'img', 'settings', 'customer', 'font_color', 'customFields', 'items'));
