@@ -1,6 +1,4 @@
 @extends('layouts.admin')
-@push('script-page')
-@endpush
 @section('page-title')
     {{ __('Stock Master Save Request') }}
 @endsection
