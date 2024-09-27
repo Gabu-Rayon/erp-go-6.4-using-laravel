@@ -275,8 +275,6 @@
                         <td>
                             <div class="view-qrcode">
                                 {{-- { {!! DNS2D::getBarcodeHTML($invoice->qrCodeURL, 'QRCODE', 2, 2) !!} --}}
-
-
                                 @if (isset($invoice->qrCodeURL) && !empty($invoice->qrCodeURL))
                                     <div class="view-qrcode" style="margin-top: 0;">
                                         {!! DNS2D::getBarcodeHTML($invoice->qrCodeURL, 'QRCODE', 2, 2) !!}
@@ -284,7 +282,6 @@
                                 @else
                                     <p>QR Code data not available</p>
                                 @endif
-
                             </div>
                         </td>
                     </tr>
@@ -355,7 +352,6 @@
                 <tr>
                     <th class="text-dark">{{ __('Product') }}</th>
                     <th class="text-dark">{{ __('Qty') }}</th>
-                    <th class="text-dark">{{ __('pkgQty') }}</th>
                     <th class="text-dark">{{ __('Prc') }}</th>
                     <th class="text-dark">{{ __('Discount') }}</th>
                     <th class="text-dark">{{ __('Tax') }}</th>
@@ -374,17 +370,9 @@
                 @foreach ($items as $key => $iteam)
                     <td>{{ !empty($iteam->name) ? $iteam->name : '' }}</td>
                     <td>{{ !empty($iteam->quantity) ? $iteam->quantity : '' }}</td>
-                    <td>{{ !empty($iteam->pkgQuantity) ? $iteam->pkgQuantity : '' }}</td>
-                    <td>Kes {{ $iteam->unitPrice }}</td>
+                    <td>{{ $iteam->price }}</td>
                     <td>{{ !empty($iteam->discount) ? $iteam->discount : '' }}</td>
-                    <td>
-                        @php
-                            $taxData = \Utility::getTaxData();
-                            $taxRate = floatval($taxData[$iteam->taxTypeCode]);
-                            $taxTot = ($iteam->price - $iteam->discount) * ($taxRate / 100);
-                        @endphp
-                        {{ $taxTot }}
-                    </td>
+                    <td>{{ $iteam->itemTax[0]['tax_price'] }}</td>
                     <td>{{ !empty($iteam->description) ? $iteam->description : '' }}</td>
                     <td>Kes {{ $iteam->price }}</td>
                     </tr>
@@ -467,7 +455,7 @@
                         <td colspan="6"></td>
                         <td class="text-end"><b>{{ __('Tax') }}</b></td>
                         <td class="text-end">
-                            {{ \Auth::user()->priceFormat($taxSum) }}
+                            {{ \Auth::user()->priceFormat($tax) }}
                         </td>
                     </tr>
                     <tr>
