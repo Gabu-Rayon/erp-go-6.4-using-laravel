@@ -4015,101 +4015,75 @@ class Utility extends Model
     {
         try {
             $settings = Utility::getStorageSetting();
-            //                dd($settings);
 
             if (!empty($settings['storage_setting'])) {
-
-                if ($settings['storage_setting'] == 'wasabi') {
-
-                    config(
-                        [
-                            'filesystems.disks.wasabi.key' => $settings['wasabi_key'],
-                            'filesystems.disks.wasabi.secret' => $settings['wasabi_secret'],
-                            'filesystems.disks.wasabi.region' => $settings['wasabi_region'],
-                            'filesystems.disks.wasabi.bucket' => $settings['wasabi_bucket'],
-                            'filesystems.disks.wasabi.endpoint' => 'https://s3.' . $settings['wasabi_region'] . '.wasabisys.com',
-                        ]
-                    );
-
-                    $max_size = !empty($settings['wasabi_max_upload_size']) ? $settings['wasabi_max_upload_size'] : '2048';
-                    $mimes = !empty($settings['wasabi_storage_validation']) ? $settings['wasabi_storage_validation'] : '';
-
-                } else if ($settings['storage_setting'] == 's3') {
-                    config(
-                        [
-                            'filesystems.disks.s3.key' => $settings['s3_key'],
-                            'filesystems.disks.s3.secret' => $settings['s3_secret'],
-                            'filesystems.disks.s3.region' => $settings['s3_region'],
-                            'filesystems.disks.s3.bucket' => $settings['s3_bucket'],
-                            'filesystems.disks.s3.use_path_style_endpoint' => false,
-                        ]
-                    );
-                    $max_size = !empty($settings['s3_max_upload_size']) ? $settings['s3_max_upload_size'] : '2048';
-                    $mimes = !empty($settings['s3_storage_validation']) ? $settings['s3_storage_validation'] : '';
-
-                } else {
-
-                    $max_size = !empty($settings['local_storage_max_upload_size']) ? $settings['local_storage_max_upload_size'] : '20480000000';
-
-                    $mimes = !empty($settings['local_storage_validation']) ? $settings['local_storage_validation'] : '';
-                }
+                // Initialize variables based on storage setting
+                $max_size = $settings['local_storage_max_upload_size'] ?? '20480000000'; // Default for local storage
+                $mimes = $settings['local_storage_validation'] ?? '';
 
                 $file = $request[$key_name];
 
+                // Log the file information for debugging
                 \Log::info('FILELELELELE');
                 \Log::info($file);
 
-                $name = $name;
+                // Determine the final path to save the file
+                if ($settings['storage_setting'] == 'local'
+                ) {
+                    // Move file to the public folder
+                    $publicPath = public_path($path); // Get the public path
+                    $file->move($publicPath, $name); // Move the file
+                    $path = $path . $name; // Update path variable
 
-                if ($settings['storage_setting'] == 'local') {
-                    //                    dd(\Storage::disk(),$path);
-                    $request[$key_name]->move(storage_path($path), $name);
-                    $path = $path . $name;
                 } else if ($settings['storage_setting'] == 'wasabi') {
+                    // Configure Wasabi storage
+                    config([
+                        'filesystems.disks.wasabi.key' => $settings['wasabi_key'],
+                        'filesystems.disks.wasabi.secret' => $settings['wasabi_secret'],
+                        'filesystems.disks.wasabi.region' => $settings['wasabi_region'],
+                        'filesystems.disks.wasabi.bucket' => $settings['wasabi_bucket'],
+                        'filesystems.disks.wasabi.endpoint' => 'https://s3.' . $settings['wasabi_region'] . '.wasabisys.com',
+                    ]);
 
-                    $path = \Storage::disk('wasabi')->putFileAs(
-                        $path,
-                        $file,
-                        $name
-                    );
-
-                    // $path = $path.$name;
-
+                    $path = \Storage::disk('wasabi')->putFileAs($path, $file, $name);
                 } else if ($settings['storage_setting'] == 's3') {
+                    // Configure S3 storage
+                    config([
+                        'filesystems.disks.s3.key' => $settings['s3_key'],
+                        'filesystems.disks.s3.secret' => $settings['s3_secret'],
+                        'filesystems.disks.s3.region' => $settings['s3_region'],
+                        'filesystems.disks.s3.bucket' => $settings['s3_bucket'],
+                        'filesystems.disks.s3.use_path_style_endpoint' => false,
+                    ]);
 
-                    $path = \Storage::disk('s3')->putFileAs(
-                        $path,
-                        $file,
-                        $name
-                    );
-                    // $path = $path.$name;
-                    // dd($path);
+                    $path = \Storage::disk('s3')->putFileAs($path, $file, $name);
                 }
 
+                // Prepare success response
                 $res = [
                     'flag' => 1,
                     'msg' => 'success',
                     'url' => $path,
                 ];
                 return $res;
-
             } else {
+                // Handle case where settings are not properly configured
                 $res = [
                     'flag' => 0,
                     'msg' => __('Please set proper configuration for storage.'),
                 ];
                 return $res;
             }
-
         } catch (\Exception $e) {
-
+            // Handle exceptions and return error response
             $res = [
                 'flag' => 0,
-                'msg' => $e,
+                'msg' => $e->getMessage(), // Use getMessage for clearer error output
             ];
             return $res;
         }
     }
+
 
     //only employee edit storage setting upload_coustom_file function
 
