@@ -1,8 +1,6 @@
 @php
     $settings_data = \App\Models\Utility::settingsById($invoice->created_by);
-
 @endphp
-
 <!DOCTYPE html>
 <html lang="en" dir="{{ $settings_data['SITE_RTL'] == 'on' ? 'rtl' : '' }}">
 
@@ -12,8 +10,6 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-
 
     <style type="text/css">
         :root {
@@ -85,6 +81,7 @@
 
         .no-space tr td {
             padding: 0;
+            white-space: nowrap;
         }
 
         .vertical-align-top td {
@@ -92,11 +89,14 @@
         }
 
         .view-qrcode {
-            max-width: 114px;
-            height: 114px;
+            max-width: 139px;
+            height: 139px;
+            width: 100%;
             margin-left: auto;
             margin-top: 15px;
             background: var(--white);
+            padding: 13px;
+            border-radius: 10px;
         }
 
         .view-qrcode img {
@@ -107,6 +107,8 @@
         .invoice-body {
             padding: 30px 25px 0;
         }
+
+
 
         table.add-border tr {
             border-top: 1px solid var(--theme-color);
@@ -164,14 +166,6 @@
             margin-left: 0;
             margin-right: auto;
         }
-
-        p:not(:last-of-type) {
-            margin-bottom: 15px;
-        }
-
-        .invoice-summary p {
-            margin-bottom: 0;
-        }
     </style>
 
     @if ($settings_data['SITE_RTL'] == 'on')
@@ -179,16 +173,28 @@
     @endif
 </head>
 
-<body>
+<body class="">
     <div class="invoice-preview-main" id="boxes">
-        <div class="invoice-header" style="">
+        <div class="invoice-header" style="background: {{ $color }};color:{{ $font_color }}">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            {{ Log::info('IMAGEEEEE') }}
+                            {{ Log::info($img) }}
+                            <img class="invoice-logo" src="{{ asset($img) }}" alt="lOGO">
+                        </td>
+                        <td class="text-right">
+                            <h3 style="text-transform: uppercase; font-size: 40px; font-weight: bold;">
+                                {{ __('INVOICE') }}</h3>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
             <table class="vertical-align-top">
                 <tbody>
                     <tr>
                         <td>
-                            <img class="invoice-logo" src="{{ asset($img) }}" alt="lOGO">
-                        </td>
-                        <td class="text-right">
                             <p>
                                 @if ($settings['company_name'])
                                     {{ $settings['company_name'] }}
@@ -231,17 +237,8 @@
                                 @endif
                             </p>
                         </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table class="vertical-align-top">
-                <tbody>
-                    <tr>
                         <td>
-                            <h3
-                                style="text-transform: uppercase; font-size: 25px; font-weight: bold; margin-bottom: 15px;">
-                                {{ __('INVOICE') }}</h3>
-                            <table class="no-space">
+                            <table class="no-space" style="width: 45%;margin-left: auto;">
                                 <tbody>
                                     <tr>
                                         <td>{{ __('Number') }}:</td>
@@ -253,6 +250,7 @@
                                         <td class="text-right">
                                             {{ Utility::dateFormat($settings, $invoice->issue_date) }}</td>
                                     </tr>
+
                                     <tr>
                                         <td><b>{{ __('Due Date:') }}</b></td>
                                         <td class="text-right">{{ Utility::dateFormat($settings, $invoice->due_date) }}
@@ -267,22 +265,21 @@
                                             </tr>
                                         @endforeach
                                     @endif
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="view-qrcode">
+                                                {{-- {!! DNS2D::getBarcodeHTML($invoice->qrCodeURL, 'QRCODE', 2, 2) !!} --}}
 
-
+                                                @if (isset($invoice->qrCodeURL) && !empty($invoice->qrCodeURL))
+                                                    {!! DNS2D::getBarcodeHTML($invoice->qrCodeURL, 'QRCODE', 2, 2) !!}
+                                                @else
+                                                    <p>QR Code data not available</p>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
-                        </td>
-                        <td>
-                            <div class="view-qrcode">
-                                {{-- { {!! DNS2D::getBarcodeHTML($invoice->qrCodeURL, 'QRCODE', 2, 2) !!} --}}
-                                @if (isset($invoice->qrCodeURL) && !empty($invoice->qrCodeURL))
-                                    <div class="view-qrcode" style="margin-top: 0;">
-                                        {!! DNS2D::getBarcodeHTML($invoice->qrCodeURL, 'QRCODE', 2, 2) !!}
-                                    </div>
-                                @else
-                                    <p>QR Code data not available</p>
-                                @endif
-                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -308,6 +305,7 @@
                                 -
                             @endif
                         </td>
+
                         @if ($settings['shipping_display'] == 'on')
                             <td class="text-right">
                                 <strong style="margin-bottom: 10px; display:block;">{{ __('Ship To') }}:</strong>
@@ -348,142 +346,110 @@
                     </tr>
                 </tbody>
             </table>
-            <table class="table mb-0 table-striped">
-                <tr>
-                    <th class="text-dark">{{ __('Product') }}</th>
-                    <th class="text-dark">{{ __('Qty') }}</th>
-                    <th class="text-dark">{{ __('Prc') }}</th>
-                    <th class="text-dark">{{ __('Discount') }}</th>
-                    <th class="text-dark">{{ __('Tax') }}</th>
-                    <th class="text-dark">{{ __('Desc') }}</th>
-                    <th class="text-end text-dark" width="12%">{{ __('Price') }}<br>
-                        <small class="text-danger font-weight-bold">{{ __('after tax & discount') }}</small>
-                    </th>
-                </tr>
-                @php
-                    $totalQuantity = 0;
-                    $totalRate = 0;
-                    $totalTaxPrice = 0;
-                    $totalDiscount = 0;
-                    $taxesData = [];
-                @endphp
-                @foreach ($items as $key => $iteam)
-                    <td>{{ !empty($iteam->name) ? $iteam->name : '' }}</td>
-                    <td>{{ !empty($iteam->quantity) ? $iteam->quantity : '' }}</td>
-                    <td>{{ $iteam->price }}</td>
-                    <td>{{ !empty($iteam->discount) ? $iteam->discount : '' }}</td>
-                    <td>{{ $iteam->itemTax[0]['tax_price'] }}</td>
-                    <td>{{ !empty($iteam->description) ? $iteam->description : '' }}</td>
-                    <td>Kes {{ $iteam->price }}</td>
+            <table class="add-border invoice-summary" style="margin-top: 30px;">
+                <thead style="background: {{ $color }};color:{{ $font_color }}">
+                    <tr>
+                        <th>{{ __('Item') }}</th>
+                        <th>{{ __('Quantity') }}</th>
+                        <th>{{ __('Rate') }}</th>
+                        <th>{{ __('Discount') }}</th>
+                        <th>{{ __('Tax') }} (%)</th>
+                        <th>{{ __('Price') }} <small>after tax & discount</small></th>
                     </tr>
-                @endforeach
+                </thead>
+                <tbody>
+                    @if (isset($invoice->itemData) && count($invoice->itemData) > 0)
+                        @foreach ($invoice->itemData as $key => $item)
+                            <tr>
+                                <td>{{ $item->name }}</td>
+                                @php
+                                    $unitName = App\Models\ProductServiceUnit::find($item->unit);
+                                @endphp
+                                <td>{{ $item->quantity }} {{ $unitName != null ? '(' . $unitName->name . ')' : '' }}
+                                </td>
+                                <td>{{ Utility::priceFormat($settings, $item->price) }}</td>
+                                <td>{{ $item->discount != 0 ? Utility::priceFormat($settings, $item->discount) : '-' }}
+                                </td>
+                                @php
+                                    $itemtax = 0;
+                                @endphp
+                                <td>
+                                    @if (!empty($item->itemTax))
+                                        @foreach ($item->itemTax as $taxes)
+                                            @php
+                                                $itemtax += $taxes['tax_price'];
+                                            @endphp
+                                            <p>{{ $taxes['name'] }} ({{ $taxes['rate'] }}) {{ $taxes['price'] }}</p>
+                                        @endforeach
+                                    @else
+                                        <span>-</span>
+                                    @endif
+                                </td>
+                                <td>{{ Utility::priceFormat($settings, $item->price * $item->quantity - $item->discount + $itemtax) }}
+                                </td>
+                                @if (!empty($item->description))
+                            <tr class="border-0 itm-description ">
+                                <td colspan="6">{{ $item->description }}</td>
+                            </tr>
+                        @endif
+                        </tr>
+                    @endforeach
+                @else
+                    @endif
+
+                </tbody>
                 <tfoot>
                     <tr>
-                        <td><b>{{ __('Total') }}</b></td>
-                        <td>
-                            <b>
-                                @php
-                                    $qtySum = 0;
-                                    foreach ($items as $iteam) {
-                                        $qtySum += $iteam->quantity;
-                                    }
-                                @endphp
-                                {{ $qtySum }}
-                            </b>
-                        </td>
-                        <td>
-                            <b>
-                                @php
-                                    $unitPrcSum = 0;
-                                    foreach ($items as $iteam) {
-                                        $prc = $iteam->price * $iteam->quantity;
-                                        $unitPrcSum += $prc;
-                                    }
-                                @endphp
-                                {{ $unitPrcSum }}
-                            </b>
-                        </td>
-                        <td>
-                            <b>
-                                @php
-                                    $discountSum = 0;
-                                    foreach ($items as $iteam) {
-                                        $discountSum += $iteam->discount;
-                                    }
-                                @endphp
-                                {{ $discountSum }}
-                            </b>
-                        </td>
-                        <td>
-                            <b>
-                                @php
-                                    $tax = 0;
-                                    foreach ($items as $iteam) {
-                                        $tax += $iteam->itemTax[0]['tax_price'];
-                                    }
-                                @endphp
-                                {{ $tax }}
-                            </b>
-                        </td>
-                        <td></td>
-                        <td>
-                            <b>
-                                @php
-                                    $tot = 0;
-                                    foreach ($items as $iteam) {
-                                        $tot += $iteam->price;
-                                    }
-                                @endphp
-                                {{ $tot }}
-                            </b>
-                        </td>
+                        <td>{{ __('Total') }}</td>
+                        <td>{{ $invoice->totalQuantity }}</td>
+                        <td>{{ Utility::priceFormat($settings, $invoice->totalRate) }}</td>
+                        <td>{{ Utility::priceFormat($settings, $invoice->totalDiscount) }}</td>
+                        <td>{{ Utility::priceFormat($settings, $invoice->totalTaxPrice) }}</td>
+                        <td>{{ Utility::priceFormat($settings, $invoice->getSubTotal()) }}</td>
                     </tr>
                     <tr>
-                        <td colspan="6"></td>
-                        <td class="text-end"><b>{{ __('Sub Total') }}</b></td>
-                        <td class="text-end">
-                            {{ \Auth::user()->priceFormat($invoice->getSubTotal()) }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="6"></td>
-                        <td class="text-end"><b>{{ __('Discount') }}</b></td>
-                        <td class="text-end">
-                            {{ \Auth::user()->priceFormat($invoice->getTotalDiscount()) }}
+                        <td colspan="4"></td>
+                        <td colspan="2" class="sub-total">
+                            <table class="total-table">
+                                <tr>
+                                    <td>{{ __('Subtotal') }}:</td>
+                                    <td>{{ Utility::priceFormat($settings, $invoice->getSubTotal()) }}</td>
+                                </tr>
+                                @if ($invoice->getTotalDiscount())
+                                    <tr>
+                                        <td>{{ __('Discount') }}:</td>
+                                        <td>{{ Utility::priceFormat($settings, $invoice->getTotalDiscount()) }}</td>
+                                    </tr>
+                                @endif
+                                @if (!empty($invoice->taxesData))
+                                    @foreach ($invoice->taxesData as $taxName => $taxPrice)
+                                        <tr>
+                                            <td>{{ $taxName }} :</td>
+                                            <td>{{ Utility::priceFormat($settings, $taxPrice) }}</td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                                <tr>
+                                    <td>{{ __('Total') }}:</td>
+                                    <td>{{ Utility::priceFormat($settings, $invoice->getSubTotal() - $invoice->getTotalDiscount() + $invoice->getTotalTax()) }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Paid') }}:</td>
+                                    <td>{{ Utility::priceFormat($settings, $invoice->getTotal() - $invoice->getDue() - $invoice->invoiceTotalCreditNote()) }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Credit Note') }}:</td>
+                                    <td>{{ Utility::priceFormat($settings, $invoice->invoiceTotalCreditNote()) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Due Amount') }}:</td>
+                                    <td>{{ Utility::priceFormat($settings, $invoice->getDue()) }}</td>
+                                </tr>
+
+                            </table>
                         </td>
-                    </tr>
-                    <tr>
-                        <td colspan="6"></td>
-                        <td class="text-end"><b>{{ __('Tax') }}</b></td>
-                        <td class="text-end">
-                            {{ \Auth::user()->priceFormat($tax) }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="6"></td>
-                        <td class="blue-text text-end"><b>{{ __('Total') }}</b></td>
-                        <td class="blue-text text-end">
-                            {{ \Auth::user()->priceFormat($invoice->getTotal()) }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="6"></td>
-                        <td class="text-end"><b>{{ __('Paid') }}</b></td>
-                        <td class="text-end">
-                            {{ \Auth::user()->priceFormat($invoice->getTotal() - $invoice->getDue() - $invoice->invoiceTotalCreditNote()) }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="6"></td>
-                        <td class="text-end"><b>{{ __('Credit Note') }}</b></td>
-                        <td class="text-end">
-                            {{ \Auth::user()->priceFormat($invoice->invoiceTotalCreditNote()) }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="6"></td>
-                        <td class="text-end"><b>{{ __('Due') }}</b></td>
-                        <td class="text-end">
-                            {{ \Auth::user()->priceFormat($invoice->getDue()) }}</td>
                     </tr>
                 </tfoot>
             </table>
