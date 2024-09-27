@@ -556,7 +556,7 @@ Route::group(['middleware' => ['verified']], function () {
 
             Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('invoice.get');
             Route::get('invoice/{id}/credit-note', [CreditNoteController::class, 'create'])->name('invoice.credit.note');
-            
+
             Route::post('invoice/{id}/credit-note', [CreditNoteController::class, 'store'])->name('invoice.credit.note');
             Route::get('invoice/{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'edit'])->name('invoice.edit.credit.note');
             Route::post('invoice/{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'update'])->name('invoice.edit.credit.note');
@@ -1929,13 +1929,13 @@ Route::middleware(['auth', 'XSS', 'revalidate'])->group(function () {
     // Routes for stock move List
     Route::get('stockmovelist', [StockController::class, 'stockMoveListIndex'])->name('stockmovelist.index');
     Route::get('stockmovelist/show/{id}', [StockController::class, 'stockMoveListShow'])->name('stockmovelist.show');
-    
-    Route::get('stockmovelist/create', [StockController::class, 'stockMoveListCreate'])->name('stockmovelist.create');    
+
+    Route::get('stockmovelist/create', [StockController::class, 'stockMoveListCreate'])->name('stockmovelist.create');
     Route::post('stockmovelist/store', [StockController::class, 'stockMoveListStore'])->name('stockmovelist.store');
-    
+
     Route::post('stockmovelist/edit/{id}', [StockController::class, 'stockMoveListUpdate'])->name('stockmovelist.delete');
     Route::post('stockmovelist/update/{id}', [StockController::class, 'stockMoveListUpdate'])->name('stockmovelist.update');
-    
+
     Route::post('stockmovelist/delete/{id}', [StockController::class, 'stockMoveListDelete'])->name('stockmovelist.delete');
     Route::post('stockmovelist/destroy/{id}', [StockController::class, 'stockMoveListDestroy'])->name('stockmovelist.destroy');
     //stockmovelist.searchByDate
@@ -1944,7 +1944,7 @@ Route::middleware(['auth', 'XSS', 'revalidate'])->group(function () {
     Route::get('getStockMoveListFromApi', [StockController::class, 'getStockMoveListFromApi'])->name('stock.getStockMoveListFromApi');
     // stockmovelist.synchronize
     Route::get('synchronizegetStockMoveList', [StockController::class, 'synchronizegetStockMoveListFromApi'])->name('stockmovelist.synchronize');
-    
+
     //Branch Transfer Code for the product Stock 
     Route::get('branch/transfer/stock', [StockController::class, 'branchTransferIndex'])->name('branch.transfer.index');
     Route::get('branch/transfer/stock/show/{id}', [StockController::class, 'branchTransferShow'])->name('branch.transfer.Show');
@@ -1957,14 +1957,14 @@ Route::middleware(['auth', 'XSS', 'revalidate'])->group(function () {
 
     Route::post('branch/transfer/stock/delete/{id}', [StockController::class, 'branchTransferDelete'])->name('branch.transfer.delete');
     Route::post('branch/transfer/stock/destroy/{id}', [StockController::class, 'branchTransferDestroy'])->name('branch.transfer.destroy');
-   
+
 
     // Routes for stockMaster Save Request V2 updates by invoice number
     Route::get('stock/master/save/request', [StockController::class, 'stockMasterSaveRequestIndex'])->name('stock.master.save.request.index');
-    Route::get('stock/master/save/request/{id}', [StockController::class, 'stockMasterSaveRequestShow'])->name('stock.master.save.request.Show');
+    Route::get('stock/master/save/request/{id}', [StockController::class, 'stockMasterSaveRequestShow'])->name('stock.master.save.request.show');
 
-    Route::get('stock/master/save/request/create', [StockController::class, 'stockMasterSaveRequestCreate'])->name('stock.master.save.request.create');
-    Route::post('stock/master/save/request/store', [StockController::class, 'stockMasterSaveRequestStore'])->name('stock.master.save.request.store');
+    Route::get('save/request/create', [StockController::class, 'stockMasterSaveRequestCreate'])->name('save.request.create');
+    Route::post('save/request/store', [StockController::class, 'stockMasterSaveRequestStore'])->name('save.request.store');
 
     Route::post('stock/master/save/request/edit/{id}', [StockController::class, 'stockMasterSaveRequestUpdate'])->name('stock.master.save.request.edit');
     Route::post('stock/master/save/request/update/{id}', [StockController::class, 'stockMasterSaveRequestUpdate'])->name('stock.master.save.request.update');
@@ -1987,7 +1987,6 @@ Route::middleware(['auth', 'XSS', 'revalidate'])->group(function () {
 
     Route::post('stock/update/by/invoice/delete/{id}', [StockController::class, 'stockUpdateByInvoiceDelete'])->name('stock.update.by.invoice.no.delete');
     Route::post('stock/update/by/invoice/destroy/{id}', [StockController::class, 'stockUpdateByInvoiceDestroy'])->name('stock.update.by.invoice.no.destroy');
-    
 });
 
 Route::post('configuration-settings', [ConfigSettingsController::class, 'update'])->name('configuration-settings');
