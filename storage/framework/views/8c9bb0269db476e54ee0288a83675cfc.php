@@ -24,7 +24,7 @@
                 <div class="row justify-content-between align-items-center">
                     <div class="col-md-12 d-flex align-items-center justify-content-between justify-content-md-end">
                         <input type="button" value="<?php echo e(__('Go Back')); ?>"
-                            onclick="location.href = '<?php echo e(route('purchase.mappedPurchases')); ?>';" class="btn btn-primary">
+                            onclick="location.href = '<?php echo e(route('stockmovelist.index')); ?>';" class="btn btn-primary">
                     </div>
                 </div>
             </div>

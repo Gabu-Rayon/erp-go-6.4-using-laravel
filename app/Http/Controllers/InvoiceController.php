@@ -1492,7 +1492,7 @@ class InvoiceController extends Controller
 
         $config = ConfigSettings::first();
 
-        $url = $config->api_url . 'StockUpdate/ByInvoiceNo?InvoiceNo=' . $invoiceNo;
+        $url = $config->api_url . 'StockUpdateV2/ByInvoiceNo?InvoiceNo=' . $invoiceNo;
 
         // Make the API request using Laravel's Http client
         $response = Http::withHeaders([
