@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Http;
 use App\Models\BranchTransferProduct;
 use Illuminate\Support\FacadesValidator;
 use App\Models\StockAdjustmentProductList;
+use App\Models\StockMasterSaveRequest;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -83,10 +85,10 @@ class StockController extends Controller
             $response = Http::withOptions(['verify' => false])->withHeaders([
                 'key' => $config->api_key,
             ])->post($url, [
-                        'storeReleaseTypeCode' => $data['storeReleaseTypeCode'],
-                        'remark' => $data['remark'],
-                        'stockItemList' => $data['items']
-                    ]);
+                'storeReleaseTypeCode' => $data['storeReleaseTypeCode'],
+                'remark' => $data['remark'],
+                'stockItemList' => $data['items']
+            ]);
 
             if ($response['statusCode'] !== 200) {
                 return redirect()->back()->with('error', 'Check your credentials and try again');
@@ -502,7 +504,7 @@ class StockController extends Controller
                         'to_branch' => $request->branchTo,
                         'product_id' => null, // You may want to change this later
                         'totItemCnt' => count($request->items),
-                        'status' => 1, 
+                        'status' => 1,
                     ]);
 
                     foreach ($request->items as $item) {
@@ -558,7 +560,8 @@ class StockController extends Controller
     // Stock Master Save Request Methods
     public function stockMasterSaveRequestIndex()
     {
-        // Code to list stock master save requests
+        $requests = StockMasterSaveRequest::all();
+        return view('stockmastersaverequest.index', compact('requests'));
     }
 
     public function stockMasterSaveRequestShow($id)
@@ -568,12 +571,66 @@ class StockController extends Controller
 
     public function stockMasterSaveRequestCreate()
     {
-        // Code to show create form
+        $branches = BranchesList::all()->pluck('bhfNm', 'bhfId');
+        $items = ProductService::all()->pluck('itemNm', 'kraItemCode');
+        return view('stockmastersaverequest.create', compact('branches', 'items'));
     }
 
     public function stockMasterSaveRequestStore(Request $request)
     {
-        // Code to store new stock master save request
+        try {
+
+            $data = $request->all();
+
+            DB::beginTransaction();
+
+            $config = ConfigSettings::first();
+
+            $request = Http::withOptions(['verify' => false])
+                ->withHeaders(['key' => $config->api_key])
+                ->post($config->api_url . 'StockMasterSaveRequestV2', [
+                    'itemCd' => $data['itemCd'] ?? '',
+                    'rsdQty' => $data['rsdQty'] ?? '',
+                    'regrId' => $data['regrId'] ?? '',
+                    'regrNm' => $data['regrNm'] ?? '',
+                    'modrNm' => $data['modrNm'] ?? '',
+                    'modrId' => $data['modrId'] ?? '',
+                    'tin' => $data['tin'] ?? '',
+                    'bhfId' => $data['bhfId'] ?? '',
+                ]);
+
+            Log::info('SAVE REQUEST STORE RESPONSE');
+
+            $response = $request->json();
+
+            Log::info($request->json());
+
+            if (!$response['status']) {
+                return redirect()->back()->with('error', $response['message']);
+            }
+
+            StockMasterSaveRequest::create([
+                'itemCd' => $data['itemCd'] ?? '',
+                'rsdQty' => $data['rsdQty'] ?? '',
+                'regrId' => $data['regrId'] ?? '',
+                'regrNm' => $data['regrNm'] ?? '',
+                'modrNm' => $data['modrNm'] ?? '',
+                'modrId' => $data['modrId'] ?? '',
+                'tin' => $data['tin'] ?? '',
+                'bhfId' => $data['bhfId'] ?? '',
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('stock.master.save.request.index')->with('success', 'Stock Master Save Request Added.');
+        } catch (Exception $e) {
+
+            DB::rollBack();
+
+            Log::info('SAVE REQUEST STORE ERROR');
+            Log::info($e);
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function stockMasterSaveRequestUpdate(Request $request, $id)
