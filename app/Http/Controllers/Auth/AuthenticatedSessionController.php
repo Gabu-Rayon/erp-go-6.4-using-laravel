@@ -10,6 +10,7 @@ use  App\Models\Utility;
 use  App\Models\User;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,7 +44,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      *
-     * @param \App\Http\RequestsAuth\LoginRequest $request
+     * @param \App\Http\Requests\Auth\LoginRequest $request
      *
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -66,7 +67,7 @@ class AuthenticatedSessionController extends Controller
     //    }
 
 
-    public function store(Request $request)
+    public function store(LoginRequest $request)
     {
 
         $user = User::where('email', $request->email)->first();
@@ -96,7 +97,7 @@ class AuthenticatedSessionController extends Controller
         if ($user->is_active == 0) {
             auth()->logout();
         }
-        $user = Auth::user();
+        $user = \Auth::user();
         if ($user->type == 'company') {
             $plan = Plan::find($user->plan);
             if ($plan) {
@@ -114,7 +115,7 @@ class AuthenticatedSessionController extends Controller
                 }
 
                 if ($user->trial_expire_date != null) {
-                    if (Auth::user()->trial_expire_date > date('Y-m-d')) {
+                    if (\Auth::user()->trial_expire_date > date('Y-m-d')) {
                         $user->assignPlan(1);
 
                         return redirect()->intended(RouteServiceProvider::HOME)->with('error', __('Your Trial plan Expired.'));
@@ -159,7 +160,7 @@ class AuthenticatedSessionController extends Controller
             $login_detail->ip = $ip;
             $login_detail->date = date('Y-m-d H:i:s');
             $login_detail->Details = $json;
-            $login_detail->created_by = Auth::user()->creatorId();
+            $login_detail->created_by = \Auth::user()->creatorId();
             $login_detail->save();
         }
         //end for user log
@@ -212,17 +213,17 @@ class AuthenticatedSessionController extends Controller
             ]
         );
 
-        if (Auth::guard('customer')->attempt(
+        if (\Auth::guard('customer')->attempt(
             [
                 'email' => $request->email,
                 'password' => $request->password,
             ],
             $request->get('remember')
         )) {
-            if (Auth::guard('customer')->user()->is_active == 0) {
-                Auth::guard('customer')->logout();
+            if (\Auth::guard('customer')->user()->is_active == 0) {
+                \Auth::guard('customer')->logout();
             }
-            $user = Auth::guard('customer')->user();
+            $user = \Auth::guard('customer')->user();
             $user->update(
                 [
                     'last_login_at' => Carbon::now()->toDateTimeString(),
@@ -255,17 +256,17 @@ class AuthenticatedSessionController extends Controller
                 'password' => 'required|min:6',
             ]
         );
-        if (Auth::guard('vender')->attempt(
+        if (\Auth::guard('vender')->attempt(
             [
                 'email' => $request->email,
                 'password' => $request->password,
             ],
             $request->get('remember')
         )) {
-            if (Auth::guard('vender')->user()->is_active == 0) {
-                Auth::guard('vender')->logout();
+            if (\Auth::guard('vender')->user()->is_active == 0) {
+                \Auth::guard('vender')->logout();
             }
-            $user = Auth::guard('vender')->user();
+            $user = \Auth::guard('vender')->user();
             $user->update(
                 [
                     'last_login_at' => Carbon::now()->toDateTimeString(),
