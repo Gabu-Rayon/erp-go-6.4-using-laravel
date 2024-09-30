@@ -184,7 +184,7 @@
                 <tbody>
                     <tr>
                         <td>
-                            <img class="invoice-logo" src="{{ $img }}" alt="">
+                           <img class="invoice-logo" src="{{ asset($img) }}" alt="lOGO">
                         </td>
                         <td class="text-right">
                             <h3 style="text-transform: uppercase; font-size: 40px; font-weight: bold;">

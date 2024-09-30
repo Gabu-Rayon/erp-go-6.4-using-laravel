@@ -220,7 +220,7 @@
                             </table>
                         </td>
                         <td class="text-right">
-                            <img class="invoice-logo" src="<?php echo e($img); ?>" alt="">
+                           <img class="invoice-logo" src="<?php echo e(asset($img)); ?>" alt="lOGO">
                         </td>
                     </tr>
                 </tbody>

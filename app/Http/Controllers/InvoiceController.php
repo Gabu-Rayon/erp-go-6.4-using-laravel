@@ -1349,19 +1349,24 @@ class InvoiceController extends Controller
         //        $company_logo = Utility::getValByName('company_logo_dark');
         //        $img          = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png'));
 
-        $logo = asset(Storage::url('uploads/logo/'));
+        $logo = 'uploads/logo/';
         $company_logo = Utility::getValByName('company_logo_dark');
         $settings_data = Utility::settingsById($invoice->created_by);
         $invoice_logo = $settings_data['invoice_logo'];
         if (isset($invoice_logo) && !empty($invoice_logo)) {
-            $img = Utility::get_file('invoice_logo/') . $invoice_logo;
+            $img = 'invoice_logo/' . $invoice_logo;
         } else {
-            $img = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png'));
+            $img = $logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png');
         }
 
         if ($invoice) {
             $color = '#' . $settings['invoice_color'];
             $font_color = Utility::getFontColor($color);
+
+            Log::info('Logo Image ');
+            Log::info($logo);
+            Log::info('Company Logo Image ');
+            Log::info($company_logo);
 
             Log::info('iteam(item)');
             Log::info($items);

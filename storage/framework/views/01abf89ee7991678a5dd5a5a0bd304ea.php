@@ -1,8 +1,6 @@
 <?php
     $settings_data = \App\Models\Utility::settingsById($invoice->created_by);
-
 ?>
-
 <!DOCTYPE html>
 <html lang="en" dir="<?php echo e($settings_data['SITE_RTL'] == 'on' ? 'rtl' : ''); ?>">
 
@@ -12,8 +10,6 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo e(asset('css/app.css')); ?>">
-
 
     <style type="text/css">
         :root {
@@ -85,6 +81,7 @@
 
         .no-space tr td {
             padding: 0;
+            white-space: nowrap;
         }
 
         .vertical-align-top td {
@@ -92,11 +89,14 @@
         }
 
         .view-qrcode {
-            max-width: 114px;
-            height: 114px;
+            max-width: 139px;
+            height: 139px;
+            width: 100%;
             margin-left: auto;
             margin-top: 15px;
             background: var(--white);
+            padding: 13px;
+            border-radius: 10px;
         }
 
         .view-qrcode img {
@@ -107,6 +107,8 @@
         .invoice-body {
             padding: 30px 25px 0;
         }
+
+
 
         table.add-border tr {
             border-top: 1px solid var(--theme-color);
@@ -164,14 +166,6 @@
             margin-left: 0;
             margin-right: auto;
         }
-
-        p:not(:last-of-type) {
-            margin-bottom: 15px;
-        }
-
-        .invoice-summary p {
-            margin-bottom: 0;
-        }
     </style>
 
     <?php if($settings_data['SITE_RTL'] == 'on'): ?>
@@ -179,16 +173,30 @@
     <?php endif; ?>
 </head>
 
-<body>
+<body class="">
     <div class="invoice-preview-main" id="boxes">
-        <div class="invoice-header" style="">
+        <div class="invoice-header" style="background: <?php echo e($color); ?>;color:<?php echo e($font_color); ?>">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <?php echo e(Log::info('IMAGEEEEE')); ?>
+
+                            <?php echo e(Log::info($img)); ?>
+
+                            <img class="invoice-logo" src="<?php echo e(asset($img)); ?>" alt="lOGO">
+                        </td>
+                        <td class="text-right">
+                            <h3 style="text-transform: uppercase; font-size: 40px; font-weight: bold;">
+                                <?php echo e(__('INVOICE')); ?></h3>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
             <table class="vertical-align-top">
                 <tbody>
                     <tr>
                         <td>
-                            <img class="invoice-logo" src="<?php echo e($img); ?>" alt="">
-                        </td>
-                        <td class="text-right">
                             <p>
                                 <?php if($settings['company_name']): ?>
                                     <?php echo e($settings['company_name']); ?>
@@ -240,17 +248,8 @@
                                 <?php endif; ?>
                             </p>
                         </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table class="vertical-align-top">
-                <tbody>
-                    <tr>
                         <td>
-                            <h3
-                                style="text-transform: uppercase; font-size: 25px; font-weight: bold; margin-bottom: 15px;">
-                                <?php echo e(__('INVOICE')); ?></h3>
-                            <table class="no-space">
+                            <table class="no-space" style="width: 45%;margin-left: auto;">
                                 <tbody>
                                     <tr>
                                         <td><?php echo e(__('Number')); ?>:</td>
@@ -262,6 +261,7 @@
                                         <td class="text-right">
                                             <?php echo e(Utility::dateFormat($settings, $invoice->issue_date)); ?></td>
                                     </tr>
+
                                     <tr>
                                         <td><b><?php echo e(__('Due Date:')); ?></b></td>
                                         <td class="text-right"><?php echo e(Utility::dateFormat($settings, $invoice->due_date)); ?>
@@ -278,26 +278,22 @@
                                             </tr>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     <?php endif; ?>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="view-qrcode">
+                                                
 
+                                                <?php if(isset($invoice->qrCodeURL) && !empty($invoice->qrCodeURL)): ?>
+                                                    <?php echo DNS2D::getBarcodeHTML($invoice->qrCodeURL, 'QRCODE', 2, 2); ?>
 
+                                                <?php else: ?>
+                                                    <p>QR Code data not available</p>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
-                        </td>
-                        <td>
-                            <div class="view-qrcode">
-                                
-
-
-                                <?php if(isset($invoice->qrCodeURL) && !empty($invoice->qrCodeURL)): ?>
-                                    <div class="view-qrcode" style="margin-top: 0;">
-                                        <?php echo DNS2D::getBarcodeHTML($invoice->qrCodeURL, 'QRCODE', 2, 2); ?>
-
-                                    </div>
-                                <?php else: ?>
-                                    <p>QR Code data not available</p>
-                                <?php endif; ?>
-
-                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -323,6 +319,7 @@
                                 -
                             <?php endif; ?>
                         </td>
+
                         <?php if($settings['shipping_display'] == 'on'): ?>
                             <td class="text-right">
                                 <strong style="margin-bottom: 10px; display:block;"><?php echo e(__('Ship To')); ?>:</strong>

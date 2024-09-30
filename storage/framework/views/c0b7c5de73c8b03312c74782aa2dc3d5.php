@@ -251,8 +251,8 @@
                         </td>
 
                         <td>
-                            <img class="invoice-logo" src="<?php echo e($img); ?>" alt=""
-                                style="margin-bottom: 15px;">
+
+                                <img class="invoice-logo" src="<?php echo e(asset($img)); ?>" alt="lOGO"  style="margin-bottom: 15px;">
 
                             <table class="no-space">
                                 <tbody>

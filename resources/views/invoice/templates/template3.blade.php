@@ -193,7 +193,7 @@
                         </td>
 
                         <td class="text-right">
-                            <img class="invoice-logo" src="{{ $img }}" alt="">
+                           <img class="invoice-logo" src="{{ asset($img) }}" alt="lOGO">
                         </td>
                     </tr>
                 </tbody>
