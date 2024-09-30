@@ -1537,7 +1537,7 @@ class InvoiceController extends Controller
 
         // Validate the trader invoice number input
         $request->validate([
-            'SalesByTraderInvoiceNo' => 'required|integer',
+            'SalesByTraderInvoiceNo' => 'required|string',
         ], [
             'SalesByTraderInvoiceNo.required' => __('Data is required for synchronization.'),
         ]);
