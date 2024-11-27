@@ -310,8 +310,8 @@ class ProductServiceController extends Controller
                 ])->withHeaders([
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
-                    'key' => $$config->api_key
-                ])->post($$config->api_url . 'AddItemsListV2', $apiData);
+                    'key' => $config->api_key
+                ])->post($config->api_url . 'AddItemsListV2', $apiData);
 
                 // Log response data
                 \Log::info('API Response Status Code For Posting Product Data: ' . $response->status());

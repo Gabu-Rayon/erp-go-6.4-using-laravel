@@ -1397,7 +1397,11 @@
                                         <a class="dash-link"
                                             href="<?php echo e(route('stockadjustment.index')); ?>"><?php echo e(__('Stock Adjustment')); ?></a>
                                     </li>
-                                    
+                                    <li
+                                        class="dash-item <?php echo e(request()->is('stock.master.save.request.index') ? 'active' : ''); ?>">
+                                        <a class="dash-link"
+                                            href="<?php echo e(route('stock.master.save.request.index')); ?>"><?php echo e(__('Stock Master Save Request')); ?></a>
+                                    </li>
                                 </ul>
                             </li>
                         <?php endif; ?>
@@ -1576,14 +1580,14 @@
             <?php endif; ?>
 
             <!-- <?php if(\Auth::user()->type == 'company'): ?>
-                        <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'iteminfomation' ? 'active' : ''); ?>">
-                            <a href="<?php echo e(route('productservice.index')); ?>" class="dash-link">
-                                <span class="dash-micon"><i class="ti ti-notification"></i></span><span
-                                    class="dash-mtext"><?php echo e(__('Product Service')); ?></span>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                     -->
+                                <li class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'iteminfomation' ? 'active' : ''); ?>">
+                                    <a href="<?php echo e(route('productservice.index')); ?>" class="dash-link">
+                                        <span class="dash-micon"><i class="ti ti-notification"></i></span><span
+                                            class="dash-mtext"><?php echo e(__('Product Service')); ?></span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                             -->
             <!--------------------- Start System Setup ----------------------------------->
 
             <?php if(\Auth::user()->type != 'super admin'): ?>
@@ -1810,7 +1814,7 @@
 
 
             <div class="navbar-footer border-top ">
-                <div class="d-flex align-items-center py-3 px-3 border-bottom">
+                <div class="px-3 py-3 d-flex align-items-center border-bottom">
                     <div class="me-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="29" height="30" viewBox="0 0 29 30"
                             fill="none">
