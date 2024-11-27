@@ -27,15 +27,15 @@
 
 @section('action-btn')
     <div class="float-end">
-        <div class="d-inline-block mb-4">
+        <div class="mb-4 d-inline-block">
             {{ Form::open(['route' => 'invoice.no.getSalesByTraderInvoiceNo', 'method' => 'POST', 'class' => 'w-100']) }}
             @csrf
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <div class="form-group">
                 {{ Form::label('SalesByTraderInvoiceNo', __('Get Sales By Trader Invoice No'), ['class' => 'form-label']) }}
-                {{ Form::number('SalesByTraderInvoiceNo', null, ['class' => 'form-control', 'placeholder' => '1', 'required' => 'required']) }}
+                {{ Form::text('SalesByTraderInvoiceNo', null, ['class' => 'form-control', 'placeholder' => '1', 'required' => 'required']) }}
             </div>
-            <button type="submit" class="btn btn-primary  sync">{{ __('Search') }}</button>
+            <button type="submit" class="btn btn-primary sync">{{ __('Search') }}</button>
             {{ Form::close() }}
         </div>
         <a class="btn btn-sm btn-primary" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button"
@@ -64,13 +64,13 @@
                     <div class="card-body">
                         {{ Form::open(['route' => ['invoice.index'], 'method' => 'GET', 'id' => 'customer_submit']) }}
                         <div class="row d-flex align-items-center justify-content-end">
-                            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12 mr-2">
+                            <div class="mr-2 col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12">
                                 <div class="btn-box">
                                     {{ Form::label('issue_date', __('Issue Date'), ['class' => 'form-label']) }}
                                     {{ Form::date('issue_date', isset($_GET['issue_date']) ? $_GET['issue_date'] : '', ['class' => 'form-control month-btn', 'id' => 'pc-daterangepicker-1']) }}
                                 </div>
                             </div>
-                            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12 mr-2">
+                            <div class="mr-2 col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12">
                                 <div class="btn-box">
                                     {{ Form::label('customer', __('Customer'), ['class' => 'form-label']) }}
                                     {{ Form::select('customer', $customer, isset($_GET['customer']) ? $_GET['customer'] : '', ['class' => 'form-control select']) }}
@@ -82,7 +82,7 @@
                                     {{ Form::select('status', ['' => 'Select Status'] + $status, isset($_GET['status']) ? $_GET['status'] : '', ['class' => 'form-control select']) }}
                                 </div>
                             </div>
-                            <div class="col-auto float-end ms-2 mt-4">
+                            <div class="col-auto mt-4 float-end ms-2">
                                 <a href="#" class="btn btn-sm btn-primary"
                                     onclick="document.getElementById('customer_submit').submit(); return false;"
                                     data-toggle="tooltip" data-original-title="{{ __('apply') }}">
@@ -139,7 +139,7 @@
                                         <td>{{ Auth::user()->dateFormat($invoice->issue_date) }}</td>
                                         <td>
                                             @if ($invoice->due_date < date('Y-m-d'))
-                                                <p class="text-danger mt-3">
+                                                <p class="mt-3 text-danger">
                                                     {{ \Auth::user()->dateFormat($invoice->due_date) }}
                                                 </p>
                                             @else
@@ -150,28 +150,28 @@
                                         <td>
                                             @if ($invoice->status == 0)
                                                 <span
-                                                    class="status_badge badge bg-secondary p-2 px-3 rounded">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                                    class="p-2 px-3 rounded status_badge badge bg-secondary">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
                                             @elseif($invoice->status == 1)
                                                 <span
-                                                    class="status_badge badge bg-warning p-2 px-3 rounded">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                                    class="p-2 px-3 rounded status_badge badge bg-warning">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
                                             @elseif($invoice->status == 2)
                                                 <span
-                                                    class="status_badge badge bg-danger p-2 px-3 rounded">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                                    class="p-2 px-3 rounded status_badge badge bg-danger">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
                                             @elseif($invoice->status == 3)
                                                 <span
-                                                    class="status_badge badge bg-info p-2 px-3 rounded">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                                    class="p-2 px-3 rounded status_badge badge bg-info">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
                                             @elseif($invoice->status == 4)
                                                 <span
-                                                    class="status_badge badge bg-primary p-2 px-3 rounded">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                                    class="p-2 px-3 rounded status_badge badge bg-primary">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
                                             @endif
                                         </td>
                                         <td>
                                             @if ($invoice->isKRASynchronized == 0 || $invoice->isStockIOUpdate == 0)
                                                 <span
-                                                    class="status_badge badge bg-danger p-2 px-3 rounded">Unsynchronized</span>
+                                                    class="p-2 px-3 rounded status_badge badge bg-danger">Unsynchronized</span>
                                             @elseif ($invoice->isKRASynchronized == 1 && $invoice->isStockIOUpdate == 1)
                                                 <span
-                                                    class="status_badge badge bg-primary p-2 px-3 rounded">Synchronized</span>
+                                                    class="p-2 px-3 rounded status_badge badge bg-primary">Synchronized</span>
                                             @endif
                                         </td>
 
@@ -185,7 +185,7 @@
                                                         onclick="copyToClipboard(this)" data-bs-toggle="tooltip"
                                                         title="{{ __('Copy Invoice') }}"
                                                         data-original-title="{{ __('Copy Invoice') }}"><i
-                                                            class="ti ti-link text-white"></i></a>
+                                                            class="text-white ti ti-link"></i></a>
                                                 </div>
                                                 <div class="action-btn bg-primary ms-2">
                                                     {!! Form::open([
@@ -201,7 +201,7 @@
                                                         data-original-title="{{ __('Delete') }}"
                                                         data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back"
                                                         data-confirm-yes="document.getElementById('duplicate-form-{{ $invoice->id }}').submit();">
-                                                        <i class="ti ti-copy text-white"></i>
+                                                        <i class="text-white ti ti-copy"></i>
                                                         {!! Form::open([
                                                             'method' => 'get',
                                                             'route' => ['invoice.duplicate', $invoice->id],
@@ -215,7 +215,7 @@
                                                 {{--                                                                    <a href="{{ route('customer.invoice.show', \Crypt::encrypt($invoice->id)) }}" --}}
                                                 {{--                                                                       class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip" title="Show " --}}
                                                 {{--                                                                       data-original-title="{{ __('Detail') }}"> --}}
-                                                {{--                                                                        <i class="ti ti-eye text-white"></i> --}}
+                                                {{--                                                                        <i class="text-white ti ti-eye"></i> --}}
                                                 {{--                                                                    </a> --}}
                                                 {{--                                                                </div> --}}
                                                 {{--                                                        @else --}}
@@ -223,7 +223,7 @@
                                                     <a href="{{ route('invoice.show', \Crypt::encrypt($invoice->id)) }}"
                                                         class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip"
                                                         title="Show " data-original-title="{{ __('Detail') }}">
-                                                        <i class="ti ti-eye text-white"></i>
+                                                        <i class="text-white ti ti-eye"></i>
                                                     </a>
                                                 </div>
                                                 {{--                                                        @endif --}}
@@ -232,7 +232,7 @@
                                                         class="mx-3 btn btn-sm align-items-center"
                                                         data-bs-toggle="tooltip" title="Edit "
                                                         data-original-title="{{ __('Edit') }}">
-                                                        <i class="ti ti-pencil text-white"></i>
+                                                        <i class="text-white ti ti-pencil"></i>
                                                     </a>
                                                 </div>
                                                 <div class="action-btn bg-danger ms-2">
@@ -247,7 +247,7 @@
                                                         data-original-title="{{ __('Delete') }}"
                                                         data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
                                                         data-confirm-yes="document.getElementById('delete-form-{{ $invoice->id }}').submit();">
-                                                        <i class="ti ti-trash text-white"></i>
+                                                        <i class="text-white ti ti-trash"></i>
                                                     </a>
                                                     {!! Form::close() !!}
                                                 </div>

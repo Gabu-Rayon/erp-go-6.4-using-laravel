@@ -186,7 +186,9 @@
                 <tbody>
                     <tr>
                         <td>
-                            <img class="invoice-logo" src="{{ $img }}" alt="">
+                        {{ Log::info('IMAGEEEEE') }}
+                        {{ Log::info($img) }}
+                              <img class="invoice-logo" src="{{ asset($img) }}" alt="lOGO">
                         </td>
                         <td class="text-right">
                             <p>
@@ -224,7 +226,8 @@
                                 <br>
                                 @if ($settings['vat_gst_number_switch'] == 'on')
                                     @if (!empty($settings['tax_type']) && !empty($settings['vat_number']))
-                                        {{ $settings['tax_type'] . ' ' . __('Number') }} : {{ $settings['vat_number'] }}
+                                        {{ $settings['tax_type'] . ' ' . __('Number') }} :
+                                        {{ $settings['vat_number'] }}
                                         <br>
                                     @endif
                                 @endif
@@ -372,7 +375,8 @@
                                 <td>{{ $item->quantity }} {{ $unitName != null ? '(' . $unitName->name . ')' : '' }}
                                 </td>
                                 <td>{{ Utility::priceFormat($settings, $item->price) }}</td>
-                                <td>{{ $item->discount != 0 ? Utility::priceFormat($settings, $item->discount) : '-' }}</td>
+                                <td>{{ $item->discount != 0 ? Utility::priceFormat($settings, $item->discount) : '-' }}
+                                </td>
                                 @php
                                     $itemtax = 0;
                                 @endphp

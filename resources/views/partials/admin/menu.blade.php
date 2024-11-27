@@ -1386,7 +1386,11 @@
                                         <a class="dash-link"
                                             href="{{ route('stockadjustment.index') }}">{{ __('Stock Adjustment') }}</a>
                                     </li>
-                                    
+                                    <li
+                                        class="dash-item {{ request()->is('stock.master.save.request.index') ? 'active' : '' }}">
+                                        <a class="dash-link"
+                                            href="{{ route('stock.master.save.request.index') }}">{{ __('Stock Master Save Request') }}</a>
+                                    </li>
                                 </ul>
                             </li>
                         @endif
@@ -1564,14 +1568,14 @@
             @endif
 
             <!-- @if (\Auth::user()->type == 'company')
-                        <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'iteminfomation' ? 'active' : '' }}">
-                            <a href="{{ route('productservice.index') }}" class="dash-link">
-                                <span class="dash-micon"><i class="ti ti-notification"></i></span><span
-                                    class="dash-mtext">{{ __('Product Service') }}</span>
-                            </a>
-                        </li>
-                    @endif
-                     -->
+                                <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'iteminfomation' ? 'active' : '' }}">
+                                    <a href="{{ route('productservice.index') }}" class="dash-link">
+                                        <span class="dash-micon"><i class="ti ti-notification"></i></span><span
+                                            class="dash-mtext">{{ __('Product Service') }}</span>
+                                    </a>
+                                </li>
+                            @endif
+                             -->
             <!--------------------- Start System Setup ----------------------------------->
 
             @if (\Auth::user()->type != 'super admin')
@@ -1798,7 +1802,7 @@
 
 
             <div class="navbar-footer border-top ">
-                <div class="d-flex align-items-center py-3 px-3 border-bottom">
+                <div class="px-3 py-3 d-flex align-items-center border-bottom">
                     <div class="me-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="29" height="30" viewBox="0 0 29 30"
                             fill="none">

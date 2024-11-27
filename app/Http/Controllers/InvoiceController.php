@@ -1277,16 +1277,16 @@ class InvoiceController extends Controller
         $color = '#' . $color;
         $font_color = Utility::getFontColor($color);
 
-        $logo = asset(Storage::url('uploads/logo/'));
+        $logo = 'uploads/logo/';
         $company_logo = Utility::getValByName('company_logo_dark');
         $invoice_logo = Utility::getValByName('invoice_logo');
         if (isset($invoice_logo) && !empty($invoice_logo)) {
-            $img = Utility::get_file('invoice_logo/') . $invoice_logo;
+            $img = 'invoice_logo/' . $invoice_logo;
         } else {
-            $img = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png'));
+            $img = $logo . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png');
         }
 
-        return view('invoice.templates.' . $template, compact('invoice', 'preview', 'color', 'img', 'settings', 'customer', 'font_color', 'customFields'));
+        return view('invoice.templates.' . $template, compact('invoice', 'preview', 'color', 'img', 'settings', 'customer', 'font_color', 'customFields', 'items'));
     }
 
     public function invoice($invoice_id)
@@ -1349,19 +1349,24 @@ class InvoiceController extends Controller
         //        $company_logo = Utility::getValByName('company_logo_dark');
         //        $img          = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png'));
 
-        $logo = asset(Storage::url('uploads/logo/'));
+        $logo = 'uploads/logo/';
         $company_logo = Utility::getValByName('company_logo_dark');
         $settings_data = Utility::settingsById($invoice->created_by);
         $invoice_logo = $settings_data['invoice_logo'];
         if (isset($invoice_logo) && !empty($invoice_logo)) {
-            $img = Utility::get_file('invoice_logo/') . $invoice_logo;
+            $img = 'invoice_logo/' . $invoice_logo;
         } else {
-            $img = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png'));
+            $img = $logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png');
         }
 
         if ($invoice) {
             $color = '#' . $settings['invoice_color'];
             $font_color = Utility::getFontColor($color);
+
+            Log::info('Logo Image ');
+            Log::info($logo);
+            Log::info('Company Logo Image ');
+            Log::info($company_logo);
 
             Log::info('iteam(item)');
             Log::info($items);
@@ -1492,7 +1497,7 @@ class InvoiceController extends Controller
 
         $config = ConfigSettings::first();
 
-        $url = $config->api_url . 'StockUpdate/ByInvoiceNo?InvoiceNo=' . $invoiceNo;
+        $url = $config->api_url . 'StockUpdateV2/ByInvoiceNo?InvoiceNo=' . $invoiceNo;
 
         // Make the API request using Laravel's Http client
         $response = Http::withHeaders([
@@ -1537,7 +1542,7 @@ class InvoiceController extends Controller
 
         // Validate the trader invoice number input
         $request->validate([
-            'SalesByTraderInvoiceNo' => 'required|integer',
+            'SalesByTraderInvoiceNo' => 'required|string',
         ], [
             'SalesByTraderInvoiceNo.required' => __('Data is required for synchronization.'),
         ]);
