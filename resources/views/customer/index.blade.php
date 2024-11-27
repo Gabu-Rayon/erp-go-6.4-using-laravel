@@ -66,7 +66,7 @@ $profile=\App\Models\Utility::get_file('uploads/avatar/');
                                             {{ AUth::user()->customerNumberFormat($customer['customerNo']) }}
                                         </a>
                                     </td>
-                                    <td class="font-style">{{$customer['name']}}</td>
+                                    <td class="font-style">{{$customer['customerName']}}</td>
                                     <td>{{$customer['faxNo'] ?? '-'}}</td>
                                     <td>{{$customer['email'] ?? '-'}}</td>
                                     <td>{{\Auth::user()->priceFormat($customer['balance'])}}</td>
