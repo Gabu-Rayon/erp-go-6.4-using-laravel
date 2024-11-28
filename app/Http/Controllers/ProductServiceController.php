@@ -308,10 +308,10 @@ class ProductServiceController extends Controller
                 $response = Http::withOptions([
                     'verify' => false
                 ])->withHeaders([
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                    'key' => $config->api_key
-                ])->post($config->api_url . 'AddItemsListV2', $apiData);
+                            'Accept' => 'application/json',
+                            'Content-Type' => 'application/json',
+                            'key' => $config->api_key
+                        ])->post($config->api_url . 'AddItemsListV2', $apiData);
 
                 // Log response data
                 \Log::info('API Response Status Code For Posting Product Data: ' . $response->status());
@@ -518,10 +518,10 @@ class ProductServiceController extends Controller
             $response = Http::withOptions([
                 'verify' => false
             ])->withHeaders([
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'key' => $config->api_key
-            ])->post($config->api_url . 'UpdateItemV2', $reqData);
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                        'key' => $config->api_key
+                    ])->post($config->api_url . 'UpdateItemV2', $reqData);
 
             $res = $response->json();
 
@@ -864,87 +864,87 @@ class ProductServiceController extends Controller
   }
      ***/
 
-public function import(Request $request)
-{
-    $config = ConfigSettings::first();
-    $rules = [
-        'file' => 'required',
-    ];
-
-    $validator = \Validator::make($request->all(), $rules);
-
-    if ($validator->fails()) {
-        $messages = $validator->getMessageBag();
-        return redirect()->back()->with('error', $messages->first());
-    }
-
-    // Read and process the CSV file
-    $products = (new ProductServiceImport)->toArray(request()->file('file'))[0];
-
-    // Construct the data array in the required JSON format
-    $jsonData = [];
-    foreach ($products as $product) {
-        $jsonData[] = [
-            'created_by' => Auth::user()->creatorId(),
-            "itemCode" => $product[0],
-            "itemClassifiCode" => $product[1],
-            "itemTypeCode" => $product[2],
-            "itemName" => $product[3],
-            "itemStrdName" => $product[4],
-            "countryCode" => $product[5],
-            "pkgUnitCode" => $product[6],
-            "qtyUnitCode" => $product[7],
-            "taxTypeCode" => $product[8],
-            "batchNo" => $product[9],
-            "barcode" => $product[10],
-            "unitPrice" => (float) $product[11],
-            "group1UnitPrice" => (float) $product[12],
-            "group2UnitPrice" => (float) $product[13],
-            "group3UnitPrice" => (float) $product[14],
-            "group4UnitPrice" => (float) $product[15],
-            "group5UnitPrice" => (float) $product[16],
-            "additionalInfo" => $product[17],
-            "saftyQuantity" => (int) $product[18],
-            "isInrcApplicable" => (bool) $product[19],
-            "isUsed" => (bool) $product[20],
-            "openingBalance" => (float) $product[21],
-            "packageQuantity" => (int) $product[22]
+    public function import(Request $request)
+    {
+        $config = ConfigSettings::first();
+        $rules = [
+            'file' => 'required',
         ];
-    }
 
-    $url = $config->api_url . 'SaveItemsV2';
+        $validator = \Validator::make($request->all(), $rules);
 
-    $response = Http::withHeaders([
-        'accept' => '*/*',
-        'key' => $config->api_key,
-        'Content-Type' => 'application/json-patch+json',
-    ])->post($url, $jsonData);
+        if ($validator->fails()) {
+            $messages = $validator->getMessageBag();
+            return redirect()->back()->with('error', $messages->first());
+        }
 
-    // Log the API response
-    \Log::info('API Request Data: ' . json_encode($jsonData));
-    \Log::info('API Response: ' . $response->body());
-    \Log::info('API Response Status Code: ' . $response->status());
+        // Read and process the CSV file
+        $products = (new ProductServiceImport)->toArray(request()->file('file'))[0];
 
-    // Check if API call was successful
-    if ($response->successful()) {
-        return redirect()->route('productservice.index')->with('success', __('Data imported and posted to API successfully.'));
-    } else {
-        // If API call failed, log error and handle error message
-        \Log::error('API Error: ' . $response->body());
+        // Construct the data array in the required JSON format
+        $jsonData = [];
+        foreach ($products as $product) {
+            $jsonData[] = [
+                'created_by' => Auth::user()->creatorId(),
+                "itemCode" => $product[0],
+                "itemClassifiCode" => $product[1],
+                "itemTypeCode" => $product[2],
+                "itemName" => $product[3],
+                "itemStrdName" => $product[4],
+                "countryCode" => $product[5],
+                "pkgUnitCode" => $product[6],
+                "qtyUnitCode" => $product[7],
+                "taxTypeCode" => $product[8],
+                "batchNo" => $product[9],
+                "barcode" => $product[10],
+                "unitPrice" => (float) $product[11],
+                "group1UnitPrice" => (float) $product[12],
+                "group2UnitPrice" => (float) $product[13],
+                "group3UnitPrice" => (float) $product[14],
+                "group4UnitPrice" => (float) $product[15],
+                "group5UnitPrice" => (float) $product[16],
+                "additionalInfo" => $product[17],
+                "saftyQuantity" => (int) $product[18],
+                "isInrcApplicable" => (bool) $product[19],
+                "isUsed" => (bool) $product[20],
+                "openingBalance" => (float) $product[21],
+                "packageQuantity" => (int) $product[22]
+            ];
+        }
 
-        // Get the error message from the API response
-        $errorMessage = $response->json()['message'] ?? __('Failed to import data or post to API.');
+        $url = $config->api_url . 'SaveItemsV2';
 
-        // Check if there are any failed products
-        if (!empty($jsonData)) {
-            // There are failed products, so return with error message
-            return redirect()->back()->with('error', $errorMessage)->with('failedProducts', $jsonData);
+        $response = Http::withHeaders([
+            'accept' => '*/*',
+            'key' => $config->api_key,
+            'Content-Type' => 'application/json-patch+json',
+        ])->post($url, $jsonData);
+
+        // Log the API response
+        \Log::info('API Request Data: ' . json_encode($jsonData));
+        \Log::info('API Response: ' . $response->body());
+        \Log::info('API Response Status Code: ' . $response->status());
+
+        // Check if API call was successful
+        if ($response->successful()) {
+            return redirect()->route('productservice.index')->with('success', __('Data imported and posted to API successfully.'));
         } else {
-            // No products were imported, so just return with error message
-            return redirect()->back()->with('error', $errorMessage);
+            // If API call failed, log error and handle error message
+            \Log::error('API Error: ' . $response->body());
+
+            // Get the error message from the API response
+            $errorMessage = $response->json()['message'] ?? __('Failed to import data or post to API.');
+
+            // Check if there are any failed products
+            if (!empty($jsonData)) {
+                // There are failed products, so return with error message
+                return redirect()->back()->with('error', $errorMessage)->with('failedProducts', $jsonData);
+            } else {
+                // No products were imported, so just return with error message
+                return redirect()->back()->with('error', $errorMessage);
+            }
         }
     }
-}
 
 
     public function warehouseDetail($id)
@@ -1393,69 +1393,147 @@ public function import(Request $request)
         }
     }
 
+    // public function syncCodeList()
+    // {
+    //     try {
+
+    //         $config = ConfigSettings::first();
+    //         Log::info('Sync Code List Data Config Data : ');
+    //         Log::info($config);
+
+    //         $url = $config->api_url . 'GetCodeListV2?date=20210101120000';
+
+    //         Log::info('the Api URL  IS : ');
+    //         Log::info($url);
+
+    //         Log::info('The Config Key : ');
+    //         Log::info($config->api_key);
+
+    //         $response = Http::withOptions([
+    //             'verify' => false
+    //         ])->withHeaders([
+    //             $config->api_key,
+    //             'accept' => 'application/json',
+    //         ])->timeout(60)->get($url);
+
+    //         Log::info('SYNC CODE LIST RESPONSE');
+    //         Log::info($response);
+
+    //         $data = $response->json()['data'];
+
+    //         $remoteCodes = $data['data']['clsList'];
+
+    //         Log::info('REMOTE CODES');
+    //         Log::info(json_encode($remoteCodes));
+
+    //         $codesToSync = [];
+
+    //         foreach ($remoteCodes as $remoteCode) {
+    //             $code = [
+    //                 'cdCls' => $remoteCode['cdCls'],
+    //                 'cdClsNm' => $remoteCode['cdClsNm'],
+    //                 'cdClsDesc' => $remoteCode['cdClsDesc'],
+    //                 'useYn' => $remoteCode['useYn'],
+    //                 'userDfnNm1' => $remoteCode['userDfnNm1'],
+    //                 'userDfnNm2' => $remoteCode['userDfnNm2'],
+    //                 'userDfnNm3' => $remoteCode['userDfnNm3'],
+    //             ];
+    //             array_push($codesToSync, $code);
+    //         }
+
+    //         Log::info('CODES TO SYNC');
+    //         Log::info($codesToSync);
+
+    //         $syncedCodes = 0;
+
+    //         foreach ($codesToSync as $codeToSync) {
+    //             $exists = (bool) Code::where('cdCls', $codeToSync['cdCls'])->exists();
+    //             if (!$exists) {
+    //                 Code::create($codeToSync);
+    //                 $syncedCodes++;
+    //             }
+    //         }
+
+    //         if ($syncedCodes > 0) {
+    //             return redirect()->back()->with('success', __('Synced ' . $syncedCodes . ' Codes' . 'Successfully'));
+    //         } else {
+    //             return redirect()->back()->with('success', __('Codes Up To Date'));
+    //         }
+    //     } catch (\Exception $e) {
+    //         Log::info('ERROR SYNCING CODE LIST');
+    //         Log::info($e);
+    //         return redirect()->back()->with('error', __('Error Syncing Code List'));
+    //     }
+    // }
+
+
+
+
     public function syncCodeList()
     {
         try {
-
             $config = ConfigSettings::first();
+            Log::info('Sync Code List Data Config Data: ', $config->toArray());
 
             $url = $config->api_url . 'GetCodeListV2?date=20210101120000';
+            Log::info('The API URL is: ' . $url);
 
             $response = Http::withOptions([
                 'verify' => false
             ])->withHeaders([
-                $config->api_key
-            ])->timeout(60)->get($url);
+                        'key' => $config->api_key, // Correct header name
+                        'accept' => 'application/json'
+                    ])->timeout(60)->get($url);
 
-            Log::info('SYNC CODE LIST RESPONSE');
-            Log::info($response);
+            Log::info('SYNC CODE LIST RESPONSE: ', $response->json());
 
-            $data = $response->json()['data'];
+            // Check if the response status is true
+            if ($response->ok() && $response->json()['status'] === true) {
+                $responseData = $response->json()['responseData'];
 
-            $remoteCodes = $data['data']['clsList'];
+                if (isset($responseData['clsList']) && is_array($responseData['clsList'])) {
+                    $remoteCodes = $responseData['clsList'];
 
-            Log::info('REMOTE CODES');
-            Log::info(json_encode($remoteCodes));
+                    Log::info('REMOTE CODES: ', $remoteCodes);
 
-            $codesToSync = [];
+                    $codesToSync = [];
+                    foreach ($remoteCodes as $remoteCode) {
+                        $codesToSync[] = [
+                            'cdCls' => $remoteCode['cdCls'],
+                            'cdClsNm' => $remoteCode['cdClsNm'],
+                            'cdClsDesc' => $remoteCode['cdClsDesc'],
+                            'useYn' => $remoteCode['useYn'],
+                            'userDfnNm1' => $remoteCode['userDfnNm1'],
+                            'userDfnNm2' => $remoteCode['userDfnNm2'],
+                            'userDfnNm3' => $remoteCode['userDfnNm3'],
+                        ];
+                    }
 
-            foreach ($remoteCodes as $remoteCode) {
-                $code = [
-                    'cdCls' => $remoteCode['cdCls'],
-                    'cdClsNm' => $remoteCode['cdClsNm'],
-                    'cdClsDesc' => $remoteCode['cdClsDesc'],
-                    'useYn' => $remoteCode['useYn'],
-                    'userDfnNm1' => $remoteCode['userDfnNm1'],
-                    'userDfnNm2' => $remoteCode['userDfnNm2'],
-                    'userDfnNm3' => $remoteCode['userDfnNm3'],
-                ];
-                array_push($codesToSync, $code);
-            }
+                    Log::info('CODES TO SYNC: ', $codesToSync);
 
-            Log::info('CODES TO SYNC');
-            Log::info($codesToSync);
+                    $syncedCodes = 0;
+                    foreach ($codesToSync as $codeToSync) {
+                        $exists = Code::where('cdCls', $codeToSync['cdCls'])->exists();
+                        if (!$exists) {
+                            Code::create($codeToSync);
+                            $syncedCodes++;
+                        }
+                    }
 
-            $syncedCodes = 0;
-
-            foreach ($codesToSync as $codeToSync) {
-                $exists = (bool) Code::where('cdCls', $codeToSync['cdCls'])->exists();
-                if (!$exists) {
-                    Code::create($codeToSync);
-                    $syncedCodes++;
+                    $message = $syncedCodes > 0 ? "Synced $syncedCodes Codes Successfully" : "Codes Up To Date";
+                    return redirect()->back()->with('success', __($message));
+                } else {
+                    throw new \Exception('No clsList found in API response.');
                 }
-            }
-
-            if ($syncedCodes > 0) {
-                return redirect()->back()->with('success', __('Synced ' . $syncedCodes . ' Codes' . 'Successfully'));
             } else {
-                return redirect()->back()->with('success', __('Codes Up To Date'));
+                throw new \Exception('API Response Error: ' . $response->json()['message']);
             }
         } catch (\Exception $e) {
-            Log::info('ERROR SYNCING CODE LIST');
-            Log::info($e);
-            return redirect()->back()->with('error', __('Error Syncing Code List'));
+            Log::error('ERROR SYNCING CODE LIST', ['exception' => $e]);
+            return redirect()->back()->with('error', __('Error Syncing Code List: ' . $e->getMessage()));
         }
     }
+
 
 
     public function synchronize()
@@ -1596,8 +1674,8 @@ public function import(Request $request)
             $response = Http::withOptions([
                 'verify' => false
             ])->withHeaders([
-                $config->api_key
-            ])->timeout(60)->get($url);
+                        $config->api_key
+                    ])->timeout(60)->get($url);
 
             $data = $response->json()['data'];
 

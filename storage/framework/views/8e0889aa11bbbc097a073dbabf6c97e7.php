@@ -28,7 +28,7 @@
 
 <?php $__env->startSection('action-btn'); ?>
     <div class="float-end">
-        <div class="d-inline-block mb-4">
+        <div class="mb-4 d-inline-block">
             <?php echo e(Form::open(['route' => 'invoice.no.getSalesByTraderInvoiceNo', 'method' => 'POST', 'class' => 'w-100'])); ?>
 
             <?php echo csrf_field(); ?>
@@ -36,10 +36,10 @@
             <div class="form-group">
                 <?php echo e(Form::label('SalesByTraderInvoiceNo', __('Get Sales By Trader Invoice No'), ['class' => 'form-label'])); ?>
 
-                <?php echo e(Form::number('SalesByTraderInvoiceNo', null, ['class' => 'form-control', 'placeholder' => '1', 'required' => 'required'])); ?>
+                <?php echo e(Form::text('SalesByTraderInvoiceNo', null, ['class' => 'form-control', 'placeholder' => '1', 'required' => 'required'])); ?>
 
             </div>
-            <button type="submit" class="btn btn-primary  sync"><?php echo e(__('Search')); ?></button>
+            <button type="submit" class="btn btn-primary sync"><?php echo e(__('Search')); ?></button>
             <?php echo e(Form::close()); ?>
 
         </div>
@@ -70,7 +70,7 @@
                         <?php echo e(Form::open(['route' => ['invoice.index'], 'method' => 'GET', 'id' => 'customer_submit'])); ?>
 
                         <div class="row d-flex align-items-center justify-content-end">
-                            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12 mr-2">
+                            <div class="mr-2 col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12">
                                 <div class="btn-box">
                                     <?php echo e(Form::label('issue_date', __('Issue Date'), ['class' => 'form-label'])); ?>
 
@@ -78,7 +78,7 @@
 
                                 </div>
                             </div>
-                            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12 mr-2">
+                            <div class="mr-2 col-xl-3 col-lg-3 col-md-6 col-sm-12 col-12">
                                 <div class="btn-box">
                                     <?php echo e(Form::label('customer', __('Customer'), ['class' => 'form-label'])); ?>
 
@@ -94,7 +94,7 @@
 
                                 </div>
                             </div>
-                            <div class="col-auto float-end ms-2 mt-4">
+                            <div class="col-auto mt-4 float-end ms-2">
                                 <a href="#" class="btn btn-sm btn-primary"
                                     onclick="document.getElementById('customer_submit').submit(); return false;"
                                     data-toggle="tooltip" data-original-title="<?php echo e(__('apply')); ?>">
@@ -147,7 +147,7 @@
                                         <td><?php echo e(Auth::user()->dateFormat($invoice->issue_date)); ?></td>
                                         <td>
                                             <?php if($invoice->due_date < date('Y-m-d')): ?>
-                                                <p class="text-danger mt-3">
+                                                <p class="mt-3 text-danger">
                                                     <?php echo e(\Auth::user()->dateFormat($invoice->due_date)); ?>
 
                                                 </p>
@@ -160,28 +160,28 @@
                                         <td>
                                             <?php if($invoice->status == 0): ?>
                                                 <span
-                                                    class="status_badge badge bg-secondary p-2 px-3 rounded"><?php echo e(__(\App\Models\Invoice::$statues[$invoice->status])); ?></span>
+                                                    class="p-2 px-3 rounded status_badge badge bg-secondary"><?php echo e(__(\App\Models\Invoice::$statues[$invoice->status])); ?></span>
                                             <?php elseif($invoice->status == 1): ?>
                                                 <span
-                                                    class="status_badge badge bg-warning p-2 px-3 rounded"><?php echo e(__(\App\Models\Invoice::$statues[$invoice->status])); ?></span>
+                                                    class="p-2 px-3 rounded status_badge badge bg-warning"><?php echo e(__(\App\Models\Invoice::$statues[$invoice->status])); ?></span>
                                             <?php elseif($invoice->status == 2): ?>
                                                 <span
-                                                    class="status_badge badge bg-danger p-2 px-3 rounded"><?php echo e(__(\App\Models\Invoice::$statues[$invoice->status])); ?></span>
+                                                    class="p-2 px-3 rounded status_badge badge bg-danger"><?php echo e(__(\App\Models\Invoice::$statues[$invoice->status])); ?></span>
                                             <?php elseif($invoice->status == 3): ?>
                                                 <span
-                                                    class="status_badge badge bg-info p-2 px-3 rounded"><?php echo e(__(\App\Models\Invoice::$statues[$invoice->status])); ?></span>
+                                                    class="p-2 px-3 rounded status_badge badge bg-info"><?php echo e(__(\App\Models\Invoice::$statues[$invoice->status])); ?></span>
                                             <?php elseif($invoice->status == 4): ?>
                                                 <span
-                                                    class="status_badge badge bg-primary p-2 px-3 rounded"><?php echo e(__(\App\Models\Invoice::$statues[$invoice->status])); ?></span>
+                                                    class="p-2 px-3 rounded status_badge badge bg-primary"><?php echo e(__(\App\Models\Invoice::$statues[$invoice->status])); ?></span>
                                             <?php endif; ?>
                                         </td>
                                         <td>
                                             <?php if($invoice->isKRASynchronized == 0 || $invoice->isStockIOUpdate == 0): ?>
                                                 <span
-                                                    class="status_badge badge bg-danger p-2 px-3 rounded">Unsynchronized</span>
+                                                    class="p-2 px-3 rounded status_badge badge bg-danger">Unsynchronized</span>
                                             <?php elseif($invoice->isKRASynchronized == 1 && $invoice->isStockIOUpdate == 1): ?>
                                                 <span
-                                                    class="status_badge badge bg-primary p-2 px-3 rounded">Synchronized</span>
+                                                    class="p-2 px-3 rounded status_badge badge bg-primary">Synchronized</span>
                                             <?php endif; ?>
                                         </td>
 
@@ -195,7 +195,7 @@
                                                         onclick="copyToClipboard(this)" data-bs-toggle="tooltip"
                                                         title="<?php echo e(__('Copy Invoice')); ?>"
                                                         data-original-title="<?php echo e(__('Copy Invoice')); ?>"><i
-                                                            class="ti ti-link text-white"></i></a>
+                                                            class="text-white ti ti-link"></i></a>
                                                 </div>
                                                 <div class="action-btn bg-primary ms-2">
                                                     <?php echo Form::open([
@@ -212,7 +212,7 @@
                                                         data-original-title="<?php echo e(__('Delete')); ?>"
                                                         data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back"
                                                         data-confirm-yes="document.getElementById('duplicate-form-<?php echo e($invoice->id); ?>').submit();">
-                                                        <i class="ti ti-copy text-white"></i>
+                                                        <i class="text-white ti ti-copy"></i>
                                                         <?php echo Form::open([
                                                             'method' => 'get',
                                                             'route' => ['invoice.duplicate', $invoice->id],
@@ -236,7 +236,7 @@
                                                     <a href="<?php echo e(route('invoice.show', \Crypt::encrypt($invoice->id))); ?>"
                                                         class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip"
                                                         title="Show " data-original-title="<?php echo e(__('Detail')); ?>">
-                                                        <i class="ti ti-eye text-white"></i>
+                                                        <i class="text-white ti ti-eye"></i>
                                                     </a>
                                                 </div>
                                                 
@@ -245,7 +245,7 @@
                                                         class="mx-3 btn btn-sm align-items-center"
                                                         data-bs-toggle="tooltip" title="Edit "
                                                         data-original-title="<?php echo e(__('Edit')); ?>">
-                                                        <i class="ti ti-pencil text-white"></i>
+                                                        <i class="text-white ti ti-pencil"></i>
                                                     </a>
                                                 </div>
                                                 <div class="action-btn bg-danger ms-2">
@@ -261,7 +261,7 @@
                                                         data-original-title="<?php echo e(__('Delete')); ?>"
                                                         data-confirm="<?php echo e(__('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?')); ?>"
                                                         data-confirm-yes="document.getElementById('delete-form-<?php echo e($invoice->id); ?>').submit();">
-                                                        <i class="ti ti-trash text-white"></i>
+                                                        <i class="text-white ti ti-trash"></i>
                                                     </a>
                                                     <?php echo Form::close(); ?>
 
