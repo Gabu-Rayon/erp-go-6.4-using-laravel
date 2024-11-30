@@ -90,9 +90,9 @@ class StockController extends Controller
                 'stockItemList' => $data['items']
             ]);
 
-            if ($response['statusCode'] !== 200) {
-                return redirect()->back()->with('error', 'Check your credentials and try again');
-            }
+            // if ($response['statusCode'] !== 200) {
+            //     return redirect()->back()->with('error', 'Check your credentials and try again');
+            // }
             // Log response data
             Log::info('API Response Status Code For Posting Stock Adjustment : ' . $response->status());
             Log::info('API Request  Stock Adjustment Data Posted: ' . json_encode($response));
