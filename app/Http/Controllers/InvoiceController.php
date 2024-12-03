@@ -248,8 +248,8 @@ class InvoiceController extends Controller
         return [
             "customerNo" => $customer->customerNo,
             "customerTin" => $customer->customerTin,
-            "customerName" => $customer->name,
-            "customerMobileNo" => $customer->contact,
+            "customerName" => $customer->customerName,
+            "customerMobileNo" => $customer->telNo,
             "salesType" => $data['salesType'],
             "paymentType" => $data['paymentType'],
             "traderInvoiceNo" => $data['traderInvoiceNo'],

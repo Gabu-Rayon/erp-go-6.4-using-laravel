@@ -195,7 +195,7 @@ class CustomerController extends Controller
             // Create a new customer instance
             $customer = new Customer();
             $customer->customer_id = $this->customerNumber();
-            $customer->customerNo = $this->customerNumber();
+            $customer->customerNo = $request->customerNo;
             $customer->customerTin = $request->customerTin;
             $customer->customerName = $request->customerName;
             $customer->email = $request->email;
@@ -228,7 +228,7 @@ class CustomerController extends Controller
 
             //array containing the data to be sent to the API
             $requestData = [
-                'customerNo' => $this->customerNumber(),
+                'customerNo' => $request->customerNo,
                 'customerTin' => $request->customerTin,
                 'customerName' => $request->customerName,
                 'address' => $request->address,

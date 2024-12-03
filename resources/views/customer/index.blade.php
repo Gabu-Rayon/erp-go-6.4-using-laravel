@@ -63,7 +63,7 @@ $profile=\App\Models\Utility::get_file('uploads/avatar/');
                                 <tr class="cust_tr" id="cust_detail" data-url="{{route('customer.show',$customer['id'])}}" data-id="{{$customer['id']}}">
                                     <td class="Id">
                                         <a href="{{ route('customer.show',\Crypt::encrypt($customer['id'])) }}" class="btn btn-outline-primary">
-                                            {{ AUth::user()->customerNumberFormat($customer['customerNo']) }}
+                                            {{ AUth::user()->customerNumberFormat($customer['customer_id']) }}
                                         </a>
                                     </td>
                                     <td class="font-style">{{$customer['customerName']}}</td>

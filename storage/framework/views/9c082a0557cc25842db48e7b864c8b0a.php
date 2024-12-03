@@ -42,9 +42,13 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
+
     <div class="card-body">
+
         <div>
+
             <h2 class="mb-3 f-w-600"><?php echo e(__('Login')); ?></h2>
+            
         </div>
         <?php echo e(Form::open(['route' => 'login', 'method' => 'post', 'id' => 'loginForm', 'class' => 'login-form'])); ?>
 

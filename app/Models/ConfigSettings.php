@@ -19,4 +19,5 @@ class ConfigSettings extends Model
         'api_key',
         'created_by'
     ];
+    
 }

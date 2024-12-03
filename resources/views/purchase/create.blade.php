@@ -123,6 +123,8 @@
                         </div>
                         <div class="form-group col-md-3" id="vender-box">
                             {{ Form::label('supplierInvcNo', __('Supplier Invoice No'), ['class' => 'form-label']) }}
+                            <span
+                                            class="text-success">(Optional)</span>
                             {{ Form::text('supplierInvcNo', null, ['class' => 'form-control supplierInvcNo']) }}
                         </div>
                         <div class="form-group col-md-3" id="vender-box">

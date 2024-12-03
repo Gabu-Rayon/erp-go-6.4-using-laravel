@@ -64,7 +64,7 @@ $profile=\App\Models\Utility::get_file('uploads/avatar/');
                                 <tr class="cust_tr" id="cust_detail" data-url="<?php echo e(route('customer.show',$customer['id'])); ?>" data-id="<?php echo e($customer['id']); ?>">
                                     <td class="Id">
                                         <a href="<?php echo e(route('customer.show',\Crypt::encrypt($customer['id']))); ?>" class="btn btn-outline-primary">
-                                            <?php echo e(AUth::user()->customerNumberFormat($customer['customerNo'])); ?>
+                                            <?php echo e(AUth::user()->customerNumberFormat($customer['customer_id'])); ?>
 
                                         </a>
                                     </td>

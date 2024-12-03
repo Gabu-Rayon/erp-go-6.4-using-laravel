@@ -9,7 +9,7 @@
                 <?php echo e(Form::label('customerNo',__('Customer Number'),['class'=>'form-label'])); ?>
 
                 <span class="text-danger">*</span>
-                <?php echo e(Form::text('customerNo',null,array('class'=>'form-control', 'required'=>'required'))); ?>
+                <?php echo e(Form::text('customerNo',null,array('class'=>'form-control', 'required'=>'required','placeholder' =>'CUST00001'))); ?>
 
             </div>
         </div>
