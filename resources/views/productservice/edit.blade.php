@@ -147,16 +147,4 @@
         var src = URL.createObjectURL(this.files[0])
         document.getElementById('image').src = src
     }
-    //hide & show quantity
-
-    $(document).on('click', '.type', function() {
-        var type = $(this).val();
-        if (type == 'product') {
-            $('.quantity').removeClass('d-none')
-            $('.quantity').addClass('d-block');
-        } else {
-            $('.quantity').addClass('d-none')
-            $('.quantity').removeClass('d-block');
-        }
-    });
 </script>

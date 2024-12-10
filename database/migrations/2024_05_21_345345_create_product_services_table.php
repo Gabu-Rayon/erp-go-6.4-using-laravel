@@ -67,6 +67,13 @@ return new class extends Migration
             $table->foreign('itemClsCd')->references('itemClsCd')->on('productservices_classifications');
 
             $table->timestamps();
+
+            // Foreign keys
+            $table->foreign('tax_id')->references('id')->on('taxes')->onDelete('set null');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
+            $table->foreign('unit_id')->references('id')->on('units')->onDelete('set null');
+            $table->foreign('sale_chartaccount_id')->references('id')->on('chart_accounts')->onDelete('set null');
+            $table->foreign('expense_chartaccount_id')->references('id')->on('chart_accounts')->onDelete('set null');
         });
     }
 
