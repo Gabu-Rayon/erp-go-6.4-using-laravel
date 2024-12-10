@@ -105,7 +105,6 @@ class ProductServiceController extends Controller
             $packagingUnitCodes = ProductServicesPackagingUnit::all()->pluck('name', 'code');
             $category = ProductServiceCategory::all()->pluck('name', 'id');
             $category->prepend('Select Category', '');
->>>>>>> Purchase
             return view(
                 'productservice.create',
                 compact(
@@ -131,8 +130,6 @@ class ProductServiceController extends Controller
             return redirect()->back()->with('error', 'Something Went Wrong');
         }
     }
-
-
 
     /**
      * Store a newly created resource in storage.
@@ -446,10 +443,6 @@ class ProductServiceController extends Controller
         }
     }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> Purchase
     public function update(Request $request, $id)
     {
         $config = ConfigSettings::first();
@@ -489,6 +482,7 @@ class ProductServiceController extends Controller
                 return redirect()->back()->with('error', $messages->first());
             }
 
+
             $data = $request->all();
             Log::info('Product Service INFO being edited and posted to the API:', $data);
 
@@ -503,26 +497,18 @@ class ProductServiceController extends Controller
                 "qtyUnitCode" => $data['qtyUnitCd'],
                 "taxTypeCode" => $data['taxTyCd'],
                 "batchNo" => $data['btchNo'],
-                "barcode" => $data['bcd'] ?? null,
+                "barcode" => $data['bcd'],
                 "unitPrice" => $data['dftPrc'],
                 "group1UnitPrice" => $data['grpPrcL1'],
                 "group2UnitPrice" => $data['grpPrcL2'],
                 "group3UnitPrice" => $data['grpPrcL3'],
                 "group4UnitPrice" => $data['grpPrcL4'],
                 "group5UnitPrice" => $data['grpPrcL5'],
-<<<<<<< HEAD
-                "additionalInfo" => $data['addInfo'] ?? null,
-                "saftyQuantity" => $data['sftyQty'],
-                "isInrcApplicable" => (bool) $data['isrcAplcbYn'],
-                "isUsed" => (bool) $data['isUsed'],
-                "packageQuantity" => $data['pkgQuantity'],
-=======
                 "additionalInfo" => $data['addInfo'],
                 "saftyQuantity" => $data['sftyQty'],
                 "isInrcApplicable" => (bool) $data['isrcAplcbYn'],
                 "isUsed" => (bool) $data['isUsed'],
                 "packageQuantity" => $data['packageQuantity'],
->>>>>>> Purchase
             ];
 
             $config = ConfigSettings::first();
@@ -634,8 +620,6 @@ class ProductServiceController extends Controller
                     Log::info('Storage limit exceeded for user ' . Auth::user()->creatorId());
                     return redirect()->back()->with('error', 'Storage limit exceeded.');
                 }
-<<<<<<< HEAD
-=======
             } else {
                 // Update the Product Service information without changing the image
                 $iteminformation->update([
@@ -679,58 +663,7 @@ class ProductServiceController extends Controller
                     'useYn' => $data['useYn'] ?? null,
                     'isUsed' => $data['isUsed'] ?? null,
                 ]);
->>>>>>> Purchase
             }
-
-            // Determine the unit_id from qtyUnitCode
-            $unitId = null;
-            if (isset($data['qtyUnitCd'])) {
-                $unit = ProductServicesPackagingUnit::where('code', $data['qtyUnitCd'])->first();
-                $unitId = $unit ? $unit->id : null;
-            }
-
-            // Update the product service information
-            $itemInformation->update([
-                'name' => $data['itemNm'],
-                'sku' => $data['itemCd'],
-                'sale_price' => $data['sale_price'],
-                'purchase_price' => $data['purchase_price'],
-                'tax_id' => $taxIdCode,
-                'category_id' => $data['category_id'],
-                'unit_id' => $unitId,
-                'type' => $productTypeMapping[$data['itemTyCd']] ?? null,
-                'quantity' => $data['quantity'] ?? null,
-                'description' => $data['addInfo'] ?? null,
-                'pro_image' => $dir . '/' . $fileName,
-                'sale_chartaccount_id' => $data['sale_chartaccount_id'],
-                'expense_chartaccount_id' => $data['expense_chartaccount_id'],
-                'created_by' => \Auth::user()->creatorId(),
-                'tin' => $data['tin'] ?? null,
-                'itemCd' => $data['itemCd'],
-                'itemClsCd' => $data['itemClsCd'],
-                'itemTyCd' => $data['itemTyCd'],
-                'itemNm' => $data['itemNm'],
-                'itemStdNm' => $data['itemStdNm'],
-                'orgnNatCd' => $data['orgnNatCd'],
-                'pkgUnitCd' => $data['pkgUnitCd'],
-                'qtyUnitCd' => $data['qtyUnitCd'],
-                'taxTyCd' => $data['taxTyCd'],
-                'btchNo' => $data['btchNo'],
-                'regBhfId' => $data['regBhfId'] ?? null,
-                'bcd' => $data['bcd'] ?? null,
-                'dftPrc' => $data['dftPrc'],
-                'grpPrcL1' => $data['grpPrcL1'],
-                'grpPrcL2' => $data['grpPrcL2'],
-                'grpPrcL3' => $data['grpPrcL3'],
-                'grpPrcL4' => $data['grpPrcL4'],
-                'grpPrcL5' => $data['grpPrcL5'],
-                'addInfo' => $data['addInfo'] ?? null,
-                'sftyQty' => $data['sftyQty'],
-                'isrcAplcbYn' => $data['isrcAplcbYn'],
-                'rraModYn' => $data['rraModYn'] ?? null,
-                'pkgQuantity' => $data['pkgQuantity'] ?? null,
-                'useYn' => $data['useYn'] ?? null,
-            ]);
 
             return redirect()->route('productservice.index')->with('success', 'Product / Service Updated Successfully');
         } catch (\Exception $e) {
@@ -738,11 +671,6 @@ class ProductServiceController extends Controller
             return redirect()->back()->with('error', 'Something Went Wrong');
         }
     }
-
-
-
-
-
     public function edit($id)
     {
         if (

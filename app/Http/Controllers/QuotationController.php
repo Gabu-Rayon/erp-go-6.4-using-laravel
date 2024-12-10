@@ -25,14 +25,11 @@ class QuotationController extends Controller
      */
     public function index()
     {
-        if(\Auth::user()->type == 'company')
-        {
-            $quotations      = Quotation::where('created_by', \Auth::user()->creatorId())->with(['customer','warehouse'])->get();
+        if (\Auth::user()->type == 'company') {
+            $quotations = Quotation::where('created_by', \Auth::user()->creatorId())->with(['customer', 'warehouse'])->get();
 
-            return view('quotation.index',compact('quotations'));
-        }
-        else
-        {
+            return view('quotation.index', compact('quotations'));
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -42,22 +39,19 @@ class QuotationController extends Controller
      */
     public function create()
     {
-        if(\Auth::user()->type == 'company')
-        {
-            $customers     = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+        if (\Auth::user()->type == 'company') {
+            $customers = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customers->prepend('Select Customer', '');
 
-            $warehouse     = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $warehouse = warehouse::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $warehouse->prepend('Select Warehouse', '');
 
             // $product_services = ['--'];
 
             $quotation_number = \Auth::user()->quotationNumberFormat($this->quotationNumber());
 
-            return view('quotation.create', compact('customers','warehouse' , 'quotation_number'));
-        }
-        else
-        {
+            return view('quotation.create', compact('customers', 'warehouse', 'quotation_number'));
+        } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
     }
@@ -70,65 +64,61 @@ class QuotationController extends Controller
         $quotation_date = $request->quotation_date;
         $quotation_number = $request->quotation_number;
 
-        
-        $warehouseProducts = WarehouseProduct::where('created_by', '=', \Auth::user()->creatorId())->where('warehouse_id',$request->warehouse_id)->get()->pluck('product_id')->toArray();
-        $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->whereIn('id',$warehouseProducts)->where('type','!=', 'service')->get()->pluck('name', 'id');
+
+        $warehouseProducts = WarehouseProduct::where('created_by', '=', \Auth::user()->creatorId())->where('warehouse_id', $request->warehouse_id)->get()->pluck('product_id')->toArray();
+        $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->whereIn('id', $warehouseProducts)->where('type', '!=', 'service')->get()->pluck('name', 'id');
         $product_services->prepend(' -- ', '');
 
-        return view('quotation.quotation_create', compact('customer','warehouse' ,'quotation_date' , 'quotation_number','product_services'));
+        return view('quotation.quotation_create', compact('customer', 'warehouse', 'quotation_date', 'quotation_number', 'product_services'));
     }
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        if(\Auth::user()->type == 'company')
-        {
+        if (\Auth::user()->type == 'company') {
             $validator = \Validator::make(
-                $request->all(), [
+                $request->all(),
+                [
                     'customer_id' => 'required',
                     'warehouse_id' => 'required',
                     'quotation_date' => 'required',
                     'items' => 'required',
                 ]
             );
-            if($validator->fails())
-            {
+            if ($validator->fails()) {
                 $messages = $validator->getMessageBag();
 
                 return redirect()->back()->with('error', $messages->first());
             }
-            $customer = Customer::where('name',$request->customer_id)->first();
-            $warehouse = warehouse::where('name',$request->warehouse_id)->first();
+            $customer = Customer::where('name', $request->customer_id)->first();
+            $warehouse = warehouse::where('name', $request->warehouse_id)->first();
 
-            $quotations                 = new Quotation();
-            $quotations->quotation_id    = $this->quotationNumber();
-            $quotations->customer_id      = $customer->id;
-            $quotations->warehouse_id      = $warehouse->id;
-            $quotations->quotation_date  = $request->quotation_date;
-            $quotations->status         =  0;
-            $quotations->category_id    =  0;
-            $quotations->created_by     = \Auth::user()->creatorId();
+            $quotations = new Quotation();
+            $quotations->quotation_id = $this->quotationNumber();
+            $quotations->customer_id = $customer->id;
+            $quotations->warehouse_id = $warehouse->id;
+            $quotations->quotation_date = $request->quotation_date;
+            $quotations->status = 0;
+            $quotations->category_id = 0;
+            $quotations->created_by = \Auth::user()->creatorId();
             $quotations->save();
 
             $products = $request->items;
 
-            for($i = 0; $i < count($products); $i++)
-            {
-                $quotationItems              = new QuotationProduct();
-                $quotationItems->quotation_id    = $quotations->id;
+            for ($i = 0; $i < count($products); $i++) {
+                $quotationItems = new QuotationProduct();
+                $quotationItems->quotation_id = $quotations->id;
                 $quotationItems->product_id = $products[$i]['item'];
-                $quotationItems->price      = $products[$i]['price'];
-                $quotationItems->quantity   = $products[$i]['quantity'];
-                $quotationItems->tax       = $products[$i]['tax'];
-                $quotationItems->discount        = $products[$i]['discount'];
+                $quotationItems->price = $products[$i]['price'];
+                $quotationItems->quantity = $products[$i]['quantity'];
+                $quotationItems->tax = $products[$i]['tax'];
+                $quotationItems->discount = $products[$i]['discount'];
                 $quotationItems->save();
             }
 
             return redirect()->route('quotation.index', $quotations->id)->with('success', __('Quotation successfully created.'));
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -139,7 +129,7 @@ class QuotationController extends Controller
     public function show($ids)
     {
 
-        if (|| \Auth::user()->type == 'company') {
+        if (\Auth::user()->type == 'company') {
             try {
                 $id = Crypt::decrypt($ids);
             } catch (\Throwable $th) {
@@ -169,24 +159,21 @@ class QuotationController extends Controller
      */
     public function edit($ids)
     {
-        if(\Auth::user()->type == 'company')
-        {
-            $id   = Crypt::decrypt($ids);
-            $quotation     = Quotation::find($id);
+        if (\Auth::user()->type == 'company') {
+            $id = Crypt::decrypt($ids);
+            $quotation = Quotation::find($id);
 
-            $customer = Customer::where('id',$quotation->customer_id)->first();
-            $warehouse = warehouse::where('id',$quotation->warehouse_id)->first();
+            $customer = Customer::where('id', $quotation->customer_id)->first();
+            $warehouse = warehouse::where('id', $quotation->warehouse_id)->first();
 
-            $warehouseProducts = WarehouseProduct::where('created_by', '=', \Auth::user()->creatorId())->where('warehouse_id',$quotation->warehouse_id)->get()->pluck('product_id')->toArray();
-            $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->whereIn('id',$warehouseProducts)->where('type','!=', 'service')->get()->pluck('name', 'id');
+            $warehouseProducts = WarehouseProduct::where('created_by', '=', \Auth::user()->creatorId())->where('warehouse_id', $quotation->warehouse_id)->get()->pluck('product_id')->toArray();
+            $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->whereIn('id', $warehouseProducts)->where('type', '!=', 'service')->get()->pluck('name', 'id');
             $product_services->prepend(' -- ', '');
 
             $quotation_number = \Auth::user()->quotationNumberFormat($this->quotationNumber());
 
-            return view('quotation.edit', compact('customer', 'product_services','warehouse' , 'quotation_number' , 'quotation'));
-        }
-        else
-        {
+            return view('quotation.edit', compact('customer', 'product_services', 'warehouse', 'quotation_number', 'quotation'));
+        } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
     }
@@ -196,69 +183,60 @@ class QuotationController extends Controller
      */
     public function update(Request $request, Quotation $quotation)
     {
-        if(\Auth::user()->type == 'company')
-        {
+        if (\Auth::user()->type == 'company') {
 
-            if($quotation->created_by == \Auth::user()->creatorId())
-            {
+            if ($quotation->created_by == \Auth::user()->creatorId()) {
                 $validator = \Validator::make(
-                    $request->all(), [
+                    $request->all(),
+                    [
                         'customer_id' => 'required',
                         'quotation_date' => 'required',
                         'items' => 'required',
                     ]
                 );
-                if($validator->fails())
-                {
+                if ($validator->fails()) {
                     $messages = $validator->getMessageBag();
 
                     return redirect()->route('quotation.index')->with('error', $messages->first());
                 }
-                $customer = Customer::where('name',$request->customer_id)->first();
-                $warehouse = warehouse::where('name',$request->warehouse_id)->first();
+                $customer = Customer::where('name', $request->customer_id)->first();
+                $warehouse = warehouse::where('name', $request->warehouse_id)->first();
 
-                $quotation->customer_id      = $customer->id;
-                $quotation->warehouse_id      = $warehouse->id;
-                $quotation->quotation_date  = $request->quotation_date;
-                $quotation->status         =  0;
-                $quotation->category_id    =  0;
-                $quotation->created_by     = \Auth::user()->creatorId();
+                $quotation->customer_id = $customer->id;
+                $quotation->warehouse_id = $warehouse->id;
+                $quotation->quotation_date = $request->quotation_date;
+                $quotation->status = 0;
+                $quotation->category_id = 0;
+                $quotation->created_by = \Auth::user()->creatorId();
                 $quotation->save();
                 $products = $request->items;
 
-                for($i = 0; $i < count($products); $i++)
-                {
+                for ($i = 0; $i < count($products); $i++) {
                     $quotationProduct = QuotationProduct::find($products[$i]['id']);
 
-                    if($quotationProduct == null)
-                    {
-                        $quotationProduct             = new QuotationProduct();
-                        $quotationProduct->quotation_id    = $quotation->id;
+                    if ($quotationProduct == null) {
+                        $quotationProduct = new QuotationProduct();
+                        $quotationProduct->quotation_id = $quotation->id;
 
                     }
-                    if(isset($products[$i]['item']))
-                    {
+                    if (isset($products[$i]['item'])) {
                         $quotationProduct->product_id = $products[$i]['item'];
                     }
 
-                    $quotationProduct->quantity    = $products[$i]['quantity'];
-                    $quotationProduct->tax         = $products[$i]['tax'];
-                    $quotationProduct->discount    = $products[$i]['discount'];
-                    $quotationProduct->price       = $products[$i]['price'];
+                    $quotationProduct->quantity = $products[$i]['quantity'];
+                    $quotationProduct->tax = $products[$i]['tax'];
+                    $quotationProduct->discount = $products[$i]['discount'];
+                    $quotationProduct->price = $products[$i]['price'];
                     $quotationProduct->description = $products[$i]['description'];
                     $quotationProduct->save();
 
                 }
 
                 return redirect()->route('quotation.index')->with('success', __('Quotation successfully updated.'));
-            }
-            else
-            {
+            } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -267,10 +245,8 @@ class QuotationController extends Controller
      */
     public function destroy(Quotation $quotation)
     {
-        if(\Auth::user()->type == 'company')
-        {
-            if($quotation->created_by == \Auth::user()->creatorId())
-            {
+        if (\Auth::user()->type == 'company') {
+            if ($quotation->created_by == \Auth::user()->creatorId()) {
 
 
                 $quotation->delete();
@@ -278,14 +254,10 @@ class QuotationController extends Controller
 
 
                 return redirect()->route('quotation.index')->with('success', __('Quotation successfully deleted.'));
-            }
-            else
-            {
+            } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -293,8 +265,7 @@ class QuotationController extends Controller
     function quotationNumber()
     {
         $latest = Quotation::where('created_by', '=', \Auth::user()->creatorId())->latest()->first();
-        if(!$latest)
-        {
+        if (!$latest) {
             return 1;
         }
 
@@ -303,18 +274,18 @@ class QuotationController extends Controller
 
     public function product(Request $request)
     {
-        $data['product']     = $product = ProductService::find($request->product_id);
-        $data['unit']        = !empty($product->unit) ? $product->unit->name : '';
-        $data['taxRate']     = $taxRate = !empty($product->tax_id) ? $product->taxRate($product->tax_id) : 0;
-        $data['taxes']       = !empty($product->tax_id) ? $product->tax($product->tax_id) : 0;
-        $salePrice           = $product->sale_price;
-        $quantity            = 1;
-        $taxPrice            = ($taxRate / 100) * ($salePrice * $quantity);
+        $data['product'] = $product = ProductService::find($request->product_id);
+        $data['unit'] = !empty($product->unit) ? $product->unit->name : '';
+        $data['taxRate'] = $taxRate = !empty($product->tax_id) ? $product->taxRate($product->tax_id) : 0;
+        $data['taxes'] = !empty($product->tax_id) ? $product->tax($product->tax_id) : 0;
+        $salePrice = $product->sale_price;
+        $quantity = 1;
+        $taxPrice = ($taxRate / 100) * ($salePrice * $quantity);
         $data['totalAmount'] = ($salePrice * $quantity);
 
         $product = ProductService::find($request->product_id);
         $productquantity = 0;
-        
+
         if ($product) {
             $productquantity = $product->getQuantity();
         }
@@ -326,16 +297,13 @@ class QuotationController extends Controller
     public function productDestroy(Request $request)
     {
 
-        if(\Auth::user()->type == 'company')
-        {
+        if (\Auth::user()->type == 'company') {
 
             QuotationProduct::where('id', '=', $request->id)->delete();
 
             return redirect()->back()->with('success', __('Quotation product successfully deleted.'));
 
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -479,7 +447,8 @@ class QuotationController extends Controller
 
         foreach ($post as $key => $data) {
             \DB::insert(
-                'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
+                'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                [
                     $data,
                     $key,
                     \Auth::user()->creatorId(),
@@ -531,7 +500,7 @@ class QuotationController extends Controller
 
         $details['customer']['details'] = $customerdetails;
         $details['warehouse']['details'] = $warehousedetails;
-            //
+        //
         $details['customer']['shippdetails'] = $shippdetails;
 
         $details['user']['details'] = $userdetails;
