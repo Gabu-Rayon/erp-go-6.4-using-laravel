@@ -143,7 +143,6 @@ use App\Http\Controllers\NepalstePaymnetController;
 use App\Http\Controllers\PaystackPaymentController;
 use App\Http\Controllers\PerformanceTypeController;
 use App\Http\Controllers\RazorpayPaymentController;
-use App\Http\Controllers\SalesCreditNoteController;
 use App\Http\Controllers\TerminationTypeController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\ApiInitializationController;
@@ -558,6 +557,9 @@ Route::group(['middleware' => ['verified']], function () {
             Route::get('invoice/{id}/credit-note', [CreditNoteController::class, 'create'])->name('invoice.credit.note');
 
             Route::post('invoice/{id}/credit-note', [CreditNoteController::class, 'store'])->name('invoice.credit.note');
+            
+            Route::get('/credit-note/{id}', [CreditNoteController::class, 'show'])->name('invoice.show.credit.note');
+            
             Route::get('invoice/{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'edit'])->name('invoice.edit.credit.note');
             Route::post('invoice/{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'update'])->name('invoice.edit.credit.note');
             Route::delete('invoice/{id}/credit-note/delete/{cn_id}', [CreditNoteController::class, 'destroy'])->name('invoice.delete.credit.note');

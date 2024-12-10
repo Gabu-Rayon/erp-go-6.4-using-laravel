@@ -8,6 +8,7 @@
                 {{Form::label('customerNo',__('Customer Number'),['class'=>'form-label'])}}
                 <span class="text-danger">*</span>
                 {{Form::text('customerNo',null,array('class'=>'form-control', 'required'=>'required','placeholder' =>'CUST00001'))}}
+                <small class="text-danger">maximum length of 9</small>
             </div>
         </div>
         <div class="col-lg-4 col-md-4 col-sm-6">

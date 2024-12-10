@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BranchUser;
-use App\Http\Controllers\Controller;
-use App\Models\ConfigSettings;
 use Exception;
+use App\Models\BranchUser;
+use App\Models\BranchesList;
 use Illuminate\Http\Request;
+use App\Models\ConfigSettings;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class BranchUserController extends Controller
@@ -36,11 +37,19 @@ class BranchUserController extends Controller
     public function create()
     {
         try {
-            return view('branchuser.create');
+            $branches = BranchesList::pluck('bhfNm', 'id');
+
+            return view('branchuser.create', compact('branches'));
+
+
         } catch (Exception $e) {
+            
             Log::info('BRANCH USER CREATE ERROR RENDER');
+            
             Log::info($e);
+            
             return redirect()->back()->with('error', $e->getMessage());
+            
         }
     }
 
@@ -49,11 +58,16 @@ class BranchUserController extends Controller
      */
     public function store(Request $request)
     {
+
+        Log::info('Data for creating Branch User : ');
+        Log::info($request->all());
+        
         $validator = Validator::make(
             $request->all(),
             [
                 'branchUserName' => 'required|max:120',
                 'address' => 'required',
+                'branch_id' => 'nullable',
                 'contactNo' => 'required',
                 'remark' => 'required',
                 'password' => 'required|min:6',
@@ -94,7 +108,7 @@ class BranchUserController extends Controller
             'key' => '123456',
         ])->timeout(600)->post($url, $requestData);
 
-        Log::info('BRANCH USER RESPONSE');
+        Log::info('BRANCH USER RESPONSE');        
         Log::info($response);
 
         if ($response['status']) {
@@ -102,6 +116,7 @@ class BranchUserController extends Controller
                 'branchUserId' => $branchUserId,
                 'branchUserName' => $request->branchUserName,
                 'password' => Hash::make($request->password),
+                'branch_id' =>$request->branch_id,
                 'address' => $request->address,
                 'contactNo' => $request->contactNo,
                 'authenticationCode' => $authenticationCode,

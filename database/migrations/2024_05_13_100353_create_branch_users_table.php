@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('branchUserId', 20);
             $table->string('branchUserName', 60);
+            $table->integer('branch_id');
             $table->string('password', 100);
             $table->string('address', 200)->nullable();
             $table->string('contactNo', 20)->nullable();

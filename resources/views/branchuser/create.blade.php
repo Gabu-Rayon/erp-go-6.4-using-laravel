@@ -30,6 +30,21 @@
                 </span>
             @enderror
         </div>
+
+        {{-- make this select of branches    we use name and id  --}}
+        <div class="form-group col-6">
+            {{ Form::label('branch_id', __('Branch'), ['class' => 'form-label']) }}
+            {{ Form::select('branch_id', $branches, null, ['class' => 'form-control', 'placeholder' => __('Select a branch')]) }}
+            @error('branch_id')
+                <span class="invalid-name" role="alert">
+                    <strong class="text-danger">{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
+
+
+
+
         <div class="form-group col-6">
             {{ Form::label('contactNo', __('Contact No'), ['class' => 'form-label']) }}
             {{ Form::text('contactNo', null, ['class' => 'form-control', 'placeholder' => __('0720045000')]) }}

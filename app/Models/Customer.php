@@ -258,6 +258,11 @@ class Customer extends Authenticatable
         return $this->hasMany(Invoice::class, 'customer_id');
     }
 
+    public function creditNotes()
+    {
+        return $this->hasMany('App\Models\CreditNote', 'customer', 'customer_id');
+    }
+
     public function customerTotalInvoiceSum($customerId)
     {
         return $this->invoices()

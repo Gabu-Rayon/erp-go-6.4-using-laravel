@@ -421,8 +421,12 @@ class PurchaseController extends Controller
         try {
 
             $data = $request->all();
+            Log::info('Raw data from the from is : ');
+            Log::info($request);
 
             $validator = Validator::make($data, [
+                'supplierTin' =>'nullable',
+                'supplierInvcNo' => 'nullable',
                 'purchTypeCode' => 'required|string|min:1|max:1',
                 'purchStatusCode' => 'required|string|min:2|max:2',
                 'pmtTypeCode' => 'required|string|min:2|max:2',
@@ -435,6 +439,9 @@ class PurchaseController extends Controller
                 'items.*.unitPrice' => 'required|numeric',
                 'items.*.discountRate' => 'required|numeric',
                 'items.*.taxTypeCode' => 'required',
+                'items.*.supplrItemCode' => 'nullable',
+                'items.*.supplrItemClsCode' => 'nullable',
+                'items.*.supplrItemName' => 'nullable',
             ]);
 
             if ($validator->fails()) {
@@ -445,22 +452,33 @@ class PurchaseController extends Controller
 
             $apiData = [];
             $items = [];
-            Log::info('Purchase FoRM Data being Posted  : ');
+            Log::info('Purchase Data from the Request* Posted  : ');
             Log::info($data);
 
-            if ($data['supplierTin']) {
-                $supplier = Vender::where('spplrTin', $data['supplierTin'])->first();
-                Log::info('Supplier Info  : ');
-                Log::info($supplier);
+            
 
-                $apiData['supplierTin'] = $data['supplierTin'];
-                $apiData['supplierBhfId'] = $supplier->spplrBhfId;
-                $apiData['supplierName'] = $supplier->spplrNm;
+            if (!empty($data['supplierTin'])) { // Check if supplierTin is not null or empty
+                $supplier = Vender::where('spplrTin', $data['supplierTin'])->first();
+
+                Log::info('Supplier Info: ', ['supplier' => $supplier]);
+
+                if ($supplier) {
+                    $apiData['supplierTin'] = $data['supplierTin'];
+                    $apiData['supplierBhfId'] = $supplier->spplrBhfId;
+                    $apiData['supplierName'] = $supplier->spplrNm;
+                } else {
+                    Log::warning('No supplier found for the given TIN.');
+                    $apiData['supplierTin'] = $data['supplierTin'];
+                    $apiData['supplierBhfId'] = null;
+                    $apiData['supplierName'] = null;
+                }
             } else {
                 $apiData['supplierTin'] = null;
                 $apiData['supplierBhfId'] = null;
                 $apiData['supplierName'] = null;
+                Log::info('supplierTin is empty or not provided.');
             }
+
 
             $apiData['supplierInvcNo'] = $data['supplierInvcNo'] ?? null;
             $apiData['purchTypeCode'] = $data['purchTypeCode'];
@@ -1416,9 +1434,9 @@ class PurchaseController extends Controller
                         'key' => $config->api_key,
                         'Content-Type' => 'application/json',
                     ])->post($url, [
-                        'invoiceNo' => $request->input('supplierInvcNo'),
-                        'isUpdate' => true
-                    ]);
+                                'invoiceNo' => $request->input('supplierInvcNo'),
+                                'isUpdate' => true
+                            ]);
 
                     Log::info('Api Response For Updating the Map Purchase Status: ' . $secondResponse);
 

@@ -17,6 +17,7 @@ use App\Imports\CustomerImport;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
@@ -36,10 +37,10 @@ class CustomerController extends Controller
 
     public function index()
     {
-        if(
+        if (
             \Auth::user()->type == 'accountant'
             || \Auth::user()->type == 'company'
-        ){
+        ) {
             $customers = Customer::where('created_by', \Auth::user()->creatorId())->get();
 
             return view('customer.index', compact('customers'));
@@ -49,7 +50,7 @@ class CustomerController extends Controller
     }
     public function create()
     {
-        if(
+        if (
             \Auth::user()->type == 'accountant'
             || \Auth::user()->type == 'company'
         ) {
@@ -61,98 +62,98 @@ class CustomerController extends Controller
         }
     }
 
-/***
-    public function store(Request $request)
-    {
-        if (\Auth::user()->can('create customer')) {
+    /***
+        public function store(Request $request)
+        {
+            if (\Auth::user()->can('create customer')) {
 
-            $rules = [
-                'customertin' => 'required',
-                'name' => 'required',
-                'address' => 'required',
-                'telno' => 'required',
-                'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'email' => [
-                    'required',
-                    Rule::unique('customers')->where(function ($query) {
-                        return $query->where('created_by', \Auth::user()->id);
-                    }),
-                    'faxno' => 'required',
-                    'remark' => 'required',
-                ],
-            ];
+                $rules = [
+                    'customertin' => 'required',
+                    'name' => 'required',
+                    'address' => 'required',
+                    'telno' => 'required',
+                    'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
+                    'email' => [
+                        'required',
+                        Rule::unique('customers')->where(function ($query) {
+                            return $query->where('created_by', \Auth::user()->id);
+                        }),
+                        'faxno' => 'required',
+                        'remark' => 'required',
+                    ],
+                ];
 
 
-            $validator = \Validator::make($request->all(), $rules);
+                $validator = \Validator::make($request->all(), $rules);
 
-            if ($validator->fails()) {
-                $messages = $validator->getMessageBag();
-                return redirect()->route('customer.index')->with('error', $messages->first());
-            }
+                if ($validator->fails()) {
+                    $messages = $validator->getMessageBag();
+                    return redirect()->route('customer.index')->with('error', $messages->first());
+                }
 
-            $objCustomer = \Auth::user();
-            $creator = User::find($objCustomer->creatorId());
-            $total_customer = $objCustomer->countCustomers();
-            $plan = Plan::find($creator->plan);
+                $objCustomer = \Auth::user();
+                $creator = User::find($objCustomer->creatorId());
+                $total_customer = $objCustomer->countCustomers();
+                $plan = Plan::find($creator->plan);
 
-            $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->first();
-            if ($total_customer < $plan->max_customers || $plan->max_customers == -1) {
-                $customer = new Customer();
-                $customer->customer_id = $this->customerNumber();
-                $customer->customertin = $request->customertin;
-                $customer->name = $request->name;
-                $customer->address = $request->address;
-                $customer->telno = $request->telno;
-                $customer->email = $request->email;
-                $customer->faxno = $request->faxno;
-                $customer->remark = $request->remark;
-                $customer->tax_number = $request->tax_number;
-                $customer->contact = $request->contact;
-                $customer->created_by = \Auth::user()->creatorId();
-                $customer->billing_name = $request->billing_name;
-                $customer->billing_country = $request->billing_country;
-                $customer->billing_state = $request->billing_state;
-                $customer->billing_city = $request->billing_city;
-                $customer->billing_phone = $request->billing_phone;
-                $customer->billing_zip = $request->billing_zip;
-                $customer->billing_address = $request->billing_address;
+                $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->first();
+                if ($total_customer < $plan->max_customers || $plan->max_customers == -1) {
+                    $customer = new Customer();
+                    $customer->customer_id = $this->customerNumber();
+                    $customer->customertin = $request->customertin;
+                    $customer->name = $request->name;
+                    $customer->address = $request->address;
+                    $customer->telno = $request->telno;
+                    $customer->email = $request->email;
+                    $customer->faxno = $request->faxno;
+                    $customer->remark = $request->remark;
+                    $customer->tax_number = $request->tax_number;
+                    $customer->contact = $request->contact;
+                    $customer->created_by = \Auth::user()->creatorId();
+                    $customer->billing_name = $request->billing_name;
+                    $customer->billing_country = $request->billing_country;
+                    $customer->billing_state = $request->billing_state;
+                    $customer->billing_city = $request->billing_city;
+                    $customer->billing_phone = $request->billing_phone;
+                    $customer->billing_zip = $request->billing_zip;
+                    $customer->billing_address = $request->billing_address;
 
-                $customer->shipping_name = $request->shipping_name;
-                $customer->shipping_country = $request->shipping_country;
-                $customer->shipping_state = $request->shipping_state;
-                $customer->shipping_city = $request->shipping_city;
-                $customer->shipping_phone = $request->shipping_phone;
-                $customer->shipping_zip = $request->shipping_zip;
-                $customer->shipping_address = $request->shipping_address;
+                    $customer->shipping_name = $request->shipping_name;
+                    $customer->shipping_country = $request->shipping_country;
+                    $customer->shipping_state = $request->shipping_state;
+                    $customer->shipping_city = $request->shipping_city;
+                    $customer->shipping_phone = $request->shipping_phone;
+                    $customer->shipping_zip = $request->shipping_zip;
+                    $customer->shipping_address = $request->shipping_address;
 
-                $customer->lang = !empty($default_language) ? $default_language->value : '';
+                    $customer->lang = !empty($default_language) ? $default_language->value : '';
 
-                $customer->save();
-                CustomField::saveData($customer, $request->customField);
+                    $customer->save();
+                    CustomField::saveData($customer, $request->customField);
+                } else {
+                    return redirect()->back()->with('error', __('Your user limit is over, Please upgrade plan.'));
+                }
+
+                //For Notification
+                $setting = Utility::settings(\Auth::user()->creatorId());
+                $customerNotificationArr = [
+                    'user_name' => \Auth::user()->name,
+                    'customer_name' => $customer->name,
+                    'customer_email' => $customer->email,
+                ];
+
+                //Twilio Notification
+                if (isset($setting['twilio_customer_notification']) && $setting['twilio_customer_notification'] == 1) {
+                    Utility::send_twilio_msg($request->contact, 'new_customer', $customerNotificationArr);
+                }
+
+
+                return redirect()->route('customer.index')->with('success', __('Customer successfully created.'));
             } else {
-                return redirect()->back()->with('error', __('Your user limit is over, Please upgrade plan.'));
+                return redirect()->back()->with('error', __('Permission denied.'));
             }
-
-            //For Notification
-            $setting = Utility::settings(\Auth::user()->creatorId());
-            $customerNotificationArr = [
-                'user_name' => \Auth::user()->name,
-                'customer_name' => $customer->name,
-                'customer_email' => $customer->email,
-            ];
-
-            //Twilio Notification
-            if (isset($setting['twilio_customer_notification']) && $setting['twilio_customer_notification'] == 1) {
-                Utility::send_twilio_msg($request->contact, 'new_customer', $customerNotificationArr);
-            }
-
-
-            return redirect()->route('customer.index')->with('success', __('Customer successfully created.'));
-        } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
         }
-    }
-****/
+    
     public function store(Request $request)
     {
 
@@ -183,7 +184,7 @@ class CustomerController extends Controller
                     'remark' => 'required',
                 ],
             ];
-            
+
             $validator = \Validator::make($request->all(), $rules);
 
             if ($validator->fails()) {
@@ -264,7 +265,84 @@ class CustomerController extends Controller
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
+****/
 
+
+    public function store(Request $request)
+    {
+        $config = ConfigSettings::first();
+
+        if (\Auth::user()->type === 'accountant' || \Auth::user()->type === 'company') {
+            $rules = [
+                'customerTin' => 'required|between:9,15',
+                'customerName' => 'required',
+                'address' => 'required',
+                'telNo' => 'required',
+                'email' => [
+                    'required',
+                    Rule::unique('customers')->where(function ($query) {
+                        return $query->where('created_by', \Auth::user()->id);
+                    }),
+                ],
+                'faxNo' => 'required',
+                'remark' => 'required',
+            ];
+
+            $validator = \Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return redirect()->route('customer.index')->with('error', $validator->errors()->first());
+            }
+
+            $requestData = [
+                'customerNo' => $request->customerNo,
+                'customerTin' => $request->customerTin,
+                'customerName' => $request->customerName,
+                'address' => $request->address,
+                'telNo' => $request->telNo,
+                'email' => $request->email,
+                'faxNo' => $request->faxNo,
+                'isUsed' => true,
+                'remark' => $request->remark,
+            ];
+
+            try {
+                $response = Http::withOptions(['verify' => false])
+                    ->withHeaders([
+                        'accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                        'key' => $config->api_key,
+                    ])
+                    ->post($config->api_url . 'AddCustomer', $requestData);
+
+                \Log::info('API Request Data: ' . json_encode($requestData));
+                \Log::info('API Response: ' . $response->body());
+
+                if ($response->successful()) {
+                    // Save customer to local database
+                    $customer = new Customer();
+                    $customer->customer_id = $this->customerNumber();
+                    $customer->fill($request->all());
+                    $customer->created_by = \Auth::user()->creatorId();
+                    $customer->lang = config('app.locale', 'en');
+                    $customer->save();
+
+                    CustomField::saveData($customer, $request->customField);
+
+                    return redirect()->route('customer.index')->with('success', __('Customer successfully created.'));
+                } else {
+
+                    return redirect()->route('customer.index')->with('error', __('Error occured when Creating Customer Check your  Input Data'));
+                    
+                }
+            } catch (\Exception $e) {
+                \Log::error('API Request Exception: ' . $e->getMessage());
+                return redirect()->back()->with('error', __('Failed to create customer due to an error.'));
+            }
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
 
     public function show($ids)
     {
@@ -282,7 +360,7 @@ class CustomerController extends Controller
 
     public function edit($id)
     {
-        if(
+        if (
             \Auth::user()->type == 'accountant'
             || \Auth::user()->type == 'company'
         ) {
@@ -301,10 +379,10 @@ class CustomerController extends Controller
     public function update(Request $request, Customer $customer)
     {
 
-        if(
+        if (
             \Auth::user()->type == 'accountant'
             || \Auth::user()->type == 'company'
-        ){
+        ) {
 
             $rules = [
                 'name' => 'required',
@@ -351,7 +429,7 @@ class CustomerController extends Controller
 
     public function destroy(Customer $customer)
     {
-        if(
+        if (
             \Auth::user()->type == 'accountant'
             || \Auth::user()->type == 'company'
         ) {
@@ -389,7 +467,7 @@ class CustomerController extends Controller
     public function payment(Request $request)
     {
 
-        if(\Auth::user()->type == 'customer') {
+        if (\Auth::user()->type == 'customer') {
             $category = [
                 'Invoice' => 'Invoice',
                 'Deposit' => 'Deposit',
@@ -415,7 +493,7 @@ class CustomerController extends Controller
 
     public function transaction(Request $request)
     {
-        if(
+        if (
             \Auth::user()->type == 'customer'
         ) {
             $category = [
@@ -579,96 +657,96 @@ class CustomerController extends Controller
     public function import(Request $request)
     {
 
-        if(
+        if (
             \Auth::user()->type == 'accountant'
             || \Auth::user()->type == 'company'
         ) {
 
-        $rules = [
-            'file' => 'required|mimes:csv,txt',
-        ];
+            $rules = [
+                'file' => 'required|mimes:csv,txt',
+            ];
 
-        $validator = \Validator::make($request->all(), $rules);
+            $validator = \Validator::make($request->all(), $rules);
 
-        if ($validator->fails()) {
-            $messages = $validator->getMessageBag();
+            if ($validator->fails()) {
+                $messages = $validator->getMessageBag();
 
-            return redirect()->back()->with('error', $messages->first());
-        }
+                return redirect()->back()->with('error', $messages->first());
+            }
 
-        $customers = (new CustomerImport())->toArray(request()->file('file'))[0];
+            $customers = (new CustomerImport())->toArray(request()->file('file'))[0];
 
-        $totalCustomer = count($customers) - 1;
-        $errorArray = [];
-        for ($i = 1; $i <= count($customers) - 1; $i++) {
-            $customer = $customers[$i];
+            $totalCustomer = count($customers) - 1;
+            $errorArray = [];
+            for ($i = 1; $i <= count($customers) - 1; $i++) {
+                $customer = $customers[$i];
 
-            $customerByEmail = Customer::where('email', $customer[2])->first();
-            if (!empty($customerByEmail)) {
-                $customerData = $customerByEmail;
+                $customerByEmail = Customer::where('email', $customer[2])->first();
+                if (!empty($customerByEmail)) {
+                    $customerData = $customerByEmail;
+                } else {
+                    $customerData = new Customer();
+                    $customerData->customer_id = $this->customerNumber();
+                }
+
+                $customerData->customer_id = $customer[0];
+                $customerData->customerNo = $customer[2];
+                $customerData->customertin = $customer[3];
+                $customerData->name = $customer[4];
+                $customerData->email = $customer[5];
+                $customerData->address = $customer[6];
+                $customerData->tax_number = $customer[7];
+                $customerData->contact = $customer[8];
+                $customerData->faxno = $customer[9];
+                $customerData->isUsed = $customer[10];
+                $customerData->remark = $customer[11];
+                $customerData->avatar = $customer[12];
+                $customerData->created_by = \Auth::user()->creatorId();
+                $customerData->is_active = $customer[13];
+                $customerData->billing_name = $customer[14];
+                $customerData->billing_country = $customer[15];
+                $customerData->billing_state = $customer[16];
+                $customerData->billing_city = $customer[17];
+                $customerData->billing_phone = $customer[18];
+                $customerData->billing_zip = $customer[19];
+                $customerData->billing_address = $customer[20];
+
+                $customerData->shipping_name = $customer[21];
+                $customerData->shipping_country = $customer[22];
+                $customerData->shipping_state = $customer[23];
+                $customerData->shipping_city = $customer[24];
+                $customerData->shipping_phone = $customer[25];
+                $customerData->shipping_zip = $customer[26];
+                $customerData->shipping_address = $customer[27];
+                $customerData->lang = $customer[28];
+                $customerData->balance = [29];
+
+                if (empty($customerData)) {
+                    $errorArray[] = $customerData;
+                } else {
+                    $customerData->save();
+                }
+            }
+
+            $errorRecord = [];
+            if (empty($errorArray)) {
+                $data['status'] = 'success';
+                $data['msg'] = __('Record successfully imported');
             } else {
-                $customerData = new Customer();
-                $customerData->customer_id = $this->customerNumber();
+                $data['status'] = 'error';
+                $data['msg'] = count($errorArray) . ' ' . __('Record imported fail out of' . ' ' . $totalCustomer . ' ' . 'record');
+
+
+                foreach ($errorArray as $errorData) {
+
+                    $errorRecord[] = implode(',', $errorData);
+
+                }
+
+                \Session::put('errorArray', $errorRecord);
             }
 
-            $customerData->customer_id = $customer[0];
-            $customerData->customerNo = $customer[2];
-            $customerData->customertin = $customer[3];
-            $customerData->name = $customer[4];
-            $customerData->email = $customer[5];
-            $customerData->address = $customer[6];
-            $customerData->tax_number = $customer[7];
-            $customerData->contact = $customer[8];
-            $customerData->faxno = $customer[9];
-            $customerData->isUsed = $customer[10];
-            $customerData->remark = $customer[11];
-            $customerData->avatar = $customer[12];
-            $customerData->created_by = \Auth::user()->creatorId();
-             $customerData->is_active = $customer[13];
-            $customerData->billing_name = $customer[14];
-            $customerData->billing_country = $customer[15];
-            $customerData->billing_state = $customer[16];
-            $customerData->billing_city = $customer[17];
-            $customerData->billing_phone = $customer[18];
-            $customerData->billing_zip = $customer[19];
-            $customerData->billing_address = $customer[20];
-            
-            $customerData->shipping_name = $customer[21];
-            $customerData->shipping_country = $customer[22];
-            $customerData->shipping_state = $customer[23];
-            $customerData->shipping_city = $customer[24];
-            $customerData->shipping_phone = $customer[25];
-            $customerData->shipping_zip = $customer[26];
-            $customerData->shipping_address = $customer[27];
-            $customerData->lang = $customer[28];
-            $customerData->balance = [29];
-
-            if (empty($customerData)) {
-                $errorArray[] = $customerData;
-            } else {
-                $customerData->save();
-            }
-        }
-
-        $errorRecord = [];
-        if (empty($errorArray)) {
-            $data['status'] = 'success';
-            $data['msg'] = __('Record successfully imported');
-        } else {
-            $data['status'] = 'error';
-            $data['msg'] = count($errorArray) . ' ' . __('Record imported fail out of' . ' ' . $totalCustomer . ' ' . 'record');
-
-
-            foreach ($errorArray as $errorData) {
-
-                $errorRecord[] = implode(',', $errorData);
-
-            }
-
-            \Session::put('errorArray', $errorRecord);
-        }
-
-        return redirect()->back()->with($data['status'], $data['msg']);
+            return redirect()->back()->with($data['status'], $data['msg']);
 
             // return $customers;
         } else {
@@ -678,7 +756,7 @@ class CustomerController extends Controller
 
     public function searchCustomers(Request $request)
     {
-        if(
+        if (
             \Auth::user()->type == 'accountant'
             || \Auth::user()->type == 'company'
         ) {
@@ -698,62 +776,63 @@ class CustomerController extends Controller
 
     public function getCustomer($id)
     {
-        if(
+        if (
             \Auth::user()->type == 'accountant'
             || \Auth::user()->type == 'company'
         ) {
-        try {
-            $customerInfo = Customer::where('customer_id', $id)->first();
-            \Log::info('CUSTOMER');
-            \Log::info($customerInfo);
-            return response()->json([
-                'message' => 'success',
-                'data' => $customerInfo
-            ]);
-        } catch (\Exception $e) {
-            \Log::info('Get Item Error');
-            \Log::info($e);
-            return response()->json([
-                'message' => 'error',
-                'error' => $e->getMessage()
-            ]);
-        }
+            try {
+                $customerInfo = Customer::where('customer_id', $id)->first();
+                \Log::info('CUSTOMER');
+                \Log::info($customerInfo);
+                return response()->json([
+                    'message' => 'success',
+                    'data' => $customerInfo
+                ]);
+            } catch (\Exception $e) {
+                \Log::info('Get Item Error');
+                \Log::info($e);
+                return response()->json([
+                    'message' => 'error',
+                    'error' => $e->getMessage()
+                ]);
+            }
 
-         } else {
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
 
     public function getCustomerByName($name)
     {
-        if(
+        if (
             \Auth::user()->type == 'accountant'
             || \Auth::user()->type == 'company'
-        ){
-        try {
-            $customerInfo = Customer::where('name', $name)->first();
-            \Log::info('CUSTOMER');
-            \Log::info($customerInfo);
-            return response()->json([
-                'message' => 'success',
-                'data' => $customerInfo
-            ]);
-        } catch (\Exception $e) {
-            \Log::info('Get Item Error');
-            \Log::info($e);
-            return response()->json([
-                'message' => 'error',
-                'error' => $e->getMessage()
-            ]);
-        }
-       } else {
+        ) {
+            try {
+                $customerInfo = Customer::where('name', $name)->first();
+                \Log::info('CUSTOMER');
+                \Log::info($customerInfo);
+                return response()->json([
+                    'message' => 'success',
+                    'data' => $customerInfo
+                ]);
+            } catch (\Exception $e) {
+                \Log::info('Get Item Error');
+                \Log::info($e);
+                return response()->json([
+                    'message' => 'error',
+                    'error' => $e->getMessage()
+                ]);
+            }
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
 
 
-    public function getCustomerByTin(){
-        if(
+    public function getCustomerByTin()
+    {
+        if (
             \Auth::user()->type == 'accountant'
             || \Auth::user()->type == 'company'
         ) {

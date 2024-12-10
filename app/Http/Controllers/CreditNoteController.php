@@ -2,21 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ConfigSettings;
+use App\Models\Plan;
+use App\Models\User;
 use App\Models\Invoice;
 use App\Models\Utility;
 use App\Models\Customer;
 use App\Models\CreditNote;
+use App\Models\CustomField;
 use Illuminate\Http\Request;
 use App\Models\SalesTypeCode;
+use App\Models\ConfigSettings;
 use App\Models\CreditNoteItem;
 use App\Models\ProductService;
 use App\Models\CreditNoteReason;
 use App\Models\PaymentTypeCodes;
 use App\Models\InvoiceStatusCode;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 
 class CreditNoteController extends Controller
@@ -342,6 +346,49 @@ class CreditNoteController extends Controller
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
+
+    public function show($ids)
+    {
+        if (in_array(Auth::user()->type, ['company', 'accountant', 'customer'])) {
+            try {
+                $id = Crypt::decrypt($ids);
+            } catch (\Throwable $th) {
+                return redirect()->back()->with('error', __('Credit Note Not Found.'));
+            }
+
+            $creditNote = CreditNote::with('customer')->findOrFail($id);
+
+            // Retrieve associated credit note items
+            $creditNoteItems = CreditNoteItem::where('sales_credit_note_id', $creditNote->id)->get();
+
+            if ($creditNote->created_by == Auth::user()->creatorId()) {
+                $creditNoteInvoice = Invoice::where('response_trderInvoiceNo', $creditNote->traderInvoiceNo)->first();
+
+                // $customer = $creditNote->customer;
+                $customer = Customer::find($creditNote->customer);
+
+                \Log::info('Customer Details for this credit note is : ');
+                \Log::info($customer);
+
+                $user = Auth::user();
+
+                // Start for storage limit note
+                $creditNoteUser = User::find($creditNote->created_by);
+                $userPlan = Plan::getPlan($creditNoteUser->plan);
+                // End for storage limit note
+
+                $creditNote->customField = CustomField::getData($creditNote, 'invoice');
+                $customFields = CustomField::where('created_by', Auth::user()->creatorId())->where('module', 'invoice')->get();
+
+                return view('creditNote.view', compact('creditNote', 'customer', 'creditNoteItems', 'customFields', 'user', 'userPlan', 'creditNoteUser', 'creditNoteInvoice'));
+            } else {
+                return redirect()->back()->with('error', __('Permission denied.'));
+            }
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
+
 
 
     public function destroy($invoice_id, $creditNote_id)

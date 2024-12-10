@@ -15,6 +15,7 @@ class BranchUser extends Model
     protected $fillable = [
         'branchUserId',
         'branchUserName',
+        'branch_id',
         "password",
         "address",
         "contactNo",
