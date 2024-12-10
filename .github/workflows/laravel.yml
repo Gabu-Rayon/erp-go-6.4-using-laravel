@@ -49,9 +49,6 @@ jobs:
       - name: Install NPM Dependencies
         run: npm install
 
-      - name: Build Frontend Assets
-        run: npm run build
-
       - name: Sync files
         uses: SamKirkland/FTP-Deploy-action@4.0.0
         with:
