@@ -172,10 +172,6 @@
                                 </div>
                             </div>
                         </div>
-
-
-
-
                     {{--  End for all settings tab --}}
                 </div>
             </div>

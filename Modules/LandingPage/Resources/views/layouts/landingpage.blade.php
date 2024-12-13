@@ -33,7 +33,9 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ env('APP_URL') }}">
     <meta property="og:title" content="{{ $metatitle }}">
+    
     <meta property="og:description" content="{{ $metsdesc }}">
+
     <meta property="og:image" content="{{ $meta_image . $meta_logo }}">
 
     <!-- Twitter -->
@@ -47,28 +49,30 @@
     <link rel="icon" href="{{ $sup_logo . '/' . $adminSettings['company_favicon'] }}" type="image/x-icon" />
 
     <!-- font css -->
-    <link rel="stylesheet" href=" {{ Module::asset('LandingPage:Resources/assets/fonts/tabler-icons.min.css') }}" />
-    <link rel="stylesheet" href=" {{ Module::asset('LandingPage:Resources/assets/fonts/feather.css') }}" />
-    <link rel="stylesheet" href="  {{ Module::asset('LandingPage:Resources/assets/fonts/fontawesome.css') }}" />
-    <link rel="stylesheet" href="{{ Module::asset('LandingPage:Resources/assets/fonts/material.css') }}" />
+    <link rel="stylesheet" href="../../../Resources/assets/fonts/tabler-icons.min.css" />
+
+    <link rel="stylesheet" href="../../../Resources/assets/fonts/feather.css" />
+
+    <link rel="stylesheet" href="../../../Resources/assets/fonts/fontawesome.css" />
+
+    <link rel="stylesheet" href="../../../Resources/assets/fonts/material.css" />
 
 
     <!-- vendor css -->
     @if ($SITE_RTL == 'on')
-        <link rel="stylesheet" href="{{ asset('assets/css/style-rtl.css') }}">
+        <link rel="stylesheet" href="../../../Resources/assets/css/style-rtl.css">
     @endif
 
     @if ($setting['cust_darklayout'] == 'on')
-        <link rel="stylesheet" href="{{ asset('assets/css/style-dark.css') }}">
+        <link rel="stylesheet" href="../../../Resources/assets/css/style-dark.css">
     @else
-        <link rel="stylesheet" href="{{ Module::asset('LandingPage:Resources/assets/css/style.css') }}"
+        <link rel="stylesheet" href="../../../Resources/assets/css/style.css"
             id="main-style-link">
     @endif
 
-    <link rel="stylesheet" href=" {{ Module::asset('LandingPage:Resources/assets/css/customizer.css') }}" />
-    <link rel="stylesheet" href=" {{ Module::asset('LandingPage:Resources/assets/css/landing-page.css') }}" />
-    <link rel="stylesheet" href=" {{ Module::asset('LandingPage:Resources/assets/css/custom.css') }}" />
-
+    <link rel="stylesheet" href="../../../Resources/assets/css/customizer.css" />
+    <link rel="stylesheet" href="../../../Resources/assets/css/landing-page.css" />
+    <link rel="stylesheet" href="../../../Resources/assets/css/custom.css" />
 
 </head>
 
@@ -89,13 +93,20 @@
     @if ($settings['menubar_status'] == 'on')
         <div class="container">
             <nav class="navbar navbar-expand-md  default top-nav-collapse">
+
                 <div class="header-left">
+
                     <a class="navbar-brand bg-transparent" href="#">
+
                         <img src="{{ $logo . '/' . $settings['site_logo'] }}" alt="logo" class="landing_logo">
+
                     </a>
+
                 </div>
+
                 <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
                     <ul class="navbar-nav">
+
                         <li class="nav-item">
                             <a class="nav-link active" href="#home">{{ $settings['home_title'] }}</a>
                         </li>
@@ -125,7 +136,6 @@
                                 @endif
                             @endforeach
                         @endif
-
                     </ul>
                     <button class="navbar-toggler bg-primary" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false"
@@ -158,7 +168,9 @@
 
 </header>
 <!-- [ Header ] End -->
+
 <!-- [ Banner ] start -->
+
 @if ($settings['home_status'] == 'on')
     <section class="main-banner bg-primary" id="home">
         <div class="container-offset">
@@ -171,6 +183,7 @@
                         {{ $settings['home_heading'] }}
                     </h1>
                     <h6 class="mb-0">{{ $settings['home_description'] }}</h6>
+
                     <div class="d-flex gap-3 mt-4 banner-btn">
                         @if ($settings['home_live_demo_link'])
                             <a href="{{ $settings['home_live_demo_link'] }}" class="btn btn-outline-dark">
@@ -184,7 +197,9 @@
                                     class="ms-2"></i></a>
                         @endif
                     </div>
+
                 </div>
+
                 <div class="col-xxl-8 col-md-6">
                     <div class="dash-preview">
                         <img class="img-fluid preview-img" src="{{ $logo . '/' . $settings['home_banner'] }}"
@@ -233,24 +248,27 @@
                 </div>
             </div> --}}
 
-            <div class="container">
-                <div class="row g-0 gy-2 mt-4 align-items-center">
-                    <div class="col-xxl-3">
-                        <p class="mb-0">{{ __('Trusted by') }} <b class="fw-bold">{{ $settings['home_trusted_by'] }}</b></p>
-                    </div>
-                    <div class="col-xxl-9">
-                        <div class="row gy-3 row-cols-9">
-                            @foreach (explode(',', $settings['home_logo']) as $k => $home_logo )
 
+        <div class="container">
+            <div class="row g-0 gy-2 mt-4 align-items-center">
+                <div class="col-xxl-3">
+                    <p class="mb-0">{{ __('Trusted by') }} <b
+                            class="fw-bold">{{ $settings['home_trusted_by'] }}</b></p>
+                </div>
+                <div class="col-xxl-9">
+
+                    <div class="row gy-3 row-cols-9">
+                        @foreach (explode(',', $settings['home_logo']) as $k => $home_logo)
                             <div class="col-auto">
-                                <img src="{{ $logo.'/'. $home_logo }}" alt="" class="landing_logo"
-                                style="width: 130px;">
+                                <img src="{{ $logo . '/' . $home_logo }}" alt="" class="landing_logo"
+                                    style="width: 130px;">
                             </div>
-                            @endforeach
-                        </div>
+                        @endforeach
                     </div>
+
                 </div>
             </div>
+        </div>
 
     </section>
 @endif
@@ -701,9 +719,6 @@
                             @endforeach
                         @endif
 
-
-
-
                     </div>
                 </div>
                 <div class="col-12">
@@ -785,9 +800,9 @@
 <!-- Required Js -->
 
 
-<script src="{{ Module::asset('LandingPage:Resources/assets/js/plugins/popper.min.js') }}"></script>
-<script src="{{ Module::asset('LandingPage:Resources/assets/js/plugins/bootstrap.min.js') }}"></script>
-<script src="{{ Module::asset('LandingPage:Resources/assets/js/plugins/feather.min.js') }}"></script>
+<script src="{{ asset('Resources/assets/js/plugins/popper.min.js') }}"></script>
+<script src="{{ asset('Resources/assets/js/plugins/bootstrap.min.js') }}"></script>
+<script src="{{ asset('Resources/assets/js/plugins/feather.min.js') }}"></script>
 
 <script>
     // Start [ Menu hide/show on scroll ]

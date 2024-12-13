@@ -47,28 +47,30 @@
     <link rel="icon" href="<?php echo e($sup_logo . '/' . $adminSettings['company_favicon']); ?>" type="image/x-icon" />
 
     <!-- font css -->
-    <link rel="stylesheet" href=" <?php echo e(Module::asset('LandingPage:Resources/assets/fonts/tabler-icons.min.css')); ?>" />
-    <link rel="stylesheet" href=" <?php echo e(Module::asset('LandingPage:Resources/assets/fonts/feather.css')); ?>" />
-    <link rel="stylesheet" href="  <?php echo e(Module::asset('LandingPage:Resources/assets/fonts/fontawesome.css')); ?>" />
-    <link rel="stylesheet" href="<?php echo e(Module::asset('LandingPage:Resources/assets/fonts/material.css')); ?>" />
+    <link rel="stylesheet" href="../../../Resources/assets/fonts/tabler-icons.min.css" />
+
+    <link rel="stylesheet" href="../../../Resources/assets/fonts/feather.css" />
+
+    <link rel="stylesheet" href="../../../Resources/assets/fonts/fontawesome.css" />
+
+    <link rel="stylesheet" href="../../../Resources/assets/fonts/material.css" />
 
 
     <!-- vendor css -->
     <?php if($SITE_RTL == 'on'): ?>
-        <link rel="stylesheet" href="<?php echo e(asset('assets/css/style-rtl.css')); ?>">
+        <link rel="stylesheet" href="../../../Resources/assets/css/style-rtl.css">
     <?php endif; ?>
 
     <?php if($setting['cust_darklayout'] == 'on'): ?>
-        <link rel="stylesheet" href="<?php echo e(asset('assets/css/style-dark.css')); ?>">
+        <link rel="stylesheet" href="../../../Resources/assets/css/style-dark.css">
     <?php else: ?>
-        <link rel="stylesheet" href="<?php echo e(Module::asset('LandingPage:Resources/assets/css/style.css')); ?>"
+        <link rel="stylesheet" href="../../../Resources/assets/css/style.css"
             id="main-style-link">
     <?php endif; ?>
 
-    <link rel="stylesheet" href=" <?php echo e(Module::asset('LandingPage:Resources/assets/css/customizer.css')); ?>" />
-    <link rel="stylesheet" href=" <?php echo e(Module::asset('LandingPage:Resources/assets/css/landing-page.css')); ?>" />
-    <link rel="stylesheet" href=" <?php echo e(Module::asset('LandingPage:Resources/assets/css/custom.css')); ?>" />
-
+    <link rel="stylesheet" href="../../../Resources/assets/css/customizer.css" />
+    <link rel="stylesheet" href="../../../Resources/assets/css/landing-page.css" />
+    <link rel="stylesheet" href="../../../Resources/assets/css/custom.css" />
 
 </head>
 
@@ -175,6 +177,7 @@
 
                     </h1>
                     <h6 class="mb-0"><?php echo e($settings['home_description']); ?></h6>
+
                     <div class="d-flex gap-3 mt-4 banner-btn">
                         <?php if($settings['home_live_demo_link']): ?>
                             <a href="<?php echo e($settings['home_live_demo_link']); ?>" class="btn btn-outline-dark">
@@ -189,7 +192,9 @@
                                     class="ms-2"></i></a>
                         <?php endif; ?>
                     </div>
+
                 </div>
+
                 <div class="col-xxl-8 col-md-6">
                     <div class="dash-preview">
                         <img class="img-fluid preview-img" src="<?php echo e($logo . '/' . $settings['home_banner']); ?>"
@@ -200,24 +205,27 @@
         </div>
         
 
-            <div class="container">
-                <div class="row g-0 gy-2 mt-4 align-items-center">
-                    <div class="col-xxl-3">
-                        <p class="mb-0"><?php echo e(__('Trusted by')); ?> <b class="fw-bold"><?php echo e($settings['home_trusted_by']); ?></b></p>
-                    </div>
-                    <div class="col-xxl-9">
-                        <div class="row gy-3 row-cols-9">
-                            <?php $__currentLoopData = explode(',', $settings['home_logo']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $k => $home_logo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 
+        <div class="container">
+            <div class="row g-0 gy-2 mt-4 align-items-center">
+                <div class="col-xxl-3">
+                    <p class="mb-0"><?php echo e(__('Trusted by')); ?> <b
+                            class="fw-bold"><?php echo e($settings['home_trusted_by']); ?></b></p>
+                </div>
+                <div class="col-xxl-9">
+
+                    <div class="row gy-3 row-cols-9">
+                        <?php $__currentLoopData = explode(',', $settings['home_logo']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $k => $home_logo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="col-auto">
-                                <img src="<?php echo e($logo.'/'. $home_logo); ?>" alt="" class="landing_logo"
-                                style="width: 130px;">
+                                <img src="<?php echo e($logo . '/' . $home_logo); ?>" alt="" class="landing_logo"
+                                    style="width: 130px;">
                             </div>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
+
                 </div>
             </div>
+        </div>
 
     </section>
 <?php endif; ?>
@@ -781,9 +789,9 @@
 <!-- Required Js -->
 
 
-<script src="<?php echo e(Module::asset('LandingPage:Resources/assets/js/plugins/popper.min.js')); ?>"></script>
-<script src="<?php echo e(Module::asset('LandingPage:Resources/assets/js/plugins/bootstrap.min.js')); ?>"></script>
-<script src="<?php echo e(Module::asset('LandingPage:Resources/assets/js/plugins/feather.min.js')); ?>"></script>
+<script src="<?php echo e(asset('Resources/assets/js/plugins/popper.min.js')); ?>"></script>
+<script src="<?php echo e(asset('Resources/assets/js/plugins/bootstrap.min.js')); ?>"></script>
+<script src="<?php echo e(asset('Resources/assets/js/plugins/feather.min.js')); ?>"></script>
 
 <script>
     // Start [ Menu hide/show on scroll ]
